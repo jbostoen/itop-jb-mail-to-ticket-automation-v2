@@ -1,6 +1,9 @@
 # Warning
-Currently working on version 2.
-Work in progress; for now: use version 1 which is included in the ZIP file.
+Copyright (C) 2019-2020 Jeffrey Bostoen
+
+[![License](https://img.shields.io/github/license/jbostoen/iTop-custom-extensions)](https://github.com/jbostoen/iTop-custom-extensions/blob/master/license.md)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/jbostoen)
+🍻 ☕
 
 
 ## Special note
@@ -11,7 +14,7 @@ If you want to use this extension and get support or custom development, get in 
 # What?
 
 This **Mail to Ticket automation** is a **fork** from Combodo's Mail to Ticket Automation. 
-It was originally based on their version 3.0.7 (28th of August 2017), but also includes the changes up to 3.1.0 so far.
+It was originally based on their version 3.0.7 (28th of August 2017), but also includes the changes up to 3.1.2 so far.
 Some fixes in this version were accepted by Combodo back in August 2018 and are now part of the official version.
 
 What is different? In a few cases, Combodo's implementation of Mail to Ticket Automation was not sufficient enough. 

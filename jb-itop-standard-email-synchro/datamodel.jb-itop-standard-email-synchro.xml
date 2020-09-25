@@ -593,21 +593,20 @@ EOF
 			// No associated ticket found by parsing the headers, check if the subject matches a specific pattern
 			$sPattern = $this->FixPattern($this->Get('title_pattern'));
 			
-			if(($sPattern != '') && (preg_match($sPattern, $sSubject, $aMatches)))
-			{
-				$iTicketId = 0;
+			if(($sPattern != '') && (preg_match($sPattern, $sSubject, $aMatches))) {
+			
+				$oFilter = DBSearch::FromOQL('SELECT Ticket WHERE ref = :ref');
 				foreach($aMatches as $sMatch) {
-					$sMatch = preg_replace('/[^\d]/', '', $sMatch);
-					sscanf($sMatch, '%d', $iTicketId);
-					if ($iTicketId != 0)
-					{
-						break;
-					}
+					if(!empty($sMatch)) {
+						$this->Trace("iTop Simple Email Synchro: Retrieving ticket $sMatch (match by subject pattern)...");
+						$oSet = new DBObjectSet($oFilter, [], ['ref' => $sMatch]);
+						$oTicket = $oSet->Fetch();
+						if($oTicket) {
+							break;
+						}
+				    }
                 }
 				
-				// @todo Might need to be revised if there's a per-class counter (commits 2.7.0)
-				$this->Trace("iTop Simple Email Synchro: Retrieving ticket {$iTicketId} (match by subject pattern)...");
-				$oTicket = MetaModel::GetObject('Ticket', $iTicketId, false);
 			}
 		}		
 		
