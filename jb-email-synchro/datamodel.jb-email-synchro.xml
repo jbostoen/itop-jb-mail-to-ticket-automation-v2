@@ -487,29 +487,21 @@ EOF
           <static>false</static>
           <access>protected</access>
           <type>Overload-DBObject</type>
-          <code><![CDATA[	
-		  
-				protected function GetRelatedTicket(EmailMessage $oEmail) {
-					  
-					$oTicket = $oEmail->oRelatedObject;
-						
-					// There is a related object, but it's not a ticket.
-					if(($oTicket != null) && !($oTicket instanceof Ticket)) {
-					
-						// The object referenced by the email is not a ticket !!
-						// => Forward the message and delete the ticket ??
-						
-						$sObjClass = get_class($oTicket);
-						$sObjId = $oTicket->GetKey();
-						
-						$this->Trace("iTop Simple Email Synchro: WARNING the message $index ({$oEmail->sUIDL}) contains a reference to a valid iTop object that is NOT a ticket!  ({$sObjClass}::{$sObjId})");
-						$oTicket = null;
-					}
-
-				return $oTicket;
-				}
+          <code><![CDATA[	protected function GetRelatedTicket(EmailMessage $oEmail)
+	{
+		$oTicket = $oEmail->oRelatedObject;
 			
-			]]></code>
+		// There is a related object, but it's not a ticket.
+		if (($oTicket != null) && !($oTicket instanceof Ticket))
+		{
+			// The object referenced by the email is not a ticket !!
+			// => Forward the message and delete the ticket ??
+			$this->Trace("iTop Simple Email Synchro: WARNING the message $index ({$oEmail->sUIDL}) contains a reference to a valid iTop object that is NOT a ticket !");
+			$oTicket = null;
+		}
+		
+		return $oTicket;
+	}]]></code>
         </method>
         <method id="CreateTicketFromEmail">
           <comment><![CDATA[/**
