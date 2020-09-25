@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'jb-itop-standard-email-synchro/2.6.200805',
+	'jb-itop-standard-email-synchro/2.6.200129',
 	array(
 		// Identification
 		//
@@ -28,7 +28,6 @@ SetupWebPage::AddModule(
 		'datamodel' => array(
 			'model.jb-itop-standard-email-synchro.php',
 			'core/policy.class.inc.php',
-			// 'core/policy.contactmethod.class.inc.php',
 		),
 		'webservice' => array(
 			
