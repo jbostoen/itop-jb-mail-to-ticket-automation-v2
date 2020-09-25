@@ -15,6 +15,40 @@
 
 namespace jb_itop_extensions\mail_to_ticket;
 
+use \Exception;
+use \ReflectionClass;
+
+// jb-framework
+use \jb_itop_extensions\components\ormCustomCaseLog;
+
+// iTop internals
+use \Attachment;
+use \AttributeHTML;
+use \AttributeText;
+use \CMDBChangeOpPlugin;
+use \CMDBObject;
+use \CMDBSource;
+use \DBObjectSearch;
+use \DBObjectSet;
+use \Dict;
+use \InlineImage;
+use \MetaModel;
+use \ormDocument;
+use \SetupUtils;
+use \utils;
+
+// iTop email processing
+use \EmailMessage;
+use \EmailProcessor;
+use \MailInboxBase;
+use \MailInboxStandard;
+
+
+// iTop classes
+use \lnkContactToTicket;
+use \Person;
+use \Ticket;
+
 const NEWLINE_REGEX = '/\r\n|\r|\n/';
 
 /**
@@ -96,7 +130,7 @@ abstract class Policy implements iPolicy {
 	 *
 	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
 	 */
-	public static function Init(\MailInboxStandard $oMailBox, \EmailMessage $oEmail, ?\Ticket $oTicket, $aPreviouslyExecutedPolicies) {
+	public static function Init(MailInboxStandard $oMailBox, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedPolicies) {
 		
 		self::$oMailBox = $oMailBox;
 		self::$oEmail = $oEmail;
@@ -125,14 +159,14 @@ abstract class Policy implements iPolicy {
 	public static function BeforeComplianceCheck() {
 	
 		$sCalledClass = get_called_class();
-		$sUnqualifiedName = (new \ReflectionClass($sCalledClass))->getShortName();
+		$sUnqualifiedName = (new ReflectionClass($sCalledClass))->getShortName();
 		if($sUnqualifiedName != 'Policy') {
 			
 			$sLog = '. Check #'.(count(self::$aPreviouslyExecutedPolicies)+1).' (precedence: '.$sCalledClass::$iPrecedence.'): '.$sUnqualifiedName;
 			
 			// Some classes fake their $sPolicyId to recycle settings
 			$sAttCode = $sCalledClass::$sPolicyId.'_behavior';
-			if(\MetaModel::IsValidAttCode(get_class($sCalledClass::$oMailBox), $sAttCode) == true) {
+			if(MetaModel::IsValidAttCode(get_class($sCalledClass::$oMailBox), $sAttCode) == true) {
 				$sLog .= ' - Behavior: '.$sCalledClass::$oMailBox->Get($sAttCode);
 			}
 			
@@ -149,7 +183,7 @@ abstract class Policy implements iPolicy {
 	 */
 	public static function AfterPassedComplianceCheck() {
 	
-		$sUnqualifiedName = (new \ReflectionClass(get_called_class()))->getShortName();
+		$sUnqualifiedName = (new ReflectionClass(get_called_class()))->getShortName();
 		if($sUnqualifiedName  != 'Policy') {
 			self::Trace('.. Complete: '.$sUnqualifiedName);
 		}
@@ -227,26 +261,26 @@ abstract class Policy implements iPolicy {
 			case 'bounce_delete':
 			case 'delete': 
 				self::Trace('Set next action for EmailProcessor to DELETE_MESSAGE');
-				self::$oMailBox->SetNextAction(\EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
+				self::$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
 				break;
 				
 			// Mark as error should be irrelevant now. Keeping it just in case.
 			case 'mark_as_error': 
 				self::Trace('Set next action for EmailProcessor to MARK_MESSAGE_AS_ERROR');
-				self::$oMailBox->SetNextAction(\EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
+				self::$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 				break;
 				 
 			case 'bounce_mark_as_undesired':
 			case 'mark_as_undesired':
 				self::Trace('Set next action for EmailProcessor to MARK_MESSAGE_AS_UNDESIRED');
-				self::$oMailBox->SetNextAction(\EmailProcessor::MARK_MESSAGE_AS_UNDESIRED); // Keep the message temporarily in the mailbox, but marked as undesired
+				self::$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_UNDESIRED); // Keep the message temporarily in the mailbox, but marked as undesired
 				break;
 				
 			// Any other action
 			case 'do_nothing':
 			default:
 				self::Trace('Set next action for EmailProcessor to NO_ACTION');
-				self::$oMailBox->SetNextAction(\EmailProcessor::NO_ACTION);
+				self::$oMailBox->SetNextAction(EmailProcessor::NO_ACTION);
 				
 		}
 		
@@ -283,7 +317,7 @@ abstract class Policy implements iPolicy {
 			$aParamsExtended[htmlentities($sParam)] = $sValue;
 		}
 		
-		return \MetaModel::ApplyParams($sString, $aParamsExtended);
+		return MetaModel::ApplyParams($sString, $aParamsExtended);
 		
 	}
 	
@@ -338,7 +372,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	 *
 	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
 	 */
-	public static function Init(\MailInboxStandard $oMailBox, \EmailMessage $oEmail, ?\Ticket $oTicket, $aPreviouslyExecutedPolicies) {
+	public static function Init(MailInboxStandard $oMailBox, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedPolicies) {
 	
 		parent::Init($oMailBox, $oEmail, $oTicket, $aPreviouslyExecutedPolicies);
 	
@@ -413,41 +447,41 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// In case of error (exception...) set the behavior
 		if ($oMailBox->Get('error_behavior') == 'delete') {
 			 // Remove the message from the mailbox
-			$oMailBox->SetNextAction(\EmailProcessor::DELETE_MESSAGE);
+			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);
 		}
 		else {
 			 // Keep the message in the mailbox, but marked as error
-			$oMailBox->SetNextAction(\EmailProcessor::MARK_MESSAGE_AS_ERROR);
+			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR);
 		}
 		
 		self::Trace(".. Creating a new Ticket from email '{$oEmail->sSubject}'");
 		$sTargetClass = $oMailBox->Get('target_class');
 			
-		if(\MetaModel::IsValidClass($sTargetClass) == false) {
+		if(MetaModel::IsValidClass($sTargetClass) == false) {
 			$sErrorMessage = "... Invalid 'ticket_class' configured: {$sTargetClass} is not a valid class. Cannot create such an object.";
 			self::Trace($sErrorMessage);
-			throw new \Exception($sErrorMessage);
+			throw new Exception($sErrorMessage);
 		}
 		
 		if($oEmail->oInternal_Contact === null || get_class($oEmail->oInternal_Contact) != 'Person') {
 			$sErrorMessage = "... Invalid caller specified: Cannot create Ticket without valid Person.";
 			self::Trace($sErrorMessage);
-			throw new \Exception($sErrorMessage);			
+			throw new Exception($sErrorMessage);			
 		}
 		
-		self::$oTicket = \MetaModel::NewObject($sTargetClass);
+		self::$oTicket = MetaModel::NewObject($sTargetClass);
 		$oTicket = self::$oTicket;
 		
 		$oTicket->Set('org_id', $oEmail->oInternal_Contact->Get('org_id'));
-		if(\MetaModel::IsValidAttCode($sTargetClass, 'caller_id')) {
+		if(MetaModel::IsValidAttCode($sTargetClass, 'caller_id')) {
 			$oTicket->Set('caller_id', $oEmail->oInternal_Contact->GetKey());
 		}
-		if(\MetaModel::IsValidAttCode($sTargetClass, 'origin')) {
+		if(MetaModel::IsValidAttCode($sTargetClass, 'origin')) {
 			$oTicket->Set('origin', 'mail');
 		}
 		
 		// Max length for title
-		$oTicketTitleAttDef = \MetaModel::GetAttributeDef($sTargetClass, 'title');
+		$oTicketTitleAttDef = MetaModel::GetAttributeDef($sTargetClass, 'title');
 		$iTitleMaxSize = $oTicketTitleAttDef->GetMaxSize();
 		$sSubject = $oEmail->sSubject;
 		$oTicket->Set('title', substr($sSubject, 0, $iTitleMaxSize));
@@ -458,13 +492,13 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		self::AddAttachments(true);
 		
 		// Seems to be for backward compatibility / plain text.																							
-		$oTicketDescriptionAttDef = \MetaModel::GetAttributeDef($sTargetClass, 'description');
+		$oTicketDescriptionAttDef = MetaModel::GetAttributeDef($sTargetClass, 'description');
 		$bForPlainText = true; // Target format is plain text (by default)
-		if ($oTicketDescriptionAttDef instanceof \AttributeHTML) {
+		if ($oTicketDescriptionAttDef instanceof AttributeHTML) {
 			// Target format is HTML
 			$bForPlainText = false;
 		}
-		elseif($oTicketDescriptionAttDef instanceof \AttributeText) {
+		elseif($oTicketDescriptionAttDef instanceof AttributeText) {
 			$aParams = $oTicketDescriptionAttDef->GetParams();
 			if(array_key_exists('format', $aParams) && ($aParams['format'] == 'html')) {
 				// Target format is HTML
@@ -525,17 +559,17 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		
 		// In case of error (exception...) set the behavior
 		if($oMailBox->Get('error_behavior') == 'delete') {
-			$oMailBox->SetNextAction(\EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
+			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
 		}
 		else {
-			$oMailBox->SetNextAction(\EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
+			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 		}		
 		
 		// Check that the ticket is of the expected class
 		$sTargetClass = $oMailBox->Get('target_class');
 		if(is_a($oTicket, $sTargetClass) == false) {
 			self::Trace("... Error: the incoming email refers to the ticket '{$oTicket->GetName()}' of class '{get_class($oTicket)}', but this mailbox is configured to process only tickets of class '{$sTargetClass}'");
-			$oMailBox->SetNextAction(\EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
+			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 			return;
 		}
 		
@@ -563,7 +597,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 					
 		// Determine which field to update
 		$sAttCode = 'public_log';
-		$aAttCodes = \MetaModel::GetModuleSetting('jb-itop-standard-email-synchro', 'ticket_log', [
+		$aAttCodes = MetaModel::GetModuleSetting('jb-itop-standard-email-synchro', 'ticket_log', [
 			'UserRequest' => 'public_log', 
 			'Incident' => 'public_log'
 		]);
@@ -573,7 +607,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		}
 		
 		$oCaseLog = $oTicket->Get($sAttCode);
-		$oAttributeValue = new \jb_itop_extensions\components\ormCustomCaseLog();
+		$oAttributeValue = new ormCustomCaseLog();
 		$oAttributeValue->AddLogEntriesFromCaseLog($oCaseLog);
 		
 		// New entry from current email
@@ -621,12 +655,12 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		if(self::$oMailBox->Get('email_storage') == 'delete') {
 			// Remove the processed message from the mailbox
 			self::Trace(".. Deleting the source email");
-			self::$oMailBox->SetNextAction(\EmailProcessor::DELETE_MESSAGE);		
+			self::$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);		
 		}
 		else {
 			// Keep the message in the mailbox
 			self::Trace(".. Keeping the source email");
-			self::$oMailBox->SetNextAction(\EmailProcessor::NO_ACTION);		
+			self::$oMailBox->SetNextAction(EmailProcessor::NO_ACTION);		
 		}	
 	
 	}
@@ -647,22 +681,22 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			self::Trace("... Managing inline images...");
 			$sTicketDescription = self::ManageInlineImages(self::$oEmail->sBodyText, $bForPlainText);
 			if($bForPlainText == true) {
-				self::Trace("... Converting HTML to text using \utils::HtmlToText...");
-				$sTicketDescription = \utils::HtmlToText(self::$oEmail->sBodyText);
+				self::Trace("... Converting HTML to text using utils::HtmlToText...");
+				$sTicketDescription = utils::HtmlToText(self::$oEmail->sBodyText);
 			}
 		}
 		else {
 			// Original message is in plain text
-			$sTicketDescription = \utils::TextToHtml(self::$oEmail->sBodyText);
+			$sTicketDescription = utils::TextToHtml(self::$oEmail->sBodyText);
 			if($bForPlainText == false) {
 				self::Trace("... Converting text to HTML using utils::TextToHtml...");
-				$sTicketDescription = \utils::TextToHtml(self::$oEmail->sBodyText);
+				$sTicketDescription = utils::TextToHtml(self::$oEmail->sBodyText);
 			}
 		}
 
 		if(empty($sTicketDescription) == true) {
 			// Will use language of the user under which the cron job is being executed.
-			$sTicketDescription = \Dict::S('MailPolicy:CreateOrUpdateTicket:NoDescriptionProvided');
+			$sTicketDescription = Dict::S('MailPolicy:CreateOrUpdateTicket:NoDescriptionProvided');
 		}
 		
 		return $sTicketDescription;
@@ -715,7 +749,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 						$sBefore = substr($sWholeText, 0, $aInlineImages[$idx]['position']);
 						$sAfter = substr($sWholeText, $aInlineImages[$idx]['position']);
 						$oAttachment = self::$aAddedAttachments[$aInlineImages[$idx]['cid']];
-						$sUrl = \utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey();
+						$sUrl = utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey();
 						$sWholeText = $sBefore.' '.$sUrl.' '. $sAfter;
 					}
 				}
@@ -727,21 +761,21 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 				foreach(self::$aAddedAttachments as $sCID => $oAttachment)
 				{
 					$aSearches[] = 'src="cid:'.$sCID.'"';
-					if(class_exists('InlineImage') == true && $oAttachment instanceof \InlineImage) {
+					if(class_exists('InlineImage') == true && $oAttachment instanceof InlineImage) {
 						// Inline images have a special download URL requiring the 'secret' token
-						$aReplacements[] = 'src="'.\utils::GetAbsoluteUrlAppRoot().INLINEIMAGE_DOWNLOAD_URL.$oAttachment->GetKey().'&s='.$oAttachment->Get('secret').'"';
+						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().INLINEIMAGE_DOWNLOAD_URL.$oAttachment->GetKey().'&s='.$oAttachment->Get('secret').'"';
 					}
 					else {
-						$aReplacements[] = 'src="'.\utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'"';
+						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'"';
 					}
 					
 					$aSearches[] = 'src=cid:'.$sCID; // Same without quotes
 					if (class_exists('InlineImage') == true && ($oAttachment instanceof InlineImage)) {
 						// Inline images have a special download URL requiring the 'secret' token
-						$aReplacements[] = 'src="'.\utils::GetAbsoluteUrlAppRoot().INLINEIMAGE_DOWNLOAD_URL.$oAttachment->GetKey().'&s='.$oAttachment->Get('secret').'" '; // Beware: add a space at the end
+						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().INLINEIMAGE_DOWNLOAD_URL.$oAttachment->GetKey().'&s='.$oAttachment->Get('secret').'" '; // Beware: add a space at the end
 					}
 					else {
-						$aReplacements[] = 'src="'.\utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'" '; // Beware: add a space at the end
+						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'" '; // Beware: add a space at the end
 					}
 				}
 				$sWholeText = str_replace($aSearches, $aReplacements, $sBodyText);
@@ -767,7 +801,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oEmail = self::$oEmail;
 		
 		$sTargetClass = get_class($oTicket);
-		if(\MetaModel::IsValidAttCode($sTargetClass, 'contacts_list') == false) {
+		if(MetaModel::IsValidAttCode($sTargetClass, 'contacts_list') == false) {
 			return;
 		}
 		
@@ -780,8 +814,8 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 
 		foreach($oEmail->aInternal_Additional_Contacts as $oContact) {
 			
-			if(\MetaModel::IsValidAttCode($sTargetClass, 'caller_id') == true && $oContact->GetKey() != $oTicket->Get('caller_id')) {
-				$oLnk = new \lnkContactToTicket();
+			if(MetaModel::IsValidAttCode($sTargetClass, 'caller_id') == true && $oContact->GetKey() != $oTicket->Get('caller_id')) {
+				$oLnk = new lnkContactToTicket();
 				$oLnk->Set('contact_id', $oContact->GetKey());
 				$oContactsSet->AddObject($oLnk);
 			}
@@ -819,9 +853,9 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oTicket = self::$oTicket;
 		
 		// If there are any TriggerOnMailUpdate defined, let's activate them
-		$aClasses = \MetaModel::EnumParentClasses(get_class($oTicket), ENUM_PARENT_CLASSES_ALL);
-		$sClassList = implode(', ', \CMDBSource::Quote($aClasses));
-		$oSet = new \DBObjectSet(\DBObjectSearch::FromOQL("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
+		$aClasses = MetaModel::EnumParentClasses(get_class($oTicket), ENUM_PARENT_CLASSES_ALL);
+		$sClassList = implode(', ', CMDBSource::Quote($aClasses));
+		$oSet = new DBObjectSet(DBObjectSearch::FromOQL("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
 		while($oTrigger = $oSet->Fetch()) {
 			$oTrigger->DoActivate($oTicket->ToArgs('this'));
 		}
@@ -833,12 +867,12 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		if($oMailBox->Get('email_storage') == 'delete') {
 			// Remove the processed message from the mailbox
 			self::Trace(".. Deleting the source email");
-			$oMailBox->SetNextAction(\EmailProcessor::DELETE_MESSAGE);		
+			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);		
 		}
 		else {
 			// Keep the message in the mailbox
 			self::Trace(".. Keeping the source email");
-			$oMailBox->SetNextAction(\EmailProcessor::NO_ACTION);		
+			$oMailBox->SetNextAction(EmailProcessor::NO_ACTION);		
 		}
 		
 	}
@@ -941,7 +975,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 					self::Trace("... Actually applying the stimulus: {$sStimulusCode} for the ticket in state: {$oTicket->GetState()}");
 					$oTicket->ApplyStimulus($sStimulusCode);
 				}
-				catch(\Exception $e) {
+				catch(Exception $e) {
 					self::Trace("... ApplyStimulus failed: {$e->getMessage()}");
 				}
 			}
@@ -980,7 +1014,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		else {
 			self::Trace("... Extracting the new part using GetNewPart()...");
 			$sCaseLogEntry = $oEmail->GetNewPart($oEmail->sBodyText, $oEmail->sBodyFormat); // GetNewPart always returns a plain text version of the message
-			$sCaseLogEntry = \utils::TextToHtml($sCaseLogEntry);
+			$sCaseLogEntry = utils::TextToHtml($sCaseLogEntry);
 		}
 		
 		return $sCaseLogEntry;
@@ -1015,7 +1049,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		if($bNoDuplicates == true) {
 			
 			$sOQL = 'SELECT Attachment WHERE item_class = :class AND item_id = :id';
-			$oAttachments = new \DBObjectSet(\DBObjectSearch::FromOQL($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
+			$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
 			while($oPrevAttachment = $oAttachments->Fetch()) {
 				$oDoc = $oPrevAttachment->Get('contents');
 				$data = $oDoc->GetData();
@@ -1032,7 +1066,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			// same processing for InlineImages
 			if(class_exists('InlineImage') == true) {
 				$sOQL = 'SELECT InlineImage WHERE item_class = :class AND item_id = :id';
-				$oAttachments = new \DBObjectSet(\DBObjectSearch::FromOQL($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
+				$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
 				while($oPrevAttachment = $oAttachments->Fetch()) {
 					$oDoc = $oPrevAttachment->Get('contents');
 					$data = $oDoc->GetData();
@@ -1075,13 +1109,13 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 				if($bIgnoreAttachment == false) {
 					
 					if(self::IsImage($aAttachment['mimeType']) && class_exists('InlineImage') && $aAttachment['inline']) {
-						$oAttachment = new \InlineImage();
+						$oAttachment = new InlineImage();
 						self::Trace("... Attachment {$aAttachment['filename']} will be stored as an InlineImage.");
 						$oAttachment->Set('secret', sprintf ('%06x', mt_rand(0, 0xFFFFFF))); // something not easy to guess
 					}
 					else {
 						self::Trace("... Attachment {$aAttachment['filename']} will be stored as an Attachment.");
-						$oAttachment = new \Attachment();
+						$oAttachment = new Attachment();
 					}
 					if ($oTicket->IsNew()) {
 						$oAttachment->Set('item_class', get_class($oTicket));
@@ -1090,15 +1124,15 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 						$oAttachment->SetItem($oTicket);
 					}
 					
-					$oBlob = new \ormDocument($aAttachment['content'], $aAttachment['mimeType'], $aAttachment['filename']);
+					$oBlob = new ormDocument($aAttachment['content'], $aAttachment['mimeType'], $aAttachment['filename']);
 					$oAttachment->Set('contents', $oBlob);
 					$oAttachment->DBInsert();
-					$oMyChangeOp = \MetaModel::NewObject('CMDBChangeOpPlugin');
-					$oMyChange = \CMDBObject::GetCurrentChange();
+					$oMyChangeOp = MetaModel::NewObject('CMDBChangeOpPlugin');
+					$oMyChange = CMDBObject::GetCurrentChange();
 					$oMyChangeOp->Set('change', $oMyChange->GetKey());
 					$oMyChangeOp->Set('objclass', get_class($oTicket));
 					$oMyChangeOp->Set('objkey', $oTicket->GetKey());
-					$oMyChangeOp->Set('description', \Dict::Format('Attachments:History_File_Added', $aAttachment['filename']));
+					$oMyChangeOp->Set('description', Dict::Format('Attachments:History_File_Added', $aAttachment['filename']));
 					$iId = $oMyChangeOp->DBInsertNoReload();
 					self::Trace("... Attachment {$aAttachment['filename']} added to the ticket.");
 					self::$aAddedAttachments[$aAttachment['content-id']] = $oAttachment;
@@ -1898,7 +1932,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 				$oCaller = null;
 				$sContactQuery = 'SELECT Person WHERE email = :email';
 				$sCallerEmail = $oEmail->sCallerEmail;
-				$oSet = new \DBObjectSet(\DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sCallerEmail]);
+				$oSet = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sCallerEmail]);
 				
 				switch($oSet->Count()) {
 					
@@ -1933,7 +1967,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 							case 'fallback_create_person':
 								
 								self::Trace("... Creating a new Person for the email: {$sCallerEmail}");
-								$oCaller = new \Person();
+								$oCaller = new Person();
 								$oCaller->Set('email', $oEmail->sCallerEmail);
 								$sDefaultValues = $oMailBox->Get(self::$sPolicyId.'_default_values');
 								
@@ -1959,7 +1993,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 										self::Trace("... Create user with default values");
 										$oCaller->DBInsert();					
 									}
-									catch(\Exception $e) {
+									catch(Exception $e) {
 										// This is an actual error.
 										self::Trace("... Failed to create a Person for the email address '{$sCallerEmail}'.");
 										self::Trace($e->getMessage());
@@ -2186,13 +2220,13 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 						// Non-existing contacts must be created.
 						// Actual linking of contacts happens after policies have been processed.
 						$sContactQuery = 'SELECT Person WHERE email = :email';
-						$oSet = new \DBObjectSet(\DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sContactEmail]);
+						$oSet = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sContactEmail]);
 						
 						if($oSet->Count() == 0) {
 							
 							// Create
 							self::Trace(".. Creating a new Person with email address '{$sCallerEmail}'");
-							$oContact = new \Person();
+							$oContact = new Person();
 							$oContact->Set('email', $oEmail->sCallerEmail);
 							$sDefaultValues = $oMailBox->Get(self::$sPolicyId.'_default_values');
 							$aDefaults = preg_split(NEWLINE_REGEX, $sDefaultValues);
@@ -2215,7 +2249,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 								$oEmail->aInternal_Additional_Contacts[] = $oContact;
 								
 							}
-							catch(\Exception $e) {
+							catch(Exception $e) {
 								// This is an actual error.
 								self::Trace("... Failed to create a Person for the email address '{$sCallerEmail}'.");
 								self::Trace($e->getMessage());
@@ -2514,7 +2548,7 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 		}
 		else {
 			// Damned, need to create a tmp file
-			$sTempFile = tempnam(\SetupUtils::GetTmpDir(), 'img-');
+			$sTempFile = tempnam(SetupUtils::GetTmpDir(), 'img-');
 			@file_put_contents($sTempFile, $sImageData);
 			$aRet = @getimagesize($sTempFile);
 			@unlink($sTempFile);
