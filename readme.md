@@ -1,4 +1,4 @@
-# Warning
+# Mail to Ticket Automation
 Copyright (C) 2019-2020 Jeffrey Bostoen
 
 [![License](https://img.shields.io/github/license/jbostoen/iTop-custom-extensions)](https://github.com/jbostoen/iTop-custom-extensions/blob/master/license.md)
