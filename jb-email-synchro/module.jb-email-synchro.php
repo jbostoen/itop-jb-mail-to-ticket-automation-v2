@@ -61,12 +61,6 @@ SetupWebPage::AddModule(
 			
 			'use_message_id_as_uid' => true, // Do NOT change this unless you known what you are doing! Despite being 'false' in Combodo's Mail to Ticket Automation (3.0.5), it works better if set to true on IMAP connections.
 			
-			'imap_options' => array (
-				'imap',
-				'ssl',
-				'novalidate-cert',
-			),
-			
 			// These settings existed with a - instead of _ 
 			// To make them more consistent:
 			
@@ -86,13 +80,11 @@ SetupWebPage::AddModule(
 	)
 );
 
-if (!class_exists('EmailSynchroInstaller'))
-{
+if (!class_exists('EmailSynchroInstaller')) {
 
 	// Module installation handler
 	//
-	class EmailSynchroInstaller extends ModuleInstallerAPI
-	{
+	class EmailSynchroInstaller extends ModuleInstallerAPI {
 
 		/**
 		 * Handler called after the creation/update of the database schema
@@ -116,14 +108,23 @@ if (!class_exists('EmailSynchroInstaller'))
 			$oMailboxAttDef = MetaModel::GetAttributeDef('EmailReplica', 'mailbox_path');
 			$sMailboxColName = $oMailboxAttDef->Get('sql');
 
+			// 2020-10-29: IMAP options were moved to individual mailbox settings and will always be prefilled
+			$bUpgradeOptionsIMAP = ($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.201029', '<'));
+			
 			// Looping on inboxes to update
 			$oSet = new DBObjectSet($oSearch);
-			while ($oInbox = $oSet->Fetch())
-			{
+			while($oInbox = $oSet->Fetch()) {
 				$sUpdateQuery = "UPDATE $sTableName SET $sMailboxColName = " . CMDBSource::Quote($oInbox->Get('mailbox')) . " WHERE $sUidlColName LIKE " . CMDBSource::Quote($oInbox->Get('login') . '_%') . " AND $sMailboxColName IS NULL";
 				SetupPage::log_info("Executing query: " . $sUpdateQuery);
 				$iRet = CMDBSource::Query($sUpdateQuery); // Throws an exception in case of error
 				SetupPage::log_info("Updated $iRet rows.");
+				
+				if($bUpgradeOptionsIMAP == true && trim($oInbox->Get('imap_options') == '')) {
+					$aOptionsIMAP = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap', 'ssl', 'no-validate-cert'));
+					$oInbox->Set('imap_options', implode(PHP_EOL, $aOptionsIMAP);
+					$oInbox->DBUpdate();
+				}
+				
 			}
 		}
 		

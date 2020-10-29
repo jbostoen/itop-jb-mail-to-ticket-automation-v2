@@ -24,7 +24,7 @@
 Dict::Add('EN US', 'English', 'English', array(
 	// Dictionary entries go here
 	'Class:MailInboxBase' => 'Mail Inbox',
-	'Class:MailInboxBase+' => 'Source of incoming eMails',
+	'Class:MailInboxBase+' => 'Source of incoming emails',
 
 	'Class:MailInboxBase/Attribute:server' => 'Mail Server',
 	'Class:MailInboxBase/Attribute:mailbox' => 'Mailbox folder (for IMAP)',
@@ -39,11 +39,11 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Yes',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'No',
 	'Class:MailInboxBase/Attribute:imap_options' => 'IMAP options',
-	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP options can be specified, line by line. They are processed in that order',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP options can be specified, line by line. They are processed in that order.',
 
 	'MailInbox:MailboxContent' => 'Mailbox Content',
 	'MailInbox:EmptyMailbox' => 'The mailbox is empty',
-	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d eMails displayed. There are %2$d email(s) in the mailbox (%3$d new).',
+	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d emails displayed. There are %2$d email(s) in the mailbox (%3$d new).',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'MySQL parameter max_allowed_packet in "my.ini" is too small: %1$s. The recommended value is at least: %2$s',
 	'MailInbox:Status' => 'Status',
 	'MailInbox:Subject' => 'Subject',

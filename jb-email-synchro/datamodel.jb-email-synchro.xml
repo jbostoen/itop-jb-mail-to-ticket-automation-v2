@@ -1132,20 +1132,19 @@ EOF
 		switch($sProtocol)
 		{
 			case 'imap':
-			$aImapOptions = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap'));
-			$aImapOptions = array_replace($aImapOptions, explode('/\\r\\n|\\r|\\n/', $this->Get('imap_options')));
-			self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", mailbox: $sMailbox, options: /".implode('/', $aImapOptions));
-			$oSource = new IMAPEmailSource($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aImapOptions);
-			break;
+				$aImapOptions = explode('/\\r\\n|\\r|\\n/', $this->Get('imap_options'));
+				self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", mailbox: $sMailbox, options: /".implode('/', $aImapOptions));
+				$oSource = new IMAPEmailSource($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aImapOptions);
+				break;
 
 			case 'pop3':
-			$sPop3AuthOption = MetaModel::GetModuleSetting('jb-email-synchro', 'pop3_auth_option', 'USER');
-			self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", auth_option: $sPop3AuthOption");
-			$oSource = new POP3EmailSource($sServer, $iPort, $sLogin, $sPwd, $sPop3AuthOption);
-			break;
+				$sPop3AuthOption = MetaModel::GetModuleSetting('jb-email-synchro', 'pop3_auth_option', 'USER');
+				self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", auth_option: $sPop3AuthOption");
+				$oSource = new POP3EmailSource($sServer, $iPort, $sLogin, $sPwd, $sPop3AuthOption);
+				break;
 			
 			default:
-			self::Trace("Error: unsupported protocol: $sProtocol - please use one of: pop3, imap.");	
+				self::Trace("Error: unsupported protocol: $sProtocol - please use one of: pop3, imap.");	
 		}
 		return $oSource;
 	}]]></code>

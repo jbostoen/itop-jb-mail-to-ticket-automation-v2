@@ -46,18 +46,19 @@ Also make sure the PHP IMAP extension is enabled.
 ```
 
 
-# Roadmap and history
+# History
 Short term roadmap: this was my first PHP extension (fork) for iTop, somewhere in 2015.
 Initially for a minor improvement only, but it grew over time. It works, but the code was not "by the book".
 
-At the end of 2019, a refactoring attempt is being made. 
-It will keep the current options and datamodel.
+At the end of 2019, a refactoring attempt has been made.
 
-Also expect an **optional** link to the **ContactMethod** class you find in this repository, so a caller can have multiple e-mail addresses.
+## Roadmap
+
+* Expect an **optional** link to the **ContactMethod** class you find in this repository, so a caller can have multiple e-mail addresses.
+* Password field will be reviewed.
 
 Other new features may be proposed, but are currently not planned.
 
-Password field will be reviewed.
 
 
 # Basics about policies
@@ -101,15 +102,19 @@ uidl
 * **Active** - check mailbox
 * **Debug trace** - debug log
 * **Mail Aliases** - one per line. Regex patterns allowed. List each email address (minimum 1)
-* **IMAP options** - one per line.
+* **IMAP options** - one per line. Warning: overrides global (configuration file) IMAP options completely!
 
 
-## Hints on Office 365 with shared mailbox:
+### Hints on Office 365 with shared mailbox
 
-* either enable the account and set a password  
-* use thse IMAP options:  
+* option 1: enable the account and set a password
+ 
+* option 2: use thse IMAP options:  
 
 ```
+imap
+ssl
+novalidate-cert
 authuser=some@mailbox.org
 user=shared@mailbox.org
 ```
