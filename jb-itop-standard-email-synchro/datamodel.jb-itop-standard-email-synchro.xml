@@ -644,7 +644,7 @@ EOF
 		{
 			case 'decode_failed':
 			
-				$sSubject = '[iTop] Failed to decode an incoming eMail';
+				$sSubject = '[iTop] Failed to decode an incoming eMail (mail inbox: '.$this->GetName();
 				if ($oRawEmail && ($oRawEmail->GetSize() > EmailBackgroundProcess::$iMaxEmailSize))
 				{
 					$sBody = "<p>The incoming eMail is bigger (".$oRawEmail->GetSize()." bytes) than the maximum configured size (maximum_email_size = ".EmailBackgroundProcess::$iMaxEmailSize.").</p>\n";
