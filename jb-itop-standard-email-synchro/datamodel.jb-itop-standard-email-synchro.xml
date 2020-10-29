@@ -915,6 +915,9 @@ EOF
 								<item id="mail_aliases">
 									<rank>100</rank>
 								</item>
+								<item id="imap_options">
+									<rank>110</rank>
+								</item>
 							</items>
 						</item>
 

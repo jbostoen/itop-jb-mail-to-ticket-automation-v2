@@ -84,6 +84,11 @@
           <default_value>yes</default_value>
           <is_null_allowed>false</is_null_allowed>
         </field>
+		<field id="imap_options" xsi:type="AttributeText">
+			<sql>imap_options</sql>
+			<default_value/>
+			<is_null_allowed>true</is_null_allowed>
+		</field>
       </fields>
       <methods>
         <method id="__construct">
@@ -1128,6 +1133,7 @@ EOF
 		{
 			case 'imap':
 			$aImapOptions = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap'));
+			$aImapOptions = array_merge($aImapOptions, explode('/\\r\\n|\\r|\\n/', $this->Get('imap_options')));
 			self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", mailbox: $sMailbox, options: /".implode('/', $aImapOptions));
 			$oSource = new IMAPEmailSource($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aImapOptions);
 			break;
@@ -1249,6 +1255,9 @@ EOF
             </item>
             <item id="port">
               <rank>60</rank>
+            </item>
+            <item id="imap_options">
+              <rank>70</rank>
             </item>
           </items>
         </details>

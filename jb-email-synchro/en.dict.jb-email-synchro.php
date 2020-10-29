@@ -38,6 +38,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxBase/Attribute:active' => 'Active',
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Yes',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'No',
+	'Class:MailInboxBase/Attribute:imap_options' => 'IMAP options',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP options can be specified, line by line. They are processed in that order',
 
 	'MailInbox:MailboxContent' => 'Mailbox Content',
 	'MailInbox:EmptyMailbox' => 'The mailbox is empty',
