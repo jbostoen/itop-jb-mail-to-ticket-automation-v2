@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (C) 2019-2020 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     2020-08-05 19:34:49
+ * @version     2020-10-29 11:13:14
  *
  * Policy interface definition and some classes implementing it.
  * 
@@ -568,7 +568,8 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// Check that the ticket is of the expected class
 		$sTargetClass = $oMailBox->Get('target_class');
 		if(is_a($oTicket, $sTargetClass) == false) {
-			self::Trace("... Error: the incoming email refers to the ticket '{$oTicket->GetName()}' of class '{get_class($oTicket)}', but this mailbox is configured to process only tickets of class '{$sTargetClass}'");
+			$sClass = get_class($oTicket);
+			self::Trace("... Error: the incoming email refers to the ticket '{$oTicket->GetName()}' of class '{$sClass}', but this mailbox is configured to process only tickets of class '{$sTargetClass}'");
 			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 			return;
 		}
