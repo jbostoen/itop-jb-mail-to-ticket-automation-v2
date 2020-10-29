@@ -1435,6 +1435,14 @@ abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
 						// Set ticket title of email message
 						// Setting the ticket title on the ticket object happens later and not in this policy!
 						$sDefaultTitle = self::$oMailBox->Get(self::$sPolicyId.'_default_value');
+						
+						// Inproper configuration
+						if(trim($sDefaultTitle) == '') {
+							self::Trace('.. Undesired: Empty subject. Fallback to set a default subject failed, because default subject is empty.');
+							self::HandleViolation();
+							return false;
+						}
+						
 						self::Trace('.. Fallback: changing empty subject to "'.$sDefaultTitle.'"');
 						self::$oEmail->sSubject = $sDefaultTitle;
 						break;
