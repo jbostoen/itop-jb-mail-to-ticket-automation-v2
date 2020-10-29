@@ -1133,7 +1133,7 @@ EOF
 		{
 			case 'imap':
 			$aImapOptions = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap'));
-			$aImapOptions = array_merge($aImapOptions, explode('/\\r\\n|\\r|\\n/', $this->Get('imap_options')));
+			$aImapOptions = array_replace($aImapOptions, explode('/\\r\\n|\\r|\\n/', $this->Get('imap_options')));
 			self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", mailbox: $sMailbox, options: /".implode('/', $aImapOptions));
 			$oSource = new IMAPEmailSource($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aImapOptions);
 			break;

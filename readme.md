@@ -89,6 +89,7 @@ uidl
 ```
 
 # Configuration
+
 ## Mailbox Configuration
 * **Mail Server** 
 * **Login**
@@ -100,6 +101,18 @@ uidl
 * **Active** - check mailbox
 * **Debug trace** - debug log
 * **Mail Aliases** - one per line. Regex patterns allowed. List each email address (minimum 1)
+* **IMAP options** - one per line.
+
+
+## Hints on Office 365 with shared mailbox:
+
+* either enable the account and set a password  
+* use thse IMAP options:  
+
+```
+authuser=some@mailbox.org
+user=shared@mailbox.org
+```
 	 
 # Behavior on Incoming eMails
 * **Policy violation behavior** - create only, update only or both
