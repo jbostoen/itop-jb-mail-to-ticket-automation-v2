@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (C) 2019-2020 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     2020-10-29 11:13:14
+ * @version     2020-10-30 13:13:29
  *
  * Policy interface definition and some classes implementing it.
  * 
@@ -1355,14 +1355,17 @@ abstract class PolicyBounceLimitMailSize extends Policy implements iPolicy {
 		parent::BeforeComplianceCheck();
 		
 		// Checking if mail size is not too big
+		$iMaxSizeMB = self::$oMailBox->Get(self::$sPolicyId.'_max_size_MB');
+		
+		if($iMaxSizeMB > 0) {
 		
 			$iMailSize = self::$oEmail->oRawEmail->GetSize();
-			$iLimitMailSize = (self::$oMailBox->Get(self::$sPolicyId.'_max_size_MB') * 1024 * 1024);
+			$iLimitMailSize = utils::ConvertToBytes($iMaxSizeMB.'M');
 			
 			if($iMailSize > $iLimitMailSize) {
 				
 				// Mail size too big
-				self::Trace('.. Undesired: mail size too big: mail size = '.$iMailSize.' bytes, while limit is '.$iLimitMailSize.' bytes.');
+				self::Trace('.. Undesired: mail size too big: '.$iMailSize.' bytes, limit is '.$iLimitMailSize.' bytes ('.$iMaxSizeMB.' M).');
 				self::HandleViolation();
 				
 				// No fallback
@@ -1371,6 +1374,8 @@ abstract class PolicyBounceLimitMailSize extends Policy implements iPolicy {
 				return false;
 				
 			}
+			
+		}
 			
 		// Generic 'after' actions
 		parent::AfterPassedComplianceCheck();

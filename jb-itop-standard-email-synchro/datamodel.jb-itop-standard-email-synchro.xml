@@ -99,8 +99,6 @@ status:assigned]]>
 					<default_value></default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-
-
 				<field id="trace" xsi:type="AttributeEnum">
 					<values>
 						<value>yes</value>
@@ -132,7 +130,7 @@ status:assigned]]>
 				</field>		
 
 		<!-- All policy options -->
-			<!-- Mail size (attachments) too big -->
+			<!-- Mail size (message including attachments) too big? -->
 				<field id="policy_mail_size_too_big_behavior" xsi:type="AttributeEnum">
 					<values>								
 						<value>bounce_delete</value>
@@ -157,7 +155,7 @@ status:assigned]]>
 				</field>
 				<field id="policy_mail_size_too_big_max_size_MB" xsi:type="AttributeInteger">
 					<sql>policy_mail_size_too_big_max_size_MB</sql> 
-					<default_value>10</default_value>
+					<default_value>25</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 			<!-- Attachments - image dimensions -->
@@ -422,6 +420,29 @@ name:Unknown caller - $mail->caller_name$]]>
 			</fields>
 
 			<methods>
+				<method id="DoCheckToWrite">
+				  <comment>/**
+			 * Overload the standard behavior to guarantee the unicity of either:
+			 * login / server (pop3) or
+			 * login / server / mailbox (imap)
+			 * @see cmdbAbstractObject::DoCheckToWrite()
+			 */</comment>
+				  <static>false</static>
+				  <access>public</access>
+				  <type>Overload-DBObject</type>
+				  <code><![CDATA[	public function DoCheckToWrite()
+			{
+			
+				parent::DoCheckToWrite();
+
+				// IMAP: server must not be unique, but mailbox FOLDER should be unique .
+				$this->m_aCheckIssues[] = Dict::Format('MailInbox:Login/Server/MailboxMustBeUnique', $sNewLogin, $sNewServer, $sNewMailbox);
+				
+				
+				
+				
+			}	]]></code>
+				</method>
 				<method id="DisplayBareRelations">
 					<comment>/**
 	 * Add an extra tab showing the debug trace

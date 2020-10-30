@@ -4,8 +4,8 @@ However, some upgrades might break things because technology or use cases change
 
 ## Upgrading from before 2.6.201029?
 * IMAP options are now specified per inbox. They are copied from the configuration file if they exist during the upgrade process.
-* The 'imap_options' setting may be removed from the configuration file after upgrading.
-
+* The 'imap_options' setting can be removed from the configuration file after upgrading.
+* The 'maximum_email_size' setting can be removed from the configuration file after upgrading.
 
 ## Upgrading from before 2.6.191229? (a.k.a from 'version 1')
 

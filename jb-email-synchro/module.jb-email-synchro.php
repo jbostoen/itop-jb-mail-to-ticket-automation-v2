@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'jb-email-synchro/2.6.201029',
+	'jb-email-synchro/2.6.201030',
 	array(
 		// Identification
 		'label' => 'Mail to Tickets Automation (core)',
@@ -44,7 +44,6 @@ SetupWebPage::AddModule(
 			'periodicity' => 30, // interval at which to check for incoming emails (in s)
 			'body_parts_order' => 'text/html,text/plain', // Order in which to read the parts of the incoming emails
 			'pop3_auth_option' => 'USER',
-			'maximum_email_size' => '25M', // Maximum allowed size for incoming emails. Set to 0 for unlimited size.
 			'big_files_dir' => '',
 
 			// Some patterns which delimit the previous message in case of a Reply
@@ -121,7 +120,7 @@ if (!class_exists('EmailSynchroInstaller')) {
 				
 				if($bUpgradeOptionsIMAP == true && trim($oInbox->Get('imap_options') == '')) {
 					$aOptionsIMAP = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap', 'ssl', 'no-validate-cert'));
-					$oInbox->Set('imap_options', implode(PHP_EOL, $aOptionsIMAP);
+					$oInbox->Set('imap_options', implode(PHP_EOL, $aOptionsIMAP));
 					$oInbox->DBUpdate();
 				}
 				

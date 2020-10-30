@@ -93,6 +93,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_subject' => 'Bounce subject',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_notification' => 'Bounce message',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB' => 'Max size (MB)',
+	'Error:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB+' => 'Maximum size of e-mail and its attachments. Larger e-mails will not be processed. Set to 0 to disable.',
 	
 	// Policy: attachment - forbidden MimeType
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior' => 'Behavior on violation',

@@ -338,7 +338,8 @@ class EmailBackgroundProcess implements iBackgroundProcess
 										$this->Trace("Could not get message (raw email): {$sUIDL}");
 										return "Stopped processing due to (possible temporary) IMAP error. Message(s) read: $iTotalMessages, message(s) skipped: {$iTotalSkipped}, message(s) processed: {$iTotalProcessed}, message(s) deleted: {$iTotalDeleted}, message(s) marked as error: {$iTotalMarkedAsError}, undesired message(s): {$iTotalUndesired}";
 									}
-									
+
+/*									
 									if ((self::$iMaxEmailSize > 0) && ($oRawEmail->GetSize() > self::$iMaxEmailSize))
 									{
 										$iNextActionCode = $oProcessor->OnDecodeError($oSource, $sUIDL, null, $oRawEmail);
@@ -364,6 +365,7 @@ class EmailBackgroundProcess implements iBackgroundProcess
 									}
 									else
 									{
+*/
 										$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
 										
 										// Checks for valid caller (name, email), UIDL and attachments
@@ -443,7 +445,10 @@ class EmailBackgroundProcess implements iBackgroundProcess
 													break;
 											}
 										}
+										
+/*
 									}
+*/
 									break;
 					
 								case EmailProcessor::NO_ACTION:
