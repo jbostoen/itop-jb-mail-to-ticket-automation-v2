@@ -27,6 +27,11 @@ This extension works in steps. Those steps are called **policies** and they **ca
   * Info should only be set by one policy. That's why some of the default policies check whether some information (such as related contacts) hasn't been set yet.  
 
 
+# Requirements
+
+* iTop extensions
+  * [jb-framework](https://github.com/jbostoen/itop-jb-framework) - a generic framework shared among some of my extensions
+
 # Configuration
 
 Configuration settings are mostly similar to https://www.itophub.io/wiki/page?id=extensions%3Aticket-from-email
