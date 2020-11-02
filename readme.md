@@ -11,7 +11,7 @@ This extension was complex to develop and is now very feature rich, yet it remai
 If you want to use this extension and get support or custom development, get in touch please to discuss terms: **jbostoen.itop@outlook.com**
 
 
-# What?
+## What?
 
 This **Mail to Ticket automation** is a **fork** from Combodo's Mail to Ticket Automation. 
 It was originally based on their version 3.0.7 (28th of August 2017), but also includes the changes up to 3.1.2 so far.
@@ -27,12 +27,12 @@ This extension works in steps. Those steps are called **policies** and they **ca
   * Info should only be set by one policy. That's why some of the default policies check whether some information (such as related contacts) hasn't been set yet.  
 
 
-# Requirements
+## Requirements
 
 * iTop extensions
   * [jb-framework](https://github.com/jbostoen/itop-jb-framework) - a generic framework shared among some of my extensions
 
-# Configuration
+## Configuration
 
 Configuration settings are mostly similar to https://www.itophub.io/wiki/page?id=extensions%3Aticket-from-email
 
@@ -51,7 +51,7 @@ Also make sure the PHP IMAP extension is enabled.
 ```
 
 
-# History
+## History
 Short term roadmap: this was my first PHP extension (fork) for iTop, somewhere in 2015.
 Initially for a minor improvement only, but it grew over time. It works, but the code was not "by the book".
 
@@ -66,7 +66,7 @@ Other new features may be proposed, but are currently not planned.
 
 
 
-# Basics about policies
+## Basics about policies
 Common options are:
 * behavior (on conflict/not compliant with policy)
   * bounce and delete (inform the user the message has been rejected, provide some information why)
@@ -94,9 +94,9 @@ subject
 uidl
 ```
 
-# Configuration
+## Configuration
 
-## Mailbox Configuration
+### Mailbox Configuration
 * **Mail Server** 
 * **Login**
 * **Password** - warning: just like Combodo's Mail to Ticket Automation, the password is still saved unencrypted!
@@ -110,7 +110,7 @@ uidl
 * **IMAP options** - one per line. Warning: overrides global (configuration file) IMAP options completely!
 
 
-### Hints on Office 365 with shared mailbox
+#### Hints on Office 365 with shared mailbox
 
 * option 1: enable the account and set a password
  
@@ -124,7 +124,7 @@ authuser=some@mailbox.org
 user=shared@mailbox.org
 ```
 	 
-# Behavior on Incoming eMails
+## Behavior on Incoming eMails
 * **Policy violation behavior** - create only, update only or both
 * **After processing the eMail** - delete it right away or keep it on the mail server
 * **Ticket Class** - which ticket class (see iTop data model, usually UserRequest)
@@ -141,7 +141,7 @@ user=shared@mailbox.org
     status:assigned
 ```	 
 	 
-# Emails in Error
+## Emails in Error
 This handles technical issues with e-mails; not policy violations.
 * **Policy violation behavior**
   * Delete
@@ -151,12 +151,12 @@ This handles technical issues with e-mails; not policy violations.
 
 ***
 
-# Available policies
+## Available policies
 A list of included policies which have settings that can be edited in the MailBox configuration.
 With some programming skills, it's easy to implement your own policy (see further in this document).
 If it's a common use case, make a pull request to include it.
 
-## E-mail Size
+### E-mail Size
 * **Use case:** e-mail size is too big (often related to PHP or MySQL limits)
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -168,7 +168,7 @@ If it's a common use case, make a pull request to include it.
 * **Bounce message**
 * **Max size (MB)** - default is 10 MB
  
-## Attachment - forbidden mime types
+### Attachment - forbidden mime types
 * Use case: you might not want .exe attachments
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -181,7 +181,7 @@ If it's a common use case, make a pull request to include it.
 * **Bounce message**
 * **MIME Types** - one per line. Example: application/exe
 	
-## Attachment - image dimensions
+### Attachment - image dimensions
 * Use case: ignoring images which are too small (likely part of e-mail signatures) or resize images which are too big.
 * Requires php-gd
 * **Min width**
@@ -189,7 +189,7 @@ If it's a common use case, make a pull request to include it.
 * **Min height**
 * **Max height**
  
-## No subject
+### No subject
 * Use case: you want to enforce people to at least supply a subject.
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -201,7 +201,7 @@ If it's a common use case, make a pull request to include it.
 * **Bounce message**
 * **Default subject** - specify a default title. Example: (no subject)
  
-## Closed tickets
+### Closed tickets
 * Use case: despite very clear warnings a ticket has been closed, user still replies.
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -213,7 +213,7 @@ If it's a common use case, make a pull request to include it.
 * **Bounce subject**
 * **Bounce message**
 
-## Resolved tickets
+### Resolved tickets
 * Use case: despite very clear warnings a ticket has been resolved, user still replies.
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -225,7 +225,7 @@ If it's a common use case, make a pull request to include it.
 * **Bounce subject**
 * **Bounce message**
 	 
-## Unknown tickets
+### Unknown tickets
 * Use case: if the extension (mis)interprets a pattern similar to the ticket reference pattern in the email subject or header and can't find the ticket.
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -236,7 +236,7 @@ If it's a common use case, make a pull request to include it.
 * **Bounce subject**
 * **Bounce message**
 
-## Unknown caller
+### Unknown caller
 * Use case: first time caller
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -257,7 +257,7 @@ If it's a common use case, make a pull request to include it.
 
 ( creates a person named 'Unknown Caller', belonging to first organization in iTop)
 	 
-## Other recipients
+### Other recipients
 * Use case:
   * If other recipients (To: or CC:) to processed inboxes are allowed, it's likely people will reply to the initial email from the caller. 
   * This would lead to multiple new tickets, since there is no ticket reference in the e-mail header or subject.
@@ -273,7 +273,7 @@ If it's a common use case, make a pull request to include it.
 * **Bounce subject**
 * **Bounce message**
 	 
-## Undesired patterns in title
+### Undesired patterns in title
 * Use case: out-of-office, e-mail should NOT be processed
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -285,7 +285,7 @@ If it's a common use case, make a pull request to include it.
 * **Bounce message**
 * **Undesired patterns in subject** - (regex patterns, one per line)
 
-## Patterns to remove from title
+### Patterns to remove from title
 * Use case: getting rid of unwanted content in subjects/titles
   * Limitation: it will still be problematic if the ticket reference pattern is exactly the same!
 * **Policy violation behavior**
@@ -296,15 +296,15 @@ If it's a common use case, make a pull request to include it.
 * **Patterns to remove from subject** - (regex patterns, one per line)
 
 
-# Other improvements
+## Other improvements
+In comparison to Combodo's official Mail to Ticket Automation extension.
 
-
-## Minor code tweaks
+### Minor code tweaks
 Some code was simplified.
 
 Also more flexible in title patterns (no regex group required).
 
-## Lost IMAP connections
+### Lost IMAP connections
 There's an attempt to fix issues with lost IMAP connections (to Office 365).
 Contrary to the original extension, EmailReplicas don't immediately disappear when the mail can not be seen anymore.
 It's stored for 7 more days after it's last seen.
@@ -312,13 +312,13 @@ It's stored for 7 more days after it's last seen.
 Benefit: if the e-mail wasn't seen due to a lost IMAP connection, the EmailReplica got deleted with the original Combodo extension.
 If in the next run the IMAP connection functions properly, the e-mail would be reprocessed as 'new' - which led to new tickets being created.
 
-# Cookbook
+## Cookbook
 
 PHP
 * how to rename value enums by running queries during installation (ModuleInstallerAPI)
 * how to columns value enums by running queries during installation (ModuleInstallerAPI)
 
-# Creating new additional policies
+## Creating new additional policies
 Enforcing certain rules or simply adding your own basic logic to set Ticket info or derive a caller (Person) can be done by writing your own class implementing the **iPolicy** interface.
 
 The most important things about the interface:
