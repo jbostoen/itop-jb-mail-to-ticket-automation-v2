@@ -448,7 +448,7 @@ name:Unknown caller - $mail->caller_name$]]>
 					}
 					
 					$oSearch = DBObjectSearch::FromOQL_AllData("SELECT MailInboxBase WHERE login = :newlogin AND server = :newserver AND ((protocol = 'imap' AND mailbox = :newmailbox) OR (protocol = 'pop3' AND '' = :newmailbox)) AND id != :id");
-					$oSet = new DBObjectSet($oSearch, [], ['id' => $this->GetKey(), 'newlogin' => $sNewLogin, 'newserver' => $sNewServer, 'newmailbox' => $sNewMailbox)];
+					$oSet = new DBObjectSet($oSearch, [], ['id' => $this->GetKey(), 'newlogin' => $sNewLogin, 'newserver' => $sNewServer, 'newmailbox' => $sNewMailbox]);
 					if($oSet->Count() > 0) {
 						if ($this->Get('protocol') == 'pop3') {
 							$this->m_aCheckIssues[] = Dict::Format('MailInbox:Login/ServerMustBeUnique', $sNewLogin, $sNewServer);
