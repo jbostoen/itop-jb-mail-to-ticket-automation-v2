@@ -119,7 +119,7 @@ if (!class_exists('EmailSynchroInstaller')) {
 				SetupPage::log_info("Updated $iRet rows.");
 				
 				if($bUpgradeOptionsIMAP == true && trim($oInbox->Get('imap_options') == '')) {
-					$aOptionsIMAP = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap', 'ssl', 'no-validate-cert'));
+					$aOptionsIMAP = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap', 'ssl', 'novalidate-cert'));
 					$oInbox->Set('imap_options', implode(PHP_EOL, $aOptionsIMAP));
 					$oInbox->DBUpdate();
 				}
