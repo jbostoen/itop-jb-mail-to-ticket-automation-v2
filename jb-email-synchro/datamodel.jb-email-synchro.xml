@@ -1130,7 +1130,7 @@ EOF
 		switch($sProtocol)
 		{
 			case 'imap':
-				$aImapOptions = explode('/\\r\\n|\\r|\\n/', $this->Get('imap_options'));
+				$aImapOptions = preg_split('/\\r\\n|\\r|\\n/', $this->Get('imap_options'));
 				self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", mailbox: $sMailbox, options: /".implode('/', $aImapOptions));
 				$oSource = new IMAPEmailSource($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aImapOptions);
 				break;
