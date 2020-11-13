@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (C) 2019-2020 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     2020-10-30 13:13:29
+ * @version     2020-11-13 16:13:10
  *
  * Policy interface definition and some classes implementing it.
  * 
