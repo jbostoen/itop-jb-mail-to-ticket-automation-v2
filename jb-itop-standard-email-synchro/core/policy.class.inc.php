@@ -587,18 +587,28 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// Write the log on behalf of the caller.
 		// Fallback to e-mail address if name is unknown.
 		$sCallerName = $oEmail->sCallerName;
+		$iCallerUserId = null;
 		if($oEmail->oInternal_Contact === null) {
 			$sCallerName = $oEmail->sCallerEmail;
-			$iCallerId = null;
+			// $iCallerUserId remains null
 		}
 		else {
-			$sCallerName = $oEmail->oInternal_Contact->GetName();
-			$iCallerId = $oEmail->oInternal_Contact->GetKey();
+			$sCallerName = $oEmail->oInternal_Contact->GetName(); // Derive name from Person
+			$sOQL = 'SELECT User AS u JOIN Person AS p ON u.contactid = p.id WHERE p.id = :id';
+			$oUsers = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['id' => $oEmail->oInternal_Contact->GetKey()]);
+			
+			// Only first user will be matched. Multiple accounts could theoretically be linked to 1 Person.
+			$oUser = $oUsers->Fetch();
+			
+			if($oUser !== null) {
+				$iCallerUserId = $oUser->GetKey();
+			}
+			
 		}
 					
 		// Determine which field to update
 		$sAttCode = 'public_log';
-		$aAttCodes = MetaModel::GetModuleSetting('jb-itop-standard-email-synchro', 'ticket_log', [
+		$aAttCodes = MetaModel::GetCurrentModuleSetting('ticket_log', [
 			'UserRequest' => 'public_log', 
 			'Incident' => 'public_log'
 		]);
@@ -612,7 +622,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oAttributeValue->AddLogEntriesFromCaseLog($oCaseLog);
 		
 		// New entry from current email
-		$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $iCallerId, '');
+		$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $iCallerUserId, '');
 		
 		// Sort chronologically: ascending (true), descending (false = most recent on top)!
 		$oAttributeValue = $oAttributeValue->ToSortedCaseLog(false);
@@ -856,7 +866,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// If there are any TriggerOnMailUpdate defined, let's activate them
 		$aClasses = MetaModel::EnumParentClasses(get_class($oTicket), ENUM_PARENT_CLASSES_ALL);
 		$sClassList = implode(', ', CMDBSource::Quote($aClasses));
-		$oSet = new DBObjectSet(DBObjectSearch::FromOQL("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
+		$oSet = new DBObjectSet(DBObjectSearch::FromOQL_AllData("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
 		while($oTrigger = $oSet->Fetch()) {
 			$oTrigger->DoActivate($oTicket->ToArgs('this'));
 		}
@@ -1050,7 +1060,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		if($bNoDuplicates == true) {
 			
 			$sOQL = 'SELECT Attachment WHERE item_class = :class AND item_id = :id';
-			$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
+			$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
 			while($oPrevAttachment = $oAttachments->Fetch()) {
 				$oDoc = $oPrevAttachment->Get('contents');
 				$data = $oDoc->GetData();
@@ -1067,7 +1077,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			// same processing for InlineImages
 			if(class_exists('InlineImage') == true) {
 				$sOQL = 'SELECT InlineImage WHERE item_class = :class AND item_id = :id';
-				$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
+				$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
 				while($oPrevAttachment = $oAttachments->Fetch()) {
 					$oDoc = $oPrevAttachment->Get('contents');
 					$data = $oDoc->GetData();
