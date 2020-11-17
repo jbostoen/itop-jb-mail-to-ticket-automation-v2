@@ -603,7 +603,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			if($oUser !== null) {
 				$iCallerUserId = $oUser->GetKey();
 			}
-			
+			// else: $iCallerUserId remains null
 		}
 					
 		// Determine which field to update
