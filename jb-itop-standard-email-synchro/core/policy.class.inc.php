@@ -608,7 +608,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 					
 		// Determine which field to update
 		$sAttCode = 'public_log';
-		$aAttCodes = MetaModel::GetCurrentModuleSetting('ticket_log', [
+		$aAttCodes = MetaModel::GetModuleSetting('jb-itop-standard-email-synchro', 'ticket_log', [
 			'UserRequest' => 'public_log', 
 			'Incident' => 'public_log'
 		]);
