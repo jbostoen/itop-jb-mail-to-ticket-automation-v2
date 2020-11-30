@@ -48,7 +48,7 @@
         </field>
         <field id="mailbox" xsi:type="AttributeString">
           <sql>mailbox</sql>
-          <default_value/>
+          <default_value>Inbox</default_value>
           <is_null_allowed>true</is_null_allowed>
         </field>
         <field id="login" xsi:type="AttributeString">
@@ -67,12 +67,12 @@
             <value>imap</value>
           </values>
           <sql>protocol</sql>
-          <default_value>pop3</default_value>
+          <default_value>imap</default_value>
           <is_null_allowed>false</is_null_allowed>
         </field>
         <field id="port" xsi:type="AttributeInteger">
           <sql>port</sql>
-          <default_value/>
+          <default_value>993</default_value>
           <is_null_allowed>true</is_null_allowed>
         </field>
         <field id="active" xsi:type="AttributeEnum">
@@ -86,7 +86,9 @@
         </field>
 		<field id="imap_options" xsi:type="AttributeText">
 			<sql>imap_options</sql>
-			<default_value/>
+			<default_value><![CDATA[imap
+ssl
+novalidate-cert]]></default_value>
 			<is_null_allowed>true</is_null_allowed>
 		</field>
       </fields>
