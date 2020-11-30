@@ -1977,7 +1977,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 							case 'do_nothing':
 							case 'mark_as_undesired':
 							
-								self::Trace("... The message '{$sMailSubject}' is considered as undesired, the caller was not found.");
+								self::Trace("... The message '{$oEmail->sSubject}' is considered as undesired, the caller was not found.");
 								self::HandleViolation();
 								
 								// No fallback

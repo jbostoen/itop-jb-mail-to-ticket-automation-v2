@@ -38,7 +38,7 @@ Info on settings and default policies
 
 ## Customization
 Want to implement your own logic?
-* See [configuration](documentation/customization.md)
+* See [customization](documentation/customization.md)
 
 ## History
 Short term roadmap: this was my first PHP extension (fork) for iTop, somewhere in 2015.  
