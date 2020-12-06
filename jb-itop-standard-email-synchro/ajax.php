@@ -35,24 +35,19 @@ try
 	require_once(APPROOT.'/application/loginwebpage.class.inc.php');
 	LoginWebPage::DoLogin(false /* bMustBeAdmin */, false /* IsAllowedToPortalUsers */); // Check user rights and prompt if needed
 	
-	$oPage = new ajax_page("");
-	$oPage->no_cache();
+	$oPage = new ajax_page('');
 
 	$sOperation = utils::ReadParam('operation', '');
 	$iMailInboxId = utils::ReadParam('id', 0, false, 'raw_data');
 	
-	switch($sOperation)
-	{
+	switch($sOperation) {
 		case 'debug_trace':
 		$oInbox = MetaModel::GetObject('MailInboxBase', $iMailInboxId, false);
-		if(is_object($oInbox))
-		{
-			if ($oInbox->Get('trace') == 'yes')
-			{
+		if(is_object($oInbox)) {
+			if($oInbox->Get('trace') == 'yes') {
 				$oPage->add('<pre>'.htmlentities($oInbox->Get('debug_trace'), ENT_QUOTES, 'UTF-8').'</pre>');
 			}
-			else
-			{
+			else {
 				$oPage->p(Dict::Format('MailInboxStandard:DebugTraceNotActive'));					
 			}
 		}
@@ -64,8 +59,7 @@ try
 	}
 	$oPage->output();
 }
-catch(Exception $e)
-{	
+catch(Exception $e) {	
 	$oPage->SetContentType('text/html');
 	$oPage->add($e->getMessage());
 	$oPage->output();

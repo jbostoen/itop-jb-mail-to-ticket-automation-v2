@@ -28,8 +28,7 @@ abstract class EmailSource
 	protected $sPartsOrder;
 	protected $token;
 	
-	public function __construct()
-	{
+	public function __construct() {
 		$this->sPartsOrder = 'text/plain,text/html'; // Default value can be changed via SetPartsOrder
 		$this->token  =null;
 	}
@@ -61,8 +60,7 @@ abstract class EmailSource
 	/**
 	 * Mailbox path of the eMail source
 	 */
-	public function GetMailbox()
-	{
+	public function GetMailbox() {
 		return '';
 	}
 
@@ -77,13 +75,11 @@ abstract class EmailSource
 	 */
 	abstract public function Disconnect();
 
-	public function GetLastErrorSubject()
-	{
+	public function GetLastErrorSubject() {
 		return $this->sLastErrorSubject;
 	}
 	
-	public function GetLastErrorMessage()
-	{
+	public function GetLastErrorMessage() {
 		return $this->sLastErrorMessage;
 	}
 	
@@ -91,32 +87,28 @@ abstract class EmailSource
 	 * Preferred order for retrieving the mail "body" when scanning a multiparts emails
 	 * @param $sPartsOrder string A comma separated list of MIME types e.g. text/plain,text/html
 	 */
-	public function SetPartsOrder($sPartsOrder)
-	{
+	public function SetPartsOrder($sPartsOrder) {
 		$this->sPartsOrder = $sPartsOrder;
 	}
 	/**
 	 * Preferred order for retrieving the mail "body" when scanning a multiparts emails
 	 * @return string A comma separated list of MIME types e.g. text/plain,text/html
 	 */
-	public function GetPartsOrder()
-	{
+	public function GetPartsOrder() {
 		return $this->sPartsOrder;
 	}
 	/**
 	 * Set an opaque reference token for use by the caller...
 	 * @param mixed $token
 	 */
- 	public function SetToken($token)
- 	{
+ 	public function SetToken($token) {
  		$this->token = $token;
  	}
  	/**
  	 * Get the reference token set earlier....
  	 * @return mixed The token set by SetToken()
  	 */
- 	public function GetToken()
- 	{
+ 	public function GetToken() {
  		return $this->token;
  	}
 }

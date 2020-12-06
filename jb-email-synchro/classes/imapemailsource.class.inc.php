@@ -25,14 +25,12 @@
  *       actual unique identifiers (UIDLs) for the messages makes
  *       this unusable for our particular purpose
  */
-class IMAPEmailSource extends EmailSource
-{
+class IMAPEmailSource extends EmailSource {
 	protected $rImapConn = null;
 	protected $sLogin = '';
 	protected $sMailbox = '';
 
-	public function __construct($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aOptions)
-	{
+	public function __construct($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aOptions) {
 		parent::__construct();
 		$this->sLastErrorSubject = '';
 		$this->sLastErrorMessage = '';
@@ -40,8 +38,7 @@ class IMAPEmailSource extends EmailSource
 		$this->sMailbox = $sMailbox;
 
 		$sOptions = '';
-		if (count($aOptions) > 0)
-		{
+		if(count($aOptions) > 0) {
 			$sOptions = '/'.implode('/',$aOptions);
 		}
 		
@@ -49,8 +46,7 @@ class IMAPEmailSource extends EmailSource
 
 		$sIMAPConnStr = "{{$sServer}:{$iPort}$sOptions}$sMailbox";
 		$this->rImapConn = imap_open($sIMAPConnStr, $sLogin, $sPwd );
-		if ($this->rImapConn === false)
-		{
+		if($this->rImapConn === false) {
 			if (class_exists('EventHealthIssue')) {
 				EventHealthIssue::LogHealthIssue('jb-email-synchro', "Cannot connect to IMAP server: '$sIMAPConnStr', with login: '$sLogin'");
 			}
@@ -63,8 +59,7 @@ class IMAPEmailSource extends EmailSource
 	 * Get the number of messages to process
 	 * @return integer The number of available messages
 	 */
-	public function GetMessagesCount()
-	{
+	public function GetMessagesCount() {
 		$oInfo = imap_check($this->rImapConn);
 		if ($oInfo !== false) return $oInfo->Nmsgs;
 		
@@ -99,7 +94,7 @@ class IMAPEmailSource extends EmailSource
 		$oOverview = array_pop($aOverviews);
 
 		$bUseMessageId = (bool) MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', false);
-		if ($bUseMessageId) {
+		if($bUseMessageId) {
 			$oOverview->uid = $oOverview->message_id;
 		}
 
@@ -112,8 +107,7 @@ class IMAPEmailSource extends EmailSource
 	 * @param $index integer The index between zero and count
 	 *
 	 */
-	public function DeleteMessage($index)
-	{
+	public function DeleteMessage($index) {
 		$ret = imap_delete($this->rImapConn, (1+$index).':'.(1+$index));
 		return $ret;
 	}
@@ -123,8 +117,7 @@ class IMAPEmailSource extends EmailSource
 	 * Marks the message for undeletion (IMAP-flag) of the given index [0..Count] from the mailbox.
 	 * @param $index integer The index between zero and count
 	 */
-	public function UndeleteMessage($index)
-	{
+	public function UndeleteMessage($index) {
 		$ret = imap_undelete($this->rImapConn, (1+$index).':'.(1+$index));
 		return $ret;
 	}
@@ -134,16 +127,14 @@ class IMAPEmailSource extends EmailSource
 	/**
 	 * Name of the eMail source
 	 */
-	 public function GetName()
-	 {
+	 public function GetName() {
 	 	return $this->sLogin;
 	 }
 
 	/**
 	 * Mailbox path of the eMail source
 	 */
-	public function GetMailbox()
-	{
+	public function GetMailbox() {
 		return $this->sMailbox;
 	}
 
@@ -151,13 +142,11 @@ class IMAPEmailSource extends EmailSource
 	 * Get the list (with their IDs) of all the messages
 	 * @return Array An array of hashes: 'msg_id' => index 'uild' => message identifier
 	 */
-	 public function GetListing()
-	 {
+	 public function GetListing() {
 	 	$ret = null;
 	 	
 	 	$oInfo = imap_check($this->rImapConn);
-        if (($oInfo !== false) && ($oInfo->Nmsgs > 0))
-		{
+        if(($oInfo !== false) && ($oInfo->Nmsgs > 0)) {
         	$sRange = "1:".$oInfo->Nmsgs;
 			// Workaround for some email servers (like gMail!) where the UID may change between two sessions, so let's use the
 			// MessageID as a replacement for the UID.
@@ -171,17 +160,14 @@ class IMAPEmailSource extends EmailSource
         	$ret = array();
 			$aResponse = imap_fetch_overview($this->rImapConn,$sRange);
 			
-			foreach ($aResponse as $aMessage)
-			{
-				if ($bUseMessageId)
-				{
+			foreach ($aResponse as $aMessage) {
+				if($bUseMessageId) {
 					// There is a known issue here, probably due to SPAM messages.
 					// Tried to figure it out but no example yet.
 					// Sometimes an error is returned which outputs this as subject: "Retrieval using the IMAP4 protocol failed for the following message: <some-id>"
 					$ret[] = array('msg_id' => $aMessage->msgno, 'uidl' => $aMessage->message_id);
 				}
-				else
-				{
+				else {
 					$ret[] = array('msg_id' => $aMessage->msgno, 'uidl' => $aMessage->uid);
 				}
 			}
@@ -190,8 +176,7 @@ class IMAPEmailSource extends EmailSource
 		return $ret;
 	 }
 	 
-	 public function Disconnect()
-	 {
+	 public function Disconnect() {
 	 	imap_close($this->rImapConn, CL_EXPUNGE);
 	 	$this->rImapConn = null; // Just to be sure
 	 }

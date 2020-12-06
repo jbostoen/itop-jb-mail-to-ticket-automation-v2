@@ -80,7 +80,6 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Alias d\'email',
 	'Class:MailInboxStandard/Attribute:mail_aliases+' => 'Alias d\'email : un par ligne. Les schémas en exp. rég. sont autorisés.',
-	 
 	
 	// Policy: mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportement en cas d\'infraction',

@@ -22,8 +22,7 @@
  * Abstract class which serves as a skeleton for implementing your own processor of emails
  *
  */
-abstract class EmailProcessor
-{
+abstract class EmailProcessor {
 	const NO_ACTION = 0;
 	const DELETE_MESSAGE = 1;
 	const PROCESS_MESSAGE = 2;
@@ -56,8 +55,7 @@ abstract class EmailProcessor
 	 * @param string $sText The text to output
 	 * @return void
 	 */
-	public static function Trace($sText)
-	{
+	public static function Trace($sText) {
 		echo "$sText\n";
 	}
 	
@@ -73,15 +71,13 @@ abstract class EmailProcessor
 	 *
 	 * @return integer Next Action Code
 	 */
-	public function OnDecodeError(EmailSource $oSource, $sUIDL, $oEmail, RawEmailMessage $oRawEmail, &$aErrors = array())
-	{
-		$sEMailSubject = '';
-		if ($oEmail != null)
-		{
-			$sEMailSubject = $oEmail->sSubject;
+	public function OnDecodeError(EmailSource $oSource, $sUIDL, $oEmail, RawEmailMessage $oRawEmail, &$aErrors = array()) {
+		$sEmailSubject = '';
+		if($oEmail != null) {
+			$sEmailSubject = $oEmail->sSubject;
 			$aErrors = $oEmail->GetInvalidReasons();
 		}
-		$aErrors[] = "The message (".$sUIDL."), subject: '$sEMailSubject', was not decoded properly and therefore was not processed.";
+		$aErrors[] = "The message (".$sUIDL."), subject: '$sEmailSubject', was not decoded properly and therefore was not processed.";
 		return self::MARK_MESSAGE_AS_ERROR;
 	}
 	
@@ -98,16 +94,14 @@ abstract class EmailProcessor
 	 * Returns the subject for the last error when process ProcessMessage returns PROCESS_ERROR
 	 * @return string The subject for the error message email
 	 */
-	public function GetLastErrorSubject()
-	{
+	public function GetLastErrorSubject() {
 		return $this->sLastErrorSubject;
 	}
 	/**
 	 * Returns the body of the message for the last error when process ProcessMessage returns PROCESS_ERROR
 	 * @return string The body for the error message email
 	 */
-	public function GetLastErrorMessage()
-	{
+	public function GetLastErrorMessage() {
 		return $this->sLastErrorMessage;
 	}
 }

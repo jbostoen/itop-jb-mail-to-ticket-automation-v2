@@ -69,6 +69,23 @@ The email record is still kept for 7 days after the email was last seen.
 Benefit: if the email wasn't seen due to a lost IMAP connection, the EmailReplica got deleted with the original Combodo extension.
 If in the next run the IMAP connection functions properly, the email would be reprocessed as 'new' - which led to new tickets being created.
 
+### Invalid from/to/cc headers
+In rare cases, these headers may include invalid data. This fork surpresses the notice which occurs while handling these kind of emails.
+
+### Combodo tickets
+
+These tickets are related to the official extension.
+These issues are tackled in this fork, either by implementing a fix here or by backporting a fix by Combodo.
+
+* #1402 Ticket from email: duplicating tickets (use_message_as_uid = true) (recommendation)
+* #1489 Emoji might cause Ticket from eMail to hang (reported issue, fix by Combodo)
+* #1628 Mail to Ticket: FindCaller (suggested fix, implemented by Combodo)
+* #1781 Mail to Ticket Automation: Case log - link to user; caselog enhancement (no solution in Combodo version)
+* #1793 Mail to Ticket Automation: set IMAP undelete  (no solution in Combodo version)
+* #1859 Mail to Ticket Automation - issue with long subjects (+ solution) (some feedback, no solution in Combodo version)
+* #1924 Mail to Ticket: processing order (no solution in Combodo version)
+* #1925 Mail to Ticket: malformed headers (some feedback, no solution in Combodo version)
+
 ## Cookbook
 
 PHP

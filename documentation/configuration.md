@@ -13,6 +13,9 @@ One thing is important here: it's actually recommended to set **use_message_id_a
 (Combodo sets it to 'false' by default but this could be very undesired for IMAP connections!). 
 Also make sure the **PHP IMAP extension is enabled**.
 
+Mind that especially when processing lots of new e-mails, it may be important to increase your PHP memory limit!
+
+
 ### Mailbox Configuration
 * **Mail Server** 
 * **Login**
@@ -52,7 +55,11 @@ authuser=some@mailbox.org
 user=shared@mailbox.org
 ```
 
+#### Hints on GMail
 
+* You need to explicitly enable IMAP access for your GMail account
+* Often Google blocks initial requests. You'll receive an e-mail notification from Google in the inbox to address this. 
+* It will involve enabling 'less secure access'. It takes some time on Google's end before this is active.
 
 
 # Policies 

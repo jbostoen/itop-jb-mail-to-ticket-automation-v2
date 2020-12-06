@@ -80,8 +80,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:notify_from' => 'Mail From Address',
 	
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Mail Aliases',
-	'Class:MailInboxStandard/Attribute:mail_aliases+' => 'Mail Aliases: one per line. Regex patterns are allowed.',
-	 
+	'Class:MailInboxStandard/Attribute:mail_aliases+' => 'Mail Aliases: one per line. Regex patterns are allowed.',	 
 	
 	// Policy: mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Behavior on violation',
