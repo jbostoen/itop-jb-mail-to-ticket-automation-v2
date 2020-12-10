@@ -54,8 +54,7 @@ class EmailMessage {
 	
 	const NEW_LINE_MARKER = '__NEWLINE__'; // unlikely to be found in the body of an email message
 	
-	public function __construct($sUIDL, $sMessageId, $sSubject, $sCallerEmail, $sCallerName, $sRecipient, $aReferences, $sThreadIndex, $sBodyText, $sBodyFormat, $aAttachments, $oRelatedObject, $aHeaders, $sDecodeStatus, $sDate = '', $aTos = array(), $aCCs = array())
-	{
+	public function __construct($sUIDL, $sMessageId, $sSubject, $sCallerEmail, $sCallerName, $sRecipient, $aReferences, $sThreadIndex, $sBodyText, $sBodyFormat, $aAttachments, $oRelatedObject, $aHeaders, $sDecodeStatus, $sDate = '', $aTos = array(), $aCCs = array()) {
 		$this->sUIDL = $sUIDL;
 		$this->sMessageId = $sMessageId;
 		$this->sSubject = $sSubject;
@@ -80,53 +79,42 @@ class EmailMessage {
 	/**
 	 * Archives the message into a file
 	 */
-	public function SaveToFile($sFile)
-	{
+	public function SaveToFile($sFile) {
 		
 	}
 	/**
 	 * Read the message from an archived file
 	 */
-	public function ReadFromFile($sFile)
-	{
+	public function ReadFromFile($sFile) {
 		
 	}
 	
-	public function IsValid()
-	{
+	public function IsValid() {
 		return empty($this->GetInvalidReasons());
 	}
 
 	/**
 	 * @return array
 	 */
-	public function GetInvalidReasons()
-	{
+	public function GetInvalidReasons() {
 		$aErrors = array();
-		if (empty($this->sUIDL))
-		{
+		if(empty($this->sUIDL)) {
 			$aErrors[] = 'Empty message id';
 		}
-		if (empty($this->sCallerEmail))
-		{
+		if(empty($this->sCallerEmail)) {
 			$aErrors[] = 'No caller email';
 		}
-		if (empty($this->sCallerName))
-		{
+		if(empty($this->sCallerName)) {
 			$aErrors[] = 'No caller name';
 		}
-		foreach($this->aAttachments as $aAttachment)
-		{
-			if (empty($aAttachment['mimeType']))
-			{
+		foreach($this->aAttachments as $aAttachment) {
+			if(empty($aAttachment['mimeType'])) {
 				$aErrors[] = 'No attachment mime type for '.$aAttachment['filename'];
 			}
-			if (empty($aAttachment['filename']))
-			{
+			if(empty($aAttachment['filename'])) {
 				$aErrors[] = 'No attachment file name';
 			}
-			if (empty($aAttachment['content']))
-			{
+			if(empty($aAttachment['content'])) {
 				$aErrors[] = 'No attachment content for '.$aAttachment['filename'];
 			}
 		}
@@ -139,10 +127,8 @@ class EmailMessage {
 	 * Produce a plain-text version of the body of the message by stripping the HTML tags but preserving the visual line breaks
 	 * @return string The plain-text version of the text
 	 */
-	public function StripTags($sText = null)
-	{
-		if ($sText == null)
-		{
+	public function StripTags($sText = null) {
+		if($sText == null) {
 			$sText = $this->sBodyText;
 		}
 		
@@ -190,25 +176,20 @@ class EmailMessage {
 	 * @param hash $aMatches
 	 * @return string
 	 */
-	protected function AnchorsReplaceCallback($aMatches)
-	{
+	protected function AnchorsReplaceCallback($aMatches) {
 		$sAttributes = $aMatches[1];
-		if(preg_match('/href="([^"]+)"/', $sAttributes, $aHrefMatches))
-		{
+		if(preg_match('/href="([^"]+)"/', $sAttributes, $aHrefMatches)) {
 			// Hyperlinks
-			if (substr($aHrefMatches[1], 0, 7) == 'mailto:')
-			{
+			if(substr($aHrefMatches[1], 0, 7) == 'mailto:') {
 				// "mailto:" hyperlinks: keep only the email address (will not be clickable in iTop anyhow)
 				$sText = ' '.substr($aHrefMatches[1], 7).' ';
 			}
-			else
-			{
+			else {
 				// Other type of hyperlink, keep as-is, the display in iTop will turn it back into a clickable hyperlink
 				$sText = ' '. $aHrefMatches[1].' ';
 			}
 		}
-		else
-		{
+		else {
 			// No hyperlink, just keep the text of the anchor
 			$sText = $aMatches[2];
 		}
@@ -220,8 +201,7 @@ class EmailMessage {
 	 * @param hash $aMatches
 	 * @return string
 	 */
-	protected function PregReplaceCallback($aMatches)
-	{
+	protected function PregReplaceCallback($aMatches) {
 		$sText = str_replace(array("\n", "\r"), EmailMessage::NEW_LINE_MARKER, $aMatches[1]);
 		return EmailMessage::NEW_LINE_MARKER.strip_tags($sText).EmailMessage::NEW_LINE_MARKER; // Each <pre>...<pre> causes a line break before and after
 	}
@@ -231,16 +211,13 @@ class EmailMessage {
 	 * (tries to) extract the "new" part of the body in HTML, producing some HTML
 	 * as the output. The filtering is based on a list of tags/classes to remove (overrideable by 'html-tags-to-remove' in the config)
 	 */
-	public function GetNewPartHTML($sBodyText = null)
-	{
-		if ($sBodyText === null)
-		{
+	public function GetNewPartHTML($sBodyText = null) {
+		if($sBodyText === null) {
 			$sBodyText = $this->sBodyText;
 		}
 		
-		if ($sBodyText == '') return ''; // No need for a sophisticated processing, an empty string is an empty string!
-		if (strpos($sBodyText, '<html') === false)
-		{
+		if($sBodyText == '') return ''; // No need for a sophisticated processing, an empty string is an empty string!
+		if(strpos($sBodyText, '<html') === false) {
 			// No enclosing <html></html> tag, let's add it
 			$sBodyText = '<html><body>'.$sBodyText.'</body></html>';
 		}
@@ -252,8 +229,7 @@ class EmailMessage {
 			'pre' => array('moz-signature'),
 		);
 
-		if (class_exists('MetaModel'))
-		{
+		if(class_exists('MetaModel')) {
 			$aTagsToRemove = MetaModel::GetModuleSetting('jb-email-synchro', 'html-tags-to-remove', $aTagsToRemove);	
 		}		
 		
@@ -267,13 +243,11 @@ class EmailMessage {
 		$sXPath = "//body";
 		$oNodesList = $oXPath->query($sXPath);
 		
-		if ($oNodesList->length == 0)
-		{
+		if($oNodesList->length == 0) {
 			// No body, save the whole document
 			$sCleanHtml = $this->oDoc->saveHTML();
 		}
-		else
-		{
+		else {
 			// Export only the content of the body tag
 			$sCleanHtml = $this->oDoc->saveHTML($oNodesList->item(0));
 			// remove the body tag itself
@@ -288,54 +262,43 @@ class EmailMessage {
 	 * @param DOMNode $oElement
 	 * @param unknown $aTagsToRemove
 	 */
-	protected function CleanNode(DOMNode $oElement, $aTagsToRemove)
-	{
+	protected function CleanNode(DOMNode $oElement, $aTagsToRemove) {
 		$aAttrToRemove = array();
 		
-		if ($oElement->hasChildNodes())
-		{
+		if($oElement->hasChildNodes()) {
 			$aChildElementsToRemove = array();
 			// Gather the child nodes to remove
-			foreach($oElement->childNodes as $oNode)
-			{
-				if (($oNode instanceof DOMElement) && (array_key_exists(strtolower($oNode->tagName), $aTagsToRemove)))
-				{
+			foreach($oElement->childNodes as $oNode) {
+				if(($oNode instanceof DOMElement) && (array_key_exists(strtolower($oNode->tagName), $aTagsToRemove))) {
 					$aCSSClasses = $aTagsToRemove[strtolower($oNode->tagName)];
-					if (count($aCSSClasses) == 0)
-					{
+					if(count($aCSSClasses) == 0) {
 						// No special class to check, remove the node straight away
 						$aChildElementsToRemove[] = $oNode;
 					}
-					else
-					{
+					else {
 						// Check if the class of this node is a special one
-						if (in_array($oNode->getAttribute('class'), $aCSSClasses))
-						{
+						if(in_array($oNode->getAttribute('class'), $aCSSClasses)) {
 							// The 'class' indicates that this node has to be removed
 							$aChildElementsToRemove[] = $oNode;
 						}
-						else
-						{
+						else {
 							// Recurse
 							$this->CleanNode($oNode, $aTagsToRemove);
 						}
 					}
 				}
-				else if ($oNode instanceof DOMComment)
-				{
+				else if($oNode instanceof DOMComment) {
 					// Remove comments
 					$aChildElementsToRemove[] = $oNode;
 				}
-				else
-				{
+				else {
 					// Recurse
 					$this->CleanNode($oNode, $aTagsToRemove);
 				}
 			}
 						
 			// Now remove all marked nodes
-			foreach($aChildElementsToRemove as $oDomElement)
-			{
+			foreach($aChildElementsToRemove as $oDomElement) {
 				$oElement->removeChild($oDomElement);
 			}
 		}		
@@ -350,14 +313,11 @@ class EmailMessage {
 	 *
 	 * @return string
 	 */
-	public function GetNewPart($sBodyText = null, $sBodyFormat = null)
-	{
-		if ($sBodyText === null)
-		{
+	public function GetNewPart($sBodyText = null, $sBodyFormat = null) {
+		if($sBodyText === null) {
 			$sBodyText = $this->sBodyText;
 		}
-		if ($sBodyFormat === null)
-		{
+		if($sBodyFormat === null) {
 			$sBodyFormat = $this->sBodyFormat;
 		}
 		$this->sTrace .= "Beginning of GetNewPart:\n";
@@ -376,14 +336,13 @@ class EmailMessage {
 			'/^>.*$/' => false, // Old fashioned mail clients: continue processing the lines, each of them is preceded by >
 		);
 
-		if (class_exists('MetaModel')) {
+		if(class_exists('MetaModel')) {
 			$aIntroductoryPatterns = MetaModel::GetModuleSetting('jb-email-synchro', 'introductory_patterns', $aIntroductoryPatterns);	
 			$aGlobalDelimiterPatterns = MetaModel::GetModuleSetting('jb-email-synchro', 'multiline_delimiter_patterns', $aGlobalDelimiterPatterns);
 			$aDelimiterPatterns = MetaModel::GetModuleSetting('jb-email-synchro', 'delimiter_patterns', $aDelimiterPatterns);
 		}
 		
-		if ($sBodyFormat == 'text/html')
-		{
+		if($sBodyFormat == 'text/html') {
 			// In HTML the "quoted" text is supposed to be inside "<blockquote....>.....</blockquote>"
 			$this->sTrace .= 'Processing the HTML body (removing blockquotes)'."\n";
 			$sBodyText = preg_replace("|<blockquote.+</blockquote>|iUms", '', $sBodyText);
@@ -398,54 +357,42 @@ class EmailMessage {
 		
 		$bGlobalPattern = false;
 		$iStartPos = null; // New part position if global pattern is found
-		foreach($aGlobalDelimiterPatterns as $sPattern)
-		{
+		foreach($aGlobalDelimiterPatterns as $sPattern) {
 			$this->sTrace .= 'Processing the body; trying the global pattern: "'.$sPattern.'"'."\n";
 			$ret = preg_match($sPattern, $sBodyText, $aMatches, PREG_OFFSET_CAPTURE);
-			if ($ret === 1)
-			{
-				if ($bGlobalPattern)
-				{
+			if($ret === 1) {
+				if($bGlobalPattern) {
 					// Another pattern was already found, keep only the min of the two
 					$iStartPos = min($aMatches[0][1], $iStartPos);
 				}
-				else
-				{
+				else {
 					$iStartPos = $aMatches[0][1];
 				}
 				$this->sTrace .= 'Found a match with the global pattern: "'.$sPattern.'"'."\n";
 				$bGlobalPattern = true;
 				// continue the loop to find if another global pattern is present BEFORE this one in the message
 			}
-			else if ($ret === false)
-			{
+			else if($ret === false) {
 				$iErrCode = preg_last_error();
 				$this->sTrace .= 'An error occurred with global pattern: "'.$sPattern.'"'." (errCode = $iErrCode)\n";
 			}
 		}
-		if ($bGlobalPattern)
-		{
+		if($bGlobalPattern) {
 			$sNewText = substr($sBodyText, 0, $iStartPos);
 		}
-		else
-		{
+		else {
 			$aKeptLines = array();
-			foreach($aLines as $index => $sLine)
-			{
+			foreach($aLines as $index => $sLine) {
 				$sLine = trim($sLine);
 				$bStopNow = $this->IsNewPartLine($sLine, $aDelimiterPatterns); // returns true, false or null (if no match)
-				if ($bStopNow !== null)
-				{
+				if($bStopNow !== null) {
 					$this->sTrace .= 'Processing the text/plain body; line #'.$index.' contains the delimiter pattern, will be removed (stop = '.($bStopNow ? 'true' : 'false').')'."\n";
 					// Check if the line above contains one of the introductory pattern
 					// like: On 10/09/2010 john.doe@test.com wrote:
-					if (($index > 0) && isset($aLines[$index-1]))
-					{
+					if(($index > 0) && isset($aLines[$index-1])) {
 						$sPrevLine = trim($aLines[$index-1]);
-						foreach($aIntroductoryPatterns as $sPattern)
-						{
-							if (preg_match($sPattern, trim($sPrevLine)))
-							{
+						foreach($aIntroductoryPatterns as $sPattern) {
+							if(preg_match($sPattern, trim($sPrevLine))) {
 								// remove the introductory line
 								unset($aKeptLines[$index-1]);
 								$this->sTrace .= 'Processing the text/plain body; line #'.($index-1).' contains the introductory pattern, will be removed.'."\n";
@@ -453,13 +400,12 @@ class EmailMessage {
 							}
 						}
 					}
-					if ($bStopNow === true)
-					{
+					if($bStopNow === true) {
 						break;
 					}
 				}
-				else // null => no match, keep the line
-				{
+				else {
+					// null => no match, keep the line
 					$aKeptLines[$index] = $sLine;
 				}
 			}
@@ -470,11 +416,9 @@ class EmailMessage {
 		return $sNewText;
 	}
 	
-	protected function IsNewPartLine($sLine, $aDelimiterPatterns)
-	{
-		foreach($aDelimiterPatterns as $sPattern => $bStopNow)
-		{
-			if (preg_match($sPattern, $sLine)) return $bStopNow;
+	protected function IsNewPartLine($sLine, $aDelimiterPatterns) {
+		foreach($aDelimiterPatterns as $sPattern => $bStopNow) {
+			if(preg_match($sPattern, $sLine)) return $bStopNow;
 		}
 		return null;
 	}

@@ -18,12 +18,10 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
-class MessageFromMailbox extends RawEmailMessage
-{
+class MessageFromMailbox extends RawEmailMessage {
 	protected $sUIDL;
 	
-	public function __construct($sUIDL, $sRawHeaders, $sBody)
-	{
+	public function __construct($sUIDL, $sRawHeaders, $sBody) {
 		$this->sUIDL = $sUIDL;
 		parent::__construct( $sRawHeaders."\r\n".$sBody);
 	}
@@ -33,8 +31,7 @@ class MessageFromMailbox extends RawEmailMessage
 	 * @param string $sFilePath The path to the file to load
 	 * @return RawEmailMessage The loaded message
 	 */
-	static public function FromFile($sFilePath)
-	{
+	public static function FromFile($sFilePath) {
 		//TODO: improve error handling in case the file does not exist or is corrupted...
 		return new MessageFromMailbox(basename($sFilePath), file_get_contents($sFilePath), '');
 	}
@@ -46,17 +43,14 @@ class MessageFromMailbox extends RawEmailMessage
 	 *
 	 * @return EmailMessage
 	 */
-	public function Decode($sPreferredDecodingOrder = 'text/plain,text/html')
-	{
+	public function Decode($sPreferredDecodingOrder = 'text/plain,text/html') {
 		$sMessageId = $this->GetMessageId();
 		$aCallers = $this->GetSender();
-		if (count($aCallers) > 0)
-		{
+		if(count($aCallers) > 0) {
 			$sCallerEmail = $aCallers[0]['email'];
 			$sCallerName = $this->GetCallerName();
 		}
-		else
-		{
+		else {
 			$sCallerEmail = '';
 			$sCallerName = '';
 		}
@@ -65,8 +59,7 @@ class MessageFromMailbox extends RawEmailMessage
 		$sBodyText = '';
 		$sBodyFormat = '';
 		$aDecodingOrder = explode(',', $sPreferredDecodingOrder);
-		foreach($aDecodingOrder as $sMimeType)
-		{
+		foreach($aDecodingOrder as $sMimeType) {
 			$aPart = $this->FindFirstPart($sMimeType, '/attachment/i');
 			if ($aPart !== null)
 			{
@@ -115,44 +108,35 @@ class MessageFromMailbox extends RawEmailMessage
 	/**
 	 * Get MS Thread-index for this message
 	 */
-	protected function GetMSThreadIndex()
-	{
+	protected function GetMSThreadIndex() {
 		return $this->GetHeader('thread-index');
 	}
 	 
-	protected function GetCallerName()
-	{
+	protected function GetCallerName() {
 		$aSender = $this->GetSender();
 		$sName = '';
 		
-		if (count($aSender) > 0)
-		{
-			if (!empty($aSender[0]['name']))
-			{
+		if(count($aSender) > 0) {
+			if(!empty($aSender[0]['name'])) {
 				$sName = $aSender[0]['name'];
-				if (preg_match("/.+ \(([^\)]+) at [^\)]+\)$/", $sName, $aMatches))
-				{
+				if(preg_match("/.+ \(([^\)]+) at [^\)]+\)$/", $sName, $aMatches)) {
 					$sName = $aMatches[1];	
 				}			
 			}
-			else
-			{
-				if (preg_match("/^([^@]+)@.+$/", $aSender[0]['email'], $aMatches))
-				{
+			else {
+				if(preg_match("/^([^@]+)@.+$/", $aSender[0]['email'], $aMatches)) {
 					$sName = $aMatches[1]; // Use the first part of the email address before the @
 				}
 			}
 		}
 		
 		// Try to "pretty format" the names
-		if (preg_match("/^([^\.]+)[\._]([^\.]+)$/", $sName, $aMatches))
-		{
+		if(preg_match("/^([^\.]+)[\._]([^\.]+)$/", $sName, $aMatches)) {
 			// transform "john.doe" or "john_doe" into "john doe"
 			$sName = $aMatches[1].' '.$aMatches[2];
 		}
 
-		if (preg_match("/^([^,]+), ([^,]+)$/", $sName, $aMatches))
-		{
+		if(preg_match("/^([^,]+), ([^,]+)$/", $sName, $aMatches)) {
 			// transform "doe, john" into "john doe"
 			$sName = $aMatches[2].' '.$aMatches[1];
 		}
@@ -162,8 +146,7 @@ class MessageFromMailbox extends RawEmailMessage
 		return $sName;
 	}
 	
-	public function SendAsAttachment($sTo, $sFrom, $sSubject, $sTextMessage)
-	{
+	public function SendAsAttachment($sTo, $sFrom, $sSubject, $sTextMessage) {
   		$oEmail = new Email();
   		$oEmail->SetRecipientTO($sTo);
   		$oEmail->SetSubject($sSubject);
@@ -177,8 +160,7 @@ class MessageFromMailbox extends RawEmailMessage
   		$oEmail->Send($aIssues, true /* bForceSynchronous */, null /* $oLog */);
 	}
 	
-	protected function ParseMessageId($sMessageId)
-	{
+	protected function ParseMessageId($sMessageId) {
 		$aMatches = array();
 		$ret = false;
 		if (preg_match('/^<iTop_(.+)_([0-9]+)_.+@.+openitop\.org>$/', $sMessageId, $aMatches))
@@ -192,17 +174,13 @@ class MessageFromMailbox extends RawEmailMessage
 	 * Find-out (by analyzing the headers) if the message is related to an iTop object
 	 * @return mixed Either the related object or null if none
 	 */
-	protected function GetRelatedObject()
-	{
+	protected function GetRelatedObject() {
 		if (!class_exists('MetaModel')) return null;
 		// First look if the message is not a direct reply to a message sent by iTop
-		if ($this->GetHeader('in-reply-to') != '')
-		{
+		if($this->GetHeader('in-reply-to') != '') {
 			$ret = $this->ParseMessageId($this->GetHeader('in-reply-to'));
-			if ($ret !== false)
-			{
-				if (MetaModel::IsValidClass($ret['class']))
-				{
+			if($ret !== false) {
+				if(MetaModel::IsValidClass($ret['class'])) {
 					$oObject = MetaModel::GetObject($ret['class'], $ret['id'], false /* Caution the object may not exist */);
 					if ($oObject != null) return $oObject;
 				}
@@ -212,13 +190,10 @@ class MessageFromMailbox extends RawEmailMessage
 		// Second chance, look if a message sent by iTop is listed in the references
 		$sReferences = $this->GetHeader('references');
 		$aReferences = explode(' ', $sReferences );
-		foreach($aReferences as $sReference)
-		{
+		foreach($aReferences as $sReference) {
 			$ret = $this->ParseMessageId($sReference);
-			if ($ret !== false)
-			{
-				if (MetaModel::IsValidClass($ret['class']))
-				{
+			if($ret !== false) {
+				if(MetaModel::IsValidClass($ret['class'])) {
 					$oObject = MetaModel::GetObject($ret['class'], $ret['id'], false /* Caution the object may not exist */);
 					if ($oObject != null) return $oObject;
 				}

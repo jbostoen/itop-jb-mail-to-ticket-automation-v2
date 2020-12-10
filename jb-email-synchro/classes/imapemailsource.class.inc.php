@@ -80,7 +80,7 @@ class IMAPEmailSource extends EmailSource {
 		$sLastError = imap_last_error();
 		if($sLastError !== false) {
 			if(preg_match('/Unexpected characters at end of address: <(.*)>/', $sLastError, $aMatches)) {
-				// Exception occurred while pasrsing From, To, CC headers.
+				// Exception occurred while parsing From, To, CC headers.
 				// It's not necessarily critical, because the problem can be located just in one single address.
 				// Drop this warning.
 				imap_errors();

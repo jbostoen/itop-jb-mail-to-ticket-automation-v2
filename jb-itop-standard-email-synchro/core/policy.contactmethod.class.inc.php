@@ -11,6 +11,15 @@
  
 namespace jb_itop_extensions\mail_to_ticket;
 
+// iTop internals
+use DBObjectSet;
+use DBObjectSearch;
+use EmailMessage;
+
+// iTop classes
+use Person;
+use utils;
+
 /**
  Class PolicyHelper_ContactMethod defines some shared functionality.
 */
@@ -79,14 +88,14 @@ abstract class PolicyHelper_ContactMethod {
 	 * @details Does not simply look at 'from:' name since this might for instance be the husband's name while the wife is sending an e-mail
 	 *
 	 */
-	public static function GetScoreOfPersonNameInEmailBody(\EmailMessage $oEmail, \Person $oCaller) {
+	public static function GetScoreOfPersonNameInEmailBody(EmailMessage $oEmail, Person $oCaller) {
 		
 		$iLength = -1; // Nothing found
 		
 		// Do something about accents; only keep A-z and add LIMITED wildcard(s)
 		
 		// Run on plain text
-		$sBodyText = \utils::HtmlToText($oEmail->sBodyText);
+		$sBodyText = utils::HtmlToText($oEmail->sBodyText);
 		$aLines = preg_split(NEWLINE_REGEX, $sBodyText);
 		
 		$sPattern_FirstName = self::GetRegexForName($oCaller->Get('first_name'));
@@ -211,7 +220,7 @@ abstract class PolicyFindCallerByContactMethod extends Policy implements iPolicy
 				$oCaller = null;
 				$sContactMethodQuery = 'SELECT ContactMethod WHERE contact_method = "email" AND contact_detail LIKE ":email"';
 				$sCallerEmail = self::$oEmail->sCallerEmail;
-				$oSet_ContactMethod = new \DBObjectSet(\DBObjectSearch::FromOQL($sContactMethodQuery), [], ['email' => $sCallerEmail]);
+				$oSet_ContactMethod = new DBObjectSet(DBObjectSearch::FromOQL($sContactMethodQuery), [], ['email' => $sCallerEmail]);
 				
 				switch($oSet_ContactMethod->Count()) {
 					
@@ -222,7 +231,7 @@ abstract class PolicyFindCallerByContactMethod extends Policy implements iPolicy
 						self::Trace("... Found ContactMethod: ID ".$oContactMethod->GetKey());
 						
 						$sContactMethodQuery = 'SELECT Person WHERE id = ":id"';
-						$oSet_Person = new \DBObjectSet(\DBObjectSearch::FromOQL($sContactQuery, [], ['id' => $oContactMethod->Get('person_id')]));
+						$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery, [], ['id' => $oContactMethod->Get('person_id')]));
 						
 						// Should be 1 Person
 						if($oSet_Person->Count() == 1) {
@@ -296,8 +305,8 @@ abstract class PolicyFindCallerByContactMethod extends Policy implements iPolicy
 							$aPersonIds = array_unique($aPersonIds);
 							
 							// Query each Person found in ContactMethod objects
-							$oFilter_Person = \DBObjectSearch::FromOQL('SELECT Person WHERE id IN ('.implode(', ', $aPersonIds).')');
-							$oSet_Persons = new \DBObjectSet($oFilter_Person);
+							$oFilter_Person = DBObjectSearch::FromOQL('SELECT Person WHERE id IN ('.implode(', ', $aPersonIds).')');
+							$oSet_Persons = new DBObjectSet($oFilter_Person);
 							
 							$iScore = -99; // Should be lower than -1 (smallest value returned by PolicyHelper_ContactMethod::GetScoreOfPersonNameInEmailBody())
 						

@@ -21,8 +21,7 @@
 /**
  * Specific exceptions thrown when a decoding error occurs
  */
-class EmailDecodingException extends Exception
-{
+class EmailDecodingException extends Exception {
 }
 
 /**
@@ -42,8 +41,7 @@ class EmailDecodingException extends Exception
  * @author      Denis Flaven <denis.flaven@combodo.com>
  * @license     http://www.opensource.org/licenses/lgpl-3.0.html LGPL
  */
-class RawEmailMessage
-{
+class RawEmailMessage {
 	/**
 	 * @var string Raw content of the email (headers + body altogether)
 	 */
@@ -71,8 +69,7 @@ class RawEmailMessage
 	 *
 	 * @param string $sRawContent The full text version of the message (headers + empty line + body)
 	 */
-	public function __construct($sRawContent)
-	{
+	public function __construct($sRawContent) {
 		$this->bStopOnIconvError = false;
 		$this->iNextId = 0;
 		
@@ -89,8 +86,7 @@ class RawEmailMessage
 	 *
 	 * @return int The size of the message
 	 */
-	public function GetSize()
-	{
+	public function GetSize() {
 		return strlen($this->sRawContent);
 	}
 	
@@ -99,8 +95,7 @@ class RawEmailMessage
 	 *
 	 * @return string The raw content of the message
 	 */
-	public function GetRawContent()
-	{
+	public function GetRawContent() {
 		return $this->sRawContent;
 	}
 	
@@ -109,15 +104,12 @@ class RawEmailMessage
 	 *
 	 * @return array An array of ('email' => email_address, 'name' => display_name) one per 'sender'
 	 */
-	public function GetSender()
-	{
+	public function GetSender() {
 		$sSender = $this->GetHeader('from');
-		if (empty($sSender))
-		{
+		if(empty($sSender)) {
 			$sSender = $this->GetHeader('sender');
 		}
-		if (empty($sSender))
-		{
+		if(empty($sSender)) {
 			$sSender = $this->GetHeader('reply-to');
 		}
 		return self::ParseAddresses($sSender);
@@ -129,8 +121,7 @@ class RawEmailMessage
 	 *
 	 * @return array An array of ('email' => email_address, 'name' => display_name) one per recipient
 	 */
-	public function GetTo()
-	{
+	public function GetTo() {
 		return self::ParseAddresses($this->GetHeader('to'));
 	}
 	
@@ -139,8 +130,7 @@ class RawEmailMessage
 	 *
 	 * @return array An array of ('email' => email_address, 'name' => display_name) one per recipient
 	 */
-	public function GetCc()
-	{
+	public function GetCc() {
 		return self::ParseAddresses($this->GetHeader('cc'));
 	}
 	
@@ -149,8 +139,7 @@ class RawEmailMessage
 	 *
 	 * @return string The decoded subject of the message
 	 */
-	public function GetSubject()
-	{
+	public function GetSubject() {
 		return $this->GetHeader('subject');
 	}
 	
@@ -159,8 +148,7 @@ class RawEmailMessage
 	 *
 	 * @return string The message-id
 	 */
-	public function GetMessageId()
-	{
+	public function GetMessageId() {
 		return $this->GetHeader('message-id');
 	}
 	
@@ -170,68 +158,55 @@ class RawEmailMessage
 	 *
 	 * @return array Array of ('filename' => original_file_name, 'mimeType' => MIME_type, 'content' => binary_string), one entry per attachment
 	 */
-	public function GetAttachments(&$aAttachments = null, $aPart = null, &$index = 1)
-	{
+	public function GetAttachments(&$aAttachments = null, $aPart = null, &$index = 1) {
 		static $iAttachmentCount = 0;
-		if ($aAttachments === null)
-		{
+		if($aAttachments === null) {
 			$aAttachments = array();
 		}
-		if ($aPart === null)
-		{
+		if($aPart === null) {
 			$aPart = $this->aParts;
 		} //Init for recursion
 		
-		if ($aPart['type'] == 'simple')
-		{
-			if ($this->IsAttachment($aPart['headers']))
-			{
+		if($aPart['type'] == 'simple') {
+			if($this->IsAttachment($aPart['headers'])) {
 				$sFileName = '';
 				$sContentDisposition = $this->GetHeader('content-disposition', $aPart['headers']);
-				if (($sContentDisposition != '') && (preg_match('/filename="([^"]+)"/', $sContentDisposition, $aMatches)))
-				{
+				if(($sContentDisposition != '') && (preg_match('/filename="([^"]+)"/', $sContentDisposition, $aMatches))) {
 					$sFileName = $aMatches[1];
 				}
-				else if (($sContentDisposition != '') && (preg_match('/filename=([^"]+)/', $sContentDisposition, $aMatches))) // same but without quotes
-				{
+				elseif(($sContentDisposition != '') && (preg_match('/filename=([^"]+)/', $sContentDisposition, $aMatches))) {
+					// same but without quotes
 					$sFileName = $aMatches[1];
 				}
 				
 				$bInline = true;
-				if (stripos($sContentDisposition, 'attachment;') !== false)
-				{
+				if(stripos($sContentDisposition, 'attachment;') !== false) {
 					$bInline = false;
 				}
 				
 				
 				$sType = '';
 				$sContentId = $this->GetHeader('content-id', $aPart['headers']);
-				if (($sContentId != '') && (preg_match('/^<(.+)>$/', $sContentId, $aMatches)))
-				{
+				if(($sContentId != '') && (preg_match('/^<(.+)>$/', $sContentId, $aMatches))) {
 					$sContentId = $aMatches[1];
 				}
-				else
-				{
+				else {
 					$sContentId = 'itop_'.$iAttachmentCount;
 					$iAttachmentCount++;
 				}
 				$sContentType = $this->GetHeader('content-type', $aPart['headers']);
-				if (($sContentType != '') && (preg_match('/^([^;]+)/', $sContentType, $aMatches)))
-				{
+				if(($sContentType != '') && (preg_match('/^([^;]+)/', $sContentType, $aMatches))) {
 					$sType = $aMatches[1];
 				}
-				if (empty($sFileName) && preg_match('/name="([^"]+)"/', $sContentType, $aMatches))
-				{
+				if(empty($sFileName) && preg_match('/name="([^"]+)"/', $sContentType, $aMatches)) {
 					$sFileName = $aMatches[1];
 				}
-				if (empty($sFileName))
-				{
+				if(empty($sFileName)) {
 					// generate a name based on the type of the file...
 					$aTypes = explode('/', $sType);
 					$sFileExtension = $aTypes[1];
 					// map the type to a useful extension if needed
-					switch ($aTypes[1])
-					{
+					switch($aTypes[1]) {
 						case 'rfc822':
 							// Special case for messages: use the .eml extension
 							$sFileExtension = 'eml';
@@ -250,8 +225,7 @@ class RawEmailMessage
 		}
 		else
 		{
-			foreach ($aPart['parts'] as $aSubPart)
-			{
+			foreach ($aPart['parts'] as $aSubPart) {
 				$aAttachments = array_merge($aAttachments, $this->GetAttachments($aAttachments, $aSubPart, $index));
 			}
 		}
@@ -266,8 +240,7 @@ class RawEmailMessage
 	 *
 	 * @return RawEmailMessage The loaded message
 	 */
-	static public function FromFile($sFilePath)
-	{
+	public static function FromFile($sFilePath) {
 		//TODO: improve error handling in case the file does not exist or is corrupted...
 		return new RawEmailMessage(file_get_contents($sFilePath));
 	}
@@ -280,8 +253,7 @@ class RawEmailMessage
 	 *
 	 * @return void
 	 */
-	public Function SaveToFile($sFilePath)
-	{
+	public Function SaveToFile($sFilePath) {
 		//TODO: improve error handling in case the file does not exist or cannot be written...
 		file_put_contents($sFilePath, $this->sRawContent);
 	}
@@ -292,10 +264,9 @@ class RawEmailMessage
 	 *
 	 * @return string The text 'body' of the message or null if no plain text version of the 'body' exists
 	 */
-	public function GetTextBody()
-	{
+	public function GetTextBody() {
 		$aPart = $this->FindFirstPart('text/plain', '/attachment/i');
-		if ($aPart === null)
+		if($aPart === null)
 		{
 			return null;
 		}
@@ -311,15 +282,12 @@ class RawEmailMessage
 	 *
 	 * @return string The html 'body' of the message or null if no html version of the 'body' exists
 	 */
-	public function GetHTMLBody()
-	{
+	public function GetHTMLBody() {
 		$aPart = $this->FindFirstPart('text/html', '/attachment/i');
-		if ($aPart === null)
-		{
+		if($aPart === null) {
 			return null;
 		}
-		else
-		{
+		else {
 			return $aPart['body'];
 		}
 	}
@@ -332,16 +300,13 @@ class RawEmailMessage
 	 *
 	 * @return string The value of the header or an empty string if no such header exists in the message
 	 */
-	public function GetHeader($sHeaderName, $aHeaders = null)
-	{
-		if ($aHeaders === null)
-		{
+	public function GetHeader($sHeaderName, $aHeaders = null) {
+		if($aHeaders === null) {
 			$aHeaders = $this->aHeaders;
 		}
 		
 		$sHeaderContent = '';
-		if (array_key_exists(strtolower($sHeaderName), $aHeaders))
-		{
+		if(array_key_exists(strtolower($sHeaderName), $aHeaders)) {
 			$sHeaderContent = $aHeaders[strtolower($sHeaderName)];
 		}
 		return $sHeaderContent;
@@ -352,8 +317,7 @@ class RawEmailMessage
 	 *
 	 * @return hash The value of the headers as header_name => value
 	 */
-	public function GetHeaders()
-	{
+	public function GetHeaders() {
 		return $aHeaders = $this->aHeaders;
 	}
 	
@@ -364,25 +328,19 @@ class RawEmailMessage
 	 *
 	 * @return hash The wholme structure of the message except the 'body' piece of each part
 	 */
-	public function GetStructure($aParts = null)
-	{
+	public function GetStructure($aParts = null) {
 		$aRet = array();
-		if ($aParts === null)
-		{
+		if($aParts === null) {
 			$aParts = $this->aParts;
 		} //Init for recursion
 
 		
-		foreach ($aParts as $sKey => $aData)
-		{
-			if ($sKey !== 'body')
-			{
-				if (is_array($aData))
-				{
+		foreach ($aParts as $sKey => $aData) {
+			if($sKey !== 'body') {
+				if(is_array($aData)) {
 					$aRet[$sKey] = $this->GetStructure($aData);
 				}
-				else
-				{
+				else {
 					$aRet[$sKey] = $aData;
 				}
 			}
@@ -398,23 +356,17 @@ class RawEmailMessage
 	 *
 	 * @return hash The 'raw' part found (i.e. the body is still an array of encoded strings), or null
 	 */
-	public function GetPartById($sId, $aPart = null)
-	{
-		if ($aPart === null)
-		{
+	public function GetPartById($sId, $aPart = null) {
+		if($aPart === null) {
 			$aPart = $this->aParts;
 		} //Init for recursion
-		if (($aPart['type'] == 'simple') && ($aPart['part_id'] == $sId))
-		{
+		if(($aPart['type'] == 'simple') && ($aPart['part_id'] == $sId)) {
 			return $aPart;
 		}
-		else
-		{
-			foreach ($aPart['parts'] as $aSubPart)
-			{
+		else {
+			foreach ($aPart['parts'] as $aSubPart) {
 				$aPartFound = $this->GetPartById($sId, $aSubPart);
-				if ($aPartFound === null)
-				{
+				if($aPartFound === null) {
 					return $aPartFound;
 				}
 			}
@@ -428,11 +380,9 @@ class RawEmailMessage
 	 *
 	 * @return bool The previous (or current) valur of the parameter
 	 */
-	public function StrictCharacterSetConversion($bStrict = null)
-	{
+	public function StrictCharacterSetConversion($bStrict = null) {
 		$bPreviousValue = $this->bStopOnIconvError;
-		if ($bStrict != null)
-		{
+		if($bStrict != null) {
 			$this->bStopOnIconvError = $bStrict;
 		}
 		return $bPreviousValue;
@@ -452,29 +402,23 @@ class RawEmailMessage
 	 *
 	 * @return array (1 entry per  part). Each part is an array of lines
 	 */
-	protected function SplitIntoParts($aLines, $sBoundary)
-	{
+	protected function SplitIntoParts($aLines, $sBoundary) {
 		$sDelim = '--'.$sBoundary;
 		$iLen = strlen($sDelim);
 		$aCurPart = array();
 		$aParts = array();
-		foreach ($aLines as $sLine)
-		{
-			if (substr($sLine, 0, $iLen) == $sDelim)
-			{
-				if (count($aCurPart) > 0)
-				{
+		foreach($aLines as $sLine) {
+			if(substr($sLine, 0, $iLen) == $sDelim) {
+				if(count($aCurPart) > 0) {
 					$aParts[] = $aCurPart;
 				}
 				$aCurPart = array();
 			}
-			else
-			{
+			else {
 				$aCurPart[] = $sLine;
 			}
 		}
-		if (count($aCurPart) > 0)
-		{
+		if(count($aCurPart) > 0) {
 			$aParts[] = $aCurPart;
 		}
 		return $aParts;
@@ -489,48 +433,39 @@ class RawEmailMessage
 	 * @return array of parts. Each part is itself a hash: array(type => string, headers => hash, body => array, parts => array )
 	 * @throws \EmailDecodingException
 	 */
-	protected function ExtractParts($aHeaders, $aBodyLines)
-	{
+	protected function ExtractParts($aHeaders, $aBodyLines) {
 		$aParsedParts = array();
 		$sContentType = isset($aHeaders['content-type']) ? $aHeaders['content-type'] : '';
 
-		if (($sContentType != '') && preg_match('/multipart(.*);.*?boundary="?([^"]+)"?/i', $sContentType, $aMatches))
-		{
+		if(($sContentType != '') && preg_match('/multipart(.*);.*?boundary="?([^"]+)"?/i', $sContentType, $aMatches)) {
 			$sBoundary = $aMatches[2];
-			if (empty($sBoundary))
-			{
+			if(empty($sBoundary)) {
 				// hmm, malformed message ??
 				throw new EmailDecodingException('No boundary found for the multipart piece of the message.');
 			}
 			
-			if (stripos($sContentType, 'multipart/alternative') !== false)
-			{
+			if(stripos($sContentType, 'multipart/alternative') !== false) {
 				$aParsedParts['type'] = 'alternative';
 			}
-			else
-			{
+			else {
 				$aParsedParts['type'] = 'related';
 			}
 			$aParsedParts['part_id'] = $this->iNextId++;
 			$aParsedParts['parts'] = array();
 			$aRawParts = $this->SplitIntoParts($aBodyLines, $sBoundary);
 
-			foreach ($aRawParts as $aLines)
-			{
+			foreach($aRawParts as $aLines) {
 				$aSubPart = $this->ExtractHeadersAndRawBody($aLines);
-				if (count($aSubPart['headers']) > 0)
-				{
+				if(count($aSubPart['headers']) > 0) {
 					$aParsedParts['parts'][] = $this->ExtractParts($aSubPart['headers'], $aSubPart['body']);
 				}
 			}
 		}
-		else
-		{
+		else {
 			$aParsedParts['part_id'] = $this->iNextId++;
 			$aParsedParts['type'] = 'simple';
 			$aParsedParts['headers'] = $aHeaders;
-			if (!array_key_exists('content-type', $aParsedParts['headers']))
-			{
+			if(!array_key_exists('content-type', $aParsedParts['headers'])) {
 				// The most simple type of part is plain text
 				$aParsedParts['headers']['content-type'] = 'text/plain';
 			}
@@ -548,36 +483,31 @@ class RawEmailMessage
 	 *
 	 * @return array('headers' => hash, 'body' => array of strings)
 	 */
-	protected function ExtractHeadersAndRawBody($aLines)
-	{
+	protected function ExtractHeadersAndRawBody($aLines) {
 		$aRawFields = array();
 		$sCurrentHeader = '';
 
 		$idx = 0;
 		$aRawBody = array();
-		foreach ($aLines as $sLine)
-		{
-			if (self::IsNewLine($sLine))
-			{
+		foreach($aLines as $sLine) {
+			if(self::IsNewLine($sLine)) {
 				// end of headers
 				$aRawBody = array_slice($aLines, 1 + $idx);
 				break;
 			}
 
-			if (self::IsLineStartingWithPrintableChar($sLine)) // start of new header
-			{
-				if (preg_match('/([^:]+): ?(.*)$/', $sLine, $aMatches))
-				{
+			if(self::IsLineStartingWithPrintableChar($sLine)) {
+				// Start of new header
+				if(preg_match('/([^:]+): ?(.*)$/', $sLine, $aMatches)) {
 					$sNewHeader = strtolower($aMatches[1]);
 					$sValue = $aMatches[2];
 					$aRawFields[$sNewHeader] = $sValue;
 					$sCurrentHeader = $sNewHeader;
 				}
 			}
-			else // the current header continues on this line
-			{
-				if (isset($aRawFields[$sCurrentHeader]))
-				{
+			else {
+				// the current header continues on this line
+				if(isset($aRawFields[$sCurrentHeader])) {
 					// Fix for long subjects where spaces get lost on split header lines. At the moment, Combodo's version doesn't have this.
 					$aRawFields[$sCurrentHeader] .= (in_array($sCurrentHeader, ['references', 'subject']) == true ? $sLine : substr($sLine, 1));
 				}
@@ -587,8 +517,7 @@ class RawEmailMessage
 		
 		// Decode headers
 		$aHeaders = array();
-		foreach ($aRawFields as $sKey => $sValue)
-		{
+		foreach ($aRawFields as $sKey => $sValue) {
 			$aHeaders[$sKey] = self::DecodeHeaderString($sValue);
 		}
 		return array('headers' => $aHeaders, 'body' => $aRawBody);
@@ -601,8 +530,7 @@ class RawEmailMessage
 	 *
 	 * @return string The decoded string
 	 */
-	static protected function DecodeHeaderString($sInput)
-    {
+	protected static function DecodeHeaderString($sInput) {
 		$sOutput = iconv_mime_decode($sInput, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
 		return $sOutput; // Don't be too strict, continue on errors
     }
@@ -617,29 +545,23 @@ class RawEmailMessage
 	 * @return array The given part as a hash array('headers' => hash, 'body' => binary_string); or null if not found
 	 * @throws \Exception
 	 */
-    protected function FindFirstPart($sMimeType, $sExcludeDispositionPattern = null, $aPart = null)
-	{
+    protected function FindFirstPart($sMimeType, $sExcludeDispositionPattern = null, $aPart = null) {
 		$aRetPart = null;
 		
-		if ($aPart === null)
-		{
+		if($aPart === null) {
 			$aPart = $this->aParts;
 		} //Init for recursion
 
-		if ($aPart['type'] == 'simple')
-		{
+		if($aPart['type'] == 'simple') {
 			$sContentType = $this->GetHeader('Content-Type', $aPart['headers']);
-			if (preg_match('/^([^;]+)/', $sContentType, $aMatches))
-			{
+			if(preg_match('/^([^;]+)/', $sContentType, $aMatches)) {
 				$sPartMimeType = $aMatches[1];
-				if (strcasecmp($sPartMimeType, $sMimeType) == 0)
-				{
-					if ($sExcludeDispositionPattern != null)
-					{
+				if(strcasecmp($sPartMimeType, $sMimeType) == 0) {
+					if($sExcludeDispositionPattern != null) {
 						$sContentDisposition = $this->getHeader('Content-Disposition', $aPart['headers']);
 						$sSmimeType = array();
 						preg_match('/smime\-type=([a-zA-Z0-9\-]*);?/',$sContentType, $sSmimeType);
-						if (   ($sContentDisposition == '') 
+						if(   ($sContentDisposition == '') 
 							|| (preg_match($sExcludeDispositionPattern, $sContentDisposition) == 0) 
 							|| ($sPartMimeType === 'application/pkcs7-mime' && count($sSmimeType) > 0 && $sSmimeType[1] === 'signed-data'))
 						{
@@ -648,20 +570,16 @@ class RawEmailMessage
 							$aRetPart['body'] = $this->DecodePart($aPart['headers'], $aPart['body']);
 						}
 					}
-					else
-					{
+					else {
 						return $this->DecodePart($aPart['headers'], $aPart['body']);
 					}
 				}
 			}
 		}
-		else
-		{
-			foreach ($aPart['parts'] as $aSubPart)
-			{
+		else {
+			foreach($aPart['parts'] as $aSubPart) {
 				$aRetPart = $this->FindFirstPart($sMimeType, $sExcludeDispositionPattern, $aSubPart);
-				if ($aRetPart != null)
-				{
+				if($aRetPart != null) {
 					return $aRetPart; // Return once we've found one
 				}
 			}
@@ -678,34 +596,29 @@ class RawEmailMessage
 	 *
 	 * @return string The decoded 'body' of the part, in UTF-8
 	 */
-	function DecodePart($aHeaders, $aLines)
-	{
+	function DecodePart($aHeaders, $aLines) {
 		$sContentTransferEncoding = $this->GetHeader('Content-Transfer-Encoding');
 		$sCharset = 'UTF-8';
 		$sContentTypeHeader = $this->GetHeader('Content-Type');
 		
-		if (!empty($sContentTypeHeader) && preg_match('/charset=([^;]*)/i', $sContentTypeHeader, $aMatches))
-		{
+		if(!empty($sContentTypeHeader) && preg_match('/charset=([^;]*)/i', $sContentTypeHeader, $aMatches)) {
 			$sCharset = strtoupper(trim($aMatches[1], '"'));
 		}
 
 		$sHeader = $this->GetHeader('Content-Transfer-Encoding', $aHeaders);
-		if (!empty($sHeader))
-		{
+		if(!empty($sHeader)) {
 			$sContentTransferEncoding = strtolower($sHeader);
 		}
 		
 		$sHeader = $this->GetHeader('Content-Type', $aHeaders);
-		if (!empty($sHeader) && preg_match('/charset=([^;]*)/i', $sHeader, $aMatches))
-		{
+		if(!empty($sHeader) && preg_match('/charset=([^;]*)/i', $sHeader, $aMatches)) {
 			$sCharset = strtoupper(trim($aMatches[1], '"'));
 		}
 
-		switch ($sContentTransferEncoding)
-		{
+		switch ($sContentTransferEncoding) {
 			case 'base64':
 				$sBody = base64_decode(implode("\n", $aLines));
-				if ($sBody === false)
+				if($sBody === false)
 				{
 					// Failed to decode, try as-is
 					$sBody = implode("\n", $aLines);
@@ -722,27 +635,22 @@ class RawEmailMessage
 		}
  
 		// Convert to UTF-8 only if the part is some kind of text
-		if ($sCharset != 'UTF-8' && preg_match('/text\//', $aHeaders['content-type']))
-		{
+		if($sCharset != 'UTF-8' && preg_match('/text\//', $aHeaders['content-type'])) {
 			$sOriginalBody = $sBody;
 			$sBody = @iconv($sCharset, 'UTF-8//TRANSLIT//IGNORE', $sBody);
 
-			if ($sBody === false)
-			{
-				if ($this->bStopOnIconvError) // iconv returns false on failure
-				{
+			if($sBody === false) {
+				if($this->bStopOnIconvError) {
+					// iconv returns false on failure
 					throw new Exception("Cannot convert message part from '$sCharset' to UTF-8. iconv returned false");
 				}
-				else
-				{
+				else {
 					$sBody = $sOriginalBody; // Pass it as-is !!!
 				}
 			}
-			if (preg_match('/^([^;]+)/', $sHeader, $aMatches))
-			{
+			if(preg_match('/^([^;]+)/', $sHeader, $aMatches)) {
 				$sPartMimeType = $aMatches[1];
-				if (strcasecmp($sPartMimeType, 'text/html') == 0)
-				{
+				if(strcasecmp($sPartMimeType, 'text/html') == 0) {
 					// Right now the part is converted to UTF-8, so let's remove <meta charset=xxx> tags
 					// which may fool further attemps at parsing the HTML (for example with DOMXML)
 					$sBody = preg_replace('/<meta [^>]*charset=[^>]+>/i', '', $sBody);
@@ -760,8 +668,7 @@ class RawEmailMessage
 	 *
 	 * @return boolean
 	 */
-	protected static function IsNewLine($sLine)
-	{
+	protected static function IsNewLine($sLine) {
 		$sLine = str_replace(array("\r", "\n"), '', $sLine);
 
 		return (strlen($sLine) === 0);
@@ -774,8 +681,7 @@ class RawEmailMessage
 	 *
 	 * @return boolean
 	 */
-	protected static function IsLineStartingWithPrintableChar($sLine)
-	{
+	protected static function IsLineStartingWithPrintableChar($sLine) {
 		return preg_match('/^[A-Za-z]/', $sLine);
 	}
 	
@@ -790,36 +696,27 @@ class RawEmailMessage
 	 *
 	 * @return boolean
 	 */
-	protected function IsAttachment($aPartHeaders)
-	{
+	protected function IsAttachment($aPartHeaders) {
 		$sContentType = $this->GetHeader('content-type', $aPartHeaders);
 		$bRet = true;
-		if ($sContentType != '')
-		{
-			if (preg_match('|^([^/]+)/|', $sContentType, $aMatches))
-			{
+		if($sContentType != '') {
+			if(preg_match('|^([^/]+)/|', $sContentType, $aMatches)) {
 				$sPrimaryType = strtolower($aMatches[1]);
-				if ($sPrimaryType == 'multipart')
-				{
+				if($sPrimaryType == 'multipart') {
 					$bRet = false;
 				}
-				else
-				{
-					if ($sPrimaryType == 'text')
-					{
+				else {
+					if($sPrimaryType == 'text') {
 						$sContentDisposition = $this->GetHeader('content-disposition', $aPartHeaders);
-						if (($sContentDisposition != '') && (preg_match('/attachment/i', $sContentDisposition) != 0))
-						{
+						if(($sContentDisposition != '') && (preg_match('/attachment/i', $sContentDisposition) != 0)) {
 							$bRet = true;
 						}
-						else
-						{
+						else {
 							$bRet = false;
 						}
 
 					}
-					else
-					{
+					else {
 						$bRet = true;
 					}
 				}
@@ -836,8 +733,7 @@ class RawEmailMessage
 	 *
 	 * @return array An array of ('name' => friendly_name, 'email' => email_address)
 	 */
-	protected static function ParseAddresses($sAddresses)
-	{
+	protected static function ParseAddresses($sAddresses) {
 		$sTextQualifier = '"';
 		$sAddressDelimiter = ',';
 		
@@ -846,34 +742,28 @@ class RawEmailMessage
 		$bInTextString = false;
 		$bAtSignFound = false;
 		$sCurrentAddress = '';
-		for ($idx = 0; $idx < strlen($sAddresses); $idx++)
-		{
+		for($idx = 0; $idx < strlen($sAddresses); $idx++) {
 			$c = $sAddresses[$idx];
 			
-			if ($c == $sTextQualifier)
-			{
+			if($c == $sTextQualifier) {
 				$bInTextString = !$bInTextString;
 			}
 			
-			if (($c == '@') && !$bInTextString)
-			{
+			if(($c == '@') && !$bInTextString) {
 				$bAtSignFound = true;
 			}
 			
-			if (($c == $sAddressDelimiter) && !$bInTextString && $bAtSignFound)
-			{
+			if(($c == $sAddressDelimiter) && !$bInTextString && $bAtSignFound) {
 				// End of address
 				$aAddresses[] = self::ExtractAddressPieces($sCurrentAddress);
 				$sCurrentAddress = '';
 				$bAtSignFound = false;
 			}
-			else
-			{
+			else {
 				$sCurrentAddress .= $c;
 			}
 			
-			if (($idx == (strlen($sAddresses) - 1)) && (!empty($sCurrentAddress)))
-			{
+			if(($idx == (strlen($sAddresses) - 1)) && (!empty($sCurrentAddress))) {
 				// last address in the string
 				$aAddresses[] = self::ExtractAddressPieces($sCurrentAddress);
 			}
@@ -890,32 +780,35 @@ class RawEmailMessage
 	 *
 	 * @return array An array of ('name' => friendly_name, 'email' => email_address)
 	 */
-	protected static function ExtractAddressPieces($sAddress)
-	{
+	protected static function ExtractAddressPieces($sAddress) {
 		$sAddress = trim($sAddress);
-		if (preg_match('/^(.*)<([^ ]+)>$/', $sAddress, $aMatches))
-		{
+		// Combodo's original implementation indeed assumes that there should be no spaces.
+		if(preg_match('/^(.*)<([^ ]+)>$/', $sAddress, $aMatches)) {
 			$sName = trim($aMatches[1], ' "');
 			$sEmail = $aMatches[2];
 		}
-		else
-		{
-			if (preg_match('/^([^ ]+) ?\((.*)\)$/', $sAddress, $aMatches))
-			{
+		// In a rare circumstance, an email From: header looked like this:
+		// From: "Firstname Lastname" <firstname.lastname@domain.com >
+		// The client was Windows Live Mail, but it seems the email address was somehow misconfigured while still able to send emails.
+		// This fix still processes invalid From: headers where there are spaces before or after the email address.
+		// This regex is quite strict to prevent other issues from occurring because of this fix.
+		elseif(preg_match('/^(.*)<([ ]{0,})([^ ]+@[^ ]+\.[^ ]+)([ ]{0,})>$/', $sAddress, $aMatches)) {
+			$sName = trim($aMatches[1], ' "');
+			$sEmail = $aMatches[3];
+		}
+		else {
+			if(preg_match('/^([^ ]+) ?\((.*)\)$/', $sAddress, $aMatches)) {
 				$sName = trim($aMatches[2]);
 					   
 				$sEmail = $aMatches[1];
 			}
-			else
-			{
-				if (strpos($sAddress, '@') === false)
-				{
+			else {
+				if(strpos($sAddress, '@') === false) {
 					// Hmm, no valid address ??
 					$sName = $sAddress;
 					$sEmail = '';
 				}
-				else
-				{
+				else {
 					$sName = '';
 					$sEmail = $sAddress;
 				}
@@ -927,8 +820,7 @@ class RawEmailMessage
 	/**
 	 * @return array
 	 */
-	public function GetInvalidReasons()
-	{
+	public function GetInvalidReasons() {
 		return array();
 	}
 }

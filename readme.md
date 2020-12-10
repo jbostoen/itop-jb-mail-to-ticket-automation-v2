@@ -85,6 +85,7 @@ These issues are tackled in this fork, either by implementing a fix here or by b
 * #1859 Mail to Ticket Automation - issue with long subjects (+ solution) (some feedback, no solution in Combodo version)
 * #1924 Mail to Ticket: processing order (no solution in Combodo version)
 * #1925 Mail to Ticket: malformed headers (some feedback, no solution in Combodo version)
+* #1930 Mail to Ticket: improved parsing of from: address (no feedback yet, no solution in Combodo version)
 
 ## Cookbook
 
