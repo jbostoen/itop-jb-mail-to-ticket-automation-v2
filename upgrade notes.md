@@ -2,6 +2,11 @@
 Backward compatibility is something that is important.
 However, some upgrades might break things because technology or use cases change.
 
+## Upgrading from before 2.6.201217?
+For consistency, some settings have been renamed.
+* 'introductory-patterns' is now 'introductory_patterns'. Default settings are now empty (contains some examples).
+* 'html-tags-to-remove' is now 'html_tags_to_remove'. Default settings are now empty (contains some examples).
+
 ## Upgrading from before 2.6.201029?
 * IMAP options are now specified per inbox. They are copied from the configuration file if they exist during the upgrade process.
 * The 'imap_options' setting can be removed from the configuration file after upgrading.

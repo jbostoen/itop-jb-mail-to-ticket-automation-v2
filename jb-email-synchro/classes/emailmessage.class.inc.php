@@ -209,7 +209,7 @@ class EmailMessage {
 	/**
 	 * When the message is a reply or forward of another message, this method
 	 * (tries to) extract the "new" part of the body in HTML, producing some HTML
-	 * as the output. The filtering is based on a list of tags/classes to remove (overrideable by 'html-tags-to-remove' in the config)
+	 * as the output. The filtering is based on a list of tags/classes to remove (overrideable by 'html_tags_to_remove' in the config)
 	 */
 	public function GetNewPartHTML($sBodyText = null) {
 		if($sBodyText === null) {
@@ -222,15 +222,16 @@ class EmailMessage {
 			$sBodyText = '<html><body>'.$sBodyText.'</body></html>';
 		}
 		
+		// This is to pro-active to assume.
 		// default tags to remove: array of tag_name => array of class names
 		$aTagsToRemove = array(
-			'blockquote' => array(),
-			'div' => array('gmail_quote', 'moz-cite-prefix'),
-			'pre' => array('moz-signature'),
+			// 'blockquote' => array(),
+			// 'div' => array('gmail_quote', 'moz-cite-prefix'),
+			// 'pre' => array('moz-signature'),
 		);
 
 		if(class_exists('MetaModel')) {
-			$aTagsToRemove = MetaModel::GetModuleSetting('jb-email-synchro', 'html-tags-to-remove', $aTagsToRemove);	
+			$aTagsToRemove = MetaModel::GetModuleSetting('jb-email-synchro', 'html_tags_to_remove', $aTagsToRemove);	
 		}		
 		
 		$this->oDoc = new DOMDocument();
@@ -322,16 +323,21 @@ class EmailMessage {
 		}
 		$this->sTrace .= "Beginning of GetNewPart:\n";
 		$this->sTrace .= "=== eMail body ({$sBodyFormat}): ===\n{$sBodyText}\n=============\n";
+		
+		// As of 20201217, no longer assuming this by default!
 		$aIntroductoryPatterns = array(
-			'/^De : .+$/', // Outlook French
-			'/^le .+ a écrit :$/i', // Thunderbird French
-			'/^on .+ wrote:$/i', // Thunderbird English
-			'|^[0-9]{4}/[0-9]{1,2}/[0-9]{1,2} .+:$|', // Gmail style
+			// '/^De : .+$/', // Outlook French
+			// '/^le .+ a écrit :$/i', // Thunderbird French
+			// '/^on .+ wrote:$/i', // Thunderbird English
+			// '|^[0-9]{4}/[0-9]{1,2}/[0-9]{1,2} .+:$|', // Gmail style
 		);
+		
+		// As of 20201217, no longer assuming this by default!
 		$aGlobalDelimiterPatterns = array(
-			"/\RFrom: .+\RSent: .+\R/m",
-			"/\RDe : .+\REnvoyé : .+\R/m",
+			// "/\RFrom: .+\RSent: .+\R/m",
+			// "/\RDe : .+\REnvoyé : .+\R/m",
 		);
+		
 		$aDelimiterPatterns =  array(
 			'/^>.*$/' => false, // Old fashioned mail clients: continue processing the lines, each of them is preceded by >
 		);

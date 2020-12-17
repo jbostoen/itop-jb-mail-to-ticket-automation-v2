@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'jb-email-synchro/2.6.201209',
+	'jb-email-synchro/2.6.201217',
 	array(
 		// Identification
 		'label' => 'Mail to Tickets Automation (core)',
@@ -50,7 +50,7 @@ SetupWebPage::AddModule(
 			// The "new" part of the message is the text before the pattern
 			// Add your own multi-line patterns (use \\R for a line break)
 			// These patterns depend on the mail client/server used... feel free to add your own discoveries to the list
-			'multiline-delimiter-patterns' => array(
+			'multiline_delimiter_patterns' => array(
 				'/\\RFrom: .+\\RSent: .+\\R/m', // Outlook English
 				'/\\R_+\\R/m', // A whole line made only of underscore characters
 				'/\\RDe : .+\\R\\R?Envoyé : /m', // Outlook French, HTML and rich text
@@ -63,13 +63,24 @@ SetupWebPage::AddModule(
 			// These settings existed with a - instead of _ 
 			// To make them more consistent:
 			
+			// "New part" of e-mail
 			// Lines to be removed just above the 'new part' in a reply-to message... add your own patterns below
-			'introductory-patterns' => array(
-				'/^le .+ a écrit :$/i', // Thunderbird French
-				'/^on .+ wrote:$/i', // Thunderbird English
-				'|^[0-9]{4}/[0-9]{1,2}/[0-9]{1,2} .+:$|', // Gmail style
+			'introductory_patterns' => array(
+				// '/^le .+ a écrit :$/i', // Thunderbird French
+				// '/^on .+ wrote:$/i', // Thunderbird English
+				// '|^[0-9]{4}/[0-9]{1,2}/[0-9]{1,2} .+:$|', // Gmail style
 			),
 			
+			// "New part" of e-mail
+			// Default tags to remove: array of tag_name => array of class names.
+			// In Combodo's version, this is enabled by default (as html-tags-to-remove).
+			// However, then it also applies to forwarded messages, which is often an unwanted effect.
+			'html_tags_to_remove' => array(
+				// 'blockquote' => array(),
+				// 'div' => array('gmail_quote', 'moz-cite-prefix'),
+				// 'pre' => array('moz-signature'),
+			),
+		
 			'undesired_purge_delay' => 7, // Warning: Combodo's version had an inconsistent undesired-purge-delay setting. Renamed. Interval (in days) after which undesired emails are deleted in the mailbox
 			
 			// Deprecated settings:
