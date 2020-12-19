@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'jb-email-synchro/2.6.201217',
+	'jb-email-synchro/2.6.201219',
 	array(
 		// Identification
 		'label' => 'Mail to Tickets Automation (core)',
@@ -81,6 +81,10 @@ SetupWebPage::AddModule(
 				// 'pre' => array('moz-signature'),
 			),
 		
+			'delimiter_patterns' => array(
+				'/^>.*$/' => false, // Old fashioned mail clients: continue processing the lines, each of them is preceded by >
+			),
+			
 			'undesired_purge_delay' => 7, // Warning: Combodo's version had an inconsistent undesired-purge-delay setting. Renamed. Interval (in days) after which undesired emails are deleted in the mailbox
 			
 			// Deprecated settings:
@@ -96,6 +100,21 @@ if (!class_exists('EmailSynchroInstaller')) {
 	//
 	class EmailSynchroInstaller extends ModuleInstallerAPI {
 
+		/**
+		 * Handler called before the creation/update of the database schema
+		 *
+		 * @param \Config $oConfiguration The new configuration of the application
+		 * @param \String $sPreviousVersion Previous version number of the module (empty string in case of first install)
+		 * @param \String $sCurrentVersion Current version number of the module
+		 *
+		 * @returns \Config
+		 */
+		public static function BeforeWritingConfig(Config $oConfiguration) {
+			
+			return $oConfiguration;
+			
+		}
+		
 		/**
 		 * Handler called after the creation/update of the database schema
 		 * @param $oConfiguration Config The new configuration of the application
@@ -136,6 +155,36 @@ if (!class_exists('EmailSynchroInstaller')) {
 				}
 				
 			}
+			
+			// Workaround for BeforeWritingConfig() not having $sPreviousVersion
+			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.201219', '<=')) {
+				
+				// In previous versions, these parameters were not named in a consistent way. Rename.
+				$aSettings = array(
+					'html_tags_to_remove', 
+					'introductory_patterns',
+					'multiline_delimiter_patterns',
+					'delimiter_patterns'
+				);
+				
+				$sTargetEnvironment = 'production';
+				$sConfigFile = APPCONF.$sTargetEnvironment.'/'.ITOP_CONFIG_FILE;
+				$oExistingConfig = new Config($sConfigFile);
+				
+				foreach($aSettings as $sSetting) {
+					
+					$aDeprecatedSettingValue = $oExistingConfig->GetModuleSetting('jb-email-synchro', str_replace('_', '-', $sSetting), null);
+					if($aDeprecatedSettingValue !== null) {
+						$oExistingConfig->SetModuleSetting('jb-email-synchro', $sSetting, $aDeprecatedSettingValue);
+					}
+					
+				}
+				
+				// Update existing configuration PRIOR to iTop installation actually processing this.
+				$oExistingConfig->WriteToFile();
+				
+			}
+			
 		}
 		
 	}
