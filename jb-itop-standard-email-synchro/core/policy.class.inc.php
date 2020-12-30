@@ -1982,9 +1982,6 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 								self::HandleViolation();
 								
 								// No fallback
-								
-								// Stop processing any further!
-								$oMailBox->oCaller = $oCaller;
 								return false;
 
 								break; // Defensive programming
