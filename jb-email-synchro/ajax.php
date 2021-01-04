@@ -328,8 +328,7 @@ try {
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 				$aReplicas = array();
 				/** @var \DBObject $oReplica */
-				while ($oReplica = $oReplicaSet->Fetch())
-				{
+				while ($oReplica = $oReplicaSet->Fetch()) {
 					$oReplica->Set('status', 'ignored');
 					$oReplica->DBUpdate();
 					$aReplicas[$oReplica->Get('uidl')] = true;
