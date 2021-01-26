@@ -56,6 +56,19 @@ class IMAPEmailSource extends EmailSource {
 	}	
 
 	/**
+	 * Initializes the message when it is being processed.
+	 * @param $index integer The index between zero and count
+	 * @return void
+	 */
+	public function InitMessage($index) {
+		
+		// Preventive measure. For restored emails, sometimes there's still an IMAP flag indicating it was 'marked for removal'.
+		$this->UndeleteMessage($index);
+		
+		return;
+	}
+	
+	/**
 	 * Get the number of messages to process
 	 * @return integer The number of available messages
 	 */

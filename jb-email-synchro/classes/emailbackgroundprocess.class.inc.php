@@ -258,11 +258,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						CMDBObject::SetCurrentChange($oCurrentMessageChange);
 						
 						try {
-							if($oSource instanceof IMAPEmailSource) {
-								// Preventive measure. For restored emails, sometimes there's still an IMAP flag indicating it was 'marked for removal'.
-								$ret = $oSource->UndeleteMessage($iMessage);
-							}
-
+							
+							$oSource->InitMessage($iMessage);
+							
 							$this->InitMessageTrace($oSource, $iMessage);
 							
 							
