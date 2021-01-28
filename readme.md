@@ -14,7 +14,7 @@ Please get in touch to discuss the terms: **jbostoen.itop@outlook.com**
 ## What?
 
 This **Mail to Ticket automation** is a **fork** from Combodo's Mail to Ticket Automation.  
-It was originally based on their version 3.0.7 (28th of August 2017), but also includes the changes up to 3.1.2 so far.  
+It was originally based on their version 3.0.7 (28th of August 2017), but also includes the changes up to 3.2.0 so far.  
 Some fixes in this version were accepted by Combodo back in August 2018 and are now part of the official version.
 
 What is different? In a few cases, Combodo's implementation of Mail to Ticket Automation was not sufficient enough.  
