@@ -258,11 +258,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						CMDBObject::SetCurrentChange($oCurrentMessageChange);
 						
 						try {
-							
-							$oSource->InitMessage($iMessage);
-							
+									
 							$this->InitMessageTrace($oSource, $iMessage);
-							
 							
 							$iTotalMessages++;
 							if(self::IsMultiSourceMode()) {
@@ -275,6 +272,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							$oEmailReplica = array_key_exists($sUIDL, $aReplicas) ? $aReplicas[$sUIDL] : null;
 		
 							if($oEmailReplica == null) {
+								
 								$this->Trace("\nDispatching new message: uidl=$sUIDL index=$iMessage");
 								// Create a replica to keep track that we've processed this email
 								$oEmailReplica = new EmailReplica();
@@ -282,6 +280,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								$oEmailReplica->Set('mailbox_path', $oSource->GetMailbox());
 								$oEmailReplica->Set('message_id', $iMessage);
 								$oEmailReplica->Set('last_seen', date('Y-m-d H:i:s'));
+								
+								// Initialize e-mail which is being processed for the first time
+								$oSource->InitMessage($iMessage);
 							}
 							else {
 								
