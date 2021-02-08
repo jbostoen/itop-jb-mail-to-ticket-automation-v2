@@ -96,7 +96,7 @@ These issues are tackled in this fork, either by implementing a fix here or by b
 * #1930 Mail to Ticket: improved parsing of from: address (no feedback yet, no solution in Combodo version. Pull request made.)
 
 ## Upgrade notes
-* See [Upgrade notes](documentation/upgrade notes.md)
+* See [Upgrade notes](documentation/upgrade%20notes.md)
 
 ## Cookbook
 
