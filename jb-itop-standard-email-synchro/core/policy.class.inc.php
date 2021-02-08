@@ -128,7 +128,6 @@ abstract class Policy implements iPolicy {
 	 * @var \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
 	 * @var \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
 	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
 	 */
 	public static function Init(MailInboxStandard $oMailBox, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedPolicies) {
 		
@@ -371,7 +370,6 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	 * @var \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
 	 * @var \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
 	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
 	 */
 	public static function Init(MailInboxStandard $oMailBox, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedPolicies) {
 	
