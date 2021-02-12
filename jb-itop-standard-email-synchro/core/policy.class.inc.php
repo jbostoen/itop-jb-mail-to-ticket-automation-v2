@@ -1529,7 +1529,6 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 				 case 'bounce_delete':
 				 case 'bounce_mark_as_undesired':
 				 case 'delete':
-				 case 'do_nothing':
 				 case 'mark_as_undesired':
 				
 					foreach($aAllContacts as $aContactInfo) {
@@ -1567,6 +1566,7 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 
 					break; // Defensive programming
 					
+				case 'do_nothing':
 				case 'fallback_add_all_other_contacts':
 				case 'fallback_add_existing_other_contacts':
 				case 'fallback_ignore_other_contacts':
