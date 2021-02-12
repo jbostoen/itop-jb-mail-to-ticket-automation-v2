@@ -130,8 +130,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	
 	// Policy: other recipients
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior' => 'Comportement en cas d\'infraction',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_contacts' => 'Solution de secours : ajouter un contact existant',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_all_contacts' => 'Solution de secours : ajouter le contact / le créer si besoin',
+	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_other_contacts' => 'Solution de secours : ajouter un contact existant',
+	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_other_contacts' => 'Solution de secours : ajouter le contact / le créer si besoin',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_ignore_other_contacts' => 'Solution de secours : ignorer les autres contacts',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_mark_as_undesired' => 'Renvoyer à l\'expéditeur et marquer comme indésirable',

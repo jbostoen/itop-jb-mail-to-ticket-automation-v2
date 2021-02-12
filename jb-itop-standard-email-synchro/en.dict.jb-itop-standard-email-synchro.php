@@ -132,8 +132,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	
 	// Policy: other recipients
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior' => 'Behavior on violation',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_contacts' => 'Fallback: add existing contacts',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_all_contacts' => 'Fallback: add contact / create if necessary',
+	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_other_contacts' => 'Fallback: add existing contacts',
+	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_other_contacts' => 'Fallback: add contact / create if necessary',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_ignore_other_contacts' => 'Fallback: ignore all other contacts',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_delete' => 'Bounce to sender and delete',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_mark_as_undesired' => 'Bounce to sender and mark as undesired',
