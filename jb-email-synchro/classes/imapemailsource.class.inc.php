@@ -161,9 +161,9 @@ class IMAPEmailSource extends EmailSource {
 	 	$oInfo = imap_check($this->rImapConn);
         if(($oInfo !== false) && ($oInfo->Nmsgs > 0)) {
         	$sRange = "1:".$oInfo->Nmsgs;
-			// Workaround for some email servers (like gMail!) where the UID may change between two sessions, so let's use the
+			// Workaround for some email servers (like GMail!) where the UID may change between two sessions, so let's use the
 			// MessageID as a replacement for the UID.
-			// Note that it is possible to receive two times a message with the same MessageID, but since the content of the message
+			// Note that it is possible to receive a message with the same MessageID two times, but since the content of the message
 			// will be the same, it's safe to process such messages only once...
 			// BEWARE: Make sure that you empty the mailbox before toggling this setting in the config file, since all the messages
 			// present in the mailbox at the time of the toggle will be considered as "new" and thus processed again.
@@ -171,17 +171,17 @@ class IMAPEmailSource extends EmailSource {
         	$bUseMessageId = (bool)MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', true);
 
         	$ret = array();
-			$aResponse = imap_fetch_overview($this->rImapConn,$sRange);
+			$aResponse = imap_fetch_overview($this->rImapConn, $sRange);
 			
-			foreach ($aResponse as $aMessage) {
+			foreach($aResponse as $aMessage) {
 				if($bUseMessageId) {
 					// There is a known issue here, probably due to SPAM messages.
 					// Tried to figure it out but no example yet.
 					// Sometimes an error is returned which outputs this as subject: "Retrieval using the IMAP4 protocol failed for the following message: <some-id>"
-					$ret[] = array('msg_id' => $aMessage->msgno, 'uidl' => $aMessage->message_id);
+					$ret[] = array('msg_id' => $aMessage->msgno, 'uidl' => $aMessage->message_id, 'udate' => $aMessage->udate);
 				}
 				else {
-					$ret[] = array('msg_id' => $aMessage->msgno, 'uidl' => $aMessage->uid);
+					$ret[] = array('msg_id' => $aMessage->msgno, 'uidl' => $aMessage->uid, 'udate' => $aMessage->udate);
 				}
 			}
         }

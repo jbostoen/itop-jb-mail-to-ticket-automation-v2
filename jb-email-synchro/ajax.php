@@ -40,11 +40,15 @@ require_once(APPROOT.'/application/ajaxwebpage.class.inc.php');
  * @throws \OQLException
  */
 function GetMailboxContent($oPage, $oInbox) {
+	
 	if(is_object($oInbox)) {
+		
 		$iStartIndex = utils::ReadParam('start', 0);
 		$iMaxCount = utils::ReadParam('count', 10);
 		$iMsgCount = 0;
+		
 		try {
+			
 			/** @var \EmailSource $oSource */
 			$oSource = $oInbox->GetEmailSource();
 			$iTotalMsgCount = $oSource->GetMessagesCount();
@@ -56,8 +60,8 @@ function GetMailboxContent($oPage, $oInbox) {
 				$iCounter = 1;
 				
 				if($iStartIndex < 0 || $iMaxCount <= 0) {
-					// Don't process
-				$oPage->add('do not process');
+					// Don't process, invalid indexes
+					$oPage->add('Invalid start or max.');
 			
 				}
 				else {
@@ -105,6 +109,12 @@ function GetMailboxContent($oPage, $oInbox) {
 		$iProcessedCount = 0;
 		
 		if($iTotalMsgCount > 0) {
+			
+			// Sort but keep original index (to request right message)
+			uasort($aMessages, function($a, $b) {
+				return $a['udate'] <=> $b['udate'];
+			});
+			
 				
 			// Get the corresponding EmailReplica object for each message
 			$aUIDLs = array();
@@ -113,8 +123,11 @@ function GetMailboxContent($oPage, $oInbox) {
 			$iMessage = $iStart;
 			$bKeepProcessing = $bEmailsToProcess;
 			while($bKeepProcessing == true) {
+				
+				$iRealMessageIndex = array_keys($aMessages)[$iMessage];
+				
 				// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
-				$aUIDLs[] = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
+				$aUIDLs[] = $oSource->GetName().'_'.$aMessages[$iRealMessageIndex]['uidl'];
 				
 				$iMessage = $iMessage + $iCounter;
 
@@ -166,11 +179,13 @@ function GetMailboxContent($oPage, $oInbox) {
 			$bKeepProcessing = $bEmailsToProcess;
 			while($bKeepProcessing == true) {
 				
-				$oRawEmail = $oSource->GetMessage($iMessage);
+				$iRealMessageIndex = array_keys($aMessages)[$iMessage];
+				
+				$oRawEmail = $oSource->GetMessage($iRealMessageIndex);
 				$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
 
 				// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
-				$sUIDLs = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
+				$sUIDLs = $oSource->GetName().'_'.$aMessages[$iRealMessageIndex]['uidl'];
 				$sStatus = Dict::S('MailInbox:Status/New');
 				$sLink = '';
 				$sErrorMsg = '';
