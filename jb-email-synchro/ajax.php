@@ -55,50 +55,18 @@ function GetMailboxContent($oPage, $oInbox) {
 			$aMessages = $oSource->GetListing();
 			$bEmailsToProcess = false;
 			
-			if($oInbox->Get('imap_order') == 'default') {
 			
-				$iCounter = 1;
-				
-				if($iStartIndex < 0 || $iMaxCount <= 0) {
-					// Don't process, invalid indexes
-					$oPage->add('Invalid start or max.');
+			if($iStartIndex < 0 || $iMaxCount <= 0) {
+				// Don't process, invalid indexes
+				$oPage->add('Invalid start or max.');
+			}
 			
-				}
-				else {
-					
-					// Avoid user specifying a higher number (start) than the total message number count
-					$iStart = $iStartIndex;
-				
-					// Avoid user specifying a higher number (start + count) than the total mesage number count
-					// The largest index is (message count - 1), since messages are retrieved by index (starting at 0)
-					$iEnd = min($iStart + $iMaxCount,  $iTotalMsgCount - 1); 
-					
-					if($iStart <= $iEnd) {
-						$bEmailsToProcess = true;
-					}
-				}
-			}
-			elseif($oInbox->Get('imap_order') == 'reverse') {
-				
-				// Reverse the logic.
-				$iCounter = -1;
-				
-				if($iStartIndex < 0 || $iMaxCount <= 0) {
-					// Don't process
-				}
-				else {
-					
-					// Start from the back. Avoid user specifying an index which makes the start index negative (so total number too large) and invalidates the logic.
-					$iStart = min($iTotalMsgCount - 1 - $iStartIndex, $iTotalMsgCount - 1); 
-					
-					// Start from the back. Avoid user specifying an index which makes the count negative (smaller than 0) and invalidates the logic.
-					$iEnd = max($iStart - $iMaxCount, 0);
-				
-					if($iStart >= $iEnd) {
-						$bEmailsToProcess = true;
-					}
-				}
-			}
+			// Avoid user specifying a higher number (start) than the total message number count
+			$iStart = $iStartIndex;
+		
+			// Avoid user specifying a higher number (start + count) than the total mesage number count
+			// The largest index is (message count - 1), since messages are retrieved by index (starting at 0)
+			$iEnd = min($iStart + $iMaxCount,  $iTotalMsgCount - 1); 
 			
 		}
 		catch(Exception $e) {
@@ -111,37 +79,34 @@ function GetMailboxContent($oPage, $oInbox) {
 		if($iTotalMsgCount > 0) {
 			
 			// Sort but keep original index (to request right message)
-			uasort($aMessages, function($a, $b) {
-				return $a['udate'] <=> $b['udate'];
-			});
+			if($oInbox->Get('protocol') == 'IMAP') {
+				
+				// Sort but keep original index
+				uasort($aMessages, function($a, $b) {
+					return $a['udate'] <=> $b['udate'];
+				});
+			}
+			else {
+				// @todo Drop this when dropping support for POP3
+				// In case of POP3
+				// No sorting
+			}
 			
+			$aRealMessageIndexes = array_keys($aMessages);
 				
 			// Get the corresponding EmailReplica object for each message
 			$aUIDLs = array();
 			
 			// Gets all UIDLs to identify EmailReplicas in iTop.
 			$iMessage = $iStart;
-			$bKeepProcessing = $bEmailsToProcess;
-			while($bKeepProcessing == true) {
-				
-				$iRealMessageIndex = array_keys($aMessages)[$iMessage];
+			
+			while($iMessage <= $iEnd) {
 				
 				// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
-				$aUIDLs[] = $oSource->GetName().'_'.$aMessages[$iRealMessageIndex]['uidl'];
+				// Real index does not matter here. Just collecting ALL UIDLs
+				$aUIDLs[] = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
+				$iMessage += 1;
 				
-				$iMessage = $iMessage + $iCounter;
-
-				// Evaluate new index
-				if($iCounter == 1) {
-					if($iMessage > $iEnd) {
-						$bKeepProcessing = false;
-					}
-				}
-				elseif($iCounter == -1) {
-					if($iMessage < $iEnd) {
-						$bKeepProcessing = false;
-					}
-				}
 			}
 			
 			$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox'));
@@ -176,10 +141,10 @@ function GetMailboxContent($oPage, $oInbox) {
 			// $iMessage starts as $iStart. At the end of the while loop, the counter is incremented (default) or decremented (reverse).
 			// The loop should stop when $iMessage > $iEnd (default) or $iMessage < $iEnd (reverse).
 			$iMessage = $iStart;
-			$bKeepProcessing = $bEmailsToProcess;
-			while($bKeepProcessing == true) {
+			
+			while($iMessage <= $iEnd) {
 				
-				$iRealMessageIndex = array_keys($aMessages)[$iMessage];
+				$iRealMessageIndex = $aRealMessageIndexes[$iMessage];
 				
 				$oRawEmail = $oSource->GetMessage($iRealMessageIndex);
 				$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
@@ -228,19 +193,7 @@ function GetMailboxContent($oPage, $oInbox) {
 					'details' => $sDetailsLink,
 				);
 				
-				$iMessage = $iMessage + $iCounter;
-
-				// Evaluate new index
-				if($iCounter == 1) {
-					if($iMessage > $iEnd) {
-						$bKeepProcessing = false;
-					}
-				}
-				elseif($iCounter == -1) {
-					if($iMessage < $iEnd) {
-						$bKeepProcessing = false;
-					}
-				}
+				$iMessage += 1;
 				
 			}
 		
