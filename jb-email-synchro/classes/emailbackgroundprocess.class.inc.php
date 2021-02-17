@@ -170,54 +170,43 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					
 					/** @var \MailInboxBase $oInbox Mail inbox */
 					$oInbox = $oProcessor->GetInboxFromSource($oSource);
-					if($oInbox->Get('imap_order') == 'default') {
-						$iStart = 0;
-						$iEnd = ($iMsgCount - 1); // $iMsgCount will already be positive, no additional check needed
-						$iCounter = 1;
+					
+					// Sort but keep original index (to request right message)
+					if($oInbox->Get('protocol') == 'imap') {
+						
+						// Sort but keep original index
+						uasort($aMessages, function($a, $b) {
+							return $a['udate'] <=> $b['udate'];
+						});
 					}
-					elseif($oInbox->Get('imap_order') == 'reverse') {
-						$iStart = ($iMsgCount - 1); // $iMsgCount will already be positive, no additional check needed
-						$iEnd = 0;
-						$iCounter = -1;
+					else {
+						// @todo Drop this when dropping support for POP3
+						// In case of POP3
+						// No sorting
 					}
+					
+					$aRealMessageIndexes = array_keys($aMessages);
+					
+					$iStart = 0;
+					$iEnd = ($iMsgCount - 1); // $iMsgCount will already be positive, no additional check needed
 					
 					// Get the corresponding EmailReplica object for each message
 					$aUIDLs = array();
 					
 					// Gets all UIDLs to identify EmailReplicas in iTop.
-					$iMessage = $iStart - $iCounter; // Counter is incremented early on in while right after a condition check. So decrease/increase already.
-					$bKeepProcessing = true;
-					while($bKeepProcessing == true) {
-						
-						$iRealMessageIndex = array_keys($aMessages)[$iMessage];
-						
-						// Evaluate new index
-						if($iCounter == 1) {
-							// Already processed the last message; or worse: invalid (higher) index
-							if($iMessage >= $iEnd) {
-								$bKeepProcessing = false;
-								break;
-							}
-						}
-						elseif($iCounter == -1) {
-							// Already processed the last message; or worse: invalid (lower) index
-							if($iMessage <= $iEnd) {
-								$bKeepProcessing = false;
-								break;
-							
-							}
-						}
-						
-						$iMessage = $iMessage + $iCounter;
-						
+					$iMessage = 0;
+					while($iMessage <= $iEnd) {
+												
 						// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
+						// Not necessary to use $iRealMessageIndex
 						if(self::IsMultiSourceMode()) {
-							$aUIDLs[] = $oSource->GetName().'_'.$aMessages[$iRealMessageIndex]['uidl'];
+							$aUIDLs[] = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
 						}
 						else {
-							$aUIDLs[] = $aMessages[$iRealMessageIndex]['uidl'];
+							$aUIDLs[] = $aMessages[$iMessage]['uidl'];
 						}
 						
+						$iMessage += 1;
 						
 					}
 					
@@ -230,29 +219,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					}
 					
 					// Processes the actual messages
-					$iMessage = $iStart - $iCounter; // Counter is incremented early on in while right after a condition check. So decrease/increase already.
+					$iMessage = 0;
 					$bKeepProcessing = true;
-					while($bKeepProcessing == true) {
+					
+					while($iMessage <= $iEnd) {
 						
-						// Evaluate new index
-						if($iCounter == 1) {
-							// Already processed the last message; or worse: invalid (higher) index
-							if($iMessage >= $iEnd) {
-								$bKeepProcessing = false;
-								break;
-							}
-						}
-						elseif($iCounter == -1) {
-							// Already processed the last message; or worse: invalid (lower) index
-							if($iMessage <= $iEnd) {
-								$bKeepProcessing = false;
-								break;
-							}
-						}
-						
-						$iMessage = $iMessage + $iCounter;
 						$iRealMessageIndex = array_keys($aMessages)[$iMessage];
-						
 						
 						// N°3218 initialize a new CMDBChange for each message
 						// we cannot use \CMDBObject::SetCurrentChange($oChange) as this would force to persist our change for each message
@@ -283,7 +255,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								$oEmailReplica = new EmailReplica();
 								$oEmailReplica->Set('uidl', $sUIDL);
 								$oEmailReplica->Set('mailbox_path', $oSource->GetMailbox());
-								$oEmailReplica->Set('message_id', $iRealMessageIndex); // Investigate. Placeholder?
+								$oEmailReplica->Set('message_id', $iRealMessageIndex); // This will be set to the actual Message-ID/UIDL in ProcessMessage().
 								$oEmailReplica->Set('last_seen', date('Y-m-d H:i:s'));
 								
 								// Initialize e-mail which is being processed for the first time
@@ -476,6 +448,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							}
 							throw $e;
 						}
+						
+						$iMessage += 1;
 						
 					}
 					if(time() > $iTimeLimit) {
