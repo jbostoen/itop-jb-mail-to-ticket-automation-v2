@@ -977,9 +977,6 @@ EOF
 								<item id="imap_options">
 									<rank>110</rank>
 								</item>
-								<item id="imap_order">
-									<rank>111</rank>
-								</item>
 							</items>
 						</item>
 

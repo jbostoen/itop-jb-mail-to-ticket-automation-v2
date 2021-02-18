@@ -79,7 +79,7 @@ function GetMailboxContent($oPage, $oInbox) {
 		if($iTotalMsgCount > 0) {
 			
 			// Sort but keep original index (to request right message)
-			if($oInbox->Get('protocol') == 'IMAP') {
+			if($oInbox->Get('protocol') == 'imap') {
 				
 				// Sort but keep original index
 				uasort($aMessages, function($a, $b) {

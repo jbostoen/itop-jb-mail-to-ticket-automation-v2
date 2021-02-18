@@ -581,7 +581,12 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		
 		$sCaseLogEntry = self::BuildCaseLogEntry();
 		
-		self::Trace("... Trace: ".$oEmail->sTrace);
+		if($oEmail->sTrace == '') {
+			self::Trace("... No email trace available.");
+		}
+		else {
+			self::Trace("... Email trace: ".$oEmail->sTrace);
+		}
 		
 		// Write the log on behalf of the caller.
 		// Fallback to e-mail address if name is unknown.
