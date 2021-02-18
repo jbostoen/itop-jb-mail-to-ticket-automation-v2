@@ -123,10 +123,10 @@ abstract class Policy implements iPolicy {
 	/**
 	 * Initiator. Sets some widely used property values.
 	 *
-	 * @var \MailInboxStandard $oMailBox Mailbox
-	 * @var \EmailMessage $oEmail Email message
-	 * @var \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
-	 * @var \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
+	 * @param \MailInboxStandard $oMailBox Mailbox
+	 * @param \EmailMessage $oEmail Email message
+	 * @param \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
+	 * @param \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
 	 *
 	 */
 	public static function Init(MailInboxStandard $oMailBox, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedPolicies) {
@@ -289,7 +289,7 @@ abstract class Policy implements iPolicy {
 	/**
 	 * Replace email placeholders in a string.
 	 * 
-	 * @var \String $sString Input string
+	 * @param \String $sString Input string
 	 *
 	 * @details Also exposes some properties which are not likely to be useful (body_format) at any time, but who knows?
 	 *
@@ -324,14 +324,31 @@ abstract class Policy implements iPolicy {
 	/**
 	 * For logging information about the processing of emails.
 	 *
-	 * @var \String $sString Input string
+	 * @param \String $sString Input string
 	 *
 	 * @return void
 	 */
 	public static function Trace($sString) {
 		self::$oMailBox->Trace($sString);
 	}
-		 
+	
+	/**
+	 * For logging information about the processing of emails.
+	 *
+	 * @param \Array $aRecipients Hash table of recipients ('name', 'email')
+	 *
+	 * @return \String[]
+	 *
+	 * @todo move this to helper
+	 */
+	public static function GetAddressesFromRecipients($aRecipients) {
+		$aAddresses = [];
+		foreach($aRecipients as $aRecipient) {
+			$aAddresses[] = $aRecipient['email'];
+		}
+		return $aAddresses;
+	}
+	
 }
 
 
@@ -365,10 +382,10 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	/**
 	 * Initiator. Sets some widely used property values.
 	 *
-	 * @var \MailInboxStandard $oMailBox Mailbox
-	 * @var \EmailMessage $oEmail Email message
-	 * @var \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
-	 * @var \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
+	 * @param \MailInboxStandard $oMailBox Mailbox
+	 * @param \EmailMessage $oEmail Email message
+	 * @param \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
+	 * @param \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
 	 *
 	 */
 	public static function Init(MailInboxStandard $oMailBox, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedPolicies) {
@@ -1572,12 +1589,17 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 					break; // Defensive programming
 					
 				case 'do_nothing':
-				case 'fallback_add_all_other_contacts':
-				case 'fallback_add_existing_other_contacts':
 				case 'fallback_ignore_other_contacts':
 				
 					// Will be handled later (by default in PolicyFindAdditionalContacts)
 					self::Trace(".. Other contacts in To: or CC: will be ignored for this email in further processing.");
+					break;
+					
+				case 'fallback_add_other_contacts':
+				case 'fallback_add_existing_other_contacts':
+				
+					// Will be handled later (by default in PolicyFindAdditionalContacts)
+					self::Trace(".. Other contacts in To: or CC: will be handled in PolicyFindAdditionalContacts.");
 					break;
 				
 				default:
@@ -2196,64 +2218,42 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 							
 		// Take both the To: and CC:
 		$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
+		$aAllContacts = self::GetAddressesFromRecipients($aAllContacts);
 		
 		// Mailbox aliases
 		$sMailBoxAliases = $oMailBox->Get('mail_aliases');
 		$aMailBoxAliases = (trim($sMailBoxAliases) == '' ? [] : preg_split(NEWLINE_REGEX, $sMailBoxAliases));
 		
 		// Ignore sender; helpdesk mailbox; any helpdesk mailbox aliases
-		$aExcludeContacts = array_merge([$oEmail->sCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases);
-		$aExcludeContacts = array_unique($aExcludeContacts);
+		$aAllOtherContacts = array_udiff($aAllContacts, [$oEmail->sCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
+		$aAllOtherContacts = array_unique($aAllOtherContacts);
 
 		$sPolicyBehavior = $oMailBox->Get(self::$sPolicyId.'_behavior');
 		
 		switch($sPolicyBehavior) {
 			
 			case 'fallback_add_existing_other_contacts':
-			case 'fallback_add_all_other_contacts':
+			case 'fallback_add_other_contacts':
 		
-				foreach($aAllContacts as $aContactInfo) {
-					
-					$sCurrentEmail = $aContactInfo['email'];
-					
-					foreach($aExcludeContacts as $sPattern) {
-						
-						// Regular e-mail address? Make case insensitive pattern
-						if(filter_var($sPattern, FILTER_VALIDATE_EMAIL) == true) {
-							$sPattern = '/^'.preg_quote($sPattern).'$/i';
-						}
-						$oPregMatch = @preg_match($sPattern, $sCurrentEmail);
-						
-						if($oPregMatch === false) {
-							self::Trace(".. Invalid pattern: '{$sPattern}'");
-							continue 2;
-							
-						}
-						elseif(preg_match($sPattern, $sCurrentEmail)) {
-							
-							// Found other contact in To: or CC: which is the caller or an alias for this mailbox
-							self::Trace(".. Caller or helpdesk mailbox alias: '{$sCallerEmail}'");
-							continue 2;
-							
-						}
-						
-					}
+				foreach($aAllOtherContacts as $sCurrentEmail) {
 					
 					// Found other contacts in To: or CC:
-					self::Trace(".. Looking up Person with email address '{$sCallerEmail}'");
+					self::Trace(".. Looking up Person with email address '{$sCurrentEmail}'");
 							
 					// Check if this contact exists.
 					// Non-existing contacts must be created.
 					// Actual linking of contacts happens after policies have been processed.
 					$sContactQuery = 'SELECT Person WHERE email = :email';
-					$oSet = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sContactEmail]);
+					$oSet_Persons = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], [
+						'email' => $sCurrentEmail
+					]);
 					
-					if($oSet->Count() == 0) {
+					if($oSet_Persons->Count() == 0) {
 						
 						// Create
-						self::Trace(".. Creating a new Person with email address '{$sCallerEmail}'");
+						self::Trace(".. Creating a new Person with email address '{$sCurrentEmail}'");
 						$oContact = new Person();
-						$oContact->Set('email', $oEmail->sCallerEmail);
+						$oContact->Set('email', $sCurrentEmail);
 						$sDefaultValues = $oMailBox->Get(self::$sPolicyId.'_default_values');
 						$aDefaults = preg_split(NEWLINE_REGEX, $sDefaultValues);
 						$aDefaultValues = array();
@@ -2271,7 +2271,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 							self::Trace("... Try to create user with default values");
 							$oContact->DBInsert();
 
-							// Add Person to list of additional Contacts
+							// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
 							$oEmail->aInternal_Additional_Contacts[] = $oContact;
 							
 						}
@@ -2284,10 +2284,13 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 						}									
 						
 					}
-					elseif($oSet->Count() == 1) {
-						// Add Person to list of additional Contacts
+					elseif($oSet_Persons->Count() == 1) {
+						// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
 						$oContact = $oSet->Fetch();
 						$oEmail->aInternal_Additional_Contacts[] = $oContact;
+					}
+					else {
+						// More than one Person returned. Inconclusive. Ignore?
 					}
 					
 					
@@ -2305,7 +2308,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 				
 			case 'fallback_ignore_other_contacts':
 			
-				// Make sure these contacts are not processed in any further processing.
+				// Make sure these contacts are not processed in any further processing?
 				$oEmail->aTos = [];
 				$oEmail->aCCs = [];
 			
@@ -2561,8 +2564,8 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 	 *
 	 * @return \Array Array with image dimensions
 	 */
-	public static function GetImageSize($sImageData)
-	{
+	public static function GetImageSize($sImageData) {
+		
 		if(function_exists('getimagesizefromstring') == true ) {
 			// PHP 5.4.0 or higher
 			$aRet = @getimagesizefromstring($sImageData);
@@ -2580,6 +2583,7 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 			@unlink($sTempFile);
 		}
 		return $aRet;
+		
 	}
 	
 }

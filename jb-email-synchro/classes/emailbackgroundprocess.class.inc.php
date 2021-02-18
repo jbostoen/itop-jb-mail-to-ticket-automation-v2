@@ -220,7 +220,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					
 					// Processes the actual messages
 					$iMessage = 0;
-					$bKeepProcessing = true;
 					
 					while($iMessage <= $iEnd) {
 						

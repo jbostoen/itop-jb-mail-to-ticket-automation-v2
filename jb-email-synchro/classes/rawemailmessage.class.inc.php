@@ -831,4 +831,5 @@ class RawEmailMessage {
 	public function GetInvalidReasons() {
 		return array();
 	}
+	
 }
