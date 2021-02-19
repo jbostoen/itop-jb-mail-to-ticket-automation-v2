@@ -97,15 +97,11 @@ function GetMailboxContent($oPage, $oInbox) {
 			// Get the corresponding EmailReplica object for each message
 			$aUIDLs = array();
 			
-			// Gets all UIDLs to identify EmailReplicas in iTop.
-			$iMessage = $iStart;
-			
-			while($iMessage <= $iEnd) {
+			foreach(array_keys($aMessages) as $iMessage) {
 				
 				// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
 				// Real index does not matter here. Just collecting ALL UIDLs
 				$aUIDLs[] = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
-				$iMessage += 1;
 				
 			}
 			
@@ -138,11 +134,7 @@ function GetMailboxContent($oPage, $oInbox) {
 
 			$aData = array();
 			
-			// $iMessage starts as $iStart. At the end of the while loop, the counter is incremented (default) or decremented (reverse).
-			// The loop should stop when $iMessage > $iEnd (default) or $iMessage < $iEnd (reverse).
-			$iMessage = $iStart;
-			
-			while($iMessage <= $iEnd) {
+			foreach(array_keys($aMessages) as $iMessage) {
 				
 				$iRealMessageIndex = $aRealMessageIndexes[$iMessage];
 				
@@ -192,8 +184,6 @@ function GetMailboxContent($oPage, $oInbox) {
 					'error' => $sErrorMsg,
 					'details' => $sDetailsLink,
 				);
-				
-				$iMessage += 1;
 				
 			}
 		

@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (C) 2019-2020 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     2021-02-12 15:10:38
+ * @version     2021-02-19 10:03:35
  *
  * Policy interface definition and some classes implementing it.
  * 
@@ -2001,7 +2001,6 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 							case 'bounce_delete':
 							case 'bounce_mark_as_undesired':
 							case 'delete':
-							case 'do_nothing':
 							case 'mark_as_undesired':
 							
 								self::Trace("... The message '{$oEmail->sSubject}' is considered as undesired, the caller was not found.");

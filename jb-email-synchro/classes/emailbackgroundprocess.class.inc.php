@@ -194,8 +194,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					$aUIDLs = array();
 					
 					// Gets all UIDLs to identify EmailReplicas in iTop.
-					$iMessage = 0;
-					while($iMessage <= $iEnd) {
+					foreach(array_keys($aMessages) as $iMessage) {
 												
 						// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
 						// Not necessary to use $iRealMessageIndex
@@ -205,8 +204,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						else {
 							$aUIDLs[] = $aMessages[$iMessage]['uidl'];
 						}
-						
-						$iMessage += 1;
 						
 					}
 					
@@ -219,9 +216,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					}
 					
 					// Processes the actual messages
-					$iMessage = 0;
-					
-					while($iMessage <= $iEnd) {
+					foreach(array_keys($aMessages) as $iMessage) {
 						
 						$iRealMessageIndex = array_keys($aMessages)[$iMessage];
 						
@@ -446,9 +441,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
 							}
 							throw $e;
-						}
-						
-						$iMessage += 1;
+						}						
 						
 					}
 					if(time() > $iTimeLimit) {

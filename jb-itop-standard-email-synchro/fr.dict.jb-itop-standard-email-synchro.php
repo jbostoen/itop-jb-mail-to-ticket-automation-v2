@@ -122,7 +122,6 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_mark_as_undesired' => 'Renvoyer à l\'expéditeur et marquer comme indésirable',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:delete' => 'Supprimer',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:do_nothing' => 'Ne rien faire',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:mark_as_undesired' =>  'Marquer comme indésirable / Garder l\'email temporairement',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_subject' => 'Rejeter l\'objet',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_notification' => 'Rejeter le message',

@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (C) 2019-2020 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     2021-02-12 15:10:38
+ * @version     2021-02-19 10:03:35
  *
  * A demo of a class which could store e-mails automatically.
  */
