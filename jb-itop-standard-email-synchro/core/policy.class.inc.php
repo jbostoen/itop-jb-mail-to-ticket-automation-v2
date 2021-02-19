@@ -888,8 +888,8 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// If there are any TriggerOnMailUpdate defined, let's activate them
 		$aClasses = MetaModel::EnumParentClasses(get_class($oTicket), ENUM_PARENT_CLASSES_ALL);
 		$sClassList = implode(', ', CMDBSource::Quote($aClasses));
-		$oSet = new DBObjectSet(DBObjectSearch::FromOQL_AllData("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
-		while($oTrigger = $oSet->Fetch()) {
+		$oSet_TriggerMailUpdate = new DBObjectSet(DBObjectSearch::FromOQL_AllData("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
+		while($oTrigger = $oSet_TriggerMailUpdate->Fetch()) {
 			$oTrigger->DoActivate($oTicket->ToArgs('this'));
 		}
 
@@ -1983,14 +1983,14 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 				$oCaller = null;
 				$sContactQuery = 'SELECT Person WHERE email = :email';
 				$sCallerEmail = $oEmail->sCallerEmail;
-				$oSet = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sCallerEmail]);
+				$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sCallerEmail]);
 				
-				switch($oSet->Count()) {
+				switch($oSet_Person->Count()) {
 					
 					case 1:
 						// Ok, the caller was found in iTop
 						self::Trace("... Found person.");
-						$oCaller = $oSet->Fetch();
+						$oCaller = $oSet_Person->Fetch();
 						break;
 						
 					case 0:
@@ -2063,9 +2063,9 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 						break;
 						
 					default:
-						self::Trace("... Found ".$oSet->Count()." callers with the same email address '{$sCallerEmail}', the first one will be used...");
+						self::Trace("... Found ".$oSet_Person->Count()." callers with the same email address '{$sCallerEmail}', the first one will be used...");
 						// Multiple callers with the same email address!
-						$oCaller = $oSet->Fetch();
+						$oCaller = $oSet_Person->Fetch();
 						
 				}
 				
@@ -2244,11 +2244,11 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 					// Non-existing contacts must be created.
 					// Actual linking of contacts happens after policies have been processed.
 					$sContactQuery = 'SELECT Person WHERE email = :email';
-					$oSet_Persons = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], [
+					$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], [
 						'email' => $sCurrentEmail
 					]);
 					
-					if($oSet_Persons->Count() == 0) {
+					if($oSet_Person->Count() == 0) {
 						
 						// Create
 						self::Trace(".. Creating a new Person with email address '{$sCurrentEmail}'");
@@ -2284,9 +2284,9 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 						}									
 						
 					}
-					elseif($oSet_Persons->Count() == 1) {
+					elseif($oSet_Person->Count() == 1) {
 						// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
-						$oContact = $oSet->Fetch();
+						$oContact = $oSet_Person->Fetch();
 						$oEmail->aInternal_Additional_Contacts[] = $oContact;
 					}
 					else {
