@@ -92,8 +92,6 @@ function GetMailboxContent($oPage, $oInbox) {
 				// No sorting
 			}
 			
-			$aRealMessageIndexes = array_keys($aMessages);
-				
 			// Get the corresponding EmailReplica object for each message
 			$aUIDLs = array();
 			
@@ -136,13 +134,11 @@ function GetMailboxContent($oPage, $oInbox) {
 			
 			foreach(array_keys($aMessages) as $iMessage) {
 				
-				$iRealMessageIndex = $aRealMessageIndexes[$iMessage];
-				
-				$oRawEmail = $oSource->GetMessage($iRealMessageIndex);
+				$oRawEmail = $oSource->GetMessage($iMessage);
 				$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
 
 				// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
-				$sUIDLs = $oSource->GetName().'_'.$aMessages[$iRealMessageIndex]['uidl'];
+				$sUIDLs = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
 				$sStatus = Dict::S('MailInbox:Status/New');
 				$sLink = '';
 				$sErrorMsg = '';
