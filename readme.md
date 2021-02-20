@@ -76,8 +76,9 @@ In rare cases, these headers may include invalid data. This fork surpresses the 
 
 ### IMAP processing order
 This extension fetches e-mails through an IMAP connection.
-Some providers (Google) return e-mails from oldest to newest; so this is processed correctly.
-Other providers (Microsoft) return them from newest to oldest; sometimes mixing up chronology in iTop.
+Some providers (Google) return e-mails in a random order.
+Other providers (Microsoft) return them from newest to oldest.
+This may mix up processing steps to link "new" info to "older" tickets.
 A setting has been introduced to "reverse" the processing order.
 
 ### Related Combodo tickets
@@ -91,7 +92,7 @@ These issues are tackled in this fork, either by implementing a fix here or by b
 * #1781 Mail to Ticket Automation: Case log - link to user; caselog enhancement (no solution in Combodo version)
 * #1793 Mail to Ticket Automation: set IMAP undelete  (no solution in Combodo version. Pull request made, but not accepted because of worries about conflicts.)
 * #1859 Mail to Ticket Automation - issue with long subjects (+ solution) (some feedback, no solution in Combodo version. Pull request made.)
-* #1924 Mail to Ticket: processing order (no solution in Combodo version)
+* #1924 Mail to Ticket: processing order of e-mails is not chronologically on Microsoft Exchange/O365 and Google GMail (no solution in Combodo version)
 * #1925 Mail to Ticket: malformed headers (some feedback, no solution in Combodo version. Pull request made.)
 * #1930 Mail to Ticket: improved parsing of from: address (suggested fix, implemented by Combodo)
 
