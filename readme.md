@@ -106,5 +106,14 @@ PHP
 * how to columns value enums by running queries during installation (ModuleInstallerAPI)
 * how to implement a background process (```iBackgroundProcess```)
 
+## Need more?
+
+Some organizations have even more specific needs.
+Some of the customizations based on this generic Mail to Ticket Automation extension are:
+
+* match to open ticket based on subject (strip RE:/FW:/FWD:) and original caller in To: or CC:
+* match to open ticket based on subject (same event ID being used in every email sent to iTop)
+* match to open ticket based on Message-ID of very first e-mail for which a ticket was created and same Message-ID still in the 'References' or 'In-Reply-To' e-mail headers
+* ...
 
 
