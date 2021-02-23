@@ -3,7 +3,7 @@
 	<extension_code>jb-mail-to-ticket-automation-v2</extension_code>
 	<company></company>
 	<author><![CDATA[jbostoen]]></author>
-	<label><![CDATA[Feature: Mail to ticket automation]]></label>
+	<label><![CDATA[Feature: Mail to Ticket Automation]]></label>
 	<description><![CDATA[Scan several mailboxes to create or update tickets.]]></description>
 	<version>2.6.210219</version>
 	<release_date>2021-02-19</release_date>
