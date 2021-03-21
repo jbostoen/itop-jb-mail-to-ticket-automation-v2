@@ -242,13 +242,12 @@ status:assigned]]>
 					<values>
 						<value>bounce_delete</value>
 						<value>bounce_mark_as_undesired</value> 
-						<value>delete</value> 
-						<value>do_nothing</value>
+						<value>delete</value>
 						<value>fallback_create_person</value>
 						<value>mark_as_undesired</value>
 					</values>
 					<sql>policy_unknown_caller_behavior</sql>
-					<default_value>do_nothing</default_value>
+					<default_value>mark_as_undesired</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<field id="policy_unknown_caller_subject" xsi:type="AttributeString">
@@ -298,7 +297,11 @@ name:Unknown caller - $mail->caller_name$]]>
 				</field>
 				<field id="policy_other_recipients_default_values" xsi:type="AttributeText">
 					<sql>policy_other_recipients_default_values</sql>
-					<default_value/>
+					<default_value>
+<![CDATA[org_id:1
+first_name:-
+name:Unknown caller]]>
+					</default_value>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
 			<!-- Reference to closed ticket -->
@@ -977,9 +980,6 @@ EOF
 								<item id="imap_options">
 									<rank>110</rank>
 								</item>
-								<item id="imap_order">
-									<rank>111</rank>
-								</item>
 							</items>
 						</item>
 
@@ -1179,7 +1179,10 @@ EOF
 								</item>
 								<item id="policy_other_recipients_notification">
 									<rank>20</rank>
-								</item> 
+								</item>
+								<item id="policy_other_recipients_default_values">
+									<rank>25</rank>
+								</item>
 							</items>
 						</item> 
 

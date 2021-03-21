@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (C) 2019-2020 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     2020-12-20 19:11:40
+ * @version     2021-02-19 10:03:35
  *
  * Policy interface definition and some classes implementing it.
  * 
@@ -123,10 +123,10 @@ abstract class Policy implements iPolicy {
 	/**
 	 * Initiator. Sets some widely used property values.
 	 *
-	 * @var \MailInboxStandard $oMailBox Mailbox
-	 * @var \EmailMessage $oEmail Email message
-	 * @var \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
-	 * @var \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
+	 * @param \MailInboxStandard $oMailBox Mailbox
+	 * @param \EmailMessage $oEmail Email message
+	 * @param \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
+	 * @param \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
 	 *
 	 */
 	public static function Init(MailInboxStandard $oMailBox, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedPolicies) {
@@ -289,7 +289,7 @@ abstract class Policy implements iPolicy {
 	/**
 	 * Replace email placeholders in a string.
 	 * 
-	 * @var \String $sString Input string
+	 * @param \String $sString Input string
 	 *
 	 * @details Also exposes some properties which are not likely to be useful (body_format) at any time, but who knows?
 	 *
@@ -321,17 +321,35 @@ abstract class Policy implements iPolicy {
 		
 	}
 	
+	
 	/**
 	 * For logging information about the processing of emails.
 	 *
-	 * @var \String $sString Input string
+	 * @param \String $sString Input string
 	 *
 	 * @return void
 	 */
 	public static function Trace($sString) {
 		self::$oMailBox->Trace($sString);
 	}
-		 
+	
+	/**
+	 * For logging information about the processing of emails.
+	 *
+	 * @param \Array $aRecipients Hash table of recipients ('name', 'email')
+	 *
+	 * @return \String[]
+	 *
+	 * @todo move this to helper
+	 */
+	public static function GetAddressesFromRecipients($aRecipients) {
+		$aAddresses = [];
+		foreach($aRecipients as $aRecipient) {
+			$aAddresses[] = $aRecipient['email'];
+		}
+		return $aAddresses;
+	}
+	
 }
 
 
@@ -365,10 +383,10 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	/**
 	 * Initiator. Sets some widely used property values.
 	 *
-	 * @var \MailInboxStandard $oMailBox Mailbox
-	 * @var \EmailMessage $oEmail Email message
-	 * @var \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
-	 * @var \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
+	 * @param \MailInboxStandard $oMailBox Mailbox
+	 * @param \EmailMessage $oEmail Email message
+	 * @param \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
+	 * @param \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
 	 *
 	 */
 	public static function Init(MailInboxStandard $oMailBox, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedPolicies) {
@@ -581,7 +599,12 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		
 		$sCaseLogEntry = self::BuildCaseLogEntry();
 		
-		self::Trace("... Trace: ".$oEmail->sTrace);
+		if($oEmail->sTrace == '') {
+			self::Trace("... No email trace available.");
+		}
+		else {
+			self::Trace("... Email trace: ".$oEmail->sTrace);
+		}
 		
 		// Write the log on behalf of the caller.
 		// Fallback to e-mail address if name is unknown.
@@ -865,8 +888,8 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// If there are any TriggerOnMailUpdate defined, let's activate them
 		$aClasses = MetaModel::EnumParentClasses(get_class($oTicket), ENUM_PARENT_CLASSES_ALL);
 		$sClassList = implode(', ', CMDBSource::Quote($aClasses));
-		$oSet = new DBObjectSet(DBObjectSearch::FromOQL_AllData("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
-		while($oTrigger = $oSet->Fetch()) {
+		$oSet_TriggerMailUpdate = new DBObjectSet(DBObjectSearch::FromOQL_AllData("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
+		while($oTrigger = $oSet_TriggerMailUpdate->Fetch()) {
 			$oTrigger->DoActivate($oTicket->ToArgs('this'));
 		}
 
@@ -1529,7 +1552,6 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 				 case 'bounce_delete':
 				 case 'bounce_mark_as_undesired':
 				 case 'delete':
-				 case 'do_nothing':
 				 case 'mark_as_undesired':
 				
 					foreach($aAllContacts as $aContactInfo) {
@@ -1567,12 +1589,18 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 
 					break; // Defensive programming
 					
-				case 'fallback_add_all_other_contacts':
-				case 'fallback_add_existing_other_contacts':
+				case 'do_nothing':
 				case 'fallback_ignore_other_contacts':
 				
 					// Will be handled later (by default in PolicyFindAdditionalContacts)
 					self::Trace(".. Other contacts in To: or CC: will be ignored for this email in further processing.");
+					break;
+					
+				case 'fallback_add_other_contacts':
+				case 'fallback_add_existing_other_contacts':
+				
+					// Will be handled later (by default in PolicyFindAdditionalContacts)
+					self::Trace(".. Other contacts in To: or CC: will be handled in PolicyFindAdditionalContacts.");
 					break;
 				
 				default:
@@ -1955,14 +1983,14 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 				$oCaller = null;
 				$sContactQuery = 'SELECT Person WHERE email = :email';
 				$sCallerEmail = $oEmail->sCallerEmail;
-				$oSet = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sCallerEmail]);
+				$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sCallerEmail]);
 				
-				switch($oSet->Count()) {
+				switch($oSet_Person->Count()) {
 					
 					case 1:
 						// Ok, the caller was found in iTop
 						self::Trace("... Found person.");
-						$oCaller = $oSet->Fetch();
+						$oCaller = $oSet_Person->Fetch();
 						break;
 						
 					case 0:
@@ -1973,7 +2001,6 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 							case 'bounce_delete':
 							case 'bounce_mark_as_undesired':
 							case 'delete':
-							case 'do_nothing':
 							case 'mark_as_undesired':
 							
 								self::Trace("... The message '{$oEmail->sSubject}' is considered as undesired, the caller was not found.");
@@ -2036,9 +2063,9 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 						break;
 						
 					default:
-						self::Trace("... Found ".$oSet->Count()." callers with the same email address '{$sCallerEmail}', the first one will be used...");
+						self::Trace("... Found ".$oSet_Person->Count()." callers with the same email address '{$sCallerEmail}', the first one will be used...");
 						// Multiple callers with the same email address!
-						$oCaller = $oSet->Fetch();
+						$oCaller = $oSet_Person->Fetch();
 						
 				}
 				
@@ -2191,64 +2218,42 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 							
 		// Take both the To: and CC:
 		$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
+		$aAllContacts = self::GetAddressesFromRecipients($aAllContacts);
 		
 		// Mailbox aliases
 		$sMailBoxAliases = $oMailBox->Get('mail_aliases');
 		$aMailBoxAliases = (trim($sMailBoxAliases) == '' ? [] : preg_split(NEWLINE_REGEX, $sMailBoxAliases));
 		
 		// Ignore sender; helpdesk mailbox; any helpdesk mailbox aliases
-		$aExcludeContacts = array_merge([$oEmail->sCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases);
-		$aExcludeContacts = array_unique($aExcludeContacts);
+		$aAllOtherContacts = array_udiff($aAllContacts, [$oEmail->sCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
+		$aAllOtherContacts = array_unique($aAllOtherContacts);
 
 		$sPolicyBehavior = $oMailBox->Get(self::$sPolicyId.'_behavior');
 		
 		switch($sPolicyBehavior) {
 			
 			case 'fallback_add_existing_other_contacts':
-			case 'fallback_add_all_other_contacts':
+			case 'fallback_add_other_contacts':
 		
-				foreach($aAllContacts as $aContactInfo) {
-					
-					$sCurrentEmail = $aContactInfo['email'];
-					
-					foreach($aExcludeContacts as $sPattern) {
-						
-						// Regular e-mail address? Make case insensitive pattern
-						if(filter_var($sPattern, FILTER_VALIDATE_EMAIL) == true) {
-							$sPattern = '/^'.preg_quote($sPattern).'$/i';
-						}
-						$oPregMatch = @preg_match($sPattern, $sCurrentEmail);
-						
-						if($oPregMatch === false) {
-							self::Trace(".. Invalid pattern: '{$sPattern}'");
-							continue 2;
-							
-						}
-						elseif(preg_match($sPattern, $sCurrentEmail)) {
-							
-							// Found other contact in To: or CC: which is the caller or an alias for this mailbox
-							self::Trace(".. Caller or helpdesk mailbox alias: '{$sCallerEmail}'");
-							continue 2;
-							
-						}
-						
-					}
+				foreach($aAllOtherContacts as $sCurrentEmail) {
 					
 					// Found other contacts in To: or CC:
-					self::Trace(".. Looking up Person with email address '{$sCallerEmail}'");
+					self::Trace(".. Looking up Person with email address '{$sCurrentEmail}'");
 							
 					// Check if this contact exists.
 					// Non-existing contacts must be created.
 					// Actual linking of contacts happens after policies have been processed.
 					$sContactQuery = 'SELECT Person WHERE email = :email';
-					$oSet = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sContactEmail]);
+					$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], [
+						'email' => $sCurrentEmail
+					]);
 					
-					if($oSet->Count() == 0) {
+					if($oSet_Person->Count() == 0) {
 						
 						// Create
-						self::Trace(".. Creating a new Person with email address '{$sCallerEmail}'");
+						self::Trace(".. Creating a new Person with email address '{$sCurrentEmail}'");
 						$oContact = new Person();
-						$oContact->Set('email', $oEmail->sCallerEmail);
+						$oContact->Set('email', $sCurrentEmail);
 						$sDefaultValues = $oMailBox->Get(self::$sPolicyId.'_default_values');
 						$aDefaults = preg_split(NEWLINE_REGEX, $sDefaultValues);
 						$aDefaultValues = array();
@@ -2266,7 +2271,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 							self::Trace("... Try to create user with default values");
 							$oContact->DBInsert();
 
-							// Add Person to list of additional Contacts
+							// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
 							$oEmail->aInternal_Additional_Contacts[] = $oContact;
 							
 						}
@@ -2279,10 +2284,13 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 						}									
 						
 					}
-					elseif($oSet->Count() == 1) {
-						// Add Person to list of additional Contacts
-						$oContact = $oSet->Fetch();
+					elseif($oSet_Person->Count() == 1) {
+						// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
+						$oContact = $oSet_Person->Fetch();
 						$oEmail->aInternal_Additional_Contacts[] = $oContact;
+					}
+					else {
+						// More than one Person returned. Inconclusive. Ignore?
 					}
 					
 					
@@ -2300,7 +2308,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 				
 			case 'fallback_ignore_other_contacts':
 			
-				// Make sure these contacts are not processed in any further processing.
+				// Make sure these contacts are not processed in any further processing?
 				$oEmail->aTos = [];
 				$oEmail->aCCs = [];
 			
@@ -2556,8 +2564,8 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 	 *
 	 * @return \Array Array with image dimensions
 	 */
-	public static function GetImageSize($sImageData)
-	{
+	public static function GetImageSize($sImageData) {
+		
 		if(function_exists('getimagesizefromstring') == true ) {
 			// PHP 5.4.0 or higher
 			$aRet = @getimagesizefromstring($sImageData);
@@ -2575,6 +2583,7 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 			@unlink($sTempFile);
 		}
 		return $aRet;
+		
 	}
 	
 }

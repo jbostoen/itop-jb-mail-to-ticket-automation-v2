@@ -40,10 +40,6 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'No',
 	'Class:MailInboxBase/Attribute:imap_options' => 'IMAP options',
 	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP options can be specified, line by line. They are processed in that order.',
-	'Class:MailInboxBase/Attribute:imap_order' => 'IMAP processing',
-	'Class:MailInboxBase/Attribute:imap_order+' => 'IMAP processing. iTop should process e-mails chronologically. For example: GMail returns e-mails sorted by arrival time (ascending) so a default processing order is preferred. Office365/Outlook return e-mails sorted by arrival time (descending), so a reverse processing order is preferred.',
-	'Class:MailInboxBase/Attribute:imap_order/Value:default' => 'Default',
-	'Class:MailInboxBase/Attribute:imap_order/Value:reverse' => 'Reverse',
 
 	'MailInbox:MailboxContent' => 'Mailbox Content',
 	'MailInbox:EmptyMailbox' => 'The mailbox is empty',

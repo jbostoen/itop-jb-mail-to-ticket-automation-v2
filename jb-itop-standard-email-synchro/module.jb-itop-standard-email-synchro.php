@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'jb-itop-standard-email-synchro/2.6.201220',
+	'jb-itop-standard-email-synchro/2.6.210219',
 	array(
 		// Identification
 		//
@@ -72,9 +72,7 @@ if (!class_exists('StandardEmailSynchroInstaller')) {
 		 */
 		public static function BeforeDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion) {
 			
-			$bRenameValues = ($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.191123', '<'));
-			
-			if($bRenameValues == true) {
+			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.191123', '<')) {
 			
 				// 20191123-2011: renamed enum values, indicating they're fallbacks and doing a specific action; even if there's only one fallback.
 				self::RenameEnumValueInDB('MailInboxStandard', 'policy_forbidden_attachments_behavior', 'fallback', 'fallback_ignore_forbidden_attachments');
@@ -94,6 +92,14 @@ if (!class_exists('StandardEmailSynchroInstaller')) {
 				self::MoveColumnInDB('MailInboxStandard', 'policy_forbidden_attachments_notification', 'MailInboxStandard', 'policy_attachment_forbidden_mimetype_notification');
 				self::MoveColumnInDB('MailInboxStandard', 'policy_forbidden_attachments_mimetypes', 'MailInboxStandard', 'policy_attachment_forbidden_mimetype_mimetypes');
 				
+			}
+			
+			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.210219', '<')) {
+				CMDBSource::Query('
+					UPDATE mailinbox_standard 
+					SET policy_unknown_caller_behavior = "mark_as_undesired" 
+					WHERE policy_unknown_caller_behavior = "do_nothing"
+				');
 			}
 			
 		}
