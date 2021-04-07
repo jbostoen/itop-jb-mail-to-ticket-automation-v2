@@ -70,8 +70,10 @@ function GetMailboxContent($oPage, $oInbox) {
 			
 		}
 		catch(Exception $e) {
+			
 			$oPage->p('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
-		  return;
+			return;
+			
 		}
 	
 		$iProcessedCount = 0;
@@ -93,7 +95,7 @@ function GetMailboxContent($oPage, $oInbox) {
 			}
 			
 			// Get the corresponding EmailReplica object for each message
-			$aUIDLs = array();
+			$aUIDLs = [];
 			
 			foreach(array_keys($aMessages) as $iMessage) {
 				
@@ -105,35 +107,41 @@ function GetMailboxContent($oPage, $oInbox) {
 			
 			$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox'));
 			$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
-			$oReplicaSet->OptimizeColumnLoad(array('EmailReplica' => array('uidl', 'ticket_id', 'status', 'error_message')));
+			$oReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl', 'ticket_id', 'status', 'error_message']]);
 			$iProcessedCount = $oReplicaSet->Count();
-			$aProcessed = array();
+			$aProcessed = [];
 			
 			while($oReplica = $oReplicaSet->Fetch()) {
-				$aProcessed[$oReplica->Get('uidl')] = array(
-						'status' => $oReplica->Get('status'),
-						'ticket_id' => $oReplica->Get('ticket_id'),
-						'error_message' => $oReplica->Get('error_message'),
-						'id' => $oReplica->GetKey(),
-				);
+				$aProcessed[$oReplica->Get('uidl')] = [
+					'status' => $oReplica->Get('status'),
+					'ticket_id' => $oReplica->Get('ticket_id'),
+					'error_message' => $oReplica->Get('error_message'),
+					'id' => $oReplica->GetKey(),
+				];
 			}
 			
 			// Table config. Will be used as headers while the data is processed.
-			$aTableConfig = array(
-				'checkbox' => array('label' => '<input type="checkbox" id="mailbox_checkall"/>', 'description' => ''),
-				'status' => array('label' => Dict::S('MailInbox:Status'), 'description' => ''),
-				'date' => array('label' => Dict::S('MailInbox:Date'), 'description' => ''),
-				'from' => array('label' => Dict::S('MailInbox:From'), 'description' => ''),
-				'subject' => array('label' => Dict::S('MailInbox:Subject'), 'description' => ''),
-				'ticket' => array('label' =>  Dict::S('MailInbox:RelatedTicket'), 'description' => ''),
-				'error' => array('label' =>  Dict::S('MailInbox:ErrorMessage'), 'description' => ''),
-				'details' => array('label' =>  Dict::S('MailInbox:MessageDetails'), 'description' => ''),
-			);
+			$aTableConfig = [
+				'checkbox' => ['label' => '<input type="checkbox" id="mailbox_checkall"/>', 'description' => ''],
+				'status' => ['label' => Dict::S('MailInbox:Status'), 'description' => ''],
+				'date' => ['label' => Dict::S('MailInbox:Date'), 'description' => ''],
+				'from' => ['label' => Dict::S('MailInbox:From'), 'description' => ''],
+				'subject' => ['label' => Dict::S('MailInbox:Subject'), 'description' => ''],
+				'ticket' => ['label' =>  Dict::S('MailInbox:RelatedTicket'), 'description' => ''],
+				'error' => ['label' =>  Dict::S('MailInbox:ErrorMessage'), 'description' => ''],
+				'details' => ['label' =>  Dict::S('MailInbox:MessageDetails'), 'description' => ''],
+			];
 
-			$aData = array();
+			$aData = [];
 			
-			foreach(array_keys($aMessages) as $iMessage) {
+			$aMessageIndexes = array_keys($aMessages);
+			
+			$iCurrentIndex = $iStart;
+			while($iCurrentIndex <= $iEnd) {
 				
+				// Obtain the actual index for the message (take Nth index)
+				$iMessage = $aMessageIndexes[$iCurrentIndex];
+								
 				$oRawEmail = $oSource->GetMessage($iMessage);
 				$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
 
@@ -166,11 +174,11 @@ function GetMailboxContent($oPage, $oInbox) {
 						$sTicketUrl = ApplicationContext::MakeObjectUrl($oInbox->Get('target_class'), $aProcessed[$sUIDLs]['ticket_id']);
 						$sLink = '<a href="'.$sTicketUrl.'">'.$oInbox->Get('target_class').'::'.$aProcessed[$sUIDLs]['ticket_id'].'</a>';
 					}
-					$aArgs = array('operation' => 'message_details', 'sUIDL' => $sUIDLs);
+					$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDLs];
 					$sDetailsURL = utils::GetAbsoluteUrlModulePage(basename(dirname(__FILE__)), 'details.php', $aArgs);
 					$sDetailsLink = '<a href="'.$sDetailsURL.'">'.Dict::S('MailInbox:MessageDetails').'</a>';
 				}
-				$aData[] = array(
+				$aData[] = [
 					'checkbox' => '<input type="checkbox" class="mailbox_item" value="'.htmlentities($sUIDLs, ENT_QUOTES, 'UTF-8').'"/>',
 					'status' => $sStatus,
 					'date' => $oEmail->sDate,
@@ -179,7 +187,9 @@ function GetMailboxContent($oPage, $oInbox) {
 					'ticket' => $sLink,
 					'error' => $sErrorMsg,
 					'details' => $sDetailsLink,
-				);
+				];
+				
+				$iCurrentIndex += 1;
 				
 			}
 		
@@ -201,16 +211,16 @@ function GetMailboxContent($oPage, $oInbox) {
 
 /**
  * Finds the index of the message with the given UIDL identifier
- * @param array $aMessages The array returned by $oSource->GetListing()
- * @param string $sUIDL The UIDL to find
- * @param EmailSource $oSource
- * @return integer The index of the message or false if not found
+ * @param \Array $aMessages The array returned by $oSource->GetListing()
+ * @param \String $sUIDL The UIDL to find
+ * @param \EmailSource $oSource
+ * @return \Integer The index of the message or false if not found
  */
 function FindMessageIDFromUIDL($aMessages, $sUIDL, EmailSource $oSource) {
 	$sKey = $sUIDL;
-	$sMultiSourceKey = substr($sUIDL, 1+strlen($oSource->GetName())); // in Multisource mode the name of the source plus _ are prepended to the UIDL
+	$sMultiSourceKey = substr($sUIDL, 1 + strlen($oSource->GetName())); // in Multisource mode the name of the source plus _ are prepended to the UIDL
 	foreach($aMessages as $aData) {
-		if ((strcmp($sKey, $aData['uidl']) == 0) || (strcmp($sMultiSourceKey, $aData['uidl']) == 0)) {
+		if((strcmp($sKey, $aData['uidl']) == 0) || (strcmp($sMultiSourceKey, $aData['uidl']) == 0)) {
 			return $aData['msg_id'] - 1; // return a zero based index
 		}
 	}
@@ -218,6 +228,7 @@ function FindMessageIDFromUIDL($aMessages, $sUIDL, EmailSource $oSource) {
 }
 
 try {
+	
 	require_once(APPROOT.'/application/cmdbabstract.class.inc.php');
 	require_once(APPROOT.'/application/startup.inc.php');
 	require_once(APPROOT.'/application/loginwebpage.class.inc.php');
@@ -235,18 +246,21 @@ try {
 		$oInbox = MetaModel::GetObject('MailInboxBase', $iMailInboxId, false);
 	}
 	switch($sOperation) {
+		
 		case 'mailbox_content':
 			GetMailboxContent($oPage, $oInbox);
 			break;
 
 		case 'mailbox_reset_status':
 		case 'mailbox_delete_messages':
-			$aUIDLs = utils::ReadParam('aUIDLs', array(), false, 'raw_data');
+		
+			$aUIDLs = utils::ReadParam('aUIDLs', [], false, 'raw_data');
 			if(count($aUIDLs) > 0) {
+				
 				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).')';
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
-				$oReplicaSet->OptimizeColumnLoad(array('EmailReplica' => array('uidl')));
-				$aReplicas = array();
+				$oReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl']]);
+				$aReplicas = [];
 				while($oReplica = $oReplicaSet->Fetch()) {
 					$aReplicas[$oReplica->Get('uidl')] = $oReplica;
 				}
@@ -276,11 +290,11 @@ try {
 			break;
 
 		case 'mailbox_ignore_messages':
-			$aUIDLs = utils::ReadParam('aUIDLs', array(), false, 'raw_data');
-			if (count($aUIDLs) > 0) {
+			$aUIDLs = utils::ReadParam('aUIDLs', [], false, 'raw_data');
+			if(count($aUIDLs) > 0) {
 				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).')';
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
-				$aReplicas = array();
+				$aReplicas = [];
 				/** @var \DBObject $oReplica */
 				while ($oReplica = $oReplicaSet->Fetch()) {
 					$oReplica->Set('status', 'ignored');
