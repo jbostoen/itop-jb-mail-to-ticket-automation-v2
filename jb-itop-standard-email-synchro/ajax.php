@@ -42,20 +42,19 @@ try
 	
 	switch($sOperation) {
 		case 'debug_trace':
-		$oInbox = MetaModel::GetObject('MailInboxBase', $iMailInboxId, false);
-		if(is_object($oInbox)) {
-			if($oInbox->Get('trace') == 'yes') {
-				$oPage->add('<pre>'.htmlentities($oInbox->Get('debug_trace'), ENT_QUOTES, 'UTF-8').'</pre>');
+			$oInbox = MetaModel::GetObject('MailInboxBase', $iMailInboxId, false);
+			if(is_object($oInbox)) {
+				if($oInbox->Get('trace') == 'yes') {
+					$oPage->add('<pre>'.htmlentities($oInbox->Get('debug_trace'), ENT_QUOTES, 'UTF-8').'</pre>');
+				}
+				else {
+					$oPage->p(Dict::Format('MailInboxStandard:DebugTraceNotActive'));					
+				}
 			}
 			else {
-				$oPage->p(Dict::Format('MailInboxStandard:DebugTraceNotActive'));					
+				$oPage->P(Dict::S('UI:ObjectDoesNotExist'));
 			}
-		}
-		else
-		{
-			$oPage->P(Dict::S('UI:ObjectDoesNotExist'));
-		}
-		break;
+			break;
 	}
 	$oPage->output();
 }

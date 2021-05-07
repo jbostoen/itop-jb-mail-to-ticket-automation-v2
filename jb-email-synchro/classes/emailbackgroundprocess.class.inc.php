@@ -449,7 +449,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					
 
 					if(self::IsMultiSourceMode()) {
-						$aIDs = array(-1); // Make sure that the array is never empty...
+						
+						$aIDs = [ -1 ]; // Make sure that the array is never empty...
 						foreach($aReplicas as $oUsedReplica) {
 							if(is_object($oUsedReplica) && ($oUsedReplica->GetKey() != null)) {
 								// Fix IMAP: remember last seen. Aka: do not delete message because connection failed.
@@ -465,7 +466,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							" AND id NOT IN (" . implode(',', $aIDs) . ")";
 						$this->Trace("Searching for unused EmailReplicas: {$sOQL}");
 						$oUnusedReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
-						$oUnusedReplicaSet->OptimizeColumnLoad(array('EmailReplica' => array('uidl')));
+						$oUnusedReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl']]);
 						while($oReplica = $oUnusedReplicaSet->Fetch()) {
 							if(strtotime($oReplica->Get('last_seen')) < strtotime('-7 day')) {
 								// Replica not used for at least 7 days
