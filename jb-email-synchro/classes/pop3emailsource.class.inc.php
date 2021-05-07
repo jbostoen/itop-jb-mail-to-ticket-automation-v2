@@ -55,9 +55,9 @@ class POP3EmailSource extends EmailSource
 		{
 			if (class_exists('EventHealthIssue'))
 			{
-				EventHealthIssue::LogHealthIssue('jb-email-synchro', "Cannot login on server '$sServer' using '$sLogin' with pwd: $sPwd");
+				EventHealthIssue::LogHealthIssue('jb-email-synchro', "Cannot login on server '$sServer' using '$sLogin' with pwd: ".str_repeat("*", strlen($sPwd)));
 			}
-			throw new Exception("Cannot login using $sLogin with pwd: $sPwd");
+			throw new Exception("Cannot login using $sLogin with pwd: ".str_repeat("*", strlen($sPwd)));
 		}
 	}	
 
