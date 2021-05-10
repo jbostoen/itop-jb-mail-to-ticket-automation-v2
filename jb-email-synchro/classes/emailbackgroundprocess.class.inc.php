@@ -461,18 +461,18 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						}
 						
 						// Cleanup the unused replicas based on the pattern of their UIDL, unfortunately this is not possible in NON multi-source mode
-						$sOQL = "SELECT EmailReplica WHERE uidl LIKE " . CMDBSource::Quote($oSource->GetName() . '_%') . 
-							" AND mailbox_path = " . CMDBSource::Quote($oSource->GetMailbox()) . 
-							" AND id NOT IN (" . implode(',', $aIDs) . ")";
+						$iRetentionPeriod = MetaModel::GetModuleSetting('jb-email-synchro', 'retention_period', '7');
+						$sOQL = "SELECT EmailReplica WHERE uidl LIKE " . CMDBSource::Quote($oSource->GetName() . '_%') .
+							" AND mailbox_path = " . CMDBSource::Quote($oSource->GetMailbox()) .
+							" AND id NOT IN (" . implode(',', CMDBSource::Quote($aIDs)) . ")".
+							" AND last_seen <	DATE_SUB(NOW(), INTERVAL ".$iRetentionPeriod." DAY)";
 						$this->Trace("Searching for unused EmailReplicas: {$sOQL}");
 						$oUnusedReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 						$oUnusedReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl']]);
 						while($oReplica = $oUnusedReplicaSet->Fetch()) {
-							if(strtotime($oReplica->Get('last_seen')) < strtotime('-7 day')) {
-								// Replica not used for at least 7 days
-								$this->Trace("Deleting unused and outdated EmailReplica (#".$oReplica->GetKey()."), UIDL: ".$oReplica->Get('uidl'));
-								$oReplica->DBDelete();
-							}
+							// Replica not used for at least 7 days
+							$this->Trace("Deleting unused EmailReplica since ".$iRetentionPeriod."days (#".$oReplica->GetKey()."), UIDL: ".$oReplica->Get('uidl'));
+							$oReplica->DBDelete();
 							
 							if (time() > $iTimeLimit) break; // We'll do the rest later
 						}
