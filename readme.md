@@ -86,8 +86,8 @@ A setting has been introduced to "reverse" the processing order.
 These tickets are related to the official extension.
 These issues are tackled in this fork, either by implementing a fix here or by backporting a fix by Combodo.
 
+SourceForge tickets:
 * #1402 Ticket from email: duplicating tickets (use_message_as_uid = true) (recommendation)
-* #2181 Mail to Ticket: Sometimes duplicate ticket from mail-to-ticket (suggested fix, implemented by Combodo)
 * #1489 Emoji might cause Ticket from eMail to hang (reported issue, fix by Combodo)
 * #1628 Mail to Ticket: FindCaller (suggested fix, implemented by Combodo)
 * #1781 Mail to Ticket Automation: Case log - link to user; caselog enhancement (no solution in Combodo version)
@@ -96,6 +96,9 @@ These issues are tackled in this fork, either by implementing a fix here or by b
 * #1924 Mail to Ticket: processing order of e-mails is not chronologically on Microsoft Exchange/O365 and Google GMail (no solution in Combodo version)
 * #1925 Mail to Ticket: malformed headers (some feedback, no solution in Combodo version. Pull request made.)
 * #1930 Mail to Ticket: improved parsing of from: address (suggested fix, implemented by Combodo)
+
+Internal Combodo tickets:
+* N° 2181 Mail to Ticket: Sometimes duplicate ticket from mail-to-ticket (suggested fix, implemented by Combodo)
 
 ## Upgrade notes
 * See [Upgrade notes](documentation/upgrade%20notes.md)

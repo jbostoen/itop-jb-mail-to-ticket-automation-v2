@@ -461,7 +461,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						}
 						
 						// Cleanup the unused replicas based on the pattern of their UIDL, unfortunately this is not possible in NON multi-source mode
-						$iRetentionPeriod = MetaModel::GetModuleSetting('jb-email-synchro', 'retention_period', '7');
+						$iRetentionPeriod = MetaModel::GetModuleSetting('jb-email-synchro', 'retention_period', 10);
 						$sOQL = "SELECT EmailReplica WHERE uidl LIKE " . CMDBSource::Quote($oSource->GetName() . '_%') .
 							" AND mailbox_path = " . CMDBSource::Quote($oSource->GetMailbox()) .
 							" AND id NOT IN (" . implode(',', CMDBSource::Quote($aIDs)) . ")".
