@@ -490,6 +490,12 @@ class RawEmailMessage {
 		$idx = 0;
 		$aRawBody = array();
 		foreach($aLines as $sLine) {
+			
+			// File begins with a new line, remove the line and restart the function
+			if (self::IsNewLine($sLine) && $idx == 0 ) {
+				return $this->ExtractHeadersAndRawBody(array_slice($aLines, 1));
+			}
+			
 			if(self::IsNewLine($sLine)) {
 				// end of headers
 				$aRawBody = array_slice($aLines, 1 + $idx);
