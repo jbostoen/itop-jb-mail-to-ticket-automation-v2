@@ -29,7 +29,7 @@ class EmailDecodingException extends Exception {
  * 
  * This class is written in plain PHP using the standard functions base64_decode and quoted_printable_decode
  * and depends only on the "iconv" extension for the functions iconv and iconv_mime_decode.
- * The class can be used to process messages retrieved from POP3, IMAP or read from plain text files (.eml)
+ * The class can be used to process messages retrieved from POP3 (no longer supported), IMAP or read from plain text files (.eml)
  * Note that for dealing directly with a POP3 or IMAP server, the PHP extension 'IMAP' is probably much more
  * efficient than this class!
  * 

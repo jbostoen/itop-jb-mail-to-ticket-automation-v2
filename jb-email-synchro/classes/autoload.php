@@ -19,23 +19,19 @@
  */
 
 require_once(__DIR__.'/mail_mimedecode.class.inc.php');
-require_once(__DIR__.'/net_pop3.class.inc.php');
 require_once(__DIR__.'/rawemailmessage.class.inc.php');
 require_once(__DIR__.'/messagefrommailbox.class.inc.php');
 require_once(__DIR__.'/emailmessage.class.inc.php');
-if (interface_exists('iBackgroundProcess'))
-{
+if (interface_exists('iBackgroundProcess')) {
 	// When running the stand-alone decoding of a message (from a file) we don't need this
 	require_once(__DIR__.'/emailbackgroundprocess.class.inc.php');
 	require_once(__DIR__.'/emailprocessor.class.inc.php');
-	if (file_exists(__DIR__.'/testemailprocessor.class.inc.php'))
-	{
+	if (file_exists(__DIR__.'/testemailprocessor.class.inc.php')) {
 		require_once(__DIR__.'/testemailprocessor.class.inc.php');
 	}
 	require_once(__DIR__.'/mailinboxesemailprocessor.class.inc.php');
 }
-if (class_exists('DBObject'))
-{
+if(class_exists('DBObject')) {
 	// When running the stand-alone decoding of a message (from a file) we don't need this
 	require_once(__DIR__.'/_mailinboxbase.class.inc.php');
 	require_once(__DIR__.'/emailreplica.class.inc.php');
@@ -43,8 +39,6 @@ if (class_exists('DBObject'))
 }
 require_once(__DIR__.'/emailsource.class.inc.php');
 require_once(__DIR__.'/imapemailsource.class.inc.php');
-require_once(__DIR__.'/pop3emailsource.class.inc.php');
-if (file_exists(__DIR__.'/testemailsource.class.inc.php'))
-{
+if (file_exists(__DIR__.'/testemailsource.class.inc.php')) {
 	require_once(__DIR__.'/testemailsource.class.inc.php');
 }

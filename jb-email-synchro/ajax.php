@@ -89,8 +89,7 @@ function GetMailboxContent($oPage, $oInbox) {
 				});
 			}
 			else {
-				// @todo Drop this when dropping support for POP3
-				// In case of POP3
+				// In case of POP3 (no longer supported) or other protocols
 				// No sorting
 			}
 			

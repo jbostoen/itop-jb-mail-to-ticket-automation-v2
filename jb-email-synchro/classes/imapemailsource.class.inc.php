@@ -20,22 +20,23 @@
 
 /**
  * Read messages from an IMAP mailbox using PHP's IMAP extension
- * Note: in theory PHP IMAP methods can also be used to connect to
- *       a POP3 mailbox, but in practice the missing emulation of
- *       actual unique identifiers (UIDLs) for the messages makes
- *       this unusable for our particular purpose
+ * Note: in theory PHP IMAP methods can also be used to connect to  a POP3 mailbox, 
+ * but in practice the missing emulation of actual unique identifiers (UIDLs) for the messages makes
+ * this unusable for our particular purpose
  */
 class IMAPEmailSource extends EmailSource {
 	protected $rImapConn = null;
 	protected $sLogin = '';
 	protected $sMailbox = '';
+	protected $sTargetFolder = '';
 
-	public function __construct($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aOptions) {
+	public function __construct($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aOptions, $sTargetFolder = '') {
 		parent::__construct();
 		$this->sLastErrorSubject = '';
 		$this->sLastErrorMessage = '';
 		$this->sLogin = $sLogin;
 		$this->sMailbox = $sMailbox;
+		$this->sTargetFolder = $sTargetFolder;
 
 		$sOptions = '';
 		if(count($aOptions) > 0) {
@@ -48,10 +49,10 @@ class IMAPEmailSource extends EmailSource {
 		$this->rImapConn = imap_open($sIMAPConnStr, $sLogin, $sPwd );
 		if($this->rImapConn === false) {
 			if(class_exists('EventHealthIssue')) {
-				EventHealthIssue::LogHealthIssue('combodo-email-synchro', "Cannot connect to IMAP server: '$sIMAPConnStr', with credentials: '$sLogin'/".str_repeat("*", strlen($sPwd)));
+				EventHealthIssue::LogHealthIssue('combodo-email-synchro', "Cannot connect to IMAP server: '$sIMAPConnStr', with credentials: '$sLogin/***'");
 			}
 			print_r(imap_errors());
-			throw new Exception("Cannot connect to IMAP server: '$sIMAPConnStr', with credentials: '$sLogin'/***'".str_repeat("*", strlen($sPwd)));
+			throw new Exception("Cannot connect to IMAP server: '$sIMAPConnStr', with credentials: '$sLogin/'***'");
 		}
 	}	
 
@@ -135,6 +136,18 @@ class IMAPEmailSource extends EmailSource {
 		return $ret;
 	}
 	
+	/**
+	 * Move the message of the given index [0..Count] from the mailbox to another folder
+	 * @param $index integer The index between zero and count
+	 */
+	public function MoveMessage($index) {
+		$ret = imap_mail_move($this->rImapConn, (1+$index).':'.(1+$index), $this->sTargetFolder);
+		if(!$ret){
+			print_r(imap_errors());
+			throw new Exception("Error : Cannot move message to folder ".$this->sTargetFolder);
+		}
+		return $ret;
+	}
 	
 	
 	/**

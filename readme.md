@@ -28,6 +28,9 @@ This extension works in steps. Those steps are called **policies** and they **ca
   * Examples: determining and linking additional contacts, saving emails to a folder, ...
   * Info should only be set by one policy. That's why some of the default policies check whether some information (such as related contacts) hasn't been set yet.  
 
+Furthermore, it includes some fixes which were also provided back to Combodo where it was implemented at a later point or not at all.
+
+POP3 has been deprecated.
 
 ## Requirements
 

@@ -32,7 +32,6 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxBase/Attribute:login' => 'Identifiant',
 	'Class:MailInboxBase/Attribute:password' => 'Mot de passe',
 	'Class:MailInboxBase/Attribute:protocol' => 'Protocole',
-	'Class:MailInboxBase/Attribute:protocol/Value:pop3' => 'POP3',
 	'Class:MailInboxBase/Attribute:protocol/Value:imap' => 'IMAP',
 	'Class:MailInboxBase/Attribute:port' => 'Port',
 	'Class:MailInboxBase/Attribute:active' => 'Boîte Activée',

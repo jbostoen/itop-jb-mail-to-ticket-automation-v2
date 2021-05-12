@@ -29,6 +29,7 @@ abstract class EmailProcessor {
 	const PROCESS_ERROR = 3;
 	const MARK_MESSAGE_AS_ERROR = 4;
 	const MARK_MESSAGE_AS_UNDESIRED = 5;
+	const MOVE_MESSAGE = 6;
 
 	/**
 	 * @return \EmailSource[]

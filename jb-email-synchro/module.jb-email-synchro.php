@@ -44,7 +44,6 @@ SetupWebPage::AddModule(
 			'periodicity' => 30, // interval at which to check for incoming emails (in s)
 			'retention_period' => 10, // number of days we keep the replica
 			'body_parts_order' => 'text/html,text/plain', // Order in which to read the parts of the incoming emails
-			'pop3_auth_option' => 'USER',
 			'big_files_dir' => '',
 
 			// Some patterns which delimit the previous message in case of a Reply
