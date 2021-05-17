@@ -73,14 +73,6 @@ class TestEmailSource extends EmailSource
 	}
 
 	/**
-	 * Simulates the deletion of the message of the given index [0..Count] from the mailbox... does nothing
-	 * @param $index integer The index between zero and count
-	 */
-	public function DeleteMessage($index)
-	{
-		// Do nothing !
-	}
-	/**
 	 * Move the message of the given index [0..Count] from the mailbox to another folder
 	 * @param $index integer The index between zero and count
 	 */

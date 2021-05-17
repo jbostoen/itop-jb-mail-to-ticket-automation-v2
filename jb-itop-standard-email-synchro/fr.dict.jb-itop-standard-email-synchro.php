@@ -36,6 +36,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:email_storage' => 'Après traitement de l\'eMail',
 	'Class:MailInboxStandard/Attribute:email_storage/Value:keep' => 'Conserver l\'eMail sur le serveur',
 	'Class:MailInboxStandard/Attribute:email_storage/Value:delete' => 'Effacer immédiatement l\'eMail',
+	'Class:MailInboxStandard/Attribute:email_storage/Value:move' => 'Déplacer vers un autre dossier',
 
 	'Class:MailInboxStandard/Attribute:target_class' => 'Type de Ticket',
 	'Class:MailInboxStandard/Attribute:target_class/Value:Incident' => 'Incident',
@@ -52,6 +53,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:target_class/Value:Problem+' => '',
 	'Class:MailInboxStandard/Attribute:debug_trace' => 'Debug trace',
 	'Class:MailInboxStandard/Attribute:debug_trace+' => '',
+	'Class:MailInboxStandard/Attribute:target_folder' => 'Target folder',
+	'Class:MailInboxStandard/Attribute:target_folder+' => 'Use to move an email with the IMAP protocol',
 
 	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Valeurs par défaut du Ticket',
 	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Titre par défaut (en cas de sujet vide)',

@@ -263,8 +263,13 @@ abstract class Policy implements iPolicy {
 				self::$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
 				break;
 				
-			// Mark as error should be irrelevant now. Keeping it just in case.
+			case 'move':
+				// Remove the processed message from the mailbox
+				self::Trace('Set next action for EmailProcessor to MOVE_MESSAGE');
+				self::$oMailBox->SetNextAction(EmailProcessor::MOVE_MESSAGE);
+				
 			case 'mark_as_error': 
+				// Mark as error should be irrelevant now. Keeping it just in case.
 				self::Trace('Set next action for EmailProcessor to MARK_MESSAGE_AS_ERROR');
 				self::$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 				break;
@@ -690,6 +695,11 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			self::Trace(".. Deleting the source email");
 			self::$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);		
 		}
+		elseif(self::$oMailBox->Get('email_storage') == 'move') {
+			// Move the processed message to another folder
+			self::Trace(".. Moving the source email");
+			self::$oMailBox->SetNextAction(EmailProcessor::MOVE_MESSAGE);	
+		}
 		else {
 			// Keep the message in the mailbox
 			self::Trace(".. Keeping the source email");
@@ -901,6 +911,11 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			// Remove the processed message from the mailbox
 			self::Trace(".. Deleting the source email");
 			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);		
+		}
+		elseif($oMailBox->Get('email_storage') == 'move') {
+			// Move the message to another folder
+			self::Trace(".. Moving the source email");
+			$oMailBox->SetNextAction(EmailProcessor::MOVE_MESSAGE);
 		}
 		else {
 			// Keep the message in the mailbox

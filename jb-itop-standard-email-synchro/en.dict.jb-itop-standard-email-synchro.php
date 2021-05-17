@@ -36,6 +36,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:email_storage' => 'After processing the e-mail',
 	'Class:MailInboxStandard/Attribute:email_storage/Value:keep' => 'Keep it on the mail server',
 	'Class:MailInboxStandard/Attribute:email_storage/Value:delete' => 'Delete it immediately',
+	'Class:MailInboxStandard/Attribute:email_storage/Value:move' => 'Move to another folder',
 
 	'Class:MailInboxStandard/Attribute:target_class' => 'Ticket Class',
 	'Class:MailInboxStandard/Attribute:target_class/Value:Incident' => 'Incident',
@@ -52,7 +53,9 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:target_class/Value:Problem+' => '',
 	'Class:MailInboxStandard/Attribute:debug_trace' => 'Debug trace',
 	'Class:MailInboxStandard/Attribute:debug_trace+' => '',
-
+	'Class:MailInboxStandard/Attribute:target_folder' => 'Target folder',
+	'Class:MailInboxStandard/Attribute:target_folder+' => 'Use to move an email with the IMAP protocol',
+	
 	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Default values for new Ticket',
 	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Default Title (if subject is empty)',
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Pattern to match in the subject',
