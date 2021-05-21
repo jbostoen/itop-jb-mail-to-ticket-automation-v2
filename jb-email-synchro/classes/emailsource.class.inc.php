@@ -69,7 +69,7 @@ abstract class EmailSource
 	 * Move the message of the given index [0..Count] from the mailbox to another folder
 	 * @param $index integer The index between zero and count
 	 */
-	abstract public function MoveMessage($index) {
+	public function MoveMessage($index) {
 		// Do nothing
 		return false;
 	}

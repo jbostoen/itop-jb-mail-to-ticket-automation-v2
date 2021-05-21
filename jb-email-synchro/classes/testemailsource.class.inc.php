@@ -63,6 +63,14 @@ class TestEmailSource extends EmailSource
 	}
 	
 	/**
+	 * Initializes the message when it is being processed.
+	 * @param $index integer The index between zero and count
+	 * @return void
+	 */
+	public function InitMessage($index) {
+	}
+	
+	/**
 	 * Retrieves the message of the given index [0..Count]
 	 * @param $index integer The index between zero and count
 	 * @return MessageFromMailbox
@@ -73,14 +81,13 @@ class TestEmailSource extends EmailSource
 	}
 
 	/**
-	 * Move the message of the given index [0..Count] from the mailbox to another folder
+	 * Simulates the deletion of the message of the given index [0..Count] from the mailbox... does nothing
 	 * @param $index integer The index between zero and count
 	 */
-	public function MoveMessage($index){
+	public function DeleteMessage($index)
+	{
 		// Do nothing !
-		return false;
 	}
-
 
 	/**
 	 * Name of the eMail source
