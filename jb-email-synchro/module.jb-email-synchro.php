@@ -42,7 +42,7 @@ SetupWebPage::AddModule(
 			'notify_errors_from' => '', // mandatory as well (can be set at the same value as notify_errors_to)
 			'debug' => false, // Set to true to turn on debugging
 			'periodicity' => 30, // interval at which to check for incoming emails (in s)
-			'retention_period' => 10, // number of days we keep the replica
+			'retention_period' => 24, // number of hours the email replica is kept when it is no longer seen in the mailbox
 			'body_parts_order' => 'text/html,text/plain', // Order in which to read the parts of the incoming emails
 			'big_files_dir' => '',
 
