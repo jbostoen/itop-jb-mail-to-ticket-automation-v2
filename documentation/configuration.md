@@ -264,3 +264,15 @@ If it's a common use case, make a pull request to include it.
 * **Bounce message**
 * **Patterns to remove from subject** - (regex patterns, one per line)
 
+
+# Troubleshoot
+
+## HTML e-mails are processed as plain text (Exchange servers - on premises)
+
+Solution provided by Dejan Skubic for Exchange (on premises) editions:
+``` 
+[PS] C:\Windows\system32>set-CASMailbox -Identity 'mailboxusername' -ImapUseProtocolDefaults $false
+[PS] C:\Windows\system32>set-CASMailbox -Identity 'mailboxusername' -ImapMessagesRetrievalMimeFormat HtmlOnly
+ ```
+ 
+
