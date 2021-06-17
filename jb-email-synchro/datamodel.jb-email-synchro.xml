@@ -130,6 +130,7 @@ novalidate-cert]]></default_value>
 					<type>Overload-cmdbAbstractObject</type>
 					<code><![CDATA[	function DisplayBareRelations(WebPage $oPage, $bEditMode = false) {
 		parent::DisplayBareRelations($oPage, $bEditMode);
+		$bUseLegacy = static::UseLegacy();
 		if (!$bEditMode)
 		{
 			$oPage->SetCurrentTab(Dict::S('MailInbox:MailboxContent'));
@@ -152,20 +153,19 @@ novalidate-cert]]></default_value>
 			catch (MySQLException $e)
 			{
 			}
-			$sForm = Dict::Format('MailInbox:Display_X_eMailsStartingFrom_Y', '<input type="text" size="3" id="mailbox_count" value="10"/>', '<input type="text" size="3" id="mailbox_start_index" value="0"/>');
-			$oPage->add('<p><form onsubmit="return false;">'.$sForm.'&nbsp;<button type="submit" id="mailbox_content_refresh">'.Dict::S('UI:Button:Refresh').'</button></form></p>');
+			$oPage->add('<p><form onsubmit="return false;">'.$sForm.'&nbsp;<button type="submit" id="mailbox_content_refresh" class="ibo-button ibo-is-neutral ibo-is-primary">'.Dict::S('UI:Button:Refresh').'</button></form></p>');
 			$oPage->add('<div id="mailbox_content_output"></div>');
 			$sAjaxUrl = addslashes(utils::GetAbsoluteUrlModulesRoot().basename(dirname(__FILE__)).'/ajax.php');
 			$iId = $this->GetKey();
+			$sConfirmMessage = Dict::S('MailInbox:MailboxContent:ConfirmMessage');
+			$sUseLegacy = ($bUseLegacy === true ? 'true' : 'false');
 			$oPage->add_script(
 <<<EOF
 function MailboxUpdateActionButtons() {
-	if( $(".mailbox_item:checked").length > 0 )
-	{
+	if( $(".mailbox_item:checked").length > 0 ) {
 		$('.mailbox_button').prop('disabled', false);
 	}
-	else
-	{
+	else {
 		$('.mailbox_button').prop('disabled', true);
 	}	
 }
@@ -173,7 +173,9 @@ function MailboxUpdateActionButtons() {
 function MailboxRefresh(data) {
 	$('#mailbox_content_output').html(data);
 	$('#mailbox_content_refresh').prop('disabled', false);
-	$("#mailbox_content_output .listResults").tablesorter( { headers: { 0: {sorter: false}}, widgets: ['myZebra']} ); // sortable and zebra tables
+	if($sUseLegacy) {
+		$("#mailbox_content_output .listResults").tablesorter( { headers: { 0: {sorter: false}}, widgets: ['myZebra']} ); // sortable and zebra tables
+	}
 	$("#mailbox_checkall").click(function() {
 		var bChecked = $(this).prop('checked');
 		$(".mailbox_item").each(function() {
@@ -186,12 +188,15 @@ function MailboxRefresh(data) {
 		MailboxUpdateActionButtons();
 	});
 	$('#mailbox_reset_status').click(function() {
+		if(!window.confirm("$sConfirmMessage")) { return; }
 		MailboxResetStatus();
 	});
 	$('#mailbox_delete_messages').click(function() {
+		if(!window.confirm("$sConfirmMessage")) { return; }
 		MailboxDeleteMessages();
 	});
 	$('#mailbox_ignore_messages').click(function() {
+		if(!window.confirm("$sConfirmMessage")) { return; }
 		MailboxIgnoreMessages();
 	});
 	MailboxUpdateActionButtons();

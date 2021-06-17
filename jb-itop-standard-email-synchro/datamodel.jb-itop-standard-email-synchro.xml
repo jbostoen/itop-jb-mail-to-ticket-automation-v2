@@ -126,10 +126,6 @@ status:assigned]]>
 				<field id="target_folder" xsi:type="AttributeString">
 					<sql>target_folder</sql>
 					<default_value/>
-					<dependencies>
-						<attribute id="email_storage"/>
-						<attribute id="protocol"/>
-					</dependencies>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
 				<field id="stimuli" xsi:type="AttributeText">
@@ -492,7 +488,7 @@ name:Unknown caller]]>
 			$iId = $this->GetKey();
 			if ($this->Get('trace') == 'yes')
 			{
-				$oPage->add('<p><button type="button" id="debug_trace_refresh">'.Dict::S('UI:Button:Refresh').'</button></p>');
+				$oPage->add('<p><button type="button" class="ibo-button ibo-is-regular ibo-is-neutral" id="debug_trace_refresh">'.Dict::S('UI:Button:Refresh').'</button></p>');
 				$oPage->add('<div id="debug_trace_output"></div>');
 				$oPage->add_ready_script(
 <<<EOF
@@ -929,46 +925,6 @@ EOF
 		}
 		return $sReturn;
 	}]]></code>
-				</method>
-				<method id="GetInitialStateAttributeFlags" _delta="define">
-				  <static>false</static>
-				  <access>public </access>
-				  <code><![CDATA[
-					  public function GetInitialStateAttributeFlags($sAttCode, &$aReasons = array())
-					  {
-						 if ($sAttCode == 'target_folder'){
-							if ( (MetaModel::IsValidAttCode(get_class($this), 'email_storage'))
-							 && ($this->Get('email_storage') == 'move')
-							 && (MetaModel::IsValidAttCode(get_class($this), 'protocol'))
-							 && ($this->Get('protocol') == 'imap')) {
-							  return OPT_ATT_MANDATORY;
-						   } else {
-							  return OPT_ATT_READONLY;
-						   }
-						 }
-						 return parent::GetInitialStateAttributeFlags($sAttCode, $aReasons);
-					  }
-								]]></code>
-							  </method>
-							  <method id="GetAttributeFlags" _delta="define">
-								<static>false</static>
-								<access>public </access>
-								<code><![CDATA[
-					  public function GetAttributeFlags($sAttCode, &$aReasons = array(), $sTargetState = '')
-					  {
-						  if ($sAttCode == 'target_folder') {
-							if ( (MetaModel::IsValidAttCode(get_class($this), 'email_storage'))
-							 && ($this->Get('email_storage') == 'move')
-							 && (MetaModel::IsValidAttCode(get_class($this), 'protocol'))
-							 && ($this->Get('protocol') == 'imap'))  {
-							  return OPT_ATT_MANDATORY ;
-						   } else {
-							  return OPT_ATT_READONLY;
-						   }
-						 }
-						 return parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState);
-					  }
-								]]></code>
 				</method>
 			</methods>
 			<presentation>

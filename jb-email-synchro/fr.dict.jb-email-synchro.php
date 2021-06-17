@@ -39,6 +39,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Non',
 
 	'MailInbox:MailboxContent' => 'Contenu de la boîte mail',
+	'MailInbox:MailboxContent:ConfirmMessage' => 'Etes-vous sûr(e)?',
 	'MailInbox:EmptyMailbox' => 'La boîte mail est vide.',
 	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d eMail(s) affichés. Il y a au total %2$d eMail(s) dans la boîte (dont %3$d nouveaux).',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'Le paramètre MySQL max_allowed_packet dans le fichier "my.ini" est trop petit : %1$s. La valeur recommandée est d\'au minimum : %2$s',
