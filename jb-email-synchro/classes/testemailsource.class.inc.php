@@ -37,6 +37,11 @@ class TestEmailSource extends EmailSource
 		$this->sSourceDir = $sSourceDir;
 		$this->sName = $sName;
 		$this->aMessages = array();
+		
+		if(is_dir($this->sSourceDir) == false) {
+			mkdir($this->sSourceDir);
+		}
+		
 		$hDir = opendir($this->sSourceDir);
 		while(($sFile = readdir($hDir)) !== false)
 		{
