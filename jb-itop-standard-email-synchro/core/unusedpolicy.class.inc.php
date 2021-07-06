@@ -75,12 +75,6 @@ abstract class PolicyExampleSaveEmailsToPath extends Policy implements iPolicy {
 
 
 /*
-@todo 
-
-
-abstract class PolicyAttachmentSize implements iPolicy {
-	// attachment too big
-}
 
 abstract class PolicyAttachmentVirusCheck implements iPolicy {
 	// could be an example implementing ClamAv, similar to what's mentioned in MailInboxBase
