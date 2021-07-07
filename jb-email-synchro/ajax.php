@@ -65,7 +65,7 @@ function GetMailboxContent($oPage, $oInbox) {
 		
 			// Avoid user specifying a higher number (start + count) than the total mesage number count
 			// The largest index is (message count - 1), since messages are retrieved by index (starting at 0)
-			$iEnd = min($iStart + $iMaxCount,  $iTotalMsgCount - 1); 
+			$iEnd = min($iStart + $iMaxCount -1,  $iTotalMsgCount - 1); 
 			
 		}
 		catch(Exception $e) {
