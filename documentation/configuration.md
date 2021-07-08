@@ -78,7 +78,12 @@ Common options are:
 
 In the bounce message, some placeholders (variables) can be used.  
 In fact, most (all?) strings from the EmailMessage class are supported.  
-So in the bounce subject/message, it's possible to use **$mail->subject$** etc. (list below)
+So in the bounce subject/message, it's possible to use `$mail->subject$` etc. (list below)
+
+
+## Available placeholders
+
+The place holders can be used like this: `$mail->subject`
 
 ```
 body_format
@@ -225,6 +230,10 @@ If it's a common use case, make a pull request to include it.
 ```
 
 ( creates a person named 'Unknown Caller', belonging to first organization in iTop)
+
+⚠ You can also use the placeholders such as the caller's name and e-mail in values! (See above: Available placeholders)
+
+
 	 
 ### Other recipients
 * Use case:
@@ -241,7 +250,9 @@ If it's a common use case, make a pull request to include it.
   * Mark as undesired 
 * **Bounce subject**
 * **Bounce message**
-	 
+
+The default values work the same as for unknown callers.
+
 ### Undesired patterns in title
 * Use case: out-of-office, email should NOT be processed
 * **Policy violation behavior**
