@@ -537,6 +537,18 @@ class RawEmailMessage {
 	 * @return string The decoded string
 	 */
 	protected static function DecodeHeaderString($sInput) {
+		
+		// Fix an encoding issue which may occur in multiline headers if it is indeed a utf-8 encoded string.
+		// Check if the string starts with =?utf-8? (sometimes with space in front) and ends with ?=
+		if(preg_match('/^(\s|){1,}=\?utf-8\?(.*)\?=/', $sInput)) {
+			// Remove leading white space
+			$sInput = preg_replace('/^(\s)/', '', $sInput);
+			// Remove any space of UTF8 seperation in the lines which were merged in the ExtractHeadersAndRawBody() method
+			// Mind that it's possible that some lines of a multiline subject have different encodings! (utf-8-b; utf-8-q; ...)
+			// Examples: ?==?utf-8? , ?= =?utf-8?
+			$sInput = preg_replace('/\?=(\s|){1,}=\?utf-8\?/', '?==?utf-8?', $sInput);			
+		}
+				
 		$sOutput = iconv_mime_decode($sInput, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
 		return $sOutput; // Don't be too strict, continue on errors
     }
