@@ -22,6 +22,11 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
+
+use Combodo\iTop\Application\UI\Base\Component\Html\Html;
+use Combodo\iTop\Application\UI\Base\Component\Panel\PanelUIBlockFactory;
+use Combodo\iTop\Application\UI\Base\Layout\UIContentBlock;
+
 require_once('../approot.inc.php');
 require_once(APPROOT.'/application/application.inc.php');
 require_once(APPROOT.'/application/itopwebpage.class.inc.php');
@@ -46,25 +51,42 @@ function GetMessageDetails($oPage, $sUIDL)
 	}
 
 	$oPage->set_title(Dict::S('MailInbox:MessageDetails'));
-	$oPage->add('<h2>'.Dict::S('MailInbox:MessageDetails').'</h2>');
+	if(MailInboxBase::UseLegacy()){
+		$oPage->add('<h2>'.Dict::S('MailInbox:MessageDetails').'</h2>');
+	}
+	else{
+		$oPanel = PanelUIBlockFactory::MakeForInformation(Dict::S('MailInbox:MessageDetails'));
+		$oPage->AddUiBlock($oPanel);
+	}
 
 		// Display the eml link
 	$iDocId = $oReplica->GetKey();
 	/** @var \ormDocument $oDoc */
 	$oDoc = $oReplica->Get('contents');
-	if (!$oDoc->IsEmpty())
-	{
+	if (!$oDoc->IsEmpty()) {
 		$sDownloadURL = $oDoc->GetDownloadURL('EmailReplica', $iDocId, 'contents');
-		$oPage->add('<h3><div class="attachment" id="display_attachment_'.$iDocId.'"><a href="'.$sDownloadURL.'">'.Dict::S('MailInbox:DownloadEml').'</a></div></h3>');
+		if(MailInboxBase::UseLegacy()){
+			$oPage->add('<h3><div class="attachment" id="display_attachment_'.$iDocId.'"><a href="'.$sDownloadURL.'">'.Dict::S('MailInbox:DownloadEml').'</a></div></h3>');
+		}
+		else{
+			$oSubtitle = new UIContentBlock();
+			$oSubtitle->AddHtml('<a href="'.$sDownloadURL.'">'.Dict::S('MailInbox:DownloadEml').'</a>');
+			$oPanel->SetSubTitleBlock($oSubtitle);
+		}
 	}
 
 	$aList = array('message_date', 'status', 'error_message', 'error_trace');
 	$aValues = array();
-	foreach($aList as $sAttCode)
-	{
+	foreach($aList as $sAttCode) {
 		$aValues[$sAttCode] = array('label' => MetaModel::GetLabel(get_class($oReplica), $sAttCode), 'value' => $oReplica->GetAsHTML($sAttCode));
 	}
-	$oPage->details($aValues);
+	if(MailInboxBase::UseLegacy()){
+		$oPage->details($aValues);
+	}
+	else{
+		$oPanel->AddHtml($oPage->GetDetails($aValues));
+		$oPage->AddUiBlock($oPanel);
+	}
 
 }
 
