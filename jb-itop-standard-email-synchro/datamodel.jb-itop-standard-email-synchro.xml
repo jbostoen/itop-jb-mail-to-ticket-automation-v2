@@ -694,7 +694,7 @@ EOF
 		{
 			case 'decode_failed':
 			
-				$sSubject = '[iTop] Failed to decode an incoming eMail (mail inbox: '.$this->GetName();
+				$sSubject = '[iTop] Failed to decode an incoming eMail (mail inbox: '.$this->GetName().')';
 				if ($oRawEmail && ($oRawEmail->GetSize() > EmailBackgroundProcess::$iMaxEmailSize))
 				{
 					$sBody = "<p>The incoming eMail is bigger (".$oRawEmail->GetSize()." bytes) than the maximum configured size (maximum_email_size = ".EmailBackgroundProcess::$iMaxEmailSize.").</p>\n";
@@ -748,7 +748,8 @@ EOF
 				}
 				else
 				{
-					$sBody = "<p>The following eMail (see attachment) was not decoded properly and therefore was not processed at all.</p>\n";
+					$sBody = '<p>The following eMail (see attachment) was not decoded properly and therefore was not processed at all.</p>\n';
+					$sBody .= '<ul><li>'.implode('</li><li>', $oEmail->GetInvalidReasons()).'</li></ul>';
 					$sBody .= $sLastAction;
 				}
 			break;
@@ -826,7 +827,7 @@ EOF
 		
 		if(($sTo == '') || ($sFrom == ''))
 		{
-			$this->Trace("HandleError($sErrorCode): No forward configured for forwarding the email...(To: '$sTo', From: '$sFrom'), skipping.");
+			$this->Trace("HandleError($sErrorCode): No forward configured for forwarding the email (To: '$sTo', From: '$sFrom'), skipping.");
 		}
 		else if($oRawEmail)
 		{

@@ -337,7 +337,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									// Checks for valid caller (name, email), UIDL and attachments
 									if(!$oEmail->IsValid()) {
 
-										$iNextActionCode = $oProcessor->OnDecodeError($oSource, $sUIDL, null, $oRawEmail);
+										$iNextActionCode = $oProcessor->OnDecodeError($oSource, $sUIDL, $oEmail, $oRawEmail);
 
 										switch($iNextActionCode) {
 											case EmailProcessor::MARK_MESSAGE_AS_ERROR:
@@ -345,7 +345,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												$this->Trace("Failed to decode the message, marking the message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
 												$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
 												$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
-											break;
+												break;
 								
 											case EmailProcessor::DELETE_MESSAGE:
 												$iTotalDeleted++;
