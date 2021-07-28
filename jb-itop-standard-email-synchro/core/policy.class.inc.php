@@ -513,7 +513,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// UpdateAttachments() will be called once the ticket is properly saved
 		self::AddAttachments(true);
 		
-		// Seems to be for backward compatibility / plain text.																							
+		// Seems to be for backward compatibility / plain text.
 		$oTicketDescriptionAttDef = MetaModel::GetAttributeDef($sTargetClass, 'description');
 		$bForPlainText = true; // Target format is plain text (by default)
 		if ($oTicketDescriptionAttDef instanceof AttributeHTML) {
@@ -535,6 +535,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 
 		$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize();
 		if(strlen($sTicketDescription) > $iDescriptionMaxSize) {
+			// Add the original e-mail message as an attachment.
 			$oEmail->aAttachments[] = [
 				'content' => $sTicketDescription, 
 				'filename' => ($bForPlainText == true ? 'original message.txt' : 'original message.html'), 
@@ -648,10 +649,59 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oAttributeValue = new ormCustomCaseLog();
 		$oAttributeValue->AddLogEntriesFromCaseLog($oCaseLog);
 		
+		// Loop protection
+		$bLoopProtection = MetaModel::GetModuleSetting('jb-itop-standard-email-synchro', 'loop_protection_enabled', true);
+		$iLoopProtection = (Int)MetaModel::GetModuleSetting('jb-itop-standard-email-synchro', 'loop_protection_interval_minutes', 60);
+		if($bLoopProtection == true && $iLoopProtection > 0) {
+			
+			// Ticket is being updated.
+			// This means the loop protection should check both the description and recent log entries.
+			foreach($oAttributeValue->GetAsArray() as $aLogEntry) {
+				if(strtotime($aLogEntry['date']) >= strtotime('-'.$iLoopProtection.' hours')) {
+					if($aLogEntry['message_html'] == $sCaseLogEntry || $aLogEntry['message'] == $sCaseLogEntry) {
+						// Ticket had reference and new content is exactly the same as a recent log entry.
+						// Do not process!
+						self::Trace('Set next action for EmailProcessor to MARK_MESSAGE_AS_UNDESIRED');
+						self::$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_UNDESIRED); // Keep the message temporarily in the mailbox, but marked as undesired
+						return false; // Stop processing
+					}
+				}
+			}
+			
+			// This part is similar to building a description for a new ticket
+				
+				// Seems to be for backward compatibility / plain text.
+				$oTicketDescriptionAttDef = MetaModel::GetAttributeDef($sTargetClass, 'description');
+				$bForPlainText = true; // Target format is plain text (by default)
+				if ($oTicketDescriptionAttDef instanceof AttributeHTML) {
+					// Target format is HTML
+					$bForPlainText = false;
+				}
+				elseif($oTicketDescriptionAttDef instanceof AttributeText) {
+					$aParams = $oTicketDescriptionAttDef->GetParams();
+					if(array_key_exists('format', $aParams) && ($aParams['format'] == 'html')) {
+						// Target format is HTML
+						$bForPlainText = false;
+					}
+				}
+				$sTicketDescription = self::BuildDescription($bForPlainText);
+				$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize();
+		
+				$sDescription = self::FitTextIn($sTicketDescription, $iDescriptionMaxSize - 1000);
+				
+			// Now compare this description with the log entry
+			
+			
+		}
+		
 		// New entry from current email
 		$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $iCallerUserId, '');
 		
 		// Sort chronologically: ascending (true), descending (false = most recent on top)!
+		// This actually ensured this for of Mail to Ticket ordered log entries chronologically even if they were processed in the wrong order. 
+		// However, it can not prevent a ticket (with description) being created from the 'second' e-mail first.
+		// This should be fixed now in newer versions of this extension which order the incoming e-mails first.
+		// This is still here for legacy reasons.
 		$oAttributeValue = $oAttributeValue->ToSortedCaseLog(false);
 		
 		$oTicket->Set($sAttCode, $oAttributeValue);
