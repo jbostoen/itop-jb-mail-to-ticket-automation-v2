@@ -23,7 +23,6 @@
  */
 
 
-use Combodo\iTop\Application\UI\Base\Component\Html\Html;
 use Combodo\iTop\Application\UI\Base\Component\Panel\PanelUIBlockFactory;
 use Combodo\iTop\Application\UI\Base\Layout\UIContentBlock;
 
@@ -94,7 +93,7 @@ try
 {
 	require_once(APPROOT.'/application/startup.inc.php');
 	require_once(APPROOT.'/application/loginwebpage.class.inc.php');
-	LoginWebPage::DoLogin(true /* bMustBeAdmin */, false /* IsAllowedToPortalUsers */); // Check user rights and prompt if needed
+	LoginWebPage::DoLogin(); // Check user rights and prompt if needed
 
 	$oPage = new iTopWebPage("");
 

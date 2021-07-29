@@ -24,7 +24,7 @@ class EmailReplica extends DBObject
 	{
 		$aParams = array
 		(
-			"category" => "requestmgmt",
+			"category" => "requestmgmt,grant_by_profile",
 			"key_type" => "autoincrement",
 			"name_attcode" => "uidl",
 			"state_attcode" => "",
