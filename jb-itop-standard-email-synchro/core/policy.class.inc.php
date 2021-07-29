@@ -603,6 +603,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$iCurrentUserId = UserRights::GetUserId();
 		$bInsertChangeUserId = false;
 		// Set changes author to mail author and create a new Change
+		// Method only exist in iTop 3.0
 		if(method_exists('UserRights', 'GetUserFromPerson') && $oCaller !== null){
 			$oUser = UserRights::GetUserFromPerson($oCaller, true);
 			if($oUser !== null){
