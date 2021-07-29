@@ -600,6 +600,19 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// Try to extract what's new from the message's body
 		self::Trace("... Updating Ticket '{$oTicket->GetName()}' from email '{$oEmail->sSubject}'");
 		
+		$iCurrentUserId = UserRights::GetUserId();
+		$bInsertChangeUserId = false;
+		// Set changes author to mail author and create a new Change
+		if(method_exists('UserRights', 'GetUserFromPerson') && $oCaller !== null){
+			$oUser = UserRights::GetUserFromPerson($oCaller, true);
+			if($oUser !== null){
+				CMDBObject::SetTrackUserId($oUser->GetKey());
+				$oCMDBChange = CMDBObject::GetCurrentChange();
+				CMDBObject::SetCurrentChange(null);
+				$bInsertChangeUserId = true;
+			}
+		}
+
 		// Process attachments
 		self::AddAttachments(true);
 		
@@ -650,7 +663,12 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oAttributeValue->AddLogEntriesFromCaseLog($oCaseLog);
 		
 		// New entry from current email
-		$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $iCallerUserId, '');
+		if($bInsertChangeUserId === true){
+			$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $oUser->GetKey());
+		}
+		else{
+			$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $iCallerUserId, '');
+		}
 		
 		// Sort chronologically: ascending (true), descending (false = most recent on top)!
 		// This ensures that log entries are ordered chronologically, even if the e-mails were processed in the wrong order.
@@ -668,7 +686,13 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oTicket->DBUpdate();			
 		self::Trace("... Ticket '{$oTicket->GetName()}' has been updated.");
 		self::AfterUpdateTicket();
-				
+
+		// Restore previous change as current change
+		if($bInsertChangeUserId === true){
+		  CMDBObject::SetTrackUserId($iCurrentUserId);
+		  CMDBObject::SetCurrentChange($oCMDBChange);
+		}
+		
 	}
 	
 	/**
