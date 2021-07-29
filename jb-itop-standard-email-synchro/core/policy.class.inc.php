@@ -513,7 +513,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// UpdateAttachments() will be called once the ticket is properly saved
 		self::AddAttachments(true);
 		
-		// Seems to be for backward compatibility / plain text.																							
+		// Seems to be for backward compatibility / plain text.
 		$oTicketDescriptionAttDef = MetaModel::GetAttributeDef($sTargetClass, 'description');
 		$bForPlainText = true; // Target format is plain text (by default)
 		if ($oTicketDescriptionAttDef instanceof AttributeHTML) {
@@ -535,6 +535,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 
 		$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize();
 		if(strlen($sTicketDescription) > $iDescriptionMaxSize) {
+			// Add the original e-mail message as an attachment.
 			$oEmail->aAttachments[] = [
 				'content' => $sTicketDescription, 
 				'filename' => ($bForPlainText == true ? 'original message.txt' : 'original message.html'), 
@@ -652,6 +653,10 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $iCallerUserId, '');
 		
 		// Sort chronologically: ascending (true), descending (false = most recent on top)!
+		// This ensures that log entries are ordered chronologically, even if the e-mails were processed in the wrong order.
+		// However, it can not prevent a ticket (with description) being initially created from the chronologically speaking 'second' e-mail.
+		// That issue should be fixed now in newer versions of this extension which order the incoming e-mails first.
+		// This line still matters though, because agents might also have added logs in between.
 		$oAttributeValue = $oAttributeValue->ToSortedCaseLog(false);
 		
 		$oTicket->Set($sAttCode, $oAttributeValue);
