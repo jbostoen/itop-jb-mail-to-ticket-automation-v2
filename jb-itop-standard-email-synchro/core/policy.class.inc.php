@@ -698,10 +698,10 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $iCallerUserId, '');
 		
 		// Sort chronologically: ascending (true), descending (false = most recent on top)!
-		// This actually ensured this for of Mail to Ticket ordered log entries chronologically even if they were processed in the wrong order. 
-		// However, it can not prevent a ticket (with description) being created from the 'second' e-mail first.
-		// This should be fixed now in newer versions of this extension which order the incoming e-mails first.
-		// This is still here for legacy reasons.
+		// This ensures that log entries are ordered chronologically, even if the e-mails were processed in the wrong order.
+		// However, it can not prevent a ticket (with description) being initially created from the chronologically speaking 'second' e-mail.
+		// That issue should be fixed now in newer versions of this extension which order the incoming e-mails first.
+		// This line still matters though, because agents might also have added logs in between.
 		$oAttributeValue = $oAttributeValue->ToSortedCaseLog(false);
 		
 		$oTicket->Set($sAttCode, $oAttributeValue);
