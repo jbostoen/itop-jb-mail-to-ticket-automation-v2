@@ -122,8 +122,8 @@ if (!class_exists('EmailSynchroInstaller')) {
 		 * @param $sCurrentVersion string Current version number of the module
 		 */
 		public static function AfterDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion) {
+			
 			// For each email sources, update email replicas by setting mailbox_path to source.mailbox where mailbox_path is null
-			SetupPage::Info("Updating email replicas to set their mailbox path.");
 
 			// Preparing mailboxes search
 			$oSearch = new DBObjectSearch('MailInboxBase');
@@ -144,9 +144,9 @@ if (!class_exists('EmailSynchroInstaller')) {
 			$oSet = new DBObjectSet($oSearch);
 			while($oInbox = $oSet->Fetch()) {
 				$sUpdateQuery = "UPDATE $sTableName SET $sMailboxColName = " . CMDBSource::Quote($oInbox->Get('mailbox')) . " WHERE $sUidlColName LIKE " . CMDBSource::Quote($oInbox->Get('login') . '_%') . " AND $sMailboxColName IS NULL";
-				SetupPage::Info("Executing query: " . $sUpdateQuery);
+				
 				$iRet = CMDBSource::Query($sUpdateQuery); // Throws an exception in case of error
-				SetupPage::Info("Updated $iRet rows.");
+				
 				
 				if($bUpgradeOptionsIMAP == true && trim($oInbox->Get('imap_options') == '')) {
 					$aOptionsIMAP = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap', 'ssl', 'novalidate-cert'));
