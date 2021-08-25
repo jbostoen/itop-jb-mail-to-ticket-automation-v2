@@ -36,6 +36,7 @@ use \MetaModel;
 use \ormDocument;
 use \SetupUtils;
 use \utils;
+use \UserRights;
 
 // iTop email processing
 use \EmailMessage;
