@@ -223,7 +223,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						// By doing so we lose the ability to set the CMDBChange date
 						CMDBObject::SetCurrentChange(null);
 						CMDBObject::SetTrackInfo('Mail to ticket automation (background process)');
-						CMDBObject::SetTrackOrigin('custom-extension');
+						// Important: Don't use the \Combodo\iTop\Core\CMDBChange\CMDBChangeOrigin::EMAIL_PROCESSING yet, as it is only available in iTop 3.0+
+						CMDBObject::SetTrackOrigin('email-processing');
 						
 						try {
 									
