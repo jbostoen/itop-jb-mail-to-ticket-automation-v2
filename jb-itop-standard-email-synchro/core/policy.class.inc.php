@@ -886,6 +886,9 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			$aExistingContacts[$oLnk->Get('contact_id')] = true;
 		}
 
+		// (Different) policies may have accidentally added contacts multiple times, even if they are supposed to check this.
+		$oEmail->aInternal_Additional_Contacts = array_unique($oEmail->aInternal_Additional_Contacts, SORT_REGULAR);
+
 		foreach($oEmail->aInternal_Additional_Contacts as $oContact) {
 			
 			if(MetaModel::IsValidAttCode($sTargetClass, 'caller_id') == true && $oContact->GetKey() != $oTicket->Get('caller_id')) {
@@ -897,6 +900,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 				$sContactName = $oContact->GetName();
 				self::Trace(".... Skipping '{$sContactName}' as additional contact since it is the caller.");
 			}
+			
 		}
 		$oTicket->Set('contacts_list', $oContactsSet);
 		
