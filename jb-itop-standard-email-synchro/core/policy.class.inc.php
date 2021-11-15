@@ -603,7 +603,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		
 		$iCurrentUserId = UserRights::GetUserId();
 		$bInsertChangeUserId = false;
-		// Set changes author to mail author and create a new Change
+		// Set author of change operation to mail author (from:) and create a new Change
 		// Method only exist in iTop 3.0
 		if(method_exists('UserRights', 'GetUserFromPerson') && $oCaller !== null){
 			$oUser = UserRights::GetUserFromPerson($oCaller, true);
@@ -1314,6 +1314,76 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 
 
 /**
+ * Class PolicyBounceOtherEmailCallerThanTicketCaller Bounce policy in case the email caller is not the ticket caller
+ */
+abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Policy implements iPolicy {
+	
+	/**
+	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
+	 */
+	public static $iPrecedence = 10;
+	
+	/**
+	 * @var \String $sPolicyId Shortname for policy
+	 */
+	public static $sPolicyId = 'policy_other_email_caller_than_ticket_caller';
+		
+	/**
+	 * Checks if all information within the email is compliant with the policies defined for this mailbox
+	 *
+	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 */
+	public static function IsCompliant() {
+		
+		// @todo Accept known contacts (from same org)
+		
+		$oTicket = self::$oTicket;
+		$oEmail = self::$oEmail;
+		
+		// Generic 'before' actions
+		parent::BeforeComplianceCheck();
+		
+		// Checking if attachments are in line with configured policies.
+			
+			if(self::$oMailBox->Get(self::$sPolicyId.'_enabled') == 'yes') {
+				
+				switch(self::$oMailBox->Get(self::$sPolicyId.'_behavior')) {
+				
+					case 'bounce_delete':
+					case 'bounce_mark_as_undesired':
+					case 'delete':
+					case 'mark_as_undesired':
+					case 'do_nothing':
+						
+						// Other caller?
+						$sTicketCallerEmail = $oTicket->Get('caller_id->email');
+						if($sTicketCallerEmail != $oEmail->sCallerEmail) {
+							
+							self::Trace('.. Ticket caller\'s email address is different from the email caller\'s email address.');
+							self::HandleViolation();
+							return false;
+						
+						}
+					
+						break;
+						
+					default:
+						self::Trace('.. Unexpected "behavior"');
+						break;
+				}
+				
+			}
+			
+		// Generic 'after' actions
+		parent::AfterPassedComplianceCheck();
+		
+		return true;
+		
+	}
+	
+}
+
+/**
  * Class PolicyBounceAttachmentForbiddenMimeType Offers a policy to enforce some rules on the attachment.
  */
 abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements iPolicy {
@@ -1360,8 +1430,8 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements
 					case 'bounce_delete':
 					case 'bounce_mark_as_undesired':
 					case 'delete':
-					case 'do_nothing':
 					case 'mark_as_undesired':
+					case 'do_nothing':
 						
 						// Forbidden attachments? 
 						foreach($oEmail->aAttachments as $aAttachment) { 
@@ -1395,6 +1465,7 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements
 						}
 						break;
 						
+					
 					default:
 						self::Trace('.. Unexpected "behavior"');
 						break;
@@ -1553,7 +1624,7 @@ abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
 }
 
 /**
- * Class PolicyBounceOtherRecipients Offers a policy to enforce being the sole recipient (no other recipients in To:, CC:). 
+ * Class PolicyBounceOtherRecipients Offers a policy to enforce being the sole recipient (no other recipients in To:, CC:) and the same one as the original caller. 
  * Does NOT change "related contacts" or create new ones!
  */
 abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
@@ -1580,6 +1651,7 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 		
 		$oEmail = self::$oEmail;
 		$oMailBox = self::$oMailBox;
+		
 		
 		// Checking if there are no other recipients mentioned.
 		
@@ -2233,14 +2305,14 @@ abstract class PolicyRemoveTitlePatterns extends Policy implements iPolicy {
 
 
 /**
- * Class PolicyFindAdditionalContacts Offers a policy to add "related contacts" to a Ticket.
+ * Class PolicyFindAdditionalContacts Offers a policy to add "related contacts" to a Ticket. These are people in To: or CC: of processed e-mails that are NOT the original caller.
  */
 abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 	
 	/**
 	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
 	 */
-	public static $iPrecedence = 111;
+	public static $iPrecedence = 115;
 	
 	/**
 	 * @var \String $sPolicyId Shortname for policy
@@ -2274,8 +2346,9 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 		$sMailBoxAliases = $oMailBox->Get('mail_aliases');
 		$aMailBoxAliases = (trim($sMailBoxAliases) == '' ? [] : preg_split(NEWLINE_REGEX, $sMailBoxAliases));
 		
-		// Ignore sender; helpdesk mailbox; any helpdesk mailbox aliases
-		$aAllOtherContacts = array_udiff($aAllContacts, [$oEmail->sCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
+		// Ignore helpdesk mailbox; any helpdesk mailbox aliases, original caller's email address
+		$sOriginalCallerEmail = $oTicket->Get('caller_id->email');
+		$aAllOtherContacts = array_udiff($aAllContacts, [$sOriginalCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
 		$aAllOtherContacts = array_unique($aAllOtherContacts);
 
 		$sPolicyBehavior = $oMailBox->Get(self::$sPolicyId.'_behavior');

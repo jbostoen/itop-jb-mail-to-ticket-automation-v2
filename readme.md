@@ -46,6 +46,9 @@ Furthermore, it includes some fixes which were also provided back to Combodo whe
 Info on settings and default policies
 * See [configuration](documentation/configuration.md)
 
+## Security recommendations
+Highly recommended to read the [security recommendations](documentation/security.md)
+
 ## Customization
 Want to implement your own logic?
 * See [customization](documentation/customization.md)

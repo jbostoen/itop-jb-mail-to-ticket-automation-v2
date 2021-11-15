@@ -175,6 +175,23 @@ If it's a common use case, make a pull request to include it.
 * **Bounce message**
 * **Default subject** - specify a default title. Example: (no subject)
  
+### Other e-mail caller than original ticket caller
+Recommendation: enable this for security reasons.  
+Anyone replying (even by guessing or just going over ticket numbers) to a ticket,  
+may trigger a notification with the new log entry to the original ticket caller.
+  
+* Use case: block others from replying to a ticket.
+* **Policy violation behavior**
+  * Bounce to sender and delete
+  * Bounce to sender and mark as undesired
+  * Delete
+  * Do nothing
+  * Fallback: default subject
+* **Bounce subject**	 
+* **Bounce message**
+* **Enabled** - yes/no.
+ 
+
 ### Closed tickets
 * Use case: despite very clear warnings a ticket has been closed, user still replies.
 * **Policy violation behavior**
@@ -235,7 +252,7 @@ If it's a common use case, make a pull request to include it.
 
 
 	 
-### Other recipients
+### Other recipients specified in To: or CC:
 * Use case:
   * If other recipients (To: or CC:) to processed inboxes are allowed, it's likely people will reply to the initial email from the caller. 
   * This would lead to multiple new tickets, since there is no ticket reference in the email header or subject.

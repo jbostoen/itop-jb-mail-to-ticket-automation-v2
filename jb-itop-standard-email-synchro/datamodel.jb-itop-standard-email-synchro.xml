@@ -423,7 +423,38 @@ name:Unknown caller]]>
 					<default_value/>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
-
+				<!-- Different e-mail caller than ticket caller -->
+				<field id="policy_other_email_caller_than_ticket_caller_behavior" xsi:type="AttributeEnum">
+					<values> 
+						<value>bounce_delete</value>
+						<value>bounce_mark_as_undesired</value> 
+						<value>delete</value>
+						<value>do_nothing</value>
+						<value>mark_as_undesired</value>
+					</values>
+					<sql>policy_other_email_caller_than_ticket_caller_behavior</sql>
+					<default_value>do_nothing</default_value>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
+				<field id="policy_other_email_caller_than_ticket_caller_subject" xsi:type="AttributeString">
+					<sql>policy_other_email_caller_than_ticket_caller_subject</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
+				<field id="policy_other_email_caller_than_ticket_caller_notification" xsi:type="AttributeHTML">
+					<sql>policy_other_email_caller_than_ticket_caller_notification</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
+				<field id="policy_other_email_caller_than_ticket_caller_enabled" xsi:type="AttributeEnum">
+					<sql>policy_other_email_caller_than_ticket_caller_enabled</sql>
+					<default_value>yes</default_value>
+					<is_null_allowed>false</is_null_allowed>
+					<values>
+						<value id="yes">yes</value>
+						<value id="no">no</value>
+					</values>
+				</field>
 			</fields>
 
 			<methods>
@@ -1178,7 +1209,28 @@ EOF
 									<rank>30</rank>
 								</item>
 							</items>
-						</item> 
+						</item>
+						
+						<!-- Other email caller (in follow up mail) than original ticket caller -->
+						<item id="fieldset:MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller">
+							<rank>160</rank>
+							<items>
+								<item id="policy_other_email_caller_than_ticket_caller_enabled">
+									<rank>1</rank>
+								</item>
+								<item id="policy_other_email_caller_than_ticket_caller_behavior">
+									<rank>10</rank>
+								</item>
+								<item id="policy_other_email_caller_than_ticket_caller_subject">
+									<rank>15</rank>
+								</item>
+								<item id="policy_other_email_caller_than_ticket_caller_notification">
+									<rank>20</rank>
+								</item>
+							</items>
+						</item>
+						
+						
 
 						<!-- Other contacts -->
 						<item id="fieldset:MailInbox:PolicyOtherRecipients">
