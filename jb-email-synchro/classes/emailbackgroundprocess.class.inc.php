@@ -151,7 +151,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		$iTotalMessages = 0;
 		$iTotalProcessed = 0;
 		$iTotalMarkedAsError = 0;
-		$iTotalSkipped = 0;
+		$iTotalSkippedError = 0;
+		$iTotalSkippedIgnored = 0;
+		$iTotalSkippedUndesired = 0;
 		$iTotalDeleted = 0;
 		$iTotalMoved = 0;
         $iTotalUndesired = 0;
@@ -257,12 +259,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								
 								if($oEmailReplica->Get('status') == 'error') {
 									$this->Trace("\nSkipping old (already processed) message: uidl=$sUIDL index=$iMessage marked as 'error'");
-									$iTotalSkipped++;
+									$iTotalSkippedError++;
 									continue;
 								}
 								elseif($oEmailReplica->Get('status') == 'ignored') {
 									$this->Trace("\nSkipping old (already processed) message: uidl=$sUIDL index=$iMessage marked as 'ignored'");
-									$iTotalSkipped++;
+									$iTotalSkippedIgnored++;
 									continue;
 								}
 								elseif($oEmailReplica->Get('status') == 'undesired') {
@@ -287,7 +289,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 										}
 										continue;
 									}
-									$iTotalSkipped++;
+									$iTotalSkippedUndesired++;
 									continue;
 								}
 								else {
@@ -489,7 +491,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 			}
 			if (time() > $iTimeLimit) break; // We'll do the rest later
 		}
-		return "Message(s) read: $iTotalMessages, message(s) skipped: $iTotalSkipped, message(s) processed: $iTotalProcessed, message(s) deleted: $iTotalDeleted, message(s) marked as error: $iTotalMarkedAsError, undesired message(s): $iTotalUndesired, message(s) moved: $iTotalMoved";
+		return "Message(s) read: $iTotalMessages, message(s) skipped: $iTotalSkippedError in error / $iTotalSkippedIgnored ignored / $iTotalSkippedUndesired undesired, message(s) processed: $iTotalProcessed, message(s) deleted: $iTotalDeleted, message(s) marked as error: $iTotalMarkedAsError, undesired message(s): $iTotalUndesired, message(s) moved: $iTotalMoved";
 	}
 	
 	private function InitMessageTrace($oSource, $iMessage) {
