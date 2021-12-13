@@ -13,8 +13,8 @@ Please get in touch to discuss the terms: **info@jeffreybostoen.be** / https://j
 
 ## What?
 
-⚠ Only use "releases" from this repository in iTop environments.
-⚠ POP3 has been deprecated. Currently only IMAP is supported.
+⚠ Only use "releases" from this repository in iTop environments.  
+⚠ POP3 has been deprecated. Currently only IMAP is supported.  
 
 This **Mail to Ticket automation** is a **fork** from Combodo's Mail to Ticket Automation.  
 It was originally based on their version 3.0.7 (28th of August 2017), but also includes the changes up to 3.2.0 so far.  
@@ -64,7 +64,9 @@ although some work has since been implemented in the original extensoin.
 
 ## Roadmap
 
-Other new features can be proposed, but are currently not planned.
+Sponsor to specify priority of these features:
+[ ] Auto responder. Terms can be discussed (rules based on contact, organization, subject, ...)
+
 
 ## Other improvements
 In comparison to Combodo's official Mail to Ticket Automation extension:

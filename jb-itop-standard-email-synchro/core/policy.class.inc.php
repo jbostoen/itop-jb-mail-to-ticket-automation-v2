@@ -1624,7 +1624,7 @@ abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
 }
 
 /**
- * Class PolicyBounceOtherRecipients Offers a policy to enforce being the sole recipient (no other recipients in To:, CC:) and the same one as the original caller. 
+ * Class PolicyBounceOtherRecipients Offers a policy to ensure that the service desk mailbox is the sole recipient (no other recipients in To:, CC:)
  * Does NOT change "related contacts" or create new ones!
  */
 abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
@@ -2347,8 +2347,15 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 		$aMailBoxAliases = (trim($sMailBoxAliases) == '' ? [] : preg_split(NEWLINE_REGEX, $sMailBoxAliases));
 		
 		// Ignore helpdesk mailbox; any helpdesk mailbox aliases, original caller's email address
-		$sOriginalCallerEmail = $oTicket->Get('caller_id->email');
-		$aAllOtherContacts = array_udiff($aAllContacts, [$sOriginalCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
+		if($oTicket !== null) {
+			// For existing tickets: other people might reply. So only exclude mailbox aliases and the original caller.
+			// If it's someone else replying, it should be seen as a new contact.
+			$sOriginalCallerEmail = $oTicket->Get('caller_id->email');
+			$aAllOtherContacts = array_udiff($aAllContacts, [$sOriginalCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
+		}
+		else {
+			$aAllOtherContacts = array_udiff($aAllContacts, [$sCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
+		}
 		$aAllOtherContacts = array_unique($aAllOtherContacts);
 
 		$sPolicyBehavior = $oMailBox->Get(self::$sPolicyId.'_behavior');

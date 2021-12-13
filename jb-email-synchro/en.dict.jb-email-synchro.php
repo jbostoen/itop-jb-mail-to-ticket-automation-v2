@@ -66,7 +66,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:IgnoreMessage' => 'Ignore email',
 
 	'MailInbox:MessageDetails' => 'Message details',
-	'MailInbox:DownloadEml' => 'Download eml file',
+	'MailInbox:DownloadEml' => 'Download .eml file',
 	'Class:TriggerOnMailUpdate' => 'Trigger (when updated by mail)',
 	'Class:TriggerOnMailUpdate+' => 'Trigger activated when a ticket is updated by processing an incoming email',
 	
