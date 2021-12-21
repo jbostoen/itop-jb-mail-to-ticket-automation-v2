@@ -2334,7 +2334,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 		
 		$oEmail = self::$oEmail;
 		$oMailBox = self::$oMailBox;
-		
+		$oTicket = self::$oTicket;
 		
 		$sCallerEmail = $oEmail->sCallerEmail;
 							

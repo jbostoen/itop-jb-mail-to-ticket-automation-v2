@@ -271,7 +271,7 @@ may trigger a notification with the new log entry to the original ticket caller.
 The default values work the same as for unknown callers.
 
 ### Undesired patterns in title
-* Use case: out-of-office, email should NOT be processed
+* Use case: out-of-office or automatic replies such as 'new ticket created' (in another service desk tool), email should NOT be processed
 * **Policy violation behavior**
   * Bounce to sender and delete
   * Bounce to sender and mark as undesired
