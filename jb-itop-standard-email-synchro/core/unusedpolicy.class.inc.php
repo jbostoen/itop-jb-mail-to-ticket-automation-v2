@@ -28,9 +28,7 @@ abstract class PolicyExampleSaveEmailsToPath extends Policy implements iPolicy {
 	public static $sPolicyId = 'policy_example_save_emails_to_path';
 	
 	/**
-	 * Checks if mailbox, email, ticket information is compliant with a certain policy.
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 		

@@ -798,7 +798,7 @@ EOF
 					$sBody .= '<ul><li>'.implode('</li><li>', $oEmail->GetInvalidReasons()).'</li></ul>';
 					$sBody .= $sLastAction;
 				}
-			break;
+				break;
 			
 			
 			case 'failed_to_create_contact':
@@ -849,15 +849,15 @@ EOF
 					$oEmailToSend->SetRecipientFrom($sFrom);
 					$oEmailToSend->Send($aIssues, true /* bForceSynchronous */, null /* $oLog */);
 				}
-				break;
 				
-			case 'undesired_message':
+				// Email has been undesired for multiple days.
 				if(\MetaModel::GetModuleSetting('jb-email-synchro', 'undesired_purge_delay', 7) == 0) {
 					$this->SetNextAction(\EmailProcessor::DELETE_MESSAGE); // immediate delete when delay is 0
 				}
 				else {
-					$this->SetNextAction(\EmailProcessor::MARK_MESSAGE_AS_UNDESIRED); // Keep the message in the mailbox, but marked as undesired
+					$this->SetNextAction(\EmailProcessor::MARK_MESSAGE_AS_UNDESIRED);
 				}
+				
 				$this->sLastError = 'Undesired email';
 				$oRawEmail = null; // No feedback on undesired emails
 				break;
@@ -932,8 +932,7 @@ EOF
 			// As soon as there is one policy where IsCompliant() returns false: cancel further processing.
 			// Any other policy violation handling should have been performed by the class implementing the iPolicy interface.
 			if($sPolicy::IsCompliant() == false) {
-				// Being incompliant = mark as undesired email
-				$this->SetNextAction(\EmailProcessor::MARK_MESSAGE_AS_UNDESIRED);
+				// Action to take (See EmailProcessor::DELETE_MESSAGE, EmailProcessor::MARK_MESSAGE_AS_ERROR, EmailProcessor:MARK_MESSAGE_AS_UNDESIRED, ...) should have been set already in the IsCompliant() method
 				return; // Stop further processing
 			}
 			

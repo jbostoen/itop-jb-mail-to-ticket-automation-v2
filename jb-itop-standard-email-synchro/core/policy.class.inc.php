@@ -59,7 +59,7 @@ interface iPolicy {
 	
 	/**
 	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing. In this case, it's expected a SetNextAction has been called.
 	 */
 	public static function IsCompliant();
 	
@@ -142,7 +142,7 @@ abstract class Policy implements iPolicy {
 	/**
 	 * Checks if mailbox, email, ticket information is compliant with a certain policy.
 	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing. In this case, it's expected a SetNextAction has been called.
 	 */
 	public static function IsCompliant() {
 		
@@ -268,6 +268,7 @@ abstract class Policy implements iPolicy {
 				// Remove the processed message from the mailbox
 				self::Trace('Set next action for EmailProcessor to MOVE_MESSAGE');
 				self::$oMailBox->SetNextAction(EmailProcessor::MOVE_MESSAGE);
+				break;
 				
 			case 'mark_as_error': 
 				// Mark as error should be irrelevant now. Keeping it just in case.
@@ -404,10 +405,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	}
 	
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox.
-	 * Heavily inspired by Combodo's MailInboxStandard::CreateTicketFromEmail()
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 		
@@ -1329,9 +1327,7 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Policy imple
 	public static $sPolicyId = 'policy_other_email_caller_than_ticket_caller';
 		
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 		
@@ -1399,9 +1395,7 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements
 	public static $sPolicyId = 'policy_attachment_forbidden_mimetype';
 		
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 		
@@ -1498,9 +1492,7 @@ abstract class PolicyBounceLimitMailSize extends Policy implements iPolicy {
 	public static $sPolicyId = 'policy_mail_size_too_big';
 		
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 		
@@ -1555,9 +1547,7 @@ abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
 	public static $sPolicyId = 'policy_no_subject';
 		
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 		
@@ -1640,9 +1630,7 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 	public static $sPolicyId = 'policy_other_recipients';
 	
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 		
@@ -1757,9 +1745,7 @@ abstract class PolicyBounceUnknownTicketReference extends Policy implements iPol
 	public static $sPolicyId = 'policy_ticket_unknown';
 	
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 
@@ -1854,9 +1840,7 @@ abstract class PolicyTicketResolved extends Policy implements iPolicy {
 	public static $sPolicyId = 'policy_ticket_resolved';
 	
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 		
@@ -1926,9 +1910,7 @@ abstract class PolicyTicketClosed extends Policy implements iPolicy {
 	public static $sPolicyId = 'policy_ticket_closed';
 	
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 		
@@ -1996,9 +1978,7 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Policy implements iPol
 	public static $sPolicyId = 'policy_undesired_pattern';
 	
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 		
@@ -2083,9 +2063,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 	public static $sPolicyId = 'policy_unknown_caller';
 	
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 *
 	 * @todo Test if default values properly support mail placeholders
 	 */
@@ -2173,6 +2151,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 								}
 								else {
 									self::Trace("... Default values are missing. Can't create contact.");
+									$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oEmail->oRawEmail);
 									return false;
 								}
 								
@@ -2226,9 +2205,7 @@ abstract class PolicyRemoveTitlePatterns extends Policy implements iPolicy {
 	public static $sPolicyId = 'policy_remove_pattern';
 	
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
 		
@@ -2321,9 +2298,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 	public static $sPolicyId = 'policy_other_recipients';
 	
 	/**
-	 * Checks if all information within the email is compliant with the policies defined for this mailbox
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
+	 * @inheritDoc
 	 *
 	 * @todo Test if mail placeholders work
 	 */
@@ -2410,7 +2385,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 							self::Trace("... Failed to create a Person for the email address '{$sCallerEmail}'.");
 							self::Trace($e->getMessage());
 							$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oEmail->oRawEmail);
-							return null;
+							return false;
 						}									
 						
 					}
@@ -2476,10 +2451,11 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 	public static $sPolicyId = 'policy_attachment_image_dimensions';
 	
 	/**
+	 * @inheritDoc
+	 *
+	 * @details
 	 * Function inspired by Combodo's MailInboxBase::AddAttachments()
 	 * Removes image attachments which are too small and also resizes images which are too large using php-gd
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing.
 	 */
 	public static function IsCompliant() {
 		
