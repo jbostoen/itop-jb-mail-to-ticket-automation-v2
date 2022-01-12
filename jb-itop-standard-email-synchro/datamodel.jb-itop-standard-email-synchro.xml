@@ -618,6 +618,7 @@ EOF
         // Check whether a new ticket must be initiated or an existing one updated.
         $oTicket = $this->GetRelatedTicket($oEmail);
 
+		// If there was no related ticket above, it may be created while processing the policies.
 		$oTicket = $this->ProcessPolicies($oEmail, $oTicket);
 
 		return $oTicket;
@@ -937,8 +938,10 @@ EOF
 			// As soon as there is one policy where IsCompliant() returns false: cancel further processing.
 			// Any other policy violation handling should have been performed by the class implementing the iPolicy interface.
 			if($sPolicy::IsCompliant() == false) {
-				// Action to take (See EmailProcessor::DELETE_MESSAGE, EmailProcessor::MARK_MESSAGE_AS_ERROR, EmailProcessor:MARK_MESSAGE_AS_UNDESIRED, ...) should have been set already in the IsCompliant() method
-				return; // Stop further processing
+				// Action to take should have been set already in the IsCompliant() method
+				// See EmailProcessor::DELETE_MESSAGE, EmailProcessor::MARK_MESSAGE_AS_ERROR, EmailProcessor:MARK_MESSAGE_AS_UNDESIRED, ...
+				$this->sLastError = 'Not compliant with policy '.$sPolicy;
+				return $oTicket;
 			}
 			
 			$aPreviouslyExecutedPolicies[] = $sPolicy;

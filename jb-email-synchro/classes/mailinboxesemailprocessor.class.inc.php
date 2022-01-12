@@ -172,7 +172,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 				$oResult = $oInbox->ProcessNewEmail($oSource, $index, $oEmail);
 				
 				if(is_object($oResult) && $oResult instanceof Ticket) {
-					self::Trace('Ticket created. Handle email replica.');
+					self::Trace('Linked mail to ticket. Handle email replica.');
 					
 					if (EmailBackgroundProcess::IsMultiSourceMode()) {
 				
