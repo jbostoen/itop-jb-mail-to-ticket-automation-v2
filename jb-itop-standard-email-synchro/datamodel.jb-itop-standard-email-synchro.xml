@@ -446,15 +446,6 @@ name:Unknown caller]]>
 					<default_value/>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
-				<field id="policy_other_email_caller_than_ticket_caller_enabled" xsi:type="AttributeEnum">
-					<sql>policy_other_email_caller_than_ticket_caller_enabled</sql>
-					<default_value>yes</default_value>
-					<is_null_allowed>false</is_null_allowed>
-					<values>
-						<value id="yes">yes</value>
-						<value id="no">no</value>
-					</values>
-				</field>
 			</fields>
 
 			<methods>
@@ -908,12 +899,25 @@ EOF
 		foreach(get_declared_classes() as $sClassName) {
 		
 			if(in_array('jb_itop_extensions\mail_to_ticket\iPolicy', class_implements($sClassName)) && $sClassName != 'jb_itop_extensions\mail_to_ticket\Policy') {
-				$aPolicyClasses[] = $sClassName;
+			
+				$sAttCode = $sClassName::$sPolicyId.'_behavior';
+				
+				if(MetaModel::IsValidAttCode(get_class($this), $sAttCode) == true) {
+					// Do nothing basically means the policy can be skipped
+					if($this->Get($sAttCode) != 'do_nothing') {
+						$aPolicyClasses[] = $sClassName;
+					}
+				}
+				else {
+					// No default "behavior" attribute
+					$aPolicyClasses[] = $sClassName;
+				}
+				
 			}
 			
 		}
 		
-		$this->Trace('.. '.count($aPolicyClasses).' policies to process...');
+		$this->Trace('.. '.count($aPolicyClasses).' active policies to process...');
 			
 		// Policies must be executed in a certain order.
 		// Some policies may set info on the Ticket or derive the caller; 
@@ -926,6 +930,7 @@ EOF
 		$aPreviouslyExecutedPolicies = [];
 		
 		foreach($aPolicyClasses as $sPolicy) {
+		
 			// Always overrule each time this is used. Avoid leftovers from previous e-mails!
 			$sPolicy::Init($this, $oEmail, $oTicket, $aPreviouslyExecutedPolicies);
 			
@@ -1214,9 +1219,6 @@ EOF
 						<item id="fieldset:MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller">
 							<rank>160</rank>
 							<items>
-								<item id="policy_other_email_caller_than_ticket_caller_enabled">
-									<rank>1</rank>
-								</item>
 								<item id="policy_other_email_caller_than_ticket_caller_behavior">
 									<rank>10</rank>
 								</item>

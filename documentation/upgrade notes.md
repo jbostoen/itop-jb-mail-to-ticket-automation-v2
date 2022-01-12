@@ -2,18 +2,18 @@
 Backward compatibility is something that is important.
 However, some upgrades might break things because technology or use cases change.
 
+## Upgrading from before 2.7.220122?
+The policies whose behavior is set to "Do nothing", are not evaluated anymore.
+
+
 ## Upgrading from before 2.7.211110?
 A new policy has been added which makes it possible to force that the sender from an e-mail must have the same e-mail address 
 as the e-mail address of the ticket caller.
 
-Make sure to evaluate whether you want to enable this policy (default: yes).  
+Make sure to evaluate whether you want to enable this policy (by default it's set to "Do nothing", which means it is inactive).  
 You can disable it by modifying the properties of each e-mail inbox that has been configured.
 
-The reasoning behind this is to make this process more secure.  
-Imagine a typical iTop instance, where each new log entry is sent to the original ticket caller and possible related contacts.  
-If a malicious person knows the address of the helpdesk and guesses the ticket reference number (or pattern),  
-he might send an e-mail to the helpdesk system which then results in his message being sent to the original caller (and maybe others).  
-This could escalate if this person pretends to be a support agent requiring an action from those contacts.
+This policy is a security measure.
 
 
 ## Upgrading from before 2.6.201219?

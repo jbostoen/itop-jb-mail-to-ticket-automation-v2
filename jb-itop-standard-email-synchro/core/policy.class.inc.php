@@ -209,7 +209,7 @@ abstract class Policy implements iPolicy {
 		// - bounce_delete -> bounce and delete the message
 		// - bounce_mark_as_undesired -> bounce and marks the message as undesired
 		// - delete -> delete the message
-		// - do nothing -> great, lazy. For testing purposes.
+		// - do_nothing -> great, lazy. For testing purposes.
 		// - mark_as_undesired -> stays in the mailbox for a few days
 		// - some sort of fallback -> doesn't matter here
 		
@@ -1339,36 +1339,35 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Policy imple
 		// Generic 'before' actions
 		parent::BeforeComplianceCheck();
 		
-		// Checking if attachments are in line with configured policies.
+		if($oTicket !== null) {
+				
+			// Checking if attachments are in line with configured policies.
+			switch(self::$oMailBox->Get(self::$sPolicyId.'_behavior')) {
 			
-			if(self::$oMailBox->Get(self::$sPolicyId.'_enabled') == 'yes') {
-				
-				switch(self::$oMailBox->Get(self::$sPolicyId.'_behavior')) {
-				
-					case 'bounce_delete':
-					case 'bounce_mark_as_undesired':
-					case 'delete':
-					case 'mark_as_undesired':
-					case 'do_nothing':
-						
-						// Other caller?
-						$sTicketCallerEmail = $oTicket->Get('caller_id->email');
-						if($sTicketCallerEmail != $oEmail->sCallerEmail) {
-							
-							self::Trace('.. Ticket caller\'s email address is different from the email caller\'s email address.');
-							self::HandleViolation();
-							return false;
-						
-						}
+				case 'bounce_delete':
+				case 'bounce_mark_as_undesired':
+				case 'delete':
+				case 'mark_as_undesired':
+				case 'do_nothing':
 					
-						break;
+					// Other caller?
+					$sTicketCallerEmail = $oTicket->Get('caller_id->email');
+					if($sTicketCallerEmail != $oEmail->sCallerEmail) {
 						
-					default:
-						self::Trace('.. Unexpected "behavior"');
-						break;
-				}
+						self::Trace('.. Ticket caller\'s email address is different from the email caller\'s email address.');
+						self::HandleViolation();
+						return false;
+					
+					}
 				
+					break;
+					
+				default:
+					self::Trace('.. Unexpected "behavior"');
+					break;
 			}
+		
+		}
 			
 		// Generic 'after' actions
 		parent::AfterPassedComplianceCheck();
@@ -1860,7 +1859,6 @@ abstract class PolicyTicketResolved extends Policy implements iPolicy {
 						case 'do_nothing':
 						case 'mark_as_undesired':
 						
-							self::Trace(".. Undesired: ticket was marked as resolved before.");
 							self::HandleViolation();
 							
 							// No fallback

@@ -13,7 +13,12 @@ The most important things about the interface:
   * ```$iPrecedence = 200``` is used for ticket creation/update.
 * implement the ```IsCompliant()``` method.
   * true = continue processing
-  * false = stop processing this email (marked as undesired)
+  * false = stop processing this email (marked as undesired), make sure to handle the next action for the email processing (do nothing, mark as error/undesired, move, ...)
+  
+  
+The most interesting thing to know about custom attributes: if there's an attribute added to the mailbox class with the name "policyname_behavior" set to "do_nothing", the policy will not be used/inactive.  
+"policyname" is an example here; it is what is defined in the policy class as ```$sPolicyId```
+
 
 ## Examples
 As for examples, check:

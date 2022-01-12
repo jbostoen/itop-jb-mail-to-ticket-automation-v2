@@ -215,9 +215,6 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_subject' => 'Bounce subject',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_notification' => 'Bounce message', 
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_enabled' => 'Enabled', 
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_enabled/Value:yes' => 'Yes', 
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_enabled/Value:no' => 'No', 
 	
 	
 	// Headers
