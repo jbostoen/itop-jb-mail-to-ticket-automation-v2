@@ -209,7 +209,7 @@ abstract class Policy implements iPolicy {
 		// - bounce_delete -> bounce and delete the message
 		// - bounce_mark_as_undesired -> bounce and marks the message as undesired
 		// - delete -> delete the message
-		// - do_nothing -> great, lazy. For testing purposes.
+		// - do_nothing -> great, lazy. For testing purposes. To actually see if policies are processed or log additional info without doing anything in the end.
 		// - mark_as_undesired -> stays in the mailbox for a few days
 		// - some sort of fallback -> doesn't matter here
 		

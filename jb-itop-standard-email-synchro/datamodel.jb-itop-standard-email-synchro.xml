@@ -143,9 +143,10 @@ status:assigned]]>
 						<value>delete</value>
 						<value>do_nothing</value>
 						<value>mark_as_undesired</value>
+						<value>inactive</value>
 					</values>
 					<sql>policy_mail_size_too_big_behavior</sql>
-					<default_value>do_nothing</default_value>
+					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<field id="policy_mail_size_too_big_subject" xsi:type="AttributeString">
@@ -193,9 +194,10 @@ status:assigned]]>
 						<value>do_nothing</value>
 						<value>fallback_ignore_forbidden_attachments</value>
 						<value>mark_as_undesired</value>
+						<value>inactive</value>
 					</values>
 					<sql>policy_attachment_forbidden_mimetype_behavior</sql>
-					<default_value>do_nothing</default_value>
+					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<field id="policy_attachment_forbidden_mimetype_subject" xsi:type="AttributeString">
@@ -222,9 +224,10 @@ status:assigned]]>
 						<value>do_nothing</value>
 						<value>fallback_default_subject</value>
 						<value>mark_as_undesired</value>
+						<value>inactive</value>
 					</values>
 					<sql>policy_no_subject_behavior</sql>
-					<default_value>do_nothing</default_value>
+					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<field id="policy_no_subject_subject" xsi:type="AttributeString">
@@ -250,6 +253,7 @@ status:assigned]]>
 						<value>delete</value>
 						<value>fallback_create_person</value>
 						<value>mark_as_undesired</value>
+						<value>inactive</value>
 					</values>
 					<sql>policy_unknown_caller_behavior</sql>
 					<default_value>mark_as_undesired</default_value>
@@ -285,9 +289,10 @@ name:Unknown caller - $mail->caller_name$]]>
 						<value>fallback_add_existing_other_contacts</value>
 						<value>fallback_ignore_other_contacts</value>
 						<value>mark_as_undesired</value>
+						<value>inactive</value>
 					</values>
 					<sql>policy_other_recipients_behavior</sql>
-					<default_value>do_nothing</default_value>
+					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<field id="policy_other_recipients_subject" xsi:type="AttributeString">
@@ -317,10 +322,11 @@ name:Unknown caller]]>
 						<value>delete</value>
 						<value>do_nothing</value>
 						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value> 
+						<value>bounce_mark_as_undesired</value>
+						<value>inactive</value>
 					</values>
 					<sql>policy_ticket_closed_behavior</sql>
-					<default_value>do_nothing</default_value>
+					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<field id="policy_ticket_closed_subject" xsi:type="AttributeString">
@@ -342,9 +348,10 @@ name:Unknown caller]]>
 						<value>do_nothing</value>
 						<value>fallback_reopen</value>
 						<value>mark_as_undesired</value>
+						<value>inactive</value>
 					</values>
 					<sql>policy_ticket_resolved_behavior</sql>
-					<default_value>do_nothing</default_value>
+					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<field id="policy_ticket_resolved_subject" xsi:type="AttributeString">
@@ -365,9 +372,10 @@ name:Unknown caller]]>
 						<value>delete</value>
 						<value>do_nothing</value>
 						<value>mark_as_undesired</value>
+						<value>inactive</value>
 					</values>
 					<sql>policy_ticket_unknown_behavior</sql>
-					<default_value>do_nothing</default_value>
+					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<field id="policy_ticket_unknown_subject" xsi:type="AttributeString">
@@ -388,9 +396,10 @@ name:Unknown caller]]>
 						<value>delete</value>
 						<value>do_nothing</value>
 						<value>mark_as_undesired</value>
+						<value>inactive</value>
 					</values>
 					<sql>policy_undesired_pattern_behavior</sql>
-					<default_value>do_nothing</default_value>
+					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<field id="policy_undesired_pattern_subject" xsi:type="AttributeString">
@@ -412,10 +421,11 @@ name:Unknown caller]]>
 				<field id="policy_remove_pattern_behavior" xsi:type="AttributeEnum">
 					<values>
 						<value>do_nothing</value>
+						<value>inactive</value>
 						<value>fallback_remove</value>
 					</values>
 					<sql>policy_remove_pattern_behavior</sql>
-					<default_value>do_nothing</default_value>
+					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field> 
 				<field id="policy_remove_pattern_patterns" xsi:type="AttributeText">
@@ -431,9 +441,10 @@ name:Unknown caller]]>
 						<value>delete</value>
 						<value>do_nothing</value>
 						<value>mark_as_undesired</value>
+						<value>inactive</value>
 					</values>
 					<sql>policy_other_email_caller_than_ticket_caller_behavior</sql>
-					<default_value>do_nothing</default_value>
+					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<field id="policy_other_email_caller_than_ticket_caller_subject" xsi:type="AttributeString">
@@ -905,7 +916,7 @@ EOF
 				
 				if(MetaModel::IsValidAttCode(get_class($this), $sAttCode) == true) {
 					// Do nothing basically means the policy can be skipped
-					if($this->Get($sAttCode) != 'do_nothing') {
+					if($this->Get($sAttCode) != 'inactive') {
 						$aPolicyClasses[] = $sClassName;
 					}
 				}

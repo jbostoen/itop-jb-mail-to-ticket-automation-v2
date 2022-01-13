@@ -2,8 +2,11 @@
 Backward compatibility is something that is important.
 However, some upgrades might break things because technology or use cases change.
 
-## Upgrading from before 2.7.220122?
-The policies whose behavior is set to "Do nothing", are not evaluated anymore.
+## Upgrading from before 2.7.220123?
+A new behavior has been added to lots of policies: "Inactive".  
+This behavior is now the default for a lot of new policies when configuring a new inbox.  
+The policies with a behavior set to "Inactive", are not processed.  
+The policies with a behavior set to "Do nothing", keep their original purpose: they are processed and might give warnings, but they should not change anything to the ticket or to the e-mail in the inbox.  
 
 
 ## Upgrading from before 2.7.211110?

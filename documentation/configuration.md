@@ -137,6 +137,7 @@ If it's a common use case, make a pull request to include it.
   * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
+  * Inactive
   * Mark as undesired
 * **Bounce subject**
 * **Bounce message**
@@ -149,6 +150,7 @@ If it's a common use case, make a pull request to include it.
   * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
+  * Inactive
   * Fallback: ignore forbidden attachments
   * Mark as undesired
 * **Bounce subject**
@@ -170,6 +172,7 @@ If it's a common use case, make a pull request to include it.
   * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
+  * Inactive
   * Fallback: default subject
 * **Bounce subject**	 
 * **Bounce message**
@@ -186,6 +189,7 @@ may trigger a notification with the new log entry to the original ticket caller.
   * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
+  * Inactive
   * Fallback: default subject
 * **Bounce subject**	 
 * **Bounce message**
@@ -199,6 +203,7 @@ may trigger a notification with the new log entry to the original ticket caller.
   * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
+  * Inactive
   * Fallback: reopen ticket
   * Mark as undesired
 * **Bounce subject**
@@ -211,6 +216,7 @@ may trigger a notification with the new log entry to the original ticket caller.
   * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
+  * Inactive
   * Fallback: reopen ticket
   * Mark as undesired
 * **Bounce subject**
@@ -223,6 +229,7 @@ may trigger a notification with the new log entry to the original ticket caller.
   * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
+  * Inactive
   * Mark as undesired
 * **Bounce subject**
 * **Bounce message**
@@ -234,6 +241,7 @@ may trigger a notification with the new log entry to the original ticket caller.
   * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
+  * Inactive
   * Fallback: create person (with specified default values)
   * Mark as undesired
 * **Bounce subject**
@@ -261,6 +269,7 @@ may trigger a notification with the new log entry to the original ticket caller.
   * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
+  * Inactive
   * Fallback: ignore other contacts
   * Fallback: add other contacts, create if necessary
   * Fallback: add other existing contacts
@@ -277,6 +286,7 @@ The default values work the same as for unknown callers.
   * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
+  * Inactive
   * Mark as undesired
 * **Bounce subject**
 * **Bounce message**
@@ -288,10 +298,23 @@ The default values work the same as for unknown callers.
 * **Policy violation behavior**
   * Fallback - Remove: it's removed completely in the title, even when viewing in iTop.
   * Do nothing
+  * Inactive
 * **Bounce subject**
 * **Bounce message**
 * **Patterns to remove from subject** - (regex patterns, one per line)
 
+### Limit accepted e-mail replies to original ticket caller's e-mail address
+* Use case: security measure. Only accept e-mail replies to a ticket if it's from the same e-mail address as the original caller.
+  * Limitation: it will still be problematic if the ticket reference pattern is exactly the same!
+* **Policy violation behavior**
+  * Bounce to sender and delete
+  * Bounce to sender and mark as undesired
+  * Delete
+  * Do nothing
+  * Inactive
+  * Mark as undesired
+* **Bounce subject**
+* **Bounce message**
 
 # Troubleshoot
 
