@@ -49,7 +49,7 @@ class IMAPEmailSource extends EmailSource {
 		$this->rImapConn = imap_open($sIMAPConnStr, $sLogin, $sPwd );
 		if($this->rImapConn === false) {
 			if(class_exists('EventHealthIssue')) {
-				EventHealthIssue::LogHealthIssue('combodo-email-synchro', "Cannot connect to IMAP server: '$sIMAPConnStr', with credentials: '$sLogin/***'");
+				EventHealthIssue::LogHealthIssue('jb-email-synchro', "Cannot connect to IMAP server: '$sIMAPConnStr', with credentials: '$sLogin/***'");
 			}
 			print_r(imap_errors());
 			throw new Exception("Cannot connect to IMAP server: '$sIMAPConnStr', with credentials: '$sLogin/'***'");
