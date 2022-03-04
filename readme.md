@@ -111,6 +111,7 @@ SourceForge tickets:
 * #1924 Mail to Ticket: processing order of e-mails is not chronologically on Microsoft Exchange/O365 and Google GMail (no solution in Combodo version)
 * #1925 Mail to Ticket: malformed headers (some feedback, no solution in Combodo version. Pull request made.)
 * #1930 Mail to Ticket: improved parsing of from: address (suggested fix, implemented by Combodo)
+* #2039 Return code missing in combodo-email-synchro - GetActionFromCode() (suggested fix, no solution in Combodo version)
 
 Internal Combodo tickets:
 * N° 2181 Mail to Ticket: Sometimes duplicate ticket from mail-to-ticket (suggested fix, implemented by Combodo)
