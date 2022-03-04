@@ -4,7 +4,7 @@
 		<class id="MailInboxStandard" _delta="define">
 			<parent>MailInboxBase</parent>
 			<properties>
-				<category>grant_by_profile</category>
+				<category>grant_by_profile,application</category>
 				<abstract>false</abstract>
 				<key_type>autoincrement</key_type>
 				<db_table>mailinbox_standard</db_table>
@@ -1052,9 +1052,6 @@ EOF
 								<item id="email_storage">
 									<rank>20</rank>
 								</item>
-								<item id="target_folder">
-									<rank>4</rank>
-								</item>
 								<item id="target_class">
 									<rank>50</rank>
 								</item>
@@ -1069,6 +1066,9 @@ EOF
 								</item> 
 								<item id="stimuli">
 									<rank>80</rank>
+								</item>
+								<item id="target_folder">
+									<rank>90</rank>
 								</item>
 							</items>
 						</item>

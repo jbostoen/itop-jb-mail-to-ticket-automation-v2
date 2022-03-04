@@ -141,10 +141,10 @@ class IMAPEmailSource extends EmailSource {
 	 * @param $index integer The index between zero and count
 	 */
 	public function MoveMessage($index) {
+		// Note that the message is in fact copied to the new folder (and getting a new UID there), while the original one is marked for deletion
 		$ret = imap_mail_move($this->rImapConn, (1+$index).':'.(1+$index), $this->sTargetFolder);
 		if(!$ret){
-			print_r(imap_errors());
-			throw new Exception("Error : Cannot move message to folder ".$this->sTargetFolder);
+			throw new Exception("Error : Cannot move message to folder ".$this->sTargetFolder.' - '.json_encode(print_r(imap_errors(), true)));
 		}
 		return $ret;
 	}

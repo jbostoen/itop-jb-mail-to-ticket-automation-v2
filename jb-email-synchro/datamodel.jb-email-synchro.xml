@@ -16,7 +16,7 @@
  *
  * @package     jb-email-synchro
  */</comment>
-				<category>grant_by_profile</category>
+				<category>grant_by_profile,application</category>
 				<abstract>true</abstract>
 				<key_type>autoincrement</key_type>
 				<db_table>mailinbox_base</db_table>
@@ -1122,8 +1122,9 @@ EOF
 		{
 			case 'imap':
 				$aImapOptions = preg_split('/\\r\\n|\\r|\\n/', $this->Get('imap_options'));
+				$sTargetFolder = $this->Get('target_folder');
 				self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", mailbox: $sMailbox, options: /".implode('/', $aImapOptions));
-				$oSource = new IMAPEmailSource($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aImapOptions);
+				$oSource = new IMAPEmailSource($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aImapOptions, $sTargetFolder);
 				break;
 
 			case 'pop3':

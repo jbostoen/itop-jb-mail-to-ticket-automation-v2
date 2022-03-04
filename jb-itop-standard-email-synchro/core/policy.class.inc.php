@@ -32,6 +32,7 @@ use \DBObjectSearch;
 use \DBObjectSet;
 use \Dict;
 use \InlineImage;
+use \IssueLog;
 use \MetaModel;
 use \ormDocument;
 use \SetupUtils;
@@ -466,6 +467,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oMailBox = self::$oMailBox;
 		
 		// In case of error (exception...) set the behavior
+		// Upon success, this will be overruled again.
 		if($oMailBox->Get('error_behavior') == 'delete') {
 			 // Remove the message from the mailbox
 			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);
@@ -532,9 +534,18 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		
 		$sTicketDescription = self::BuildDescription($bForPlainText);
 
-		$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize();
+		$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize() - 1000; // Keep some room just in case...
+		
 		if(strlen($sTicketDescription) > $iDescriptionMaxSize) {
-			// Add the original e-mail message as an attachment.
+			
+			$sMsg = "CreateTicketFromEmail: Truncated description for [{$oTicket->Get('title')}] actual length: ".strlen($sTicketDescription)." maximum: $iDescriptionMaxSize";
+		    IssueLog::Error($sMsg);
+			self::Trace($sMsg);
+			
+			
+		 
+			// Add the original e-mail message as an attachment. 
+			// Newer comment by Combodo notes: this has no effect, attachments have already been processed
 			$oEmail->aAttachments[] = [
 				'content' => $sTicketDescription, 
 				'filename' => ($bForPlainText == true ? 'original message.txt' : 'original message.html'), 
@@ -543,7 +554,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		}
 		
 		// Keep some room just in case... (in case of what?)
-		$oTicket->Set('description', self::FitTextIn($sTicketDescription, $iDescriptionMaxSize - 1000)); 
+		$oTicket->Set('description', self::FitTextIn($sTicketDescription, $iDescriptionMaxSize));
 		
 		// Default values
 		$sDefaultValues = $oMailBox->Get('ticket_default_values');
@@ -580,6 +591,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oTicket = self::$oTicket;
 		
 		// In case of error (exception...) set the behavior
+		// Upon success, this will be overruled again.
 		if($oMailBox->Get('error_behavior') == 'delete') {
 			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
 		}
