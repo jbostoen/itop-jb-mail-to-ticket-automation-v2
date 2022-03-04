@@ -105,6 +105,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_mark_as_undesired' => 'Bounce to sender and mark as undesired',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:delete' => 'Delete the message from the mailbox',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:do_nothing' => 'Do nothing',
+	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:inactive' => 'Inactive',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_subject' => 'Bounce subject',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_notification' => 'Bounce message',

@@ -196,7 +196,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					$aUIDLs = array();
 					
 					// Gets all UIDLs to identify EmailReplicas in iTop.
-					foreach(array_keys($aMessages) as $iMessage) {
+					for($iMessage = 0; $iMessage < $iMsgCount; $iMessage++) {
 												
 						// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
 						if(self::IsMultiSourceMode()) {
@@ -217,7 +217,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					}
 					
 					// Processes the actual messages
-					foreach(array_keys($aMessages) as $iMessage) {
+					for($iMessage = 0; $iMessage < $iMsgCount; $iMessage++) {
 						
 						// N°3218 initialize a new CMDBChange for each message
 						// we cannot use \CMDBObject::SetCurrentChange($oChange) as this would force to persist our change for each message
@@ -394,12 +394,19 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												break;
 											
 											case EmailProcessor::MOVE_MESSAGE:
+											
 												$iTotalMoved++;
-												$this->Trace("Move message (and replica): $sUIDL");
-												$ret = $oSource->MoveMessage($iMessage);
+												$this->Trace("Move message (and replica): $sUIDL / index $iMessage");
+												try {
+													$ret = $oSource->MoveMessage($iMessage);
+												}
+												catch(Exception $e) {
+													$this->Trace("Unable to move message");
+												}
 												break;
 													
 											case EmailProcessor::PROCESS_ERROR:
+											
 												$sSubject = $oProcessor->GetLastErrorSubject();
 												$sMessage = $oProcessor->GetLastErrorMessage();
 												EmailBackgroundProcess::ReportError($sSubject, $sMessage, $oRawEmail);

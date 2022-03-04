@@ -130,6 +130,10 @@ class MailInboxesEmailProcessor extends EmailProcessor {
             case EmailProcessor::MARK_MESSAGE_AS_UNDESIRED:
 				$sRetCode = 'MARK_MESSAGE_AS_UNDESIRED';
 				break;
+				
+            case EmailProcessor::MOVE_MESSAGE:
+				$sRetCode = 'MOVE_MESSAGE';
+				break;
 		}
 		return $sRetCode;		
 	}
