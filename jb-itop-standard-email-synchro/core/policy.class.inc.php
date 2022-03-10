@@ -419,33 +419,49 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		
 		$sBehavior = $oMailBox->Get('behavior');
 		
-		switch($sBehavior)
-		{
-			case 'create_only':
-				self::CreateTicketFromEmail();
-				break;
-			
-			case 'update_only':
-				if(is_object($oTicket) == false) {
-					// No ticket associated with the incoming email, nothing to update, reject the email
-					$oMailBox->HandleError($oEmail, 'nothing_to_update', $oEmail->oRawEmail);
-				}
-				else {
-					// Update the ticket with the incoming email
-					self::UpdateTicketFromEmail();
-				}
-				break;
-			
-			default: // both: update or create as needed
-				if(is_object($oTicket) == false) {
-					// Create a new ticket
+		try {
+				
+			switch($sBehavior)
+			{
+				case 'create_only':
 					self::CreateTicketFromEmail();
-				}
-				else {
-					// Update the ticket with the incoming email
-					self::UpdateTicketFromEmail();
-				}
-				break;			
+					break;
+				
+				case 'update_only':
+					if(is_object($oTicket) == false) {
+						// No ticket associated with the incoming email, nothing to update, reject the email
+						$oMailBox->HandleError($oEmail, 'nothing_to_update', $oEmail->oRawEmail);
+					}
+					else {
+						// Update the ticket with the incoming email
+						self::UpdateTicketFromEmail();
+					}
+					break;
+				
+				default: // both: update or create as needed
+					if(is_object($oTicket) == false) {
+						// Create a new ticket
+						self::CreateTicketFromEmail();
+					}
+					else {
+						// Update the ticket with the incoming email
+						self::UpdateTicketFromEmail();
+					}
+					break;			
+			}
+			
+		}
+		catch(Exception $e) {
+		
+			switch($e->GetMessage()) {
+				// Match descriptions in CreateTicketFromEmail(), UpdateTicketFromEmail()
+				case 'Ticket creation failed':
+				case 'Ticket update failed':
+					
+					// Stop further processing (will delete or mark as error, based on user's settings)
+					return false;
+			}
+			
 		}
 			
 		// Generic 'after' actions
@@ -460,6 +476,8 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	 * Creates a new Ticket from an email
 	 *
 	 * @return void
+	 *
+	 * @throws \Exception
 	 */
 	public static function CreateTicketFromEmail() {
 		
@@ -572,8 +590,17 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		self::AddAdditionalContacts();
 		
 		self::BeforeInsertTicket();
-		$oTicket->DBInsert();
-		self::Trace(".. Ticket ".$oTicket->GetName()." created.");
+		
+		try {
+			$oTicket->DBInsert();
+			self::Trace(".. Ticket ".$oTicket->GetName()." created.");
+		}
+		catch(Exception $e) {
+			self::Trace("... Ticket {$oTicket->GetName()} might not be properly created or something else went wrong (for instance: notifications).");
+			self::Trace($e->GetMessage()); // Add actual error message (if available)
+			throw new Exception('Ticket creation failed'); // Match in IsCompliant()
+		}
+			
 		self::AfterInsertTicket();
 		
 	}
@@ -583,12 +610,15 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	 * Updates an existing Ticket from an email
 	 *
 	 * @return void
+	 *
+	 * @throws \Exception
 	 */
 	public static function UpdateTicketFromEmail() {
 		
 		$oMailBox = self::$oMailBox;
 		$oEmail = self::$oEmail;
 		$oTicket = self::$oTicket;
+		$oCaller = $oEmail->oInternal_Contact;
 		
 		// In case of error (exception...) set the behavior
 		// Upon success, this will be overruled again.
@@ -695,8 +725,17 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		self::AddAdditionalContacts();
 		
 		self::BeforeUpdateTicket();
-		$oTicket->DBUpdate();			
-		self::Trace("... Ticket '{$oTicket->GetName()}' has been updated.");
+		
+		try {
+			$oTicket->DBUpdate();			
+			self::Trace("... Ticket '{$oTicket->GetName()}' has been updated.");
+		}
+		catch(Exception $e) {
+			self::Trace("... Ticket {$oTicket->GetName()} might not be properly updated or something else went wrong (for instance: notifications).");
+			self::Trace($e->GetMessage()); // Add actual error message (if available)
+			throw new Exception('Ticket update failed'); // Match in IsCompliant()
+		}
+		
 		self::AfterUpdateTicket();
 
 		// Restore previous change as current change
