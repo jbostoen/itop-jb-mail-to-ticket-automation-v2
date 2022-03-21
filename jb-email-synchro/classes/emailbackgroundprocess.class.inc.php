@@ -187,8 +187,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						// No sorting
 					}
 					
-					$aRealMessageIndexes = array_keys($aMessages);
-					
 					$iStart = 0;
 					$iEnd = ($iMsgCount - 1); // $iMsgCount will already be positive, no additional check needed
 					
@@ -196,7 +194,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					$aUIDLs = array();
 					
 					// Gets all UIDLs to identify EmailReplicas in iTop.
-					for($iMessage = 0; $iMessage < $iMsgCount; $iMessage++) {
+					foreach(array_keys($aMessages) as $iMessage) {
 												
 						// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
 						if(self::IsMultiSourceMode()) {
@@ -216,8 +214,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						$aReplicas[$oReplica->Get('uidl')] = $oReplica;
 					}
 					
-					// Processes the actual messages
-					for($iMessage = 0; $iMessage < $iMsgCount; $iMessage++) {
+					// Processes the actual messages in the correct order
+					// Due to sorting above with uasort(), the array keys might have changed from e.g. 0, 1, 2  to 0, 2, 1
+					foreach(array_keys($aMessages) as $iMessage) {
 						
 						// N°3218 initialize a new CMDBChange for each message
 						// we cannot use \CMDBObject::SetCurrentChange($oChange) as this would force to persist our change for each message
