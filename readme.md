@@ -66,8 +66,8 @@ although some work has since been implemented in the original extensoin.
 
 Sponsor to specify priority of these features:
 
-[ ] Auto responder or auto dispatcher. Terms can be discussed (rules based on contact, organization, subject, ...)
-[ ] Support for different protocols
+- [ ] Auto responder or auto dispatcher. Terms can be discussed (rules based on contact, organization, subject, ...)
+- [ ] Support for different protocols
 
 
 ## Other improvements
