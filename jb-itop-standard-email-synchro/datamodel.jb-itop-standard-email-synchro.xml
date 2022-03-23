@@ -253,7 +253,6 @@ status:assigned]]>
 						<value>delete</value>
 						<value>fallback_create_person</value>
 						<value>mark_as_undesired</value>
-						<value>inactive</value>
 					</values>
 					<sql>policy_unknown_caller_behavior</sql>
 					<default_value>mark_as_undesired</default_value>
