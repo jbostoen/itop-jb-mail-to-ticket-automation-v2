@@ -16,6 +16,7 @@
  *
  * @package     jb-email-synchro
  */</comment>
+				<!-- 'application' makes it possible to import through CSV -->
 				<category>grant_by_profile,application</category>
 				<abstract>true</abstract>
 				<key_type>autoincrement</key_type>
