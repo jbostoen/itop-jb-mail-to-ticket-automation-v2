@@ -629,7 +629,7 @@ EOF
         $oTicket = $this->GetRelatedTicket($oEmail);
 
 		// If there was no related ticket above, it may be created while processing the policies.
-		$oTicket = $this->ProcessPolicies($oEmail, $oTicket);
+		$oTicket = $this->ProcessPolicies($oEmail, $oTicket, $oSource, $index);
 
 		return $oTicket;
 		
@@ -888,8 +888,12 @@ EOF
 				<method id="ProcessPolicies">
 					<comment>
 						<![CDATA[/**
-	 * Check all policies to see if the email is considered as "undesired"
+	 * Processes e-mail in steps (policies)
+	 *
 	 * @param \EmailMessage $oEmail The message to check
+	 * @param \Ticket $oTicket The ticket
+	 * @param \EmailSource $oSource The e-mail source
+	 * @param \Integer|\String $index The index of the e-mail within the source
 	 *
 	 * @return \Ticket|null Ticket object (or subclass of Ticket) or null
 	 *
@@ -900,7 +904,7 @@ EOF
 					<access>protected</access>
 					<type>Overload-DBObject</type>
 					<code>
-						<![CDATA[	protected function ProcessPolicies(EmailMessage $oEmail, $oTicket)
+						<![CDATA[	protected function ProcessPolicies(EmailMessage $oEmail, $oTicket, $oSource, $index)
 	{
 		
 		$oCaller = null;
@@ -943,7 +947,7 @@ EOF
 		foreach($aPolicyClasses as $sPolicy) {
 		
 			// Always overrule each time this is used. Avoid leftovers from previous e-mails!
-			$sPolicy::Init($this, $oEmail, $oTicket, $aPreviouslyExecutedPolicies);
+			$sPolicy::Init($this, $oSource, $index, $oEmail, $oTicket, $aPreviouslyExecutedPolicies);
 			
 			// As soon as there is one policy where IsCompliant() returns false: cancel further processing.
 			// Any other policy violation handling should have been performed by the class implementing the iPolicy interface.
