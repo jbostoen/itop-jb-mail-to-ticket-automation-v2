@@ -437,7 +437,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
 									break;
 							}
-							if(time() > $iTimeLimit)  {
+							if(time() > $iTimeLimit) {
 								// Process the other e-mails later
 
 								break; 
