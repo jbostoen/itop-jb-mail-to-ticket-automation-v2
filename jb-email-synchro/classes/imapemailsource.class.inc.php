@@ -25,6 +25,7 @@
  * this unusable for our particular purpose
  */
 class IMAPEmailSource extends EmailSource {
+	
 	protected $rImapConn = null;
 	protected $sLogin = '';
 	protected $sMailbox = '';
@@ -46,6 +47,7 @@ class IMAPEmailSource extends EmailSource {
 		if (!function_exists('imap_open')) throw new Exception('The imap_open function is missing. Is the PHP module "IMAP" installed on the server?');
 
 		$sIMAPConnStr = "{{$sServer}:{$iPort}$sOptions}$sMailbox";
+		
 		$this->rImapConn = imap_open($sIMAPConnStr, $sLogin, $sPwd );
 		if($this->rImapConn === false) {
 			if(class_exists('EventHealthIssue')) {
@@ -206,4 +208,17 @@ class IMAPEmailSource extends EmailSource {
 	 	imap_close($this->rImapConn, CL_EXPUNGE);
 	 	$this->rImapConn = null; // Just to be sure
 	 }
+	 
+	 
+	 /**
+	  * Get IMAP connection. Exposed to dedicated extensions.
+	  *
+	  * @return IMAP connection
+	  */
+	 public function GetConnection() {
+		
+		return $this->rImapConn;
+		
+	 }
+	 
 }

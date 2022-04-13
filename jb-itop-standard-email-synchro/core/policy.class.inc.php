@@ -426,8 +426,8 @@ abstract class Policy implements iPolicy {
 				elseif($oRawEmail) {
 					
 					// Allow some customization in the bounce message
-					$sSubject = self::ReplaceMailPlaceholders($sSubject);
-					$sBody = self::ReplaceMailPlaceholders($sBody);
+					$sSubject = static::ReplaceMailPlaceholders($sSubject);
+					$sBody = static::ReplaceMailPlaceholders($sBody);
 					
 					if($sSubject == '') {
 						$sSubject = 'Message bounced - not compliant with an enforced policy.';
@@ -615,7 +615,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			switch($sBehavior)
 			{
 				case 'create_only':
-					self::CreateTicketFromEmail();
+					static::CreateTicketFromEmail();
 					break;
 				
 				case 'update_only':
@@ -625,18 +625,18 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 					}
 					else {
 						// Update the ticket with the incoming email
-						self::UpdateTicketFromEmail();
+						static::UpdateTicketFromEmail();
 					}
 					break;
 				
 				default: // both: update or create as needed
 					if(is_object($oTicket) == false) {
 						// Create a new ticket
-						self::CreateTicketFromEmail();
+						static::CreateTicketFromEmail();
 					}
 					else {
 						// Update the ticket with the incoming email
-						self::UpdateTicketFromEmail();
+						static::UpdateTicketFromEmail();
 					}
 					break;			
 			}
@@ -651,6 +651,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 					
 					// Stop further processing (will delete or mark as error, based on user's settings)
 					return false;
+					
 			}
 			
 		}
@@ -741,7 +742,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		static::Trace("... Email body format: ".$oEmail->sBodyFormat);
 		static::Trace("... Target format for 'description': ".($bForPlainText ? 'text/plain' : 'text/html'));
 		
-		$sTicketDescription = self::BuildDescription($bForPlainText);
+		$sTicketDescription = static::BuildDescription($bForPlainText);
 
 		$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize() - 1000; // Keep some room just in case...
 		
@@ -763,7 +764,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		}
 		
 		// Keep some room just in case... (in case of what?)
-		$oTicket->Set('description', self::FitTextIn($sTicketDescription, $iDescriptionMaxSize));
+		$oTicket->Set('description', static::FitTextIn($sTicketDescription, $iDescriptionMaxSize));
 		
 		// Default values
 		$sDefaultValues = $oMailBox->Get('ticket_default_values');
@@ -778,9 +779,9 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		}
 		$oMailBox->InitObjectFromDefaultValues($oTicket, $aDefaultValues);
 		
-		self::AddAdditionalContacts();
+		static::AddAdditionalContacts();
 		
-		self::BeforeInsertTicket();
+		static::BeforeInsertTicket();
 		
 		try {
 			$oTicket->DBInsert();
@@ -792,7 +793,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			throw new Exception('Ticket creation failed'); // Match in IsCompliant()
 		}
 			
-		self::AfterInsertTicket();
+		static::AfterInsertTicket();
 		
 	}
 	
@@ -849,7 +850,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// Process attachments
 		static::AddAttachments(true);
 		
-		$sCaseLogEntry = self::BuildCaseLogEntry();
+		$sCaseLogEntry = static::BuildCaseLogEntry();
 		
 		if($oEmail->sTrace == '') {
 			static::Trace("... No email trace available.");
@@ -913,9 +914,9 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oTicket->Set($sAttCode, $oAttributeValue);
 		
 		// Policy has already removed unwanted contacts
-		self::AddAdditionalContacts();
+		static::AddAdditionalContacts();
 		
-		self::BeforeUpdateTicket();
+		static::BeforeUpdateTicket();
 		
 		try {
 			$oTicket->DBUpdate();			
@@ -927,7 +928,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			throw new Exception('Ticket update failed'); // Match in IsCompliant()
 		}
 		
-		self::AfterUpdateTicket();
+		static::AfterUpdateTicket();
 
 		// Restore previous change as current change
 		if($bInsertChangeUserId === true){
@@ -958,7 +959,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	public static function AfterInsertTicket() {
 		 
 		// Process attachments now the ID is known
-		self::UpdateAttachments();
+		static::UpdateAttachments();
 		
 		$oMailBox = static::GetMailBox();
 		
@@ -996,7 +997,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		if($oEmail->sBodyFormat == 'text/html') {
 			// Original message is in HTML
 			static::Trace("... Managing inline images...");
-			$sTicketDescription = self::ManageInlineImages($oEmail->sBodyText, $bForPlainText);
+			$sTicketDescription = static::ManageInlineImages($oEmail->sBodyText, $bForPlainText);
 			if($bForPlainText == true) {
 				static::Trace("... Converting HTML to text using utils::HtmlToText...");
 				$sTicketDescription = utils::HtmlToText($oEmail->sBodyText);
@@ -1182,7 +1183,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		}
 
 		// Apply a stimulus if needed, will write the ticket to the database, may launch triggers, etc...
-		self::ApplyConfiguredStimulus($oTicket);
+		static::ApplyConfiguredStimulus($oTicket);
 		
 		// Delete the email immediately or keep it stored
 		if($oMailBox->Get('email_storage') == 'delete') {
@@ -1269,7 +1270,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 							if ($oAllowedValues->Count() == 1) 	{
 								$oRemoteObj = $oAllowedValues->Fetch();
 								$oTicket->Set($sAttCode, $oRemoteObj->GetKey());
-								self::race("... Setting the mandatory External Key {$sAttCode} to the only allowed value: {$oRemoteObj->GetKey()}");
+								static::race("... Setting the mandatory External Key {$sAttCode} to the only allowed value: {$oRemoteObj->GetKey()}");
 							}
 							else {
 								static::Trace("... Cannot apply the stimulus since the attribute {$sAttCode} is mandatory in the target state {$sTargetState} and is neither currently set nor has just one allowed value.");
@@ -1335,7 +1336,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 				$sCaseLogEntry = $oEmail->sBodyText;
 			}
 			static::Trace("... Managing inline images...");
-			$sCaseLogEntry = self::ManageInlineImages($sCaseLogEntry, false /* $bForPlainText */);
+			$sCaseLogEntry = static::ManageInlineImages($sCaseLogEntry, false /* $bForPlainText */);
 		}
 		else {
 			static::Trace("... Extracting the new part using GetNewPart()...");
@@ -1434,7 +1435,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 				
 				if($bIgnoreAttachment == false) {
 					
-					if(self::IsImage($aAttachment['mimeType']) && class_exists('InlineImage') && $aAttachment['inline']) {
+					if(static::IsImage($aAttachment['mimeType']) && class_exists('InlineImage') && $aAttachment['inline']) {
 						$oAttachment = new InlineImage();
 						static::Trace("... Attachment {$aAttachment['filename']} will be stored as an InlineImage.");
 						$oAttachment->Set('secret', sprintf ('%06x', mt_rand(0, 0xFFFFFF))); // something not easy to guess
@@ -1602,7 +1603,7 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Policy imple
 					if($sTicketCallerEmail != $oEmail->sCallerEmail) {
 						
 						static::Trace('.. Ticket caller\'s email address is different from the email caller\'s email address.');
-						self::HandleViolation();
+						static::HandleViolation();
 						return false;
 					
 					}
@@ -1680,7 +1681,7 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements
 							if(in_array($aAttachment['mimeType'], $aForbiddenMimeTypes) == true) {
 								
 								static::Trace('... Found attachment with forbidden MimeType "'.$aAttachment['mimeType'].'"');
-								self::HandleViolation();
+								static::HandleViolation();
 								
 								// No specific fallback								
 								// Stop processing any further!
@@ -1760,7 +1761,7 @@ abstract class PolicyBounceLimitMailSize extends Policy implements iPolicy {
 				
 				// Mail size too big
 				static::Trace('.. Undesired: mail size too big: '.$iMailSize.' bytes, limit is '.$iLimitMailSize.' bytes ('.$iMaxSizeMB.' M).');
-				self::HandleViolation();
+				static::HandleViolation();
 				
 				// No fallback
 				
@@ -1822,7 +1823,7 @@ abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
 
 						// No subject (and no fallback)
 						static::Trace('.. Undesired: Empty subject.');
-						self::HandleViolation();
+						static::HandleViolation();
 						
 						// No fallback
 						
@@ -1840,7 +1841,7 @@ abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
 						// Inproper configuration
 						if(trim($sDefaultTitle) == '') {
 							static::Trace('.. Undesired: Empty subject. Fallback to set a default subject failed, because default subject is empty.');
-							self::HandleViolation();
+							static::HandleViolation();
 							return false;
 						}
 						
@@ -1944,7 +1945,7 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 						
 						// Did not match caller e-mail or any alias of this helpdesk mailbox
 						static::Trace(".. Undesired: at least one other recipient (missing alias or unwanted other recipient): {$aContactInfo['email']}");
-						self::HandleViolation();
+						static::HandleViolation();
 						return false;
 						
 					}
@@ -2115,7 +2116,7 @@ abstract class PolicyTicketResolved extends Policy implements iPolicy {
 						case 'do_nothing':
 						case 'mark_as_undesired':
 						
-							self::HandleViolation();
+							static::HandleViolation();
 							
 							// No fallback
 							
@@ -2186,7 +2187,7 @@ abstract class PolicyTicketClosed extends Policy implements iPolicy {
 						case 'mark_as_undesired':
 						
 							static::Trace(".. Undesired: ticket was marked as closed before.");
-							self::HandleViolation();
+							static::HandleViolation();
 							
 							// No fallback
 							
@@ -2271,7 +2272,7 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Policy implements iPol
 								case 'mark_as_undesired':
 								
 									static::Trace(".. The message '{$sMailSubject}' is considered as undesired, since it matches {$sPattern}.");
-									self::HandleViolation();
+									static::HandleViolation();
 									
 									// No fallback
 									
@@ -2364,7 +2365,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 							case 'mark_as_undesired':
 							
 								static::Trace("... The message '{$oEmail->sSubject}' is considered as undesired, the caller was not found.");
-								self::HandleViolation();
+								static::HandleViolation();
 								
 								// No fallback
 								return false;
@@ -2389,7 +2390,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 											if(preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
 												$sAttCode = trim($aMatches[1]);
 												$sValue = trim($aMatches[2]);
-												$sValue = self::ReplaceMailPlaceholders($sValue);
+												$sValue = static::ReplaceMailPlaceholders($sValue);
 												$aDefaultValues[$sAttCode] = $sValue;
 											}
 										}
@@ -2575,7 +2576,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 							
 		// Take both the To: and CC:
 		$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
-		$aAllContacts = self::GetAddressesFromRecipients($aAllContacts);
+		$aAllContacts = static::GetAddressesFromRecipients($aAllContacts);
 		
 		// Mailbox aliases
 		$sMailBoxAliases = $oMailBox->Get('mail_aliases');
@@ -2626,7 +2627,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 							if (preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
 								$sAttCode = trim($aMatches[1]);
 								$sValue = trim($aMatches[2]);
-								$sValue = self::ReplaceMailPlaceholders($sValue);
+								$sValue = static::ReplaceMailPlaceholders($sValue);
 								$aDefaultValues[$sAttCode] = $sValue;
 							}
 						}
@@ -2756,9 +2757,9 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 
 			foreach($oEmail->aAttachments as $sAttachmentRef => &$aAttachment) {
 				
-				if(self::IsImage($aAttachment['mimeType']) == true) {
+				if(static::IsImage($aAttachment['mimeType']) == true) {
 					
-					$aImgInfo = self::GetImageSize($aAttachment['content']);
+					$aImgInfo = static::GetImageSize($aAttachment['content']);
 					if($aImgInfo !== false) {
 						
 						$iWidth = $aImgInfo[0];
@@ -2782,7 +2783,7 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 							
 							// Resize
 							static::Trace("... Image too large; resizing {$sAttachmentRef}");
-							$aAttachment = self::ResizeImageToFit($aAttachment, $iWidth, $iHeight, $iMaxWidth, $iMaxHeight);
+							$aAttachment = static::ResizeImageToFit($aAttachment, $iWidth, $iHeight, $iMaxWidth, $iMaxHeight);
 							
 						}
 						else {

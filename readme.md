@@ -134,6 +134,7 @@ Some of the customizations based on this generic Mail to Ticket Automation exten
 * match with open ticket based on subject (strip RE:/FW:/FWD:) and original caller in To: or CC:
 * match with open ticket based on subject (same event ID being used in every email sent to iTop)
 * match with open ticket based on Message-ID of very first e-mail for which a ticket was created and same Message-ID still in the 'References' or 'In-Reply-To' e-mail headers
+* move to specific target folder (dedicated to customer)
 * ...
 
 
