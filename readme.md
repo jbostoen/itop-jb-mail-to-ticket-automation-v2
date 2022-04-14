@@ -53,21 +53,14 @@ Highly recommended to read the [security recommendations](documentation/security
 Want to implement your own logic?
 * See [customization](documentation/customization.md)
 
-## History
-Short term roadmap: this was my first PHP extension (fork) for iTop, somewhere in 2015.  
-Initially it was only a minor improvement, but it grew over time. It worked, but the code was not "by the book".
-
-At the end of 2019, a refactoring effort was made ("v2").
-This version makes it easier to implement additional steps ("policies") on how to handle the incoming e-mails.  
-It also contains several improvements and bug fixes compared to the original version, 
-although some work has since been implemented in the original extensoin.  
-
 ## Roadmap
 
 Sponsor to specify priority of these features:
 
 - [ ] Auto responder or auto dispatcher. Terms can be discussed (rules based on contact, organization, subject, ...)
 - [ ] Support for different protocols
+- [ ] Support for IMAP OAuth
+- [ ] Support to strip "original message" part from e-mails ( https://github.com/jbostoen/itop-jb-mail-to-ticket-automation-v2/issues/15 )
 
 
 ## Other improvements
@@ -136,5 +129,16 @@ Some of the customizations based on this generic Mail to Ticket Automation exten
 * match with open ticket based on Message-ID of very first e-mail for which a ticket was created and same Message-ID still in the 'References' or 'In-Reply-To' e-mail headers
 * move to specific target folder (dedicated to customer)
 * ...
+
+
+
+## History
+Short term roadmap: this was my first PHP extension (fork) for iTop, somewhere in 2015.  
+Initially it was only a minor improvement, but it grew over time. It worked, but the code was not "by the book".
+
+At the end of 2019, a refactoring effort was made ("v2").
+This version makes it easier to implement additional steps ("policies") on how to handle the incoming e-mails.  
+It also contains several improvements and bug fixes compared to the original version, 
+although some work has since been implemented in the original extension.  
 
 
