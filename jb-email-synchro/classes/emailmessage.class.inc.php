@@ -97,6 +97,9 @@ class EmailMessage {
 	 * @return array
 	 */
 	public function GetInvalidReasons() {
+		
+		// Missing caller email, name happens when the message is mostly empty.
+		// Seen such a case where there were even no headers or message content yet (perhaps some form of concept message?); it was basically an empty .eml file
 		$aErrors = array();
 		if(empty($this->sUIDL)) {
 			$aErrors[] = 'Empty message id';

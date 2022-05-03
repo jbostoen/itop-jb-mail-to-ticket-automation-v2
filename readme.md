@@ -13,8 +13,8 @@ Please get in touch to discuss the terms: **info@jeffreybostoen.be** / https://j
 
 ## What?
 
-⚠ Only use "releases" from this repository in iTop environments.  
-⚠ POP3 has been deprecated. Currently only IMAP is supported.  
+⚠ Only use [releases](https://github.com/jbostoen/itop-jb-mail-to-ticket-automation-v2/releases) from this repository in iTop environments.  
+⚠ POP3 has been deprecated in this fork. Currently only IMAP is supported.  
 
 This **Mail to Ticket automation** is a **fork** from Combodo's Mail to Ticket Automation.  
 It was originally based on their version 3.0.7 (28th of August 2017), but also includes the changes up to 3.5.1 so far.  
@@ -64,14 +64,17 @@ Sponsor to specify priority of these features:
 
 
 ## Other improvements
+
 In comparison to Combodo's official Mail to Ticket Automation extension:
 
 ### Minor code tweaks
+
 Some code was simplified.
 
 Also more flexible in title patterns (no regex group required).
 
 ### Lost IMAP connections
+
 There's an attempt to fix issues with lost IMAP connections (to Office 365).
 Contrary to the original extension, EmailReplicas don't immediately disappear when the mail can not be seen anymore.
 The email record is still kept for 7 days after the email was last seen.
@@ -80,9 +83,11 @@ Benefit: if the email wasn't seen due to a lost IMAP connection, the EmailReplic
 If in the next run the IMAP connection functions properly, the email would be reprocessed as 'new' - which led to new tickets being created.
 
 ### Invalid from/to/cc headers
+
 In rare cases, these headers may include invalid data. This fork surpresses the notice which occurs while handling these kind of emails.
 
 ### IMAP processing order
+
 This extension fetches e-mails through an IMAP connection.
 Some providers (Google) return e-mails in a random order.
 Other providers (Microsoft) return them from newest to oldest.
@@ -102,14 +107,15 @@ SourceForge tickets:
 * #1793 Mail to Ticket Automation: set IMAP undelete  (no solution in Combodo version. Pull request made, but not accepted because of worries about conflicts.)
 * #1859 Mail to Ticket Automation - issue with long subjects (+ solution) (some feedback, pull request accepted by Combodo)
 * #1924 Mail to Ticket: processing order of e-mails is not chronologically on Microsoft Exchange/O365 and Google GMail (no solution in Combodo version)
-* #1925 Mail to Ticket: malformed headers (some feedback, no solution in Combodo version. Pull request made.)
+* #1925 Mail to Ticket: malformed headers (some feedback, no solution in Combodo version, implemented by Combodo)
 * #1930 Mail to Ticket: improved parsing of from: address (suggested fix, implemented by Combodo)
-* #2039 Return code missing in combodo-email-synchro - GetActionFromCode() (suggested fix, no solution in Combodo version)
+* #2039 Return code missing in combodo-email-synchro - GetActionFromCode() (suggested fix, implemented by Combodo)
 
 Internal Combodo tickets:
 * N° 2181 Mail to Ticket: Sometimes duplicate ticket from mail-to-ticket (suggested fix, implemented by Combodo)
 
 ## Upgrade notes
+
 * See [Upgrade notes](documentation/upgrade%20notes.md)
 
 ## Cookbook

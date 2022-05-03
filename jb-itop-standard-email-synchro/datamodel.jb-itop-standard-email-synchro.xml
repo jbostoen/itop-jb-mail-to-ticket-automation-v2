@@ -796,7 +796,7 @@ EOF
 				}
 				else
 				{
-					$sBody = '<p>The following eMail (see attachment) was not decoded properly and therefore was not processed at all.</p>\n';
+					$sBody = '<p>The following eMail (see attachment) was not decoded properly and therefore was not processed at all.</p>';
 					$sBody .= '<ul><li>'.implode('</li><li>', $oEmail->GetInvalidReasons()).'</li></ul>';
 					$sBody .= $sLastAction;
 				}
