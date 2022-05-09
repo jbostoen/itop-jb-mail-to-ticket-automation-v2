@@ -924,7 +924,7 @@ EOF
 					}
 				}
 				else {
-					// No default "behavior" attribute
+					// No default "behavior" attribute; assume this step must always be executed
 					$aPolicyClasses[] = $sClassName;
 				}
 				

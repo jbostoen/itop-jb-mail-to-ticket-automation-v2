@@ -540,7 +540,7 @@ class RawEmailMessage {
 		
 		// Fix an encoding issue which may occur in multiline headers if it is an encoded string.
 		// Check if the string starts with =?utf-8? (sometimes with space in front) or by mentioning another character encoding and ends with ?=
-		if(preg_match('/^(\s|){1,}=\?([^?]+)\?(.*)\?=/', $sInput)) {
+		if(preg_match('/^(\s|){1,}=\?([^?]+)\?(.*)\?=/', $sInput, $aMatches)) {
 			// Remove leading white space
 			$sInput = preg_replace('/^(\s)/', '', $sInput);
 			$sCharset = $aMatches[2];
