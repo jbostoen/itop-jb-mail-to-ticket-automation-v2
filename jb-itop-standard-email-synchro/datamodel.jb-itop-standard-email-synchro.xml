@@ -563,7 +563,7 @@ EOF
 		if ($this->Get('trace') == 'yes')
 		{
 			// htmlentities($sText) might be applied again on AJAX page.
-			$sStampedText = date('Y-m-d H:i:s').' - '.$sText."\n";
+			$sStampedText = date('Y-m-d H:i:s').' | '.$sText."\n";
 			$this->Set('debug_trace', $sStampedText.mb_substr($this->Get('debug_trace'), 0, $iMaxTraceLength));
 			$this->DBUpdate();
 		}

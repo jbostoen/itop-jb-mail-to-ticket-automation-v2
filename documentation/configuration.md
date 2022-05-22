@@ -6,7 +6,6 @@ It also contains additional info about the available default policies.
 A policy should be interpreted as a 'mail processing step'.
 It can be used to check a condition; but it can also actually perform a step in the ticket creation/update process (for example: matching a caller).
 
-## Configuration
 Mailbox settings are mostly similar to https://www.itophub.io/wiki/page?id=extensions%3Aticket-from-email
 
 One thing is important here: it's actually recommended to set **use_message_id_as_uid** to 'true' in the config file in a lot of cases to avoid duplicates 
@@ -17,6 +16,7 @@ Mind that especially when processing lots of new e-mails, it may be important to
 
 
 ### Mailbox Configuration
+
 * **Mail Server** 
 * **Login**
 * **Password** - warning: just like Combodo's Mail to Ticket Automation, the password is still saved unencrypted!
@@ -65,6 +65,7 @@ user=shared@mailbox.org
 # Policies 
 
 ## Basics about policies
+
 Common options are:
 * behavior (on conflict/not compliant with policy)
   * bounce and delete (inform the user the message has been rejected, provide some information why)
@@ -83,7 +84,9 @@ So in the bounce subject/message, it's possible to use `$mail->subject$` etc. (l
 
 ## Available placeholders
 
-The place holders can be used like this: `$mail->subject`
+The place holders can be used like this: `$mail->some_property_from_the_list_below$` , e.g. `$mail->subject$`
+
+Available properties for the mail:
 
 ```
 body_format
@@ -99,6 +102,7 @@ uidl
 ```
 
 ## Behavior on Incoming emails
+
 * **Policy violation behavior** - create only, update only or both
 * **After processing the email** - delete it right away or keep it on the mail server
 * **Ticket Class** - which ticket class (see iTop data model, usually UserRequest)
@@ -116,6 +120,7 @@ uidl
 ```	 
 	 
 ## Emails in Error
+
 This handles technical issues with emails; not policy violations.
 * **Policy violation behavior**
   * Delete
@@ -123,14 +128,15 @@ This handles technical issues with emails; not policy violations.
 * **Forward emails (in error) To Address**
 
 
-***
 
 ## Available policies
+
 A list of included policies which have settings that can be edited in the MailBox configuration.  
 With some programming skills, it's easy to implement your own policy (see further in this document).  
 If it's a common use case, make a pull request to include it.
 
 ### Email Size
+
 * **Use case:** email size is too big (often related to PHP or MySQL limits)
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -144,6 +150,7 @@ If it's a common use case, make a pull request to include it.
 * **Max size (MB)** - default is 10 MB
  
 ### Attachment - forbidden mime types
+
 * Use case: you might not want .exe attachments
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -158,6 +165,7 @@ If it's a common use case, make a pull request to include it.
 * **MIME Types** - one per line. Example: application/exe
 	
 ### Attachment - image dimensions
+
 * Use case: ignoring images which are too small (likely part of email signatures) or resize images which are too big.
 * Requires php-gd
 * **Min width**
@@ -166,6 +174,7 @@ If it's a common use case, make a pull request to include it.
 * **Max height**
  
 ### No subject
+
 * Use case: you want to enforce people to at least supply a subject.
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -179,6 +188,7 @@ If it's a common use case, make a pull request to include it.
 * **Default subject** - specify a default title. Example: (no subject)
  
 ### Other e-mail caller than original ticket caller
+
 Recommendation: enable this for security reasons.  
 Anyone replying (even by guessing or just going over ticket numbers) to a ticket,  
 may trigger a notification with the new log entry to the original ticket caller.
@@ -197,6 +207,7 @@ may trigger a notification with the new log entry to the original ticket caller.
  
 
 ### Closed tickets
+
 * Use case: despite very clear warnings a ticket has been closed, user still replies.
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -210,6 +221,7 @@ may trigger a notification with the new log entry to the original ticket caller.
 * **Bounce message**
 
 ### Resolved tickets
+
 * Use case: despite very clear warnings a ticket has been resolved, user still replies.
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -223,6 +235,7 @@ may trigger a notification with the new log entry to the original ticket caller.
 * **Bounce message**
 	 
 ### Unknown tickets
+
 * Use case: if the extension (mis)interprets a pattern similar to the ticket reference pattern in the email subject or header and can't find the ticket.
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -235,6 +248,7 @@ may trigger a notification with the new log entry to the original ticket caller.
 * **Bounce message**
 
 ### Unknown caller
+
 * Use case: first time caller
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -261,6 +275,7 @@ may trigger a notification with the new log entry to the original ticket caller.
 
 	 
 ### Other recipients specified in To: or CC:
+
 * Use case:
   * If other recipients (To: or CC:) to processed inboxes are allowed, it's likely people will reply to the initial email from the caller. 
   * This would lead to multiple new tickets, since there is no ticket reference in the email header or subject.
@@ -280,6 +295,7 @@ may trigger a notification with the new log entry to the original ticket caller.
 The default values work the same as for unknown callers.
 
 ### Undesired patterns in title
+
 * Use case: out-of-office or automatic replies such as 'new ticket created' (in another service desk tool), email should NOT be processed
 * **Policy violation behavior**
   * Bounce to sender and delete
@@ -293,6 +309,7 @@ The default values work the same as for unknown callers.
 * **Undesired patterns in subject** - (regex patterns, one per line)
 
 ### Patterns to remove from title
+
 * Use case: getting rid of unwanted content in subjects/titles
   * Limitation: it will still be problematic if the ticket reference pattern is exactly the same!
 * **Policy violation behavior**
@@ -304,6 +321,7 @@ The default values work the same as for unknown callers.
 * **Patterns to remove from subject** - (regex patterns, one per line)
 
 ### Limit accepted e-mail replies to original ticket caller's e-mail address
+
 * Use case: security measure. Only accept e-mail replies to a ticket if it's from the same e-mail address as the original caller.
   * Limitation: it will still be problematic if the ticket reference pattern is exactly the same!
 * **Policy violation behavior**

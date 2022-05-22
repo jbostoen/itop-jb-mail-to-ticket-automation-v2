@@ -774,6 +774,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			if (preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
 				$sAttCode = trim($aMatches[1]);
 				$sValue = trim($aMatches[2]);
+				$sValue = static::ReplaceMailPlaceholders($sValue);
 				$aDefaultValues[$sAttCode] = $sValue;
 			}
 		}
@@ -969,7 +970,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			static::Trace(".. Deleting the source email");
 			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);		
 		}
-		elseif($oMailBox->Get('email_storage') == 'move') {
+		elseif($oMailBox->Get('email_storage') == 'move' && $oMailBox->Get('target_folder') != '') {
 			// Move the processed message to another folder
 			static::Trace(".. Moving the source email");
 			$oMailBox->SetNextAction(EmailProcessor::MOVE_MESSAGE);	
