@@ -367,7 +367,7 @@ abstract class Policy implements iPolicy {
 	public static function AfterPassedComplianceCheck() {
 	
 		$sUnqualifiedName = (new ReflectionClass(get_called_class()))->getShortName();
-		if($sUnqualifiedName  != 'Policy') {
+		if($sUnqualifiedName != 'Policy') {
 			static::Trace('.. Complete: '.$sUnqualifiedName);
 		}
 	}
@@ -2128,8 +2128,13 @@ abstract class PolicyTicketResolved extends Policy implements iPolicy {
 							 
 						case 'fallback_reopen': 
 							// Reopen ticket
-							static::Trace("... Fallback: reopen resolved ticket."); 
-							$oTicket->ApplyStimulus('ev_reopen');
+							static::Trace("... Fallback: reopen resolved ticket.");
+							
+							$bRet = $oTicket->ApplyStimulus('ev_reopen');
+							
+							if($bRet == false) {
+								static::Trace('... Stimulus ev_reopen is not possible for this ticket. Hint: the stimulus may not be defined or not allowed in the current ticket state: '.$oTicket->GetState());
+							}
 							break; 
 							
 						default:
@@ -2200,7 +2205,11 @@ abstract class PolicyTicketClosed extends Policy implements iPolicy {
 						case 'fallback_reopen': 
 							// Reopen ticket
 							static::Trace("... Fallback: reopen closed ticket."); 
-							$oTicket->ApplyStimulus('ev_reopen');
+							$bRet = $oTicket->ApplyStimulus('ev_reopen');
+							
+							if($bRet == false) {
+								static::Trace('... Stimulus ev_reopen is not possible for this ticket. Hint: the stimulus may not be defined or not allowed in the current ticket state: '.$oTicket->GetState());
+							}
 							break; 
 							
 						default:

@@ -152,6 +152,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	
 	// Policy: closed ticket
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior' => 'Behavior on violation',
+	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior+' => 'Hint: by default closed tickets can not be reopened. This requires datamodel changes.',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:fallback_reopen' => 'Fallback: reopen ticket',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_delete' => 'Bounce to sender and delete',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_mark_as_undesired' => 'Bounce to sender and mark as undesired',
