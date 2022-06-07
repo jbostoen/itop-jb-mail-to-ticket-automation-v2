@@ -869,7 +869,10 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			// $iCallerUserId remains null
 		}
 		else {
+			
 			$sCallerName = $oEmail->oInternal_Contact->GetName(); // Derive name from Person
+			
+			// @todo Note: iTop 3.0 introduces UserRights::GetUserFromPerson().
 			$sOQL = 'SELECT User AS u JOIN Person AS p ON u.contactid = p.id WHERE p.id = :id';
 			$oUsers = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['id' => $oEmail->oInternal_Contact->GetKey()]);
 			
