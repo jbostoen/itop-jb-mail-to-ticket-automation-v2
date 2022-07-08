@@ -1142,7 +1142,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			if(MetaModel::IsValidAttCode($sTargetClass, 'caller_id') == true && $oContact->GetKey() != $oTicket->Get('caller_id')) {
 				$oLnk = new lnkContactToTicket();
 				$oLnk->Set('contact_id', $oContact->GetKey());
-				$oContactsSet->AddObject($oLnk);
+				$oContactsSet->AddItem($oLnk);
 			}
 			else {
 				$sContactName = $oContact->GetName();
@@ -2059,9 +2059,8 @@ abstract class PolicyBounceUnknownTicketReference extends Policy implements iPol
 				static::Trace(".. Undesired: unable to find any prior ticket despite a matching ticket reference pattern in the subject ('{$sPattern}'). ".http_build_query($aMatches));
 				return false;
 			}
-			elseif($oEmail->oRelatedObject != null ) {
-				static::Trace(".. Undesired: unable to find any prior ticket despite an email header ({$oEmail->oRelatedObject}).");
-				return false;
+			elseif($oEmail->oRelatedObject != null && !($oTicket instanceof Ticket)) {
+				static::Trace(".. Warning: email header references a (valid) non-ticket object ({$oEmail->oRelatedObject}).");
 			}
 			else {
 				static::Trace(".. Not undesired? Pattern = ".$sPattern." - subject: ".$sSubject);
