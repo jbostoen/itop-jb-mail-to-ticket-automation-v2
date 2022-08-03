@@ -58,9 +58,21 @@ Want to implement your own logic?
 Sponsor to specify priority of these features:
 
 - [ ] Auto responder or auto dispatcher. Terms can be discussed (rules based on contact, organization, subject, ...)
-- [ ] Support for different protocols
 - [ ] Support for IMAP OAuth
 - [ ] Support to strip "original message" part from e-mails ( https://github.com/jbostoen/itop-jb-mail-to-ticket-automation-v2/issues/15 )
+
+
+## Customizations on top of this Mail to Ticket automation
+
+Some organizations have even more specific needs. You can either implement new processing steps yourself or contact me.  
+Some of the customizations based on this generic Mail to Ticket Automation extension that have been done so far (professional services):
+
+* Match with open ticket based on subject (strip RE:/FW:/FWD:) and original caller in To: or CC:
+* Match with open ticket based on subject (same event ID being used in every email sent to iTop).
+* Match with open ticket based on Message-ID of very first e-mail for which a ticket was created and same Message-ID still in the 'References' or 'In-Reply-To' e-mail headers.
+* Move to specific target folder (dedicated to customer).
+* Map incoming unknown callers to organization based on e-mail domain in their e-mail address.
+* ...
 
 
 ## Other improvements
@@ -121,21 +133,9 @@ Internal Combodo tickets:
 ## Cookbook
 
 PHP
-* how to rename value enums by running queries during installation (ModuleInstallerAPI)
-* how to columns value enums by running queries during installation (ModuleInstallerAPI)
-* how to implement a background process (```iBackgroundProcess```)
-
-## Need more?
-
-Some organizations have even more specific needs.
-Some of the customizations based on this generic Mail to Ticket Automation extension are:
-
-* match with open ticket based on subject (strip RE:/FW:/FWD:) and original caller in To: or CC:
-* match with open ticket based on subject (same event ID being used in every email sent to iTop)
-* match with open ticket based on Message-ID of very first e-mail for which a ticket was created and same Message-ID still in the 'References' or 'In-Reply-To' e-mail headers
-* move to specific target folder (dedicated to customer)
-* ...
-
+* How to rename value enums by running queries during installation (ModuleInstallerAPI)
+* How to columns value enums by running queries during installation (ModuleInstallerAPI)
+* How to implement a background process (```iBackgroundProcess```)
 
 
 ## History

@@ -493,7 +493,7 @@ EOF
 			// => Forward the message and delete the ticket ??
 			$sObjClass = get_class($oTicket);
 			$sObjId = $oTicket->GetKey();
-			$this->Trace("iTop Simple Email Synchro: WARNING the message ({$oEmail->sUIDL}) contains a reference to a valid iTop object that is NOT a ticket! ({$sObjClass}::{$sObjId})");
+			$this->Trace(". iTop Simple Email Synchro: WARNING the message ({$oEmail->sUIDL}) contains a reference to a valid iTop object that is NOT a ticket! ({$sObjClass}::{$sObjId})");
 			$oTicket = null;
 		}
 		

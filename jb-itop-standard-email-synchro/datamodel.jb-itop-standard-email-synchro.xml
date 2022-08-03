@@ -694,7 +694,7 @@ EOF
 				$oFilter = DBSearch::FromOQL('SELECT Ticket WHERE ref = :ref');
 				foreach($aMatches as $sMatch) {
 					if(!empty($sMatch)) {
-						$this->Trace("iTop Simple Email Synchro: Retrieving ticket $sMatch (match by subject pattern)...");
+						$this->Trace(". iTop Simple Email Synchro: Retrieving ticket $sMatch (match by subject pattern)...");
 						$oSet = new DBObjectSet($oFilter, [], ['ref' => $sMatch]);
 						$oTicket = $oSet->Fetch();
 						if($oTicket) {
