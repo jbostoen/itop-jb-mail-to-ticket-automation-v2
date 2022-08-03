@@ -744,7 +744,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		
 		$sTicketDescription = static::BuildDescription($bForPlainText);
 
-		$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize() - 1000; // Keep some room just in case...
+		$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize(); // Keep some room just in case...
 		
 		if(strlen($sTicketDescription) > $iDescriptionMaxSize) {
 			
