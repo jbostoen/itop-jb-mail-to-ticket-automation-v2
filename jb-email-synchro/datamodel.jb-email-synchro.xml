@@ -64,7 +64,6 @@
 				</field>
 				<field id="protocol" xsi:type="AttributeEnum">
 					<values>
-						<value>pop3</value>
 						<value>imap</value>
 					</values>
 					<sql>protocol</sql>
@@ -271,8 +270,7 @@ EOF
 				</method>
 				<method id="DoCheckToWrite">
 					<comment>/**
-	 * Overload the standard behavior to guarantee the unicity of either:
-	 * login / server (pop3) or
+	 * Overload the standard behavior to guarantee the unicity of:
 	 * login / server / mailbox (imap)
 	 * @see cmdbAbstractObject::DoCheckToWrite()
 	 */</comment>
@@ -289,22 +287,16 @@ EOF
 			$sNewLogin = $this->Get('login');
 			$sNewServer = $this->Get('server');
 			$sNewMailbox = $this->Get('mailbox');
-			if ($this->Get('protocol') == 'pop3') {
-				// Ignore the mailbox
-				$sNewMailbox = '';
-			}
+			
 			
 			// Search for possible duplicates (other id and similar settings)
-			$oSearch = DBObjectSearch::FromOQL_AllData("SELECT MailInboxBase WHERE login = :newlogin AND server = :newserver AND ((protocol = 'imap' AND mailbox = :newmailbox) OR (protocol = 'pop3' AND '' = :newmailbox)) AND id != :id");
+			$oSearch = DBObjectSearch::FromOQL_AllData("SELECT MailInboxBase WHERE login = :newlogin AND server = :newserver AND (protocol = 'imap' AND mailbox = :newmailbox) AND id != :id");
 			$oSet = new DBObjectSet($oSearch, array(), array('id' => $this->GetKey(), 'newlogin' => $sNewLogin, 'newserver' => $sNewServer, 'newmailbox' => $sNewMailbox));
 			if($oSet->Count() > 0) {
-				if ($this->Get('protocol') == 'pop3') {
-					$this->m_aCheckIssues[] = Dict::Format('MailInbox:Login/ServerMustBeUnique', $sNewLogin, $sNewServer);
-				}
-				else {
-					// IMAP: server must not be unique, but mailbox FOLDER should be unique .
-					$this->m_aCheckIssues[] = Dict::Format('MailInbox:Login/Server/MailboxMustBeUnique', $sNewLogin, $sNewServer, $sNewMailbox);
-				}
+			
+				// IMAP: server must not be unique, but mailbox FOLDER should be unique .
+				$this->m_aCheckIssues[] = Dict::Format('MailInbox:Login/Server/MailboxMustBeUnique', $sNewLogin, $sNewServer, $sNewMailbox);
+				
 			}
 		}
 		
@@ -1112,6 +1104,7 @@ EOF
 					<type>Overload-DBObject</type>
 					<code>
 						<![CDATA[	public function GetEmailSource() {
+						
 		$sProtocol = $this->Get('protocol');
 		$sServer = $this->Get('server');
 		$sPwd = $this->Get('password');
@@ -1119,23 +1112,16 @@ EOF
 		$sMailbox = $this->Get('mailbox');
 		$iPort = $this->Get('port');
 		
-		switch($sProtocol)
-		{
+		switch($sProtocol) {
 			case 'imap':
 				$aImapOptions = preg_split('/\\r\\n|\\r|\\n/', $this->Get('imap_options'));
 				$sTargetFolder = $this->Get('target_folder');
 				self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", mailbox: $sMailbox, options: /".implode('/', $aImapOptions));
 				$oSource = new IMAPEmailSource($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aImapOptions, $sTargetFolder);
 				break;
-
-			case 'pop3':
-				$sPop3AuthOption = MetaModel::GetModuleSetting('jb-email-synchro', 'pop3_auth_option', 'USER');
-				self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", auth_option: $sPop3AuthOption");
-				$oSource = new POP3EmailSource($sServer, $iPort, $sLogin, $sPwd, $sPop3AuthOption);
-				break;
 			
 			default:
-				self::Trace("Error: unsupported protocol: $sProtocol - please use one of: pop3, imap.");	
+				self::Trace("Error: unsupported protocol: $sProtocol - please use: imap.");	
 		}
 		return $oSource;
 	}]]>

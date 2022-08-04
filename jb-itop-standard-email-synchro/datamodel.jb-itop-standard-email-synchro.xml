@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.6">
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.7">
 	<classes>
 		<class id="MailInboxStandard" _delta="define">
 			<parent>MailInboxBase</parent>
@@ -462,7 +462,6 @@ name:Unknown caller]]>
 				<method id="DoCheckToWrite">
 					<comment>/**
 			 * Overload the standard behavior to guarantee the unicity of either:
-			 * login / server (pop3) or
 			 * login / server / mailbox (imap)
 			 * @see cmdbAbstractObject::DoCheckToWrite()
 			 */</comment>
@@ -482,20 +481,13 @@ name:Unknown caller]]>
 					$sNewLogin = $this->Get('login');
 					$sNewServer = $this->Get('server');
 					$sNewMailbox = $this->Get('mailbox');
-					if($this->Get('protocol') == 'pop3') {
-						// Ignore the mailbox
-						$sNewMailbox = '';
-					}
 					
-					$oSearch = DBObjectSearch::FromOQL_AllData("SELECT MailInboxBase WHERE login = :newlogin AND server = :newserver AND ((protocol = 'imap' AND mailbox = :newmailbox) OR (protocol = 'pop3' AND '' = :newmailbox)) AND id != :id");
+					$oSearch = DBObjectSearch::FromOQL_AllData("SELECT MailInboxBase WHERE login = :newlogin AND server = :newserver AND (protocol = 'imap' AND mailbox = :newmailbox) AND id != :id");
 					$oSet = new DBObjectSet($oSearch, [], ['id' => $this->GetKey(), 'newlogin' => $sNewLogin, 'newserver' => $sNewServer, 'newmailbox' => $sNewMailbox]);
 					if($oSet->Count() > 0) {
-						if ($this->Get('protocol') == 'pop3') {
-							$this->m_aCheckIssues[] = Dict::Format('MailInbox:Login/ServerMustBeUnique', $sNewLogin, $sNewServer);
-						}
-						else {
-							$this->m_aCheckIssues[] = Dict::Format('MailInbox:Login/Server/MailboxMustBeUnique', $sNewLogin, $sNewServer, $sNewMailbox);
-						}
+						
+						$this->m_aCheckIssues[] = Dict::Format('MailInbox:Login/Server/MailboxMustBeUnique', $sNewLogin, $sNewServer, $sNewMailbox);
+						
 					}
 				}	
 				

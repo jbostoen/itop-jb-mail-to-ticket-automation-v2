@@ -38,6 +38,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	private $oCurrentSource;
 	
 	/**
+	 * @var string Message to print before exiting, when the iProcess time limit is exceeded
+	 * @since 3.5.3 N°5043
+	 */
+	const CRON_TIME_LIMIT_REACHED_MESSAGE = 'iProcess time limit exceeded: exiting!';
+	
+	/**
 	 * Activates the given EmailProcessor specified by its class name
 	 * @param string $sClassName
 	 */
@@ -437,10 +443,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
 									break;
 							}
-							if(time() > $iTimeLimit) {
-								// Process the other e-mails later
 
-								break; 
+							if (time() > $iTimeLimit) {
+								
+								$this->Trace(self::CRON_TIME_LIMIT_REACHED_MESSAGE);
+								break; // We'll do the rest later
+								
 							}
 							
 							
@@ -489,13 +497,23 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							$this->Trace("Deleting unused EmailReplica since ".$iRetentionPeriod." hours (#".$oReplica->GetKey()."), UIDL: ".$oReplica->Get('uidl'));
 							$oReplica->DBDelete();
 							
-							if (time() > $iTimeLimit) break; // We'll do the rest later
+							if (time() > $iTimeLimit)  {
+				
+								$this->Trace(self::CRON_TIME_LIMIT_REACHED_MESSAGE);
+								break; // We'll do the rest later
+								
+							}
 						}
 					}
 				}
 				$oSource->Disconnect();
 			}
-			if (time() > $iTimeLimit) break; // We'll do the rest later
+			if (time() > $iTimeLimit) {
+				
+				$this->Trace(self::CRON_TIME_LIMIT_REACHED_MESSAGE);
+				break; // We'll do the rest later
+				
+			}
 		}
 		return "Message(s) read: $iTotalMessages, message(s) skipped: $iTotalSkippedError in error / $iTotalSkippedIgnored ignored / $iTotalSkippedUndesired undesired, message(s) processed: $iTotalProcessed, message(s) deleted: $iTotalDeleted, message(s) marked as error: $iTotalMarkedAsError, undesired message(s): $iTotalUndesired, message(s) moved: $iTotalMoved";
 	}

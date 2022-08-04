@@ -62,11 +62,17 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	 * @throws \CoreUnexpectedValue
 	 * @throws \MySQLException
 	 */
-	public function ListEmailSources() {		
+	public function ListEmailSources() {
+
+		static::Trace('-----------------------------------------------------------------------------------------');
+		static::Trace('Listing sources:');
+		
 		$aSources = array();
 		$oSearch = new DBObjectSearch('MailInboxBase');
 		$oSearch->AddCondition('active', 'yes');
 		$oSet = new DBObjectSet($oSearch);
+		
+		/** @var \MailInboxBase $oInbox */
 		while($oInbox = $oSet->Fetch()) {
 			$this->aInboxes[$oInbox->GetKey()] = $oInbox;
 			try {

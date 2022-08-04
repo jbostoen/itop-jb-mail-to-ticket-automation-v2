@@ -69,7 +69,7 @@ function GetMailboxContent($oPage, $oInbox) {
 			
 		}
 		catch(Exception $e) {
-			
+			IssueLog::Error('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
 			$oPage->p('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
 			return;
 			
@@ -104,6 +104,7 @@ function GetMailboxContent($oPage, $oInbox) {
 			}
 			
 			$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox'));
+			IssueLog::Info("Searching EmailReplica: $sOQL");
 			$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 			$oReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl', 'ticket_id', 'status', 'error_message']]);
 			$iProcessedCount = $oReplicaSet->Count();
