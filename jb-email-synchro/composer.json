@@ -1,0 +1,16 @@
+{
+  "config": {
+    "classmap-authoritative": true
+  },
+  "autoload": {
+    "psr-4": {
+      "Combodo\\iTop\\Extension\\": "src"
+    }
+  },
+  "name": "jbostoen/jb-email-synchro",
+  "type": "itop-extension",
+  "description": "OAuth email syncro",
+  "require": {
+    "composer-runtime-api": "^2.0"
+  }
+}

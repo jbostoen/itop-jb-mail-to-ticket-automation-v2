@@ -23,8 +23,6 @@
 
 Dict::Add('EN US', 'English', 'English', array(
 
-	// Hopefully iTop 2.8 brings console tooltips out of the box?
-
 	// Dictionary entries go here
 	'Class:MailInboxStandard' => 'Standard Mail Inbox',
 	'Class:MailInboxStandard+' => 'Source of incoming e-mails',
@@ -83,7 +81,14 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:notify_from' => 'Mail From Address',
 	
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Mail Aliases',
-	'Class:MailInboxStandard/Attribute:mail_aliases+' => 'Mail Aliases: one per line. Regex patterns are allowed.',	 
+	'Class:MailInboxStandard/Attribute:mail_aliases+' => 'Mail Aliases: one per line. Regex patterns are allowed.',
+
+	'Class:MailInboxStandard' => 'OAuth 2.0 Mail Inbox',
+	'Class:MailInboxStandard+' => '',
+	'Class:MailInboxStandard/Attribute:oauth_provider' => 'Oauth provider',
+	'Class:MailInboxStandard/Attribute:oauth_provider+' => '',
+	'Class:MailInboxStandard/Attribute:oauth_client_id' => 'OAuth client',
+	'Class:MailInboxStandard/Attribute:oauth_client_id+' => '',
 	
 	// Policy: mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Behavior on violation',
@@ -255,5 +260,11 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInboxStandard:DebugTraceNotActive' => 'Activate the debug trace on this Inbox to see a detailed log of what happens.',
 	
 	'MailPolicy:CreateOrUpdateTicket:NoDescriptionProvided' => 'No description provided',
+	
+	// OAuth2
+	'UI:OAuthEmailSynchro:Wizard:ResultConf:Panel:Title' => 'Create a Mailbox',
+	'UI:OAuthEmailSynchro:Wizard:ResultConf:Panel:Description' => 'Create a new Mailbox to fetch e-mails from a remote mail provider using this OAuth connection as authentication method',
+	'UI:OAuthEmailSynchro:Wizard:ResultConf:Panel:CreateNewMailbox' => 'Create a new mailbox',
+	'UI:OAuthEmailSynchro:Error:UnknownVendor' => 'OAuth provider %1$s does not exist',
 	
 ));
