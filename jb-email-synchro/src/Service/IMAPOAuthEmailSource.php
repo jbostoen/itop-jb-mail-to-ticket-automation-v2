@@ -29,30 +29,32 @@ class IMAPOAuthEmailSource extends EmailSource {
 	 */
 	public function __construct($oMailbox) {
 		
-		$sServer = $oMailbox->Get('server');
-		$this->sServer = $sServer;
-		$sLogin = $oMailbox->Get('login');
-		$this->sLogin = $sLogin;
-		$sMailbox = $oMailbox->Get('mailbox');
-		$this->sMailbox = $sMailbox;
-		$iPort = $oMailbox->Get('port');
+		$this->sServer = $oMailbox->Get('server');
+		$this->sLogin = $oMailbox->Get('login');
+		$this->sMailbox = $oMailbox->Get('mailbox');
+		$this->iPort = $oMailbox->Get('port');
 		$this->sTargetFolder = $oMailbox->Get('target_folder');
 
 		IssueLog::Debug("IMAPOAuthEmailSource Start for $this->sServer", static::LOG_CHANNEL);
-		$oImapOptions = new ImapOptionsHelper();
+		$aImapOptions = preg_split('/\\r\\n|\\r|\\n/', $this->Get('imap_options'));
 		$sSSL = '';
-		if ($oImapOptions->HasOption('ssl')) {
+		
+		if(in_array('ssl', $aImapOptions) == true) {
 			$sSSL = 'ssl';
-		} elseif ($oImapOptions->HasOption('tls')) {
+		} 
+		elseif(in_array('tls', $aImapOptions) == true) {
 			$sSSL = 'tls';
 		}
+		
+		
 		$this->oStorage = new IMAPOAuthStorage([
-			'user'     => $sLogin,
-			'host'     => $sServer,
-			'port'     => $iPort,
-			'ssl'      => $sSSL,
-			'folder'   => $sMailbox,
+			'user'     => $this->sLogin,
+			'host'     => $this->sServer,
+			'port'     => $this->iPort,
+			'ssl'      => $this->sSSL,
+			'folder'   => $this->sMailbox,
 			'provider' => ProviderHelper::getProviderForIMAP($oMailbox),
+			'novalidatecert' => in_array('novalidate-cert', $aImapOptions)
 		]);
 		IssueLog::Debug("IMAPOAuthEmailSource End for $this->sServer", static::LOG_CHANNEL);
 

@@ -8,10 +8,11 @@ SetupWebPage::AddModule(
 	'jb-email-synchro/2.7.220523',
 	array(
 		// Identification
-		'label' => 'Mail to Tickets Automation (core)',
+		'label' => 'Mail to Ticket Automation (core)',
 		'category' => 'business',
 		// Setup
 		'dependencies' => array(
+			'itop-oauth-client/2.7.7',
 		),
 		'mandatory' => false,
 		'visible' => true,
@@ -20,6 +21,7 @@ SetupWebPage::AddModule(
 		'datamodel' => array(
 			'classes/autoload.php',
 			'model.jb-email-synchro.php',
+			'vendor/autoload.php',
 		),
 		'dictionary' => array(
 		),

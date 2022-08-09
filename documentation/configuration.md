@@ -6,7 +6,7 @@ It also contains additional info about the available default policies.
 A policy should be interpreted as a 'mail processing step'.
 It can be used to check a condition; but it can also actually perform a step in the ticket creation/update process (for example: matching a caller).
 
-Mailbox settings are mostly similar to https://www.itophub.io/wiki/page?id=extensions%3Aticket-from-email
+Mailbox settings are mostly similar to [Combodo's original version](https://www.itophub.io/wiki/page?id=extensions%3Aticket-from-email).
 
 One thing is important here: it's actually recommended to set **use_message_id_as_uid** to 'true' in the config file in a lot of cases to avoid duplicates 
 (Combodo sets it to 'false' by default but this could be very undesired for IMAP connections!). 
@@ -15,7 +15,7 @@ Also make sure the **PHP IMAP extension is enabled**.
 Mind that especially when processing lots of new e-mails, it may be important to increase your PHP memory limit!
 
 
-### Mailbox Configuration
+## Mailbox Configuration
 
 * **Mail Server** 
 * **Login**
@@ -30,7 +30,10 @@ Mind that especially when processing lots of new e-mails, it may be important to
 * **IMAP options** - one per line. Warning: overrides global (configuration file) IMAP options completely!
 
 
-#### Hints on IMAP options
+## Hints
+
+
+### IMAP options
 
 By default, it will usually look like this:
 
@@ -40,12 +43,17 @@ ssl
 novalidate-cert
 ```
 
+### Office 365 / OAuth2
 
-#### Hints on Office 365 with shared mailbox
+* [Combodo's documentation: Configure OAuth2 in iTop](https://www.itophub.io/wiki/page?id=2_7_0%3Aadmin%3Aoauth)
+* [Microsoft documentation: Configuration on Azure / Exchange Online](https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth#use-client-credentials-grant-flow-to-authenticate-imap-and-pop-connections)
 
-* option 1: enable the account and set a password
+
+### Office 365 with shared mailbox
+
+* Option 1: Enable the account and set a password.
  
-* option 2: use these IMAP options:  
+* Option 2: Use these IMAP options:
 
 ```
 imap
@@ -55,11 +63,16 @@ authuser=some@mailbox.org
 user=shared@mailbox.org
 ```
 
-#### Hints on GMail
+### GMail - enabling IMAP
 
-* You need to explicitly enable IMAP access for your GMail account
+* You need to explicitly enable IMAP access for your GMail account.
 * Often Google blocks initial requests. You'll receive an e-mail notification from Google in the inbox to address this. 
 * It will involve enabling 'less secure access'. It takes some time on Google's end before this is active.
+
+### OAuth2
+
+* Nothing special here, just check .
+
 
 
 # Policies 
@@ -67,17 +80,17 @@ user=shared@mailbox.org
 ## Basics about policies
 
 Common options are:
-* behavior (on conflict/not compliant with policy)
-  * bounce and delete (inform the user the message has been rejected, provide some information why)
-  * delete
-  * do nothing (can be used for tests, without taking further action: does it detect policy violations?)
-  * mark as undesired (keeps the email, but will ignore it in future processing)
-  * mark as error (keeps the email)
-* bouncing (sending message to the user telling their email is rejected)
-  * subject
-  * message
+* Behavior (on conflict/not compliant with policy)
+  * Bounce and delete (inform the user the message has been rejected, provide some information why)
+  * Delete
+  * Do nothing (can be used for tests, without taking further action: does it detect policy violations?)
+  * Mark as undesired (keeps the email, but will ignore it in future processing)
+  * Mark as error (keeps the email)
+* Bouncing (sending message to the user telling their email is rejected)
+  * Subject
+  * Message
 
-In the bounce message, some placeholders (variables) can be used.  
+In the bounce message, some placeholders (variables) can be used in the subject and in the message.  
 In fact, most (all?) strings from the EmailMessage class are supported.  
 So in the bounce subject/message, it's possible to use `$mail->subject$` etc. (list below)
 
@@ -112,11 +125,11 @@ uidl
 * **Stimuli to apply** - example: reopen ticket?
 
 ```
-    service_id:1
-    impact:3
-    agent_id:395
-    team_id:2
-    status:assigned
+service_id:1
+impact:3
+agent_id:395
+team_id:2
+status:assigned
 ```	 
 	 
 ## Emails in Error
@@ -263,9 +276,9 @@ may trigger a notification with the new log entry to the original ticket caller.
 * **Default values for new contact** - see example for minimal configuration
 
 ```
-	org_id:1 
-	first_name:Unknown 
-	name:Caller
+org_id:1 
+first_name:Unknown 
+name:Caller
 ```
 
 ( creates a person named 'Unknown Caller', belonging to first organization in iTop)
@@ -339,9 +352,11 @@ The default values work the same as for unknown callers.
 ## HTML e-mails are processed as plain text (Exchange servers - on premises)
 
 Solution provided by Dejan Skubic for Exchange (on premises) editions:
+
+Run these commands in PowerShell:
 ``` 
-[PS] C:\Windows\system32>set-CASMailbox -Identity 'mailboxusername' -ImapUseProtocolDefaults $false
-[PS] C:\Windows\system32>set-CASMailbox -Identity 'mailboxusername' -ImapMessagesRetrievalMimeFormat HtmlOnly
+Set-CASMailbox -Identity 'mailboxusername' -ImapUseProtocolDefaults $false
+Set-CASMailbox -Identity 'mailboxusername' -ImapMessagesRetrievalMimeFormat HtmlOnly
  ```
  
 

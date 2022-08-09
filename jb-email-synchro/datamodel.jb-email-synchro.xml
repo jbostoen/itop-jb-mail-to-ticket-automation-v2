@@ -1113,11 +1113,27 @@ EOF
 		$iPort = $this->Get('port');
 		
 		switch($sProtocol) {
+		
 			case 'imap':
-				$aImapOptions = preg_split('/\\r\\n|\\r|\\n/', $this->Get('imap_options'));
-				$sTargetFolder = $this->Get('target_folder');
-				self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", mailbox: $sMailbox, options: /".implode('/', $aImapOptions));
-				$oSource = new IMAPEmailSource($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aImapOptions, $sTargetFolder);
+				
+				if((Int)$this->Get('oauth_client_id') > 0) {
+
+					// OAuth implementation
+					
+					$oSource = new \Combodo\iTop\Extension\Service\IMAPOAuthEmailSource($this);
+				
+				}
+				else {
+				
+					// Legacy implementation
+				
+					$aImapOptions = preg_split('/\\r\\n|\\r|\\n/', $this->Get('imap_options'));
+					$sTargetFolder = $this->Get('target_folder');
+					self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", mailbox: $sMailbox, options: /".implode('/', $aImapOptions));
+					$oSource = new IMAPEmailSource($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aImapOptions, $sTargetFolder);
+					
+				}
+				
 				break;
 			
 			default:
