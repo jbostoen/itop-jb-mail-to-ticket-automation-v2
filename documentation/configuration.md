@@ -19,15 +19,16 @@ Mind that especially when processing lots of new e-mails, it may be important to
 
 * **Mail Server** 
 * **Login**
-* **Password** - warning: just like Combodo's Mail to Ticket Automation, the password is still saved unencrypted!
-* **Protocol** - POP or IMAP
-* **Port (993 for IMAP)** - often 993 for IMAP
-* **Mailbox folder (for IMAP)** - the folder, for example InboxTest/SomeSubFolder
-* **Mail From Address** - errors/bounce messages are sent 'from'
-* **Active** - check mailbox
-* **Debug trace** - debug log
-* **Mail Aliases** - one per line. Regex patterns allowed. List each email address (minimum 1)
-* **IMAP options** - one per line. Warning: overrides global (configuration file) IMAP options completely!
+* **Password** - Warning: just like Combodo's Mail to Ticket Automation, the password is still saved unencrypted!
+* **OAuth client** - Only if OAuth is needed.
+* **Protocol** - IMAP
+* **Port (993 for IMAP)** - often 993 for IMAP.
+* **Mailbox folder (for IMAP)** - the folder, for example InboxTest/SomeSubFolder.
+* **Mail From Address** - Errors/bounce messages are sent 'from'.
+* **Active** - Check mailbox.
+* **Debug trace** - Debug log.
+* **Mail Aliases** - One per line. Regex patterns allowed. List each email address (minimum 1)
+* **IMAP options** - One per line. Warning: overrides global (configuration file) IMAP options completely! Currently not available when using OAuth2.
 
 
 ## Hints

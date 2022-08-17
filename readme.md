@@ -35,6 +35,9 @@ Furthermore, it includes some fixes which were also provided back to Combodo whe
 
 ## Requirements
 
+* iTop 2.7: iTop 2.7.7 or higher
+* iTop 3.0: iTop 3.0.2 or higher.
+
 * iTop extensions
   * [jb-framework](https://github.com/jbostoen/itop-jb-framework) - a generic framework shared among some of my extensions
 
