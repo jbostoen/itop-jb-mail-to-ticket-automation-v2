@@ -110,7 +110,7 @@ class IMAPOAuthEmailSource extends EmailSource {
 	 */
 	public function UndeleteMessage($index) {
 		
-		// @todo Check https://github.com/laminas/laminas-mail/issues/179
+		$this->oStorage->undeleteMessage(1 + $index);
 		
 	}
 	

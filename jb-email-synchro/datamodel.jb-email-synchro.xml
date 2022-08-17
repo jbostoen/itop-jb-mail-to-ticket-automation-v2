@@ -1225,6 +1225,40 @@ EOF
 	}]]>
 					</code>
 				</method>
+				<method id="GetInitialStateAttributeFlags">
+					<static>false</static>
+					<access>public</access>
+					<type>Overload-DBObject</type>
+					<code><![CDATA[
+
+				public function GetInitialStateAttributeFlags($sAttCode, &$aReasons = array()) {
+
+					if($sAttCode == 'protocol') {
+						return OPT_ATT_READONLY;
+					}
+
+					return parent::GetAttributeFlags($sAttCode, $aReasons);
+					
+				}
+]]></code>
+				</method>
+				<method id="GetAttributeFlags">
+					<static>false</static>
+					<access>public</access>
+					<type>Overload-DBObject</type>
+					<code><![CDATA[
+
+				public function GetAttributeFlags($sAttCode, &$aReasons = array(), $sTargetState = '') {
+
+					if($sAttCode == 'protocol') {
+						return OPT_ATT_READONLY;
+					}
+
+					return parent::GetAttributeFlags($sAttCode, $aReasons, $sTargetState);
+					
+				}
+]]></code>
+				</method>
 			</methods>
 			<presentation>
 				<details>

@@ -10,6 +10,7 @@ use Laminas\Mail\Storage\Exception\InvalidArgumentException;
 use Laminas\Mail\Storage\Exception\RuntimeException;
 use Laminas\Mail\Storage\Imap;
 
+
 class IMAPOAuthStorage extends Imap
 {
 	const LOG_CHANNEL = 'OAuth';
@@ -62,13 +63,30 @@ class IMAPOAuthStorage extends Imap
 	 * @param  int $id number of message
 	 * @throws RuntimeException
 	 */
-	public function removeMessage($id)
-	{
+	public function removeMessage($id) {
 		if (! $this->protocol->store([Storage::FLAG_DELETED], $id, null, '+')) {
 			throw new RuntimeException('cannot set deleted flag');
 		}
 		// Postpone EXPUNGE until logout
 		$this->protocol->SetHasDeletedMails(true);
 	}
+	
+	/**
+	 * Undeletes a message from server.
+	 *
+	 * If you're doing that from a web environment you should be careful and
+	 * use a unique id as parameter if possible to identify the message.
+	 *
+	 * @param  int $id number of message
+	 * @throws RuntimeException
+	 */
+	public function undeleteMessage($id) {
+		
+		if (! $this->protocol->store([Storage::FLAG_DELETED], $id, null, '-')) {
+			throw new RuntimeException('cannot set deleted flag');
+		}
+		
+	}
+	
 
 }

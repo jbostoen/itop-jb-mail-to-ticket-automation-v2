@@ -20,7 +20,7 @@ Mind that especially when processing lots of new e-mails, it may be important to
 * **Mail Server** 
 * **Login**
 * **Password** - Warning: just like Combodo's Mail to Ticket Automation, the password is still saved unencrypted!
-* **OAuth client** - Only if OAuth is needed.
+* **OAuth client** - Only if OAuth is needed. Details: please see [Combodo's documentation on OAuth clients](https://www.itophub.io/wiki/page?id=2_7_0%253Aadmin%253Aoauth).
 * **Protocol** - IMAP
 * **Port (993 for IMAP)** - often 993 for IMAP.
 * **Mailbox folder (for IMAP)** - the folder, for example InboxTest/SomeSubFolder.
