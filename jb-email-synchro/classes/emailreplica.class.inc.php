@@ -148,8 +148,7 @@ class EmailReplica extends DBObject
 		return $oTicket;
 	}
 	
-	public static function MakeReferencesHeader($sInitialMessageId, $oObject)
-	{
+	public static function MakeReferencesHeader($sInitialMessageId, $oObject) {
 		$sReferences = '';
 		if ($sInitialMessageId != '')
 		{
@@ -159,9 +158,15 @@ class EmailReplica extends DBObject
 		return $sReferences;
 	}
 	
-	public static function MakeMessageId($oObject)
-	{
-		$sMessageId = sprintf('<iTop_%s_%d_%f@%s.openitop.org>', get_class($oObject), $oObject->GetKey(), microtime(true /* get as float*/), MetaModel::GetConfig()->Get('session_name'));
+	public static function MakeMessageId($oObject) {
+		
+		//  N°5216 Fix invalid message-id when sending notification using cron on system with a specific locale set (#15) The timestamp used was indeed locale dependent.
+		$sMessageId = sprintf('<iTop_%s_%d_%F@%s.openitop.org>',
+			get_class($oObject),
+			$oObject->GetKey(),
+			microtime(true /* get as float*/),
+			MetaModel::GetConfig()->Get('session_name')
+		);
 		return $sMessageId;
 	}
 }

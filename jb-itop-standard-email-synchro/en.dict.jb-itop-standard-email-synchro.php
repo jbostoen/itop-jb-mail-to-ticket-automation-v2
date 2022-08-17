@@ -24,7 +24,7 @@
 Dict::Add('EN US', 'English', 'English', array(
 
 	// Dictionary entries go here
-	'Class:MailInboxStandard' => 'Standard Mail Inbox',
+	'Class:MailInboxStandard' => 'IMAP Mail Inbox',
 	'Class:MailInboxStandard+' => 'Source of incoming e-mails',
 	'Class:MailInboxStandard/Attribute:behavior' => 'Behavior',
 	'Class:MailInboxStandard/Attribute:behavior/Value:create_only' => 'Create new Tickets',
@@ -83,8 +83,6 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Mail Aliases',
 	'Class:MailInboxStandard/Attribute:mail_aliases+' => 'Mail Aliases: one per line. Regex patterns are allowed.',
 
-	'Class:MailInboxStandard' => 'OAuth 2.0 Mail Inbox',
-	'Class:MailInboxStandard+' => '',
 	'Class:MailInboxStandard/Attribute:oauth_provider' => 'Oauth provider',
 	'Class:MailInboxStandard/Attribute:oauth_provider+' => '',
 	'Class:MailInboxStandard/Attribute:oauth_client_id' => 'OAuth client',

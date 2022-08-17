@@ -2,11 +2,11 @@
 
 namespace Combodo\iTop\Extension\Service;
 
-use Combodo\iTop\Extension\Helper\ImapOptionsHelper;
-use Combodo\iTop\Extension\Helper\ProviderHelper;
-use EmailSource;
-use IssueLog;
-use MessageFromMailbox;
+use \Combodo\iTop\Extension\Helper\ImapOptionsHelper;
+use \Combodo\iTop\Extension\Helper\ProviderHelper;
+use \EmailSource;
+use \IssueLog;
+use \MessageFromMailbox;
 
 class IMAPOAuthEmailSource extends EmailSource {
 	
@@ -36,7 +36,7 @@ class IMAPOAuthEmailSource extends EmailSource {
 		$this->sTargetFolder = $oMailbox->Get('target_folder');
 
 		IssueLog::Debug("IMAPOAuthEmailSource Start for $this->sServer", static::LOG_CHANNEL);
-		$aImapOptions = preg_split('/\\r\\n|\\r|\\n/', $this->Get('imap_options'));
+		$aImapOptions = preg_split('/\\r\\n|\\r|\\n/', $oMailbox->Get('imap_options'));
 		$sSSL = '';
 		
 		if(in_array('ssl', $aImapOptions) == true) {
@@ -51,7 +51,7 @@ class IMAPOAuthEmailSource extends EmailSource {
 			'user'     => $this->sLogin,
 			'host'     => $this->sServer,
 			'port'     => $this->iPort,
-			'ssl'      => $this->sSSL,
+			'ssl'      => $sSSL,
 			'folder'   => $this->sMailbox,
 			'provider' => ProviderHelper::getProviderForIMAP($oMailbox),
 			'novalidatecert' => in_array('novalidate-cert', $aImapOptions)
@@ -63,6 +63,19 @@ class IMAPOAuthEmailSource extends EmailSource {
 		
 	}
 
+	/**
+	 * Initializes the message when it is being processed.
+	 * @param $index integer The index between zero and count
+	 * @return void
+	 */
+	public function InitMessage($index) {
+		
+		// Preventive measure. For restored emails, sometimes there's still an IMAP flag indicating it was 'marked for removal'.
+		// @todo Check how undelete works
+		
+		return;
+	}
+	
 	public function GetMessagesCount() {
 		
 		IssueLog::Debug("IMAPOAuthEmailSource Start GetMessagesCount for $this->sServer", static::LOG_CHANNEL);
