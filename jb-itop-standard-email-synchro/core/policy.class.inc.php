@@ -11,7 +11,6 @@
  * - do not alter ticket contents here, such as subject. That's done at a later phase. For this particular case: change EmailMessage's subject.
  */
  
-// @todo Revise PolicyNoOtherRecipients: should this one be creating contacts as a fallback?
 
 namespace jb_itop_extensions\mail_to_ticket;
 
@@ -91,6 +90,9 @@ interface iPolicy {
 	
 }
 
+/**
+ * Class Policy. An abstract class defining a policy (an action to take in the processing of the e-mail, often to enforce certain behavior.).
+ */
 abstract class Policy implements iPolicy {
 	
 	/**
@@ -1365,7 +1367,6 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	 *
 	 * @return void
 	 *
-	 * @todo Test what happens if the same file is attached twice to an e-mail?
 	 */
 	public static function AddAttachments($bNoDuplicates = true) {
 		
@@ -1563,7 +1564,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 
 
 /**
- * Class PolicyBounceOtherEmailCallerThanTicketCaller Bounce policy in case the email caller is not the ticket caller
+ * Class PolicyBounceOtherEmailCallerThanTicketCaller Bounce policy in case the email caller is not the ticket caller.
  */
 abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Policy implements iPolicy {
 	
@@ -1631,7 +1632,7 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Policy imple
 }
 
 /**
- * Class PolicyBounceAttachmentForbiddenMimeType Offers a policy to enforce some rules on the attachment.
+ * Class PolicyBounceAttachmentForbiddenMimeType. A policy to enforce some rules on the attachment.
  */
 abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements iPolicy {
 	
@@ -1728,7 +1729,7 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements
 }
 
 /**
- * Class PolicyBounceLimitMailSize Offers a policy to prevent big email messages from being processed
+ * Class PolicyBounceLimitMailSize. A policy to prevent big email messages from being processed.
  */
 abstract class PolicyBounceLimitMailSize extends Policy implements iPolicy {
 	
@@ -1786,7 +1787,7 @@ abstract class PolicyBounceLimitMailSize extends Policy implements iPolicy {
 }
 
 /**
- * Class PolicyBounceNoSubject Offers a policy to enforce non-empty subjects
+ * Class PolicyBounceNoSubject. A policy to enforce non-empty subjects.
  */
 abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
 	
@@ -1871,7 +1872,7 @@ abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
 }
 
 /**
- * Class PolicyBounceOtherRecipients Offers a policy to ensure that the service desk mailbox is the sole recipient (no other recipients in To:, CC:)
+ * Class PolicyBounceOtherRecipients. A policy to ensure that the service desk mailbox is the sole recipient (no other recipients in To:, CC:).
  * Does NOT change "related contacts" or create new ones!
  */
 abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
@@ -1986,8 +1987,7 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 }
 
 /**
- * Class PolicyBounceUnknownTicketReference Offers a policy to handle unknown ticket references. Also see MailInboxStandard::GetRelatedTicket()
- * @todo Check if this works properly
+ * Class PolicyBounceUnknownTicketReference. A policy to handle unknown ticket references. Also see MailInboxStandard::GetRelatedTicket().
  */
 abstract class PolicyBounceUnknownTicketReference extends Policy implements iPolicy {
 	
@@ -2081,7 +2081,7 @@ abstract class PolicyBounceUnknownTicketReference extends Policy implements iPol
 }
 
 /**
- * Class PolicyTicketResolved Offers a policy to handle replies to resolved tickets.
+ * Class PolicyTicketResolved. A policy to handle replies to resolved tickets.
  */
 abstract class PolicyTicketResolved extends Policy implements iPolicy {
 	
@@ -2158,7 +2158,7 @@ abstract class PolicyTicketResolved extends Policy implements iPolicy {
 }
 
 /**
- * Class PolicyTicketClosed Offers a policy to handle replies to closed tickets.
+ * Class PolicyTicketClosed. A policy to handle replies to closed tickets.
  */
 abstract class PolicyTicketClosed extends Policy implements iPolicy {
 	
@@ -2233,7 +2233,7 @@ abstract class PolicyTicketClosed extends Policy implements iPolicy {
 }
 
 /**
- * Class PolicyBounceUndesiredTitlePatterns Offers a policy to handle undesired title patterns.
+ * Class PolicyBounceUndesiredTitlePatterns. A policy to handle undesired title patterns.
  */
 abstract class PolicyBounceUndesiredTitlePatterns extends Policy implements iPolicy {
 	
@@ -2318,7 +2318,7 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Policy implements iPol
 }
 
 /**
- * Class PolicyFindCaller Offers a policy to find the caller and create a Person with default values if the caller appears to be unknown.
+ * Class PolicyFindCaller. A policy to find the caller and create a Person with default values if the caller appears to be unknown.
  */
 abstract class PolicyFindCaller extends Policy implements iPolicy {
 	
@@ -2335,8 +2335,6 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 	
 	/**
 	 * @inheritDoc
-	 *
-	 * @todo Test if default values properly support mail placeholders
 	 */
 	public static function IsCompliant() {
 		
@@ -2462,7 +2460,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 
 
 /**
- * Class PolicyRemoveTitlePatterns Offers a policy to remove patterns in titles (in message subject and later ticket title)
+ * Class PolicyRemoveTitlePatterns. A policy to remove patterns in titles (in message subject and later ticket title).
  * @todo Check if this works properly
  */
 abstract class PolicyRemoveTitlePatterns extends Policy implements iPolicy {
@@ -2555,7 +2553,7 @@ abstract class PolicyRemoveTitlePatterns extends Policy implements iPolicy {
 
 
 /**
- * Class PolicyFindAdditionalContacts Offers a policy to add "related contacts" to a Ticket. These are people in To: or CC: of processed e-mails that are NOT the original caller.
+ * Class PolicyFindAdditionalContacts. A policy to add "related contacts" to a Ticket. These are people in To: or CC: of processed e-mails that are NOT the original caller.
  */
 abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 	
@@ -2572,8 +2570,6 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 	
 	/**
 	 * @inheritDoc
-	 *
-	 * @todo Test if mail placeholders work
 	 */
 	public static function IsCompliant() {
 		
@@ -2709,7 +2705,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 }
 
 /**
- * Class PolicyAttachmentImageDimensions Offers a policy to ignore small image sizes (likely elements of an email signature) or resize larger images.
+ * Class PolicyAttachmentImageDimensions. A policy to ignore small image sizes (likely elements of an email signature) or resize larger images.
  */
 abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy {
 	

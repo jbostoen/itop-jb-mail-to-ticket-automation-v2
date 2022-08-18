@@ -52,7 +52,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:debug_trace' => 'Debug trace',
 	'Class:MailInboxStandard/Attribute:debug_trace+' => '',
 	'Class:MailInboxStandard/Attribute:target_folder' => 'Target folder',
-	'Class:MailInboxStandard/Attribute:target_folder+' => 'Use to move an email with the IMAP protocol',
+	'Class:MailInboxStandard/Attribute:target_folder+' => 'The e-mail will be moved (IMAP protocol) to this target folder after being processed. Mind to update the setting for "After processing the e-mail" to "Move to another folder".',
 	
 	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Default values for new Ticket',
 	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Default Title (if subject is empty)',

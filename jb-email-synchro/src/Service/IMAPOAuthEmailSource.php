@@ -71,7 +71,7 @@ class IMAPOAuthEmailSource extends EmailSource {
 	public function InitMessage($index) {
 		
 		// Preventive measure. For restored emails, sometimes there's still an IMAP flag indicating it was 'marked for removal'.
-		// @todo Check how undelete works
+		$this->UndeleteMessage($index);
 		
 		return;
 	}
