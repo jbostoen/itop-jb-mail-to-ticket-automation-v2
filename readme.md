@@ -61,7 +61,6 @@ Want to implement your own logic?
 Sponsor to specify priority of these features:
 
 - [ ] Auto responder or auto dispatcher. Terms can be discussed (rules based on contact, organization, subject, ...)
-- [ ] Support for IMAP OAuth
 - [ ] Support to strip "original message" part from e-mails ( https://github.com/jbostoen/itop-jb-mail-to-ticket-automation-v2/issues/15 )
 
 
