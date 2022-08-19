@@ -149,4 +149,10 @@ This version makes it easier to implement additional steps ("policies") on how t
 It also contains several improvements and bug fixes compared to the original version, 
 although some work has since been implemented in the original extension.  
 
+## Special thanks
+
+Special thanks to Nicolas Matzick (HKT GmbH) for providing a test environment for the initial implementation of OAuth 2.0!
+
+
+
 
