@@ -42,17 +42,21 @@ Furthermore, it includes some fixes which were also provided back to Combodo whe
   * [jb-framework](https://github.com/jbostoen/itop-jb-framework) - a generic framework shared among some of my extensions
 
 ## Optional
+
 * [jb-mail-to-ticket-automation-v2-contactmethod](https://github.com/jbostoen/itop-jb-mail-to-ticket-automation-v2-contactmethod) - provides a possibility to have multiple contact methods per person and process e-mails from those accounts
 
 
 ## Configuration
+
 Info on settings and default policies
 * See [configuration](documentation/configuration.md)
 
 ## Security recommendations
+
 Highly recommended to read the [security recommendations](documentation/security.md)
 
 ## Customization
+
 Want to implement your own logic?
 * See [customization](documentation/customization.md)
 
@@ -62,6 +66,8 @@ Sponsor to specify priority of these features:
 
 - [ ] Auto responder or auto dispatcher. Terms can be discussed (rules based on contact, organization, subject, ...)
 - [ ] Support to strip "original message" part from e-mails ( https://github.com/jbostoen/itop-jb-mail-to-ticket-automation-v2/issues/15 )
+- [ ] If there's a bounce message indicating a mail address no longer exists, mark the related person as "inactive"
+- [ ] Your own idea
 
 
 ## Customizations on top of this Mail to Ticket automation
@@ -141,6 +147,7 @@ PHP
 
 
 ## History
+
 Short term roadmap: this was my first PHP extension (fork) for iTop, somewhere in 2015.  
 Initially it was only a minor improvement, but it grew over time. It worked, but the code was not "by the book".
 

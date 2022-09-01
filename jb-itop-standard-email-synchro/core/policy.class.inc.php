@@ -1132,8 +1132,9 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		$oContactsSet = $oTicket->Get('contacts_list');
 		$aExistingContacts = [];
 		
+		// Check which contacts were previously linked to the ticket.
 		while($oLnk = $oContactsSet->Fetch()) {
-			$aExistingContacts[$oLnk->Get('contact_id')] = true;
+			$aExistingContacts[] = $oLnk->Get('contact_id');
 		}
 
 		// (Different) policies may have accidentally added contacts multiple times, even if they are supposed to check this.
@@ -1141,14 +1142,24 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 
 		foreach($oEmail->aInternal_Additional_Contacts as $oContact) {
 			
+			$sContactName = $oContact->GetName();
+				
 			if(MetaModel::IsValidAttCode($sTargetClass, 'caller_id') == true && $oContact->GetKey() != $oTicket->Get('caller_id')) {
+
+				static::Trace(".... Skipping '{$sContactName}' as additional contact since it is the caller.");
+
+			}
+			elseif(in_array($oContact->GetKey(), $aExistingContacts) == true) {
+				
+				static::Trace(".... Skipping '{$sContactName}' as additional contact since the person is already linked to the ticket.");
+				
+			}
+			else {
+				
 				$oLnk = new lnkContactToTicket();
 				$oLnk->Set('contact_id', $oContact->GetKey());
 				$oContactsSet->AddItem($oLnk);
-			}
-			else {
-				$sContactName = $oContact->GetName();
-				static::Trace(".... Skipping '{$sContactName}' as additional contact since it is the caller.");
+				
 			}
 			
 		}
