@@ -33,7 +33,7 @@
 							<attribute id="oauth_client_id"/>
 							<attribute id="mailbox"/>
 						</attributes>
-						<filter><![CDATA[ISNULL(oauth_client_id) = 0]]></filter>
+						<filter><![CDATA[ISNULL(oauth_client_id) = 0 AND oauth_client_id > 0]]></filter>
 						<disabled>false</disabled>
 						<is_blocking>true</is_blocking>
 					</rule>
