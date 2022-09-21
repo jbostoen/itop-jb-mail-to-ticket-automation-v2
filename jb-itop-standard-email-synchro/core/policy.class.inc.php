@@ -2782,6 +2782,8 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 
 			foreach($oEmail->aAttachments as $sAttachmentRef => &$aAttachment) {
 				
+				static::Trace("... Processing attachment ref {$sAttachmentRef}");
+							
 				if(static::IsImage($aAttachment['mimeType']) == true) {
 					
 					$aImgInfo = static::GetImageSize($aAttachment['content']);
