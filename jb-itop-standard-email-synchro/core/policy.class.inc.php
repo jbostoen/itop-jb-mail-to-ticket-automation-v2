@@ -2633,6 +2633,8 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 						'email' => $sCurrentEmail
 					]);
 					
+					static::Trace(".. Results: {$oSet_Person->Count()}");
+					
 					if($oSet_Person->Count() == 0) {
 						
 						// Create
@@ -2676,6 +2678,10 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 					}
 					else {
 						// More than one Person returned. Inconclusive. Ignore?
+						static::Trace(".. Multiple Persons found. Returning the first one.");
+						$oContact = $oSet_Person->Fetch();
+						$oEmail->aInternal_Additional_Contacts[] = $oContact;
+						
 					}
 					
 					
