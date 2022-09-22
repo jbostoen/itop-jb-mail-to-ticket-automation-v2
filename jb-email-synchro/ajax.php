@@ -86,6 +86,7 @@ function GetMailboxContent($oPage, $oInbox) {
 				uasort($aMessages, function($a, $b) {
 					return $a['udate'] <=> $b['udate'];
 				});
+				
 			}
 			else {
 				// In case of POP3 (no longer supported) or other protocols

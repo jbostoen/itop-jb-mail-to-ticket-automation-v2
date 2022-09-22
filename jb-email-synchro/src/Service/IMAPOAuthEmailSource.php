@@ -119,11 +119,26 @@ class IMAPOAuthEmailSource extends EmailSource {
 	}
 
 	public function GetListing() {
+		
 		$aReturn = [];
 
-		foreach ($this->oStorage as $iMessageId => $oMessage) {
+		foreach($this->oStorage as $iMessageId => $oMessage) {
+			
 			IssueLog::Debug("IMAPOAuthEmailSource GetListing $iMessageId for $this->sServer", static::LOG_CHANNEL);
-			$aReturn[] = ['msg_id' => $iMessageId, 'uidl' => $this->oStorage->getUniqueId($iMessageId)];
+			
+			// Mimic 'udate' from original IMAP implementation.
+			// Force header to be returned as 'array'
+			$aHeaders = $oMessage->GetHeader('received', 'array');
+			$sHeader = $aHeaders[0]; // Note: currently using original 'received' time. Perhaps this should be the time from the first server instead? (last element)
+			$sTime = explode(';', $sHeader);
+			$uTime = strtotime($sTime);
+			
+			$aReturn[] = [
+				'msg_id' => $iMessageId,
+				'uidl' => $this->oStorage->getUniqueId($iMessageId),
+				'udate' => $uTime
+			];
+			
 		}
 
 		return $aReturn;

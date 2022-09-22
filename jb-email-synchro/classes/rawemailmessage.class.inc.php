@@ -579,7 +579,7 @@ class RawEmailMessage {
 				$sPartMimeType = $aMatches[1];
 				if(strcasecmp($sPartMimeType, $sMimeType) == 0) {
 					if($sExcludeDispositionPattern != null) {
-						$sContentDisposition = $this->getHeader('Content-Disposition', $aPart['headers']);
+						$sContentDisposition = $this->GetHeader('Content-Disposition', $aPart['headers']);
 						$sSmimeType = array();
 						preg_match('/smime\-type=([a-zA-Z0-9\-]*);?/',$sContentType, $sSmimeType);
 						if(   ($sContentDisposition == '') 
