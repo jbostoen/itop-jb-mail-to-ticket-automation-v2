@@ -1144,14 +1144,14 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			
 			$sContactName = $oContact->GetName();
 				
-			if(MetaModel::IsValidAttCode($sTargetClass, 'caller_id') == true && $oContact->GetKey() != $oTicket->Get('caller_id')) {
+			if(MetaModel::IsValidAttCode($sTargetClass, 'caller_id') == true && $oContact->GetKey() == $oTicket->Get('caller_id')) {
 
-				static::Trace(".... Skipping '{$sContactName}' as additional contact since it is the caller.");
+				static::Trace(".... Skipping '{$sContactName}' (ID {$oContact->GetKey()}) as additional contact since it is the caller.");
 
 			}
 			elseif(in_array($oContact->GetKey(), $aExistingContacts) == true) {
 				
-				static::Trace(".... Skipping '{$sContactName}' as additional contact since the person is already linked to the ticket.");
+				static::Trace(".... Skipping '{$sContactName}' (ID {$oContact->GetKey()}) as additional contact since the person is already linked to the ticket.");
 				
 			}
 			else {
