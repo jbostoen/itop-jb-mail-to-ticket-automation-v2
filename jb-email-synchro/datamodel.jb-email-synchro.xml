@@ -339,6 +339,7 @@ EOF
 		$this->SetNextAction(EmailProcessor::NO_ACTION);
 		if($oEmailReplica->IsNew()) {
 			// New (unread) message, let's process it
+			$this->Trace('. EmailReplica is new. Process message.');
 			$this->SetNextAction(EmailProcessor::PROCESS_MESSAGE);
 		}
 		else {
@@ -347,12 +348,21 @@ EOF
 			if(is_object($oTicket)) { 
 				if($oTicket->Get('status') == 'closed') {
 					// The corresponding ticket was closed, delete the email (and the replica)
+					$this->Trace('. EmailReplica is not new. Ticket closed. Delete message.');
 					$this->SetNextAction(EmailProcessor::DELETE_MESSAGE);
 				}
 			}
 			else {
-				// The corresponding ticket was deleted, delete the email (and the replica)
-				$this->SetNextAction(EmailProcessor::DELETE_MESSAGE);
+				// The corresponding ticket was deleted (or never created!), delete the email (and the replica)
+				$sReplicaStatus = $oEmailReplica->Get('status');
+				if(in_array($sReplicaStatus, ['ok', 'undesired']) == true) {
+					$this->Trace('. EmailReplica is not new. No ticket found. Status: '.$sReplicaStatus.'. Delete message.');
+					$this->SetNextAction(EmailProcessor::DELETE_MESSAGE);
+				}
+				else {
+					$this->Trace('. EmailReplica is not new. No ticket found. Status: '.$sReplicaStatus.'. Do nothing - requires manual intervention.');
+					$this->SetNextAction(EmailProcessor::NO_ACTION);
+				}
 			}
 		}
 		return $this->GetNextAction();
