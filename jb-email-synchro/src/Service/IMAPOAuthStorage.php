@@ -83,7 +83,7 @@ class IMAPOAuthStorage extends Imap
 	public function undeleteMessage($id) {
 		
 		if (! $this->protocol->store([Storage::FLAG_DELETED], $id, null, '-')) {
-			throw new RuntimeException('cannot set deleted flag');
+			throw new RuntimeException('cannot remove deleted flag');
 		}
 		
 	}
