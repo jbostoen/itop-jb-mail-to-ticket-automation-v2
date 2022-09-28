@@ -10,7 +10,9 @@ class TestEmailProcessor extends EmailProcessor
 {
 	public function ListEmailSources()
 	{
-		return array( 0 => new TestEmailSource(dirname(__FILE__).'/../log', 'test'));
+		if(file_exists(dirname(__FILE__).'/../log') == true) {
+			return array( 0 => new TestEmailSource(dirname(__FILE__).'/../log', 'test'));
+		}
 	}
 	
 	public function DispatchMessage(EmailSource $oSource, $index, $sUIDL, $oEmailReplica = null)
