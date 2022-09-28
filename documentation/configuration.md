@@ -306,7 +306,14 @@ name:Caller
 * **Bounce subject**
 * **Bounce message**
 
-The default values work the same as for unknown callers.
+The default values work the same as for unknown callers.  
+
+In addition, for each recipient, you can use these:
+```
+$recipient->email$
+$recipient->name$
+```
+
 
 ### Undesired patterns in title
 

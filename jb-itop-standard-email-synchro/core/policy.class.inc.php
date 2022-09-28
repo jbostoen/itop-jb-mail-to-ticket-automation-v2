@@ -484,13 +484,14 @@ abstract class Policy implements iPolicy {
 	/**
 	 * Replace email placeholders in a string.
 	 * 
-	 * @param \String $sString Input string
+	 * @param \String $sString Input string.
+	 * @param \Array $aExtraPlaceholders Optional: extra place holders.
 	 *
 	 * @details Also exposes some properties which are not likely to be useful (body_format) at any time, but who knows?
 	 *
 	 * @return String String where the placeholders are filled in
 	 */
-	public static function ReplaceMailPlaceholders($sString) {
+	public static function ReplaceMailPlaceholders($sString, $aExtraPlaceholders = []) {
 		
 		$oEmail = static::GetMail();
 		
@@ -506,6 +507,8 @@ abstract class Policy implements iPolicy {
 			'mail->body_text'  => $oEmail->sBodyText,
 			'mail->body_format' => $oEmail->sBodyFormat
 		];
+		
+		$aParams = array_merge($aParams, $aExtraPlaceholders);
 		
 		// Extend
 		$aParamsExtended = [];
@@ -1934,6 +1937,7 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 				 case 'mark_as_undesired':
 				
 					foreach($aAllContacts as $aContactInfo) {
+						
 						$sCurrentEmail = $aContactInfo['email'];
 						
 						foreach($aAllowedContacts as $sPattern) {
@@ -2620,17 +2624,26 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 			case 'fallback_add_existing_other_contacts':
 			case 'fallback_add_other_contacts':
 		
-				foreach($aAllOtherContacts as $sCurrentEmail) {
+				foreach($aAllContacts as $aRecipient) {
+					
+					$sRecipientEmail = $aRecipient['email'];
+					$sRecipientName = $aRecipient['name'];
+					
+					// In case this recipient's mail address should not be processed any further (reasons: see above): continue with next one
+					if(in_array($sRecipientEmail, $aAllOtherContacts) == false) {
+						continue;
+					}
+					
 					
 					// Found other contacts in To: or CC:
-					static::Trace(".. Looking up Person with email address '{$sCurrentEmail}'");
+					static::Trace(".. Looking up Person with email address '{$sRecipientEmail}'");
 							
 					// Check if this contact exists.
 					// Non-existing contacts must be created.
 					// Actual linking of contacts happens after policies have been processed.
 					$sContactQuery = 'SELECT Person WHERE email = :email';
 					$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], [
-						'email' => $sCurrentEmail
+						'email' => $sRecipientEmail
 					]);
 					
 					static::Trace(".. Results: {$oSet_Person->Count()}");
@@ -2638,17 +2651,20 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 					if($oSet_Person->Count() == 0) {
 						
 						// Create
-						static::Trace(".. Creating a new Person with email address '{$sCurrentEmail}'");
+						static::Trace(".. Creating a new Person with email address '{$sRecipientEmail}'");
 						$oContact = new Person();
-						$oContact->Set('email', $sCurrentEmail);
+						$oContact->Set('email', $sRecipientEmail);
 						$sDefaultValues = $oMailBox->Get(static::GetPolicyId().'_default_values');
 						$aDefaults = preg_split(NEWLINE_REGEX, $sDefaultValues);
 						$aDefaultValues = array();
 						foreach($aDefaults as $sLine) {
-							if (preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
+							if(preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
 								$sAttCode = trim($aMatches[1]);
 								$sValue = trim($aMatches[2]);
-								$sValue = static::ReplaceMailPlaceholders($sValue);
+								$sValue = static::ReplaceMailPlaceholders($sValue, [
+									'recipient->name' => $sRecipientName,
+									'recipient->email' => $sRecipientEmail,
+								]);
 								$aDefaultValues[$sAttCode] = $sValue;
 							}
 						}
