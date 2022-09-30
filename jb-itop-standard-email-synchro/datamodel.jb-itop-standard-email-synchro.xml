@@ -1128,7 +1128,7 @@ EOF
 						</item>
 						<!-- Mail (attachments) size too large -->
 						<item id="fieldset:MailInbox:PolicyAttachmentForbiddenMimeType">
-							<rank>120</rank>
+							<rank>121</rank>
 							<items>
 								<item id="policy_attachment_forbidden_mimetype_behavior">
 									<rank>10</rank>
@@ -1227,7 +1227,7 @@ EOF
 						</item>
 						<!-- Other email caller (in follow up mail) than original ticket caller -->
 						<item id="fieldset:MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller">
-							<rank>160</rank>
+							<rank>161</rank>
 							<items>
 								<item id="policy_other_email_caller_than_ticket_caller_behavior">
 									<rank>10</rank>
