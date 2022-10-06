@@ -7,6 +7,7 @@ use \Combodo\iTop\Extension\Helper\ProviderHelper;
 use \EmailSource;
 use \IssueLog;
 use \MessageFromMailbox;
+use \MetaModel;
 
 class IMAPOAuthEmailSource extends EmailSource {
 	
@@ -128,14 +129,17 @@ class IMAPOAuthEmailSource extends EmailSource {
 			
 			// Mimic 'udate' from original IMAP implementation.
 			// Force header to be returned as 'array'
-			$aHeaders = $oMessage->GetHeader('received', 'array');
+			$aHeaders = $oMessage->getHeader('received', 'array');
 			$sHeader = $aHeaders[0]; // Note: currently using original 'received' time. Perhaps this should be the time from the first server instead? (last element)
 			$sTime = explode(';', $sHeader);
 			$uTime = strtotime($sTime);
 			
+			$bUseMessageId = (bool)MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', true);
+			
+			
 			$aReturn[] = [
 				'msg_id' => $iMessageId,
-				'uidl' => $this->oStorage->getUniqueId($iMessageId),
+				'uidl' => ($bUseMessageId == true ? $oMessage->getHeader('message-id', 'string') : $this->oStorage->getUniqueId($iMessageId)),
 				'udate' => $uTime
 			];
 			
