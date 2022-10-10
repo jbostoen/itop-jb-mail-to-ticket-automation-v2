@@ -1,15 +1,22 @@
 # Upgrade notes
-Backward compatibility is something that is important.
-However, some upgrades might break things because technology or use cases change.
+
+Backward compatibility is something that is important.  
+However, some upgrades might break things because technology or use cases change.  
+
+A best practice before upgrading this extension, is to remove all e-mail messages which were already processed from the mailbox folders that are still configured in iTop.  
+Otherwise, it is possible in some situations that they are processed again; resulting in duplicate tickets or log entries in existing tickets.
 
 ## Upgrading from before 2.7.220123?
+
 A new behavior has been added to lots of policies: "Inactive".  
 This behavior is now the default for a lot of new policies when configuring a new inbox.  
 The policies with a behavior set to "Inactive", are not processed.  
-The policies with a behavior set to "Do nothing", keep their original purpose: they are processed and might give warnings, but they should not change anything to the ticket or to the e-mail in the inbox.  
+The policies with a behavior set to "Do nothing", keep their original purpose: they are processed and might give warnings, 
+but they should not change anything to the ticket or to the e-mail in the inbox.  
 
 
 ## Upgrading from before 2.7.211110?
+
 A new policy has been added which makes it possible to force that the sender from an e-mail must have the same e-mail address 
 as the e-mail address of the ticket caller.
 
@@ -20,6 +27,7 @@ This policy is a security measure.
 
 
 ## Upgrading from before 2.6.201219?
+
 For consistency, some settings have been renamed.
 Values will be copied; but old settings are not cleaned up automatically!
 
@@ -29,6 +37,7 @@ Values will be copied; but old settings are not cleaned up automatically!
 * 'delimiter-patterns' is now 'delimiter_patterns'. Default settings are now empty (contains some examples).
 
 ## Upgrading from before 2.6.201029?
+
 * IMAP options are now specified per inbox. They are copied from the configuration file if they exist during the upgrade process.
 * The 'imap_options' setting can be removed from the configuration file after upgrading.
 * The 'maximum_email_size' setting can be removed from the configuration file after upgrading.
