@@ -89,10 +89,16 @@ class IMAPOAuthEmailSource extends EmailSource {
 
 	public function GetMessage($index) {
 		
+		$bUseMessageId = (bool)MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', true);
+		
 		$iOffsetIndex = 1 + $index;
-		$sUIDL = $this->oStorage->getUniqueId($iOffsetIndex);
-		IssueLog::Debug("IMAPOAuthEmailSource Start GetMessage $iOffsetIndex (UID $sUIDL) for $this->sServer", static::LOG_CHANNEL);
+		$sUID = $this->oStorage->getUniqueId($iOffsetIndex);
+		
+		IssueLog::Debug("IMAPOAuthEmailSource Start GetMessage $iOffsetIndex (UID $sUID) for $this->sServer", static::LOG_CHANNEL);
+		
 		$oMail = $this->oStorage->getMessage($iOffsetIndex);
+		$sUIDL = ($bUseMessageId == true ? $oMail->getHeader('message-id') : $sUID);
+		
 		$oNewMail = new MessageFromMailbox($sUIDL, $oMail->getHeaders()->toString(), $oMail->getContent());
 		IssueLog::Debug("IMAPOAuthEmailSource End GetMessage $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
 
