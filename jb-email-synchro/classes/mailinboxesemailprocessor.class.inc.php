@@ -92,6 +92,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 			catch(Exception $e) {
 				// Don't use Trace, always output the error so that the log file can be monitored for errors
 				echo "Error - Failed to initialize the mailbox: ".$oInbox->GetName().", the mailbox will not be polled. Reason (".$e->getMessage().")\n";
+				self::Trace("Error - Failed to initialize the mailbox: ".$oInbox->GetName().", the mailbox will not be polled. Reason (".$e->getMessage().")\n");
 			}
 		}
 

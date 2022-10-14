@@ -135,9 +135,15 @@ class IMAPOAuthEmailSource extends EmailSource {
 			
 			// Mimic 'udate' from original IMAP implementation.
 			// Force header to be returned as 'array'
+			// Example:
+			// Received: from VI1PR02MB5952.eurprd02.prod.outlook.com
+			// ([fe80::b18c:101a:ab2c:958e]) by VI1PR02MB5952.eurprd02.prod.outlook.com
+			// ([fe80::b18c:101a:ab2c:958e%7]) with mapi id 15.20.5723.026; Fri, 14 Oct 2022
+			// 10:48:44 +0000
 			$aHeaders = $oMessage->getHeader('received', 'array');
-			$sHeader = $aHeaders[0]; // Note: currently using original 'received' time. Perhaps this should be the time from the first server instead? (last element)
-			$sTime = explode(';', $sHeader);
+			$sHeader = $aHeaders[0]; // Note: currently using original 'received' time on the final server. Perhaps this should be the time from the first server instead? (last element)
+			$sTime = explode(';', $sHeader)[1]; // Get date part of string like: 
+			$sTime = preg_replace('/[^A-Za-z0-9,\:\+\- ]/', '', $sTime); // Remove newlines etc which will result in failing strtotime. Keep only relevant characters.
 			$uTime = strtotime($sTime);
 			
 			$bUseMessageId = (bool)MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', true);
