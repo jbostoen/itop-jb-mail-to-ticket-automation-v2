@@ -24,6 +24,7 @@
  *
  */
 class MailInboxesEmailProcessor extends EmailProcessor {
+	
 	protected static $bDebug;
 	protected static $aExcludeAttachments;
 	protected static $sBodyPartsOrder;
@@ -35,6 +36,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	 * Construct a new EmailProcessor... some initialization, reading configuration parameters
 	 */
 	public function __construct() {
+		
 		self::$sModuleName = 'jb-email-synchro';
 		self::$bDebug = MetaModel::GetModuleSetting(self::$sModuleName, 'debug', false);
 		self::$aExcludeAttachments = MetaModel::GetModuleSetting(self::$sModuleName, 'exclude_attachment_types', array());
@@ -42,6 +44,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 		$this->aInboxes = array();
 		
 		EmailBackgroundProcess::SetMultiSourceMode(true); // make sure that we can support several email source with potentially overlapping UIDLs
+		
 	}
 	
 	/**
@@ -72,8 +75,13 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 		$oSearch->AddCondition('active', 'yes');
 		$oSet = new DBObjectSet($oSearch);
 		
+		self::Trace('Number of sources found: '.$oSet->Count());
+		
 		/** @var \MailInboxBase $oInbox */
 		while($oInbox = $oSet->Fetch()) {
+			
+			self::Trace('Add: '.$oInbox->GetKey());
+		
 			$this->aInboxes[$oInbox->GetKey()] = $oInbox;
 			try {
 				$oSource = $oInbox->GetEmailSource();
