@@ -127,9 +127,10 @@ SourceForge tickets:
 * #1793 Mail to Ticket Automation: set IMAP undelete  (no solution in Combodo version. Pull request made, but not accepted because of worries about conflicts.)
 * #1859 Mail to Ticket Automation - issue with long subjects (+ solution) (some feedback, pull request accepted by Combodo)
 * #1924 Mail to Ticket: processing order of e-mails is not chronologically on Microsoft Exchange/O365 and Google GMail (no solution in Combodo version)
-* #1925 Mail to Ticket: malformed headers (some feedback, no solution in Combodo version, implemented by Combodo)
+* #1925 Mail to Ticket: malformed headers (some feedback, implemented by Combodo)
 * #1930 Mail to Ticket: improved parsing of from: address (suggested fix, implemented by Combodo)
 * #2039 Return code missing in combodo-email-synchro - GetActionFromCode() (suggested fix, implemented by Combodo)
+* #2124 combodo-oauth-email-synchro / use_message_as_uid (suggested fix, not implemented by Combodo yet)
 
 Internal Combodo tickets:
 * N° 2181 Mail to Ticket: Sometimes duplicate ticket from mail-to-ticket (suggested fix, implemented by Combodo)
