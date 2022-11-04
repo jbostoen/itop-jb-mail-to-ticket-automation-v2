@@ -84,7 +84,8 @@ Common options are:
 * Behavior (on conflict/not compliant with policy)
   * Bounce and delete (inform the user the message has been rejected, provide some information why)
   * Delete
-  * Do nothing (can be used for tests, without taking further action: does it detect policy violations?)
+  * Do nothing (can be used for tests and might result in some output, without taking further action)
+  * Inactive (contrary to "Do nothing", the policy is not even processed)
   * Mark as undesired (keeps the email, but will ignore it in future processing)
   * Mark as error (keeps the email)
 * Bouncing (sending message to the user telling their email is rejected)
