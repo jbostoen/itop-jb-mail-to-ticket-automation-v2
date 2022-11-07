@@ -11,32 +11,31 @@ use Laminas\Mail\Storage\Exception\RuntimeException;
 use Laminas\Mail\Storage\Imap;
 
 
-class IMAPOAuthStorage extends Imap
-{
+class IMAPOAuthStorage extends Imap {
+	
 	const LOG_CHANNEL = 'OAuth';
 
-	public function __construct($params)
-	{
-		if (is_array($params)) {
+	public function __construct($params) {
+		if(is_array($params)) {
 			$params = (object)$params;
 		}
 
 		$this->has['flags'] = true;
 
-		if ($params instanceof IMAPOAuthLogin) {
+		if($params instanceof IMAPOAuthLogin) {
 			$this->protocol = $params;
 			try {
 				$this->selectFolder('INBOX');
 			}
 			catch (ExceptionInterface $e) {
-				throw new  RuntimeException('IMAPOAuthStorage cannot select INBOX, is this a valid transport?', 0, $e);
+				throw new RuntimeException('IMAPOAuthStorage cannot select INBOX, is this a valid transport?', 0, $e);
 			}
 
 			return;
 		}
 
 		if (!isset($params->user)) {
-			throw new  InvalidArgumentException('IMAPOAuthStorage need at least user in params');
+			throw new InvalidArgumentException('IMAPOAuthStorage need at least user in params');
 		}
 
 		$host = isset($params->host) ? $params->host : 'localhost';
@@ -49,7 +48,7 @@ class IMAPOAuthStorage extends Imap
 		$this->protocol->connect($host, $port, $ssl);
 		if (!$this->protocol->login($params->user, $password)) {
 			IssueLog::Error("Cannot login to IMAP OAuth for mailbox $host", static::LOG_CHANNEL);
-			throw new  RuntimeException('cannot login, user or tokens');
+			throw new RuntimeException('cannot login, user or tokens');
 		}
 		$this->selectFolder(isset($params->folder) ? $params->folder : 'INBOX');
 	}
@@ -60,7 +59,7 @@ class IMAPOAuthStorage extends Imap
 	 * If you're doing that from a web environment you should be careful and
 	 * use a unique id as parameter if possible to identify the message.
 	 *
-	 * @param  int $id number of message
+	 * @param int $id number of message
 	 * @throws RuntimeException
 	 */
 	public function removeMessage($id) {
@@ -77,7 +76,7 @@ class IMAPOAuthStorage extends Imap
 	 * If you're doing that from a web environment you should be careful and
 	 * use a unique id as parameter if possible to identify the message.
 	 *
-	 * @param  int $id number of message
+	 * @param int $id number of message
 	 * @throws RuntimeException
 	 */
 	public function undeleteMessage($id) {

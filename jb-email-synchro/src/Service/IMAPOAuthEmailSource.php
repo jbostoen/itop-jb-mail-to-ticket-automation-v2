@@ -5,6 +5,7 @@ namespace Combodo\iTop\Extension\Service;
 use \Combodo\iTop\Extension\Helper\ImapOptionsHelper;
 use \Combodo\iTop\Extension\Helper\ProviderHelper;
 use \EmailSource;
+use \Exception;
 use \IssueLog;
 use \MessageFromMailbox;
 use \MetaModel;
@@ -96,13 +97,21 @@ class IMAPOAuthEmailSource extends EmailSource {
 		
 		IssueLog::Debug("IMAPOAuthEmailSource Start GetMessage $iOffsetIndex (UID $sUID) for $this->sServer", static::LOG_CHANNEL);
 		
-		$oMail = $this->oStorage->getMessage($iOffsetIndex);
+		try {
+			$oMail = $this->oStorage->getMessage($iOffsetIndex);
+		}
+		// Likely an Exception\InvalidArgumentException
+		catch(Exception $e) {
+			IssueLog::Debug("IMAPOAuthEmailSource Failed to get message $iOffsetIndex (UID $sUID): ".$e->getMessage(), static::LOG_CHANNEL);
+		}
+		
 		$sUIDL = ($bUseMessageId == true ? $oMail->getHeader('message-id') : $sUID);
 		
 		$oNewMail = new MessageFromMailbox($sUIDL, $oMail->getHeaders()->toString(), $oMail->getContent());
 		IssueLog::Debug("IMAPOAuthEmailSource End GetMessage $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
 
 		return $oNewMail;
+		
 	}
 
 	public function DeleteMessage($index) {
@@ -129,45 +138,67 @@ class IMAPOAuthEmailSource extends EmailSource {
 		
 		$aReturn = [];
 
-		foreach($this->oStorage as $iMessageId => $oMessage) {
+		// The Combodo version uses a foreach loop, which triggers a call to the GetMessage() method which may result in errors and make it difficult to know which message was causing issues.
+		// Furthermore, it may lead to a potential crash.
+		// This alternative approach tries to process each message and skips messages which result in an error.
+		// Also to research: behavior in the laminas-mail library upon deletion of a message while the job is processed, since they're queried in this connection?
+		
+		$iMessageCount = $this->oStorage->countMessages();
+		$iMessageId = 0;
+
+		while($iMessageId < $iMessageCount) {
 			
 			IssueLog::Debug("IMAPOAuthEmailSource GetListing $iMessageId for $this->sServer", static::LOG_CHANNEL);
 			
-			// Mimic 'udate' from original IMAP implementation.
-			// Note that 'Delivery-Date' is optional, so rely on 'Received' instead.
-			// Force header to be returned as 'array'
-			// Examples:
-			// Received: from VI1PR02MB5952.eurprd02.prod.outlook.com ([fe80::b18c:101a:ab2c:958e]) by VI1PR02MB5952.eurprd02.prod.outlook.com ([fe80::b18c:101a:ab2c:958e%7]) with mapi id 15.20.5723.026; Fri, 14 Oct 2022 10:48:44 +0000
-			// Received: from VI1PR02MB5997.eurprd02.prod.outlook.com (2603:10a6:800:182::9) by PR3PR02MB6393.eurprd02.prod.outlook.com with HTTPS; Thu, 20 Oct 2022 08:36:28 +0000 ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
-			$aHeaders = $oMessage->getHeader('received', 'array');
-			$sHeader = $aHeaders[0]; // Note: currently using original 'received' time on the final server. Perhaps this should be the time from the first server instead? (last element)
-			$sReceived = explode(';', $sHeader)[1]; // Get date part of string. See examples above.
-			$sReceived = preg_replace('/[^A-Za-z0-9,\:\+\- ]/', '', $sReceived); // Remove newlines etc which will result in failing strtotime. Keep only relevant characters.
-			
-			if(preg_match('/[0-3]{0,1}[0-9] (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (19|20)[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [+-][0-9]{4}/', $sReceived, $aMatches)) {
+			try {
 				
-				$uTime = strtotime($aMatches[0]);
+				$oMessage = $this->oStorage->getMessage($iMessageId);
+			
+				// Mimic 'udate' from original IMAP implementation.
+				// Note that 'Delivery-Date' is optional, so rely on 'Received' instead.
+				// Force header to be returned as 'array'
+				// Examples:
+				// Received: from VI1PR02MB5952.eurprd02.prod.outlook.com ([fe80::b18c:101a:ab2c:958e]) by VI1PR02MB5952.eurprd02.prod.outlook.com ([fe80::b18c:101a:ab2c:958e%7]) with mapi id 15.20.5723.026; Fri, 14 Oct 2022 10:48:44 +0000
+				// Received: from VI1PR02MB5997.eurprd02.prod.outlook.com (2603:10a6:800:182::9) by PR3PR02MB6393.eurprd02.prod.outlook.com with HTTPS; Thu, 20 Oct 2022 08:36:28 +0000 ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
+				$aHeaders = $oMessage->getHeader('received', 'array');
+				$sHeader = $aHeaders[0]; // Note: currently using original 'received' time on the final server. Perhaps this should be the time from the first server instead? (last element)
+				$sReceived = explode(';', $sHeader)[1]; // Get date part of string. See examples above.
+				$sReceived = preg_replace('/[^A-Za-z0-9,\:\+\- ]/', '', $sReceived); // Remove newlines etc which will result in failing strtotime. Keep only relevant characters.
+				
+				if(preg_match('/[0-3]{0,1}[0-9] (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (19|20)[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [+-][0-9]{4}/', $sReceived, $aMatches)) {
+					
+					$uTime = strtotime($aMatches[0]);
+					
+				}
+				else {
+					
+					// Keep track of this example.
+					IssueLog::Debug("Mail to Ticket: unhandled 'Received:' header: ".$sReceived, static::LOG_CHANNEL);
+					
+					// Default to current time to avoid crash.
+					$uTime = strtotime('now');
+					
+				}
+				
+				
+				$bUseMessageId = (bool)MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', true);
+				
+				// Add to the list
+				$aReturn[] = [
+					'msg_id' => $iMessageId,
+					'uidl' => ($bUseMessageId == true ? $oMessage->getHeader('message-id', 'string') : $this->oStorage->getUniqueId($iMessageId)),
+					'udate' => $uTime
+				];
 				
 			}
-			else {
+			catch(Exception $e) {
 				
-				// Keep track of this example.
-				IssueLog::Debug("Mail to Ticket: unhandled 'Received:' header: ".$sReceived, static::LOG_CHANNEL);
-				
-				// Default to current time to avoid crash.
-				$uTime = strtotime('now');
+				// Skip, but log.
+				IssueLog::Debug("IMAPOAuthEmailSource GetListing $iMessageId resulted in an error: ".$e->getMessage(), static::LOG_CHANNEL);
 				
 			}
 			
-			
-			$bUseMessageId = (bool)MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', true);
-			
-			
-			$aReturn[] = [
-				'msg_id' => $iMessageId,
-				'uidl' => ($bUseMessageId == true ? $oMessage->getHeader('message-id', 'string') : $this->oStorage->getUniqueId($iMessageId)),
-				'udate' => $uTime
-			];
+			$iMessageId += 1;
 			
 		}
 

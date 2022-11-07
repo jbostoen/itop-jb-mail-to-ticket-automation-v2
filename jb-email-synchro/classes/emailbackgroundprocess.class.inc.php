@@ -88,10 +88,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					$oRawEmail = $oCurrentSource->GetMessage($iCurrentRequestMessage);
 				}
 			}
+			
 			if(!in_array($sErrorCode, MetaModel::GetAllowedValues_att('EmailReplica', 'status'))) {
 				$sErrorCode = 'error';
 			}
 			$oEmailReplica->Set('status', $sErrorCode);
+			
 			if(isset($oRawEmail)) {
 				$this->SaveEml($oEmailReplica, $oRawEmail);
 			}
