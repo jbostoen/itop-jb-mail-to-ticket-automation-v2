@@ -55,10 +55,10 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:target_folder+' => 'The e-mail will be moved (IMAP protocol) to this target folder after being processed. Mind to update the setting for "After processing the e-mail" to "Move to another folder".',
 	
 	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Default values for new Ticket',
-	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Default Title (if subject is empty)',
+	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Default title (if subject is empty)',
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Pattern to match in the subject',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Title Pattern',
-	'Class:MailInboxStandard/Attribute:title_pattern?' => 'Use PCRE syntax, including starting and ending delimiters',
+	'Class:MailInboxStandard/Attribute:title_pattern?' => 'Use PCRE syntax, including starting and ending delimiters to specify what the ticket reference (pattern) looks like so e-mails can be linked to tickets.',
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignore patterns in subject (regex patterns, one per line)', 
 	

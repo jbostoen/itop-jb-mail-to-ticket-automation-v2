@@ -24,7 +24,7 @@ Mind that especially when processing lots of new e-mails, it may be important to
 * **Protocol** - IMAP
 * **Port (993 for IMAP)** - often 993 for IMAP.
 * **Mailbox folder (for IMAP)** - the folder, for example InboxTest/SomeSubFolder.
-* **Mail From Address** - Errors/bounce messages are sent 'from'.
+* **Mail From Address** - The e-mail address shown as "Sender" for any error/bounce e-mails that are sent
 * **Active** - Check mailbox.
 * **Debug trace** - Debug log.
 * **Mail Aliases** - One per line. Regex patterns allowed. List each email address (minimum 1)
@@ -118,13 +118,18 @@ uidl
 
 ## Behavior on Incoming emails
 
-* **Policy violation behavior** - create only, update only or both
-* **After processing the email** - delete it right away or keep it on the mail server
-* **Ticket Class** - which ticket class (see iTop data model, usually UserRequest)
-* **Ticket Default Values** - default values for tickets (see iTop data model, example below).
-* **Title Pattern** - example: /R-([0-9]{6})/
-* **Ignore patterns in subject** - regex patterns, one per line. To make other patterns ignored while processing/finding related ticket (e.g. another ticket system with IR-123456 numbering).
-* **Stimuli to apply** - example: reopen ticket?
+* **Policy violation behavior** - Only create new tickets, only update existing tickets; or do both.
+* **After processing the email** - Delete the e-mail right away, keep the e-mail on the mail server in the same folder or move to a different folder.
+* **Ticket Class** - Which ticket class (see iTop data model, usually UserRequest)
+* **Ticket Default Values** - Default values for tickets (see iTop data model, example below).
+* **Title Pattern** - Pattern which will be used to match tickets based on a reference. Example: /R-([0-9]{6})/
+* **Ignore patterns in subject** - Regex patterns, one per line. To make other patterns ignored while processing/finding related ticket (e.g. another ticket system with IR-123456 numbering).
+* **Stimuli to apply** - Example: reopen a ticket which was in a pending state (pending:ev_reopen)
+* **Target folder**  
+  When enabled (see "After processing the email") and a target folder is specified, processed e-mail messages will be moved to this folder.  
+  Use case: useful when the e-mail should be kept (for archive purposes), but the inbox should contain as few e-mails as possible (for performance).
+  
+
 
 ```
 service_id:1
