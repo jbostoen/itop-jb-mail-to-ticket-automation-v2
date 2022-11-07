@@ -17,6 +17,10 @@ class IMAPOAuthEmailSource extends EmailSource {
 	/** LOGIN username @var string */
 	protected $sLogin;
 	protected $sServer;
+	
+	/** @var \MailInbox */
+	protected $MailInboxBase = null;
+	
 	/** * @var IMAPOAuthStorage */
 	protected $oStorage;
 	protected $sTargetFolder;
@@ -36,6 +40,7 @@ class IMAPOAuthEmailSource extends EmailSource {
 		$this->sMailbox = $oMailbox->Get('mailbox');
 		$this->iPort = $oMailbox->Get('port');
 		$this->sTargetFolder = $oMailbox->Get('target_folder');
+		$this->oMailbox = $oMailbox;
 
 		$oMailbox->Trace("IMAPOAuthEmailSource Start for $this->sServer", static::LOG_CHANNEL);
 		IssueLog::Debug("IMAPOAuthEmailSource Start for $this->sServer", static::LOG_CHANNEL);
@@ -99,19 +104,26 @@ class IMAPOAuthEmailSource extends EmailSource {
 		$iOffsetIndex = 1 + $index;
 		$sUID = $this->oStorage->getUniqueId($iOffsetIndex);
 		
+		$this->oMailbox->Trace("IMAPOAuthEmailSource Start GetMessage $iOffsetIndex (UID $sUID) for $this->sServer");
 		IssueLog::Debug("IMAPOAuthEmailSource Start GetMessage $iOffsetIndex (UID $sUID) for $this->sServer", static::LOG_CHANNEL);
 		
 		try {
+			
 			$oMail = $this->oStorage->getMessage($iOffsetIndex);
+			
 		}
 		// Likely an Exception\InvalidArgumentException
 		catch(Exception $e) {
+			
+			$this->oMailbox->Trace("IMAPOAuthEmailSource Failed to get message $iOffsetIndex (UID $sUID): ".$e->getMessage());
 			IssueLog::Debug("IMAPOAuthEmailSource Failed to get message $iOffsetIndex (UID $sUID): ".$e->getMessage(), static::LOG_CHANNEL);
+			
 		}
 		
-		$sUIDL = ($bUseMessageId == true ? $oMail->getHeader('message-id') : $sUID);
+		$sUIDL = ($bUseMessageId == true ? $oMail->getHeader('message-id', 'string') : $sUID);
 		
 		$oNewMail = new MessageFromMailbox($sUIDL, $oMail->getHeaders()->toString(), $oMail->getContent());
+		$this->oMailbox->Trace("IMAPOAuthEmailSource End GetMessage $iOffsetIndex for $this->sServer");
 		IssueLog::Debug("IMAPOAuthEmailSource End GetMessage $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
 
 		return $oNewMail;
@@ -177,6 +189,7 @@ class IMAPOAuthEmailSource extends EmailSource {
 				else {
 					
 					// Keep track of this example.
+					$this->oMailbox->Trace("Mail to Ticket: unhandled 'Received:' header: ".$sReceived);
 					IssueLog::Debug("Mail to Ticket: unhandled 'Received:' header: ".$sReceived, static::LOG_CHANNEL);
 					
 					// Default to current time to avoid crash.

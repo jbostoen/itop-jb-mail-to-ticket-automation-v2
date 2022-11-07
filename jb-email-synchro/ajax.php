@@ -50,10 +50,9 @@ function GetMailboxContent($oPage, $oInbox) {
 			
 			/** @var \EmailSource $oSource */
 			$oSource = $oInbox->GetEmailSource();
-			$iTotalMsgCount = $oSource->GetMessagesCount();
-			$aMessages = $oSource->GetListing();
-			$bEmailsToProcess = false;
-			
+			// $iTotalMsgCount = $oSource->GetMessagesCount();
+			$aMessages = $oSource->GetListing(); // Note: this may differ from GetMessagesCount(); as messages with errors could be skipped.
+			$iTotalMsgCount = count($aMessages);
 			
 			if($iStartIndex < 0 || $iMaxCount <= 0) {
 				// Don't process, invalid indexes
@@ -65,7 +64,7 @@ function GetMailboxContent($oPage, $oInbox) {
 		
 			// Avoid user specifying a higher number (start + count) than the total mesage number count
 			// The largest index is (message count - 1), since messages are retrieved by index (starting at 0)
-			$iEnd = min($iStart + $iMaxCount -1,  $iTotalMsgCount - 1); 
+			$iEnd = min($iStart + $iMaxCount - 1, $iTotalMsgCount - 1); 
 			
 		}
 		catch(Exception $e) {
@@ -300,7 +299,7 @@ try {
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 				$aReplicas = [];
 				/** @var \DBObject $oReplica */
-				while ($oReplica = $oReplicaSet->Fetch()) {
+				while($oReplica = $oReplicaSet->Fetch()) {
 					$oReplica->Set('status', 'ignored');
 					$oReplica->DBUpdate();
 					$aReplicas[$oReplica->Get('uidl')] = true;
