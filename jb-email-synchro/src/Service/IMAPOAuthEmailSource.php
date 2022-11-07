@@ -37,7 +37,9 @@ class IMAPOAuthEmailSource extends EmailSource {
 		$this->iPort = $oMailbox->Get('port');
 		$this->sTargetFolder = $oMailbox->Get('target_folder');
 
+		$oMailbox->Trace("IMAPOAuthEmailSource Start for $this->sServer", static::LOG_CHANNEL);
 		IssueLog::Debug("IMAPOAuthEmailSource Start for $this->sServer", static::LOG_CHANNEL);
+		
 		$aImapOptions = preg_split('/\\r\\n|\\r|\\n/', $oMailbox->Get('imap_options'));
 		$sSSL = '';
 		
@@ -58,6 +60,8 @@ class IMAPOAuthEmailSource extends EmailSource {
 			'provider' => ProviderHelper::getProviderForIMAP($oMailbox),
 			'novalidatecert' => in_array('novalidate-cert', $aImapOptions)
 		]);
+		
+		$oMailbox->Trace("IMAPOAuthEmailSource End for $this->sServer", static::LOG_CHANNEL);
 		IssueLog::Debug("IMAPOAuthEmailSource End for $this->sServer", static::LOG_CHANNEL);
 
 		// Calls parent with original arguments
