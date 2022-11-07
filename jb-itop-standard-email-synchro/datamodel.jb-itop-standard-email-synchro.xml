@@ -1090,201 +1090,206 @@ EOF
 								</item>
 							</items>
 						</item>
-						<!-- Mail (attachments) size too large -->
-						<item id="fieldset:MailInbox:PolicyMailSize">
-							<rank>110</rank>
+						<item id="tab:MailInbox:Policies">
+							<rank>40</rank>
 							<items>
-								<item id="policy_mail_size_too_big_behavior">
-									<rank>10</rank>
+								<!-- Mail (attachments) size too large -->
+								<item id="fieldset:MailInbox:PolicyMailSize">
+									<rank>110</rank>
+									<items>
+										<item id="policy_mail_size_too_big_behavior">
+											<rank>10</rank>
+										</item>
+										<item id="policy_mail_size_too_big_subject">
+											<rank>15</rank>
+										</item>
+										<item id="policy_mail_size_too_big_notification">
+											<rank>20</rank>
+										</item>
+										<item id="policy_mail_size_too_big_max_size_MB">
+											<rank>30</rank>
+										</item>
+									</items>
 								</item>
-								<item id="policy_mail_size_too_big_subject">
-									<rank>15</rank>
+								<!-- Image attachments: min/max dimensions -->
+								<item id="fieldset:MailInbox:PolicyAttachmentImageDimensions">
+									<rank>120</rank>
+									<items>
+										<item id="policy_attachment_image_dimensions_min_width">
+											<rank>10</rank>
+										</item>
+										<item id="policy_attachment_image_dimensions_max_width">
+											<rank>15</rank>
+										</item>
+										<item id="policy_attachment_image_dimensions_min_height">
+											<rank>20</rank>
+										</item>
+										<item id="policy_attachment_image_dimensions_max_height">
+											<rank>30</rank>
+										</item>
+									</items>
 								</item>
-								<item id="policy_mail_size_too_big_notification">
-									<rank>20</rank>
+								<!-- Mail (attachments) size too large -->
+								<item id="fieldset:MailInbox:PolicyAttachmentForbiddenMimeType">
+									<rank>121</rank>
+									<items>
+										<item id="policy_attachment_forbidden_mimetype_behavior">
+											<rank>10</rank>
+										</item>
+										<item id="policy_attachment_forbidden_mimetype_subject">
+											<rank>15</rank>
+										</item>
+										<item id="policy_attachment_forbidden_mimetype_notification">
+											<rank>20</rank>
+										</item>
+										<item id="policy_attachment_forbidden_mimetype_mimetypes">
+											<rank>30</rank>
+										</item>
+									</items>
 								</item>
-								<item id="policy_mail_size_too_big_max_size_MB">
-									<rank>30</rank>
+								<!-- No subject -->
+								<item id="fieldset:MailInbox:PolicyNoSubject">
+									<rank>130</rank>
+									<items>
+										<item id="policy_no_subject_behavior">
+											<rank>10</rank>
+										</item>
+										<item id="policy_no_subject_subject">
+											<rank>15</rank>
+										</item>
+										<item id="policy_no_subject_notification">
+											<rank>20</rank>
+										</item>
+										<item id="policy_no_subject_default_value">
+											<rank>30</rank>
+										</item>
+									</items>
 								</item>
-							</items>
-						</item>
-						<!-- Image attachments: min/max dimensions -->
-						<item id="fieldset:MailInbox:PolicyAttachmentImageDimensions">
-							<rank>120</rank>
-							<items>
-								<item id="policy_attachment_image_dimensions_min_width">
-									<rank>10</rank>
+								<!-- Closed ticket -->
+								<item id="fieldset:MailInbox:PolicyClosedTicket">
+									<rank>140</rank>
+									<items>
+										<item id="policy_ticket_closed_behavior">
+											<rank>10</rank>
+										</item>
+										<item id="policy_ticket_closed_subject">
+											<rank>15</rank>
+										</item>
+										<item id="policy_ticket_closed_notification">
+											<rank>20</rank>
+										</item>
+									</items>
 								</item>
-								<item id="policy_attachment_image_dimensions_max_width">
-									<rank>15</rank>
+								<!-- Resolved ticket -->
+								<item id="fieldset:MailInbox:PolicyResolvedTicket">
+									<rank>141</rank>
+									<items>
+										<item id="policy_ticket_resolved_behavior">
+											<rank>10</rank>
+										</item>
+										<item id="policy_ticket_resolved_subject">
+											<rank>15</rank>
+										</item>
+										<item id="policy_ticket_resolved_notification">
+											<rank>20</rank>
+										</item>
+									</items>
 								</item>
-								<item id="policy_attachment_image_dimensions_min_height">
-									<rank>20</rank>
+								<!-- Unknown ticket -->
+								<item id="fieldset:MailInbox:PolicyUnknownTicket">
+									<rank>150</rank>
+									<items>
+										<item id="policy_ticket_unknown_behavior">
+											<rank>10</rank>
+										</item>
+										<item id="policy_ticket_unknown_subject">
+											<rank>15</rank>
+										</item>
+										<item id="policy_ticket_unknown_notification">
+											<rank>20</rank>
+										</item>
+									</items>
 								</item>
-								<item id="policy_attachment_image_dimensions_max_height">
-									<rank>30</rank>
+								<!-- Unknown caller -->
+								<item id="fieldset:MailInbox:PolicyUnknownCaller">
+									<rank>160</rank>
+									<items>
+										<item id="policy_unknown_caller_behavior">
+											<rank>10</rank>
+										</item>
+										<item id="policy_unknown_caller_subject">
+											<rank>15</rank>
+										</item>
+										<item id="policy_unknown_caller_notification">
+											<rank>20</rank>
+										</item>
+										<item id="policy_unknown_caller_default_values">
+											<rank>30</rank>
+										</item>
+									</items>
 								</item>
-							</items>
-						</item>
-						<!-- Mail (attachments) size too large -->
-						<item id="fieldset:MailInbox:PolicyAttachmentForbiddenMimeType">
-							<rank>121</rank>
-							<items>
-								<item id="policy_attachment_forbidden_mimetype_behavior">
-									<rank>10</rank>
+								<!-- Other email caller (in follow up mail) than original ticket caller -->
+								<item id="fieldset:MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller">
+									<rank>161</rank>
+									<items>
+										<item id="policy_other_email_caller_than_ticket_caller_behavior">
+											<rank>10</rank>
+										</item>
+										<item id="policy_other_email_caller_than_ticket_caller_subject">
+											<rank>15</rank>
+										</item>
+										<item id="policy_other_email_caller_than_ticket_caller_notification">
+											<rank>20</rank>
+										</item>
+									</items>
 								</item>
-								<item id="policy_attachment_forbidden_mimetype_subject">
-									<rank>15</rank>
+								<!-- Other contacts -->
+								<item id="fieldset:MailInbox:PolicyOtherRecipients">
+									<rank>170</rank>
+									<items>
+										<item id="policy_other_recipients_behavior">
+											<rank>10</rank>
+										</item>
+										<item id="policy_other_recipients_subject">
+											<rank>15</rank>
+										</item>
+										<item id="policy_other_recipients_notification">
+											<rank>20</rank>
+										</item>
+										<item id="policy_other_recipients_default_values">
+											<rank>25</rank>
+										</item>
+									</items>
 								</item>
-								<item id="policy_attachment_forbidden_mimetype_notification">
-									<rank>20</rank>
+								<!-- Undesired pattern behavior -->
+								<item id="fieldset:MailInbox:PolicyUndesiredPattern">
+									<rank>180</rank>
+									<items>
+										<item id="policy_undesired_pattern_behavior">
+											<rank>10</rank>
+										</item>
+										<item id="policy_undesired_pattern_subject">
+											<rank>15</rank>
+										</item>
+										<item id="policy_undesired_pattern_notification">
+											<rank>20</rank>
+										</item>
+										<item id="policy_undesired_pattern_patterns">
+											<rank>30</rank>
+										</item>
+									</items>
 								</item>
-								<item id="policy_attachment_forbidden_mimetype_mimetypes">
-									<rank>30</rank>
-								</item>
-							</items>
-						</item>
-						<!-- No subject -->
-						<item id="fieldset:MailInbox:PolicyNoSubject">
-							<rank>130</rank>
-							<items>
-								<item id="policy_no_subject_behavior">
-									<rank>10</rank>
-								</item>
-								<item id="policy_no_subject_subject">
-									<rank>15</rank>
-								</item>
-								<item id="policy_no_subject_notification">
-									<rank>20</rank>
-								</item>
-								<item id="policy_no_subject_default_value">
-									<rank>30</rank>
-								</item>
-							</items>
-						</item>
-						<!-- Closed ticket -->
-						<item id="fieldset:MailInbox:PolicyClosedTicket">
-							<rank>140</rank>
-							<items>
-								<item id="policy_ticket_closed_behavior">
-									<rank>10</rank>
-								</item>
-								<item id="policy_ticket_closed_subject">
-									<rank>15</rank>
-								</item>
-								<item id="policy_ticket_closed_notification">
-									<rank>20</rank>
-								</item>
-							</items>
-						</item>
-						<!-- Resolved ticket -->
-						<item id="fieldset:MailInbox:PolicyResolvedTicket">
-							<rank>141</rank>
-							<items>
-								<item id="policy_ticket_resolved_behavior">
-									<rank>10</rank>
-								</item>
-								<item id="policy_ticket_resolved_subject">
-									<rank>15</rank>
-								</item>
-								<item id="policy_ticket_resolved_notification">
-									<rank>20</rank>
-								</item>
-							</items>
-						</item>
-						<!-- Unknown ticket -->
-						<item id="fieldset:MailInbox:PolicyUnknownTicket">
-							<rank>150</rank>
-							<items>
-								<item id="policy_ticket_unknown_behavior">
-									<rank>10</rank>
-								</item>
-								<item id="policy_ticket_unknown_subject">
-									<rank>15</rank>
-								</item>
-								<item id="policy_ticket_unknown_notification">
-									<rank>20</rank>
-								</item>
-							</items>
-						</item>
-						<!-- Unknown caller -->
-						<item id="fieldset:MailInbox:PolicyUnknownCaller">
-							<rank>160</rank>
-							<items>
-								<item id="policy_unknown_caller_behavior">
-									<rank>10</rank>
-								</item>
-								<item id="policy_unknown_caller_subject">
-									<rank>15</rank>
-								</item>
-								<item id="policy_unknown_caller_notification">
-									<rank>20</rank>
-								</item>
-								<item id="policy_unknown_caller_default_values">
-									<rank>30</rank>
-								</item>
-							</items>
-						</item>
-						<!-- Other email caller (in follow up mail) than original ticket caller -->
-						<item id="fieldset:MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller">
-							<rank>161</rank>
-							<items>
-								<item id="policy_other_email_caller_than_ticket_caller_behavior">
-									<rank>10</rank>
-								</item>
-								<item id="policy_other_email_caller_than_ticket_caller_subject">
-									<rank>15</rank>
-								</item>
-								<item id="policy_other_email_caller_than_ticket_caller_notification">
-									<rank>20</rank>
-								</item>
-							</items>
-						</item>
-						<!-- Other contacts -->
-						<item id="fieldset:MailInbox:PolicyOtherRecipients">
-							<rank>170</rank>
-							<items>
-								<item id="policy_other_recipients_behavior">
-									<rank>10</rank>
-								</item>
-								<item id="policy_other_recipients_subject">
-									<rank>15</rank>
-								</item>
-								<item id="policy_other_recipients_notification">
-									<rank>20</rank>
-								</item>
-								<item id="policy_other_recipients_default_values">
-									<rank>25</rank>
-								</item>
-							</items>
-						</item>
-						<!-- Undesired pattern behavior -->
-						<item id="fieldset:MailInbox:PolicyUndesiredPattern">
-							<rank>180</rank>
-							<items>
-								<item id="policy_undesired_pattern_behavior">
-									<rank>10</rank>
-								</item>
-								<item id="policy_undesired_pattern_subject">
-									<rank>15</rank>
-								</item>
-								<item id="policy_undesired_pattern_notification">
-									<rank>20</rank>
-								</item>
-								<item id="policy_undesired_pattern_patterns">
-									<rank>30</rank>
-								</item>
-							</items>
-						</item>
-						<!-- Remove pattern from subject behavior -->
-						<item id="fieldset:MailInbox:PolicyRemovePattern">
-							<rank>190</rank>
-							<items>
-								<item id="policy_remove_pattern_behavior">
-									<rank>10</rank>
-								</item>
-								<item id="policy_remove_pattern_patterns">
-									<rank>20</rank>
+								<!-- Remove pattern from subject behavior -->
+								<item id="fieldset:MailInbox:PolicyRemovePattern">
+									<rank>190</rank>
+									<items>
+										<item id="policy_remove_pattern_behavior">
+											<rank>10</rank>
+										</item>
+										<item id="policy_remove_pattern_patterns">
+											<rank>20</rank>
+										</item>
+									</items>
 								</item>
 							</items>
 						</item>

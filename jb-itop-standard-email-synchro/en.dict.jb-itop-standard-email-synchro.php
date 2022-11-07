@@ -235,6 +235,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:Server' => 'Mailbox Configuration',
 	'MailInbox:Behavior' => 'Behavior on Incoming e-mails',
 	'MailInbox:Errors' => 'E-mails in error', 
+	'MailInbox:Policies' => 'Policies', 
 	
 	// Policies
 	'MailInbox:PolicyMailSize' => 'Policy: Mail Size',

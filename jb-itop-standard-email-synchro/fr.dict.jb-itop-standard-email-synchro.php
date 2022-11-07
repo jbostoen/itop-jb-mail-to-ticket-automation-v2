@@ -208,6 +208,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:Server' => 'Configuration de la boîte mail',
 	'MailInbox:Behavior' => 'Comportement pour les nouveaux emails',
 	'MailInbox:Errors' => 'E-mails en erreur',
+	'MailInbox:Policies' => 'Policies', 
 	
 	// Policies
 	'MailInbox:PolicyMailSize' => 'Politique : Taille de l\'email',
