@@ -204,6 +204,13 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_height' => 'Hauteur max. (px)',
 	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_height+' => 'hauteur max. (px). Mettre à 0 pour ne pas limiter.',
 	
+	// Policy: Auto reply
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Behavior on violation',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:delete' => 'Delete the message from the mailbox',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:do_nothing' => 'Do nothing',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:inactive' => 'Inactive',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
+	
 	// Headers
 	'MailInbox:Server' => 'Configuration de la boîte mail',
 	'MailInbox:Behavior' => 'Comportement pour les nouveaux emails',
@@ -223,6 +230,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:PolicyNoSubject' => 'Politique : Pas d\'objet',
 	'MailInbox:PolicyUnknownCaller' => 'Politique : Bénéficiaire inconnu',
 	'MailInbox:PolicyOtherRecipients' => 'Politique : Autres destinataires',
+	'MailInbox:PolicyAutoReply' => 'Policy: Auto reply',
 	
 	'Menu:MailInboxes' => 'Boîtes emails de réception',
 	'Menu:MailInboxes+' => 'Configuration des boîtes emails à scanner pour de nouveaux messages',

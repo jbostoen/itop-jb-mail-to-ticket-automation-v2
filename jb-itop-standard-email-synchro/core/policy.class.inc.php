@@ -2002,6 +2002,85 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 }
 
 /**
+ * Class PolicyBounceAutoReply. A policy to handle auto-reply e-mails.
+ */
+abstract class PolicyBounceAutoReply extends Policy implements iPolicy {
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $iPrecedence = 10;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $sPolicyId = 'policy_autoreply';
+		
+	/**
+	 * @inheritDoc
+	 */
+	public static function IsCompliant() {
+		
+		// Generic 'before' actions
+		parent::BeforeComplianceCheck();
+		
+		$oMailBox = static::GetMailBox();
+		$oEmail = static::GetMail();
+		
+		// Checking if subject is not empty.
+		
+			$sPolicyBehavior = $oMailBox->Get(static::GetPolicyId().'_behavior');
+			
+			switch(true) {
+				
+				case ($oEmail->GetHeader('x-autoreply') != ''):
+				case ($oEmail->GetHeader('x-autorespond') != ''):
+				
+				case (strtolower($oEmail->GetHeader('precedence')) == 'auto_reply'):
+				
+				// https://www.iana.org/assignments/auto-submitted-keywords/auto-submitted-keywords.xhtml
+				// Values for auto-submitted: no, auto-generated, auto-replied, auto-notified
+				case (preg_match('/^auto/', strtolower($oEmail->GetHeader('auto-submitted')))):
+				
+					switch($sPolicyBehavior) {
+						
+						 case 'delete':
+						 case 'do_nothing':
+						 case 'mark_as_undesired':
+
+							static::Trace('.. The message is an auto-reply.');
+							static::HandleViolation();
+							
+							// No fallback
+							
+							// Stop processing any further!
+							return false;
+							
+							break; // Defensive programming
+						
+						default:
+						
+							static::Trace('.. Unexpected "behavior"');
+							break;
+						
+					}
+					break;
+				
+				default:
+					break;
+			
+			}
+			
+		// Generic 'after' actions
+		parent::AfterPassedComplianceCheck();
+		
+		return true;
+		
+	}
+	
+}
+
+/**
  * Class PolicyBounceUnknownTicketReference. A policy to handle unknown ticket references. Also see MailInboxStandard::GetRelatedTicket().
  */
 abstract class PolicyBounceUnknownTicketReference extends Policy implements iPolicy {

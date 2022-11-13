@@ -132,7 +132,6 @@ function GetMailboxContent($oPage, $oInbox) {
 			];
 
 			$aData = [];
-			
 			$aMessageIndexes = array_keys($aMessages);
 			
 			$iCurrentIndex = $iStart;

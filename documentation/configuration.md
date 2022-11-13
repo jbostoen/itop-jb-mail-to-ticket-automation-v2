@@ -320,6 +320,15 @@ $recipient->email$
 $recipient->name$
 ```
 
+### Auto-replies
+
+* Use case: ignore auto-replies. Auto-replies are detected when there are e-mail headers such as X-Autoreply, X-Autorespond, Precedence: Auto_Reply and Auto-Submitted.
+* Hint: this policy does not take subjects such as "Automatic reply:" (or localized variants) into account. This can be enforced using the "Undesired patterns in title" policy.
+* **Policy violation behavior**
+  * Delete
+  * Do nothing
+  * Inactive
+  * Mark as undesired
 
 ### Undesired patterns in title
 
@@ -360,6 +369,8 @@ $recipient->name$
   * Mark as undesired
 * **Bounce subject**
 * **Bounce message**
+
+
 
 # Troubleshoot
 

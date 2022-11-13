@@ -230,6 +230,12 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_subject' => 'Bounce subject',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_notification' => 'Bounce message', 
 	
+	// Policy: Auto reply
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Behavior on violation',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:delete' => 'Delete the message from the mailbox',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:do_nothing' => 'Do nothing',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:inactive' => 'Inactive',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
 	
 	// Headers
 	'MailInbox:Server' => 'Mailbox Configuration',
@@ -251,6 +257,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:PolicyUnknownCaller' => 'Policy: Unknown caller',
 	'MailInbox:PolicyOtherRecipients' => 'Policy: Other recipients specified in To: or CC:',
 	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Policy: Limit accepted e-mail replies to original ticket caller\'s e-mail address',
+	'MailInbox:PolicyAutoReply' => 'Policy: Auto reply',
 	
 	'Menu:MailInboxes' => 'Incoming E-mail Inboxes',
 	'Menu:MailInboxes+' => 'Configuration of Inboxes to scan for incoming e-mails',

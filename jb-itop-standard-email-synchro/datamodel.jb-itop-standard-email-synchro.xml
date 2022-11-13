@@ -451,6 +451,18 @@ name:Unknown caller]]></default_value>
 					<default_value/>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
+				<!-- Auto-reply / out-of-office -->
+				<field id="policy_autoreply_behavior" xsi:type="AttributeEnum">
+					<values>
+						<value>delete</value>
+						<value>do_nothing</value>
+						<value>mark_as_undesired</value>
+						<value>inactive</value>
+					</values>
+					<sql>policy_autoreply_behavior</sql>
+					<default_value>inactive</default_value>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
 				<field id="oauth_client_id" xsi:type="AttributeExternalKey">
 					<filter/>
 					<dependencies/>
@@ -1288,6 +1300,15 @@ EOF
 										</item>
 										<item id="policy_remove_pattern_patterns">
 											<rank>20</rank>
+										</item>
+									</items>
+								</item>
+								<!-- Auto-reply -->
+								<item id="fieldset:MailInbox:PolicyAutoReply">
+									<rank>121</rank>
+									<items>
+										<item id="policy_autoreply_behavior">
+											<rank>10</rank>
 										</item>
 									</items>
 								</item>
