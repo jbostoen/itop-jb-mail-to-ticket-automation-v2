@@ -29,7 +29,7 @@ Mind that especially when processing lots of new e-mails, it may be important to
 * **Debug trace** - Debug log.
 * **Mail Aliases** - One per line. Regex patterns allowed. List each email address (minimum 1)
 * **IMAP options** - One per line. Warning: overrides global (configuration file) IMAP options completely! Currently not available when using OAuth2.
-
+* **Disable authenticator** - Legacy implementation. Disable one or more authenticators: GSSAPI, NTLM, PLAIN. None specified by default. This may be necessary in rare use cases when Kerberos issues arise.
 
 ## Hints
 
@@ -49,12 +49,28 @@ novalidate-cert
 * [Combodo's documentation: Configure OAuth2 in iTop](https://www.itophub.io/wiki/page?id=2_7_0%3Aadmin%3Aoauth)
 * [Microsoft documentation: Configuration on Azure / Exchange Online](https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth#use-client-credentials-grant-flow-to-authenticate-imap-and-pop-connections)
 
+Advanced scope for the OAuth client should look like this for most use cases (including regular sending using SMTP, which is not used by this extension):
+
+```
+https://outlook.office.com/SMTP.Send
+https://outlook.office.com/IMAP.AccessAsUser.All
+offline_access
+```
+
+
+And obviously, the mailbox user (linked to the OAuth client) needs proper permissions on the mailbox.
+Otherwise, you might run into this error:
+
+```
+Failed to initialize the mailbox: xxx@xxx.org. Reason: cannot change folder, maybe it does not exist
+```
+
 
 ### Office 365 with shared mailbox
 
 * Option 1: Enable the account and set a password.
  
-* Option 2: Use these IMAP options:
+* Option 2: With the legacy implementation (non OAuth), it was possible to use these IMAP options:
 
 ```
 imap

@@ -133,6 +133,7 @@ function GetMailboxContent($oPage, $oInbox) {
 
 			$aData = [];
 			$aMessageIndexes = array_keys($aMessages);
+			$iUnprocessableMessages = 0;
 			
 			$iCurrentIndex = $iStart;
 			while($iCurrentIndex <= $iEnd) {
@@ -141,54 +142,70 @@ function GetMailboxContent($oPage, $oInbox) {
 				$iMessage = $aMessageIndexes[$iCurrentIndex];
 								
 				$oRawEmail = $oSource->GetMessage($iMessage);
-				$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
-
-				// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
-				$sUIDLs = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
-				$sStatus = Dict::S('MailInbox:Status/New');
-				$sLink = '';
-				$sErrorMsg = '';
-				$sDetailsLink = '';
-				if(array_key_exists($sUIDLs, $aProcessed)) {
+				
+				if(is_null($oRawEmail) == true) {
 					
-					switch($aProcessed[$sUIDLs]['status']) {
-						case 'ok':
-							$sStatus = Dict::S('MailInbox:Status/Processed');
-							break;
-
-						case 'error':
-							$sStatus = Dict::S('MailInbox:Status/Error');
-							break;
-
-						case 'undesired':
-							$sStatus = Dict::S('MailInbox:Status/Undesired');
-							break;
-
-						case 'ignored':
-							$sStatus = Dict::S('MailInbox:Status/Ignored');
-					}
-					$sErrorMsg = $aProcessed[$sUIDLs]['error_message'];
-					if($aProcessed[$sUIDLs]['ticket_id'] != '') {
-						$sTicketUrl = ApplicationContext::MakeObjectUrl($oInbox->Get('target_class'), $aProcessed[$sUIDLs]['ticket_id']);
-						$sLink = '<a href="'.$sTicketUrl.'">'.$oInbox->Get('target_class').'::'.$aProcessed[$sUIDLs]['ticket_id'].'</a>';
-					}
-					$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDLs];
-					$sDetailsURL = utils::GetAbsoluteUrlModulePage(basename(dirname(__FILE__)), 'details.php', $aArgs);
-					$sDetailsLink = '<a href="'.$sDetailsURL.'">'.Dict::S('MailInbox:MessageDetails').'</a>';
+					// Just ignore.
+					// Adding a dummy record in the table could lead to actions being performed which should not be available for this corrupted message.
+					$iUnprocessableMessages += 1;
+					
 				}
-				$aData[] = [
-					'checkbox' => '<input type="checkbox" class="mailbox_item" value="'.htmlentities($sUIDLs, ENT_QUOTES, 'UTF-8').'"/>',
-					'status' => $sStatus,
-					'date' => $oEmail->sDate,
-					'from' => $oEmail->sCallerEmail,
-					'subject' => $oEmail->sSubject,
-					'ticket' => $sLink,
-					'error' => $sErrorMsg,
-					'details' => $sDetailsLink,
-				];
+				else {
+					
+					$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
+
+					// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
+					$sUIDLs = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
+					$sStatus = Dict::S('MailInbox:Status/New');
+					$sLink = '';
+					$sErrorMsg = '';
+					$sDetailsLink = '';
+					if(array_key_exists($sUIDLs, $aProcessed)) {
+						
+						switch($aProcessed[$sUIDLs]['status']) {
+							case 'ok':
+								$sStatus = Dict::S('MailInbox:Status/Processed');
+								break;
+
+							case 'error':
+								$sStatus = Dict::S('MailInbox:Status/Error');
+								break;
+
+							case 'undesired':
+								$sStatus = Dict::S('MailInbox:Status/Undesired');
+								break;
+
+							case 'ignored':
+								$sStatus = Dict::S('MailInbox:Status/Ignored');
+						}
+						$sErrorMsg = $aProcessed[$sUIDLs]['error_message'];
+						if($aProcessed[$sUIDLs]['ticket_id'] != '') {
+							$sTicketUrl = ApplicationContext::MakeObjectUrl($oInbox->Get('target_class'), $aProcessed[$sUIDLs]['ticket_id']);
+							$sLink = '<a href="'.$sTicketUrl.'">'.$oInbox->Get('target_class').'::'.$aProcessed[$sUIDLs]['ticket_id'].'</a>';
+						}
+						$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDLs];
+						$sDetailsURL = utils::GetAbsoluteUrlModulePage(basename(dirname(__FILE__)), 'details.php', $aArgs);
+						$sDetailsLink = '<a href="'.$sDetailsURL.'">'.Dict::S('MailInbox:MessageDetails').'</a>';
+					}
+					$aData[] = [
+						'checkbox' => '<input type="checkbox" class="mailbox_item" value="'.htmlentities($sUIDLs, ENT_QUOTES, 'UTF-8').'"/>',
+						'status' => $sStatus,
+						'date' => $oEmail->sDate,
+						'from' => $oEmail->sCallerEmail,
+						'subject' => $oEmail->sSubject,
+						'ticket' => $sLink,
+						'error' => $sErrorMsg,
+						'details' => $sDetailsLink,
+					];
+					
+				}
 				
 				$iCurrentIndex += 1;
 				
+			}
+			
+			if($iUnprocessableMessages > 0) {
+				$oPage->p(Dict::Format('MailInbox:UnprocessableMessages', $iUnprocessableMessages));
 			}
 		
 			if(count($aData) > 0) {

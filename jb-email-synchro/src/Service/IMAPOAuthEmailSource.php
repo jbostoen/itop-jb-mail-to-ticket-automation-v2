@@ -112,11 +112,13 @@ class IMAPOAuthEmailSource extends EmailSource {
 			$oMail = $this->oStorage->getMessage($iOffsetIndex);
 			
 		}
-		// Likely an Exception\InvalidArgumentException
+		// Likely a Laminas\Mail\Exception\InvalidArgumentException
+		// For example: jb-mail-to-ticket-automation-v2 GitHub issue #27
 		catch(Exception $e) {
 			
 			$this->oMailbox->Trace("IMAPOAuthEmailSource Failed to get message $iOffsetIndex (UID $sUID): ".$e->getMessage());
 			IssueLog::Debug("IMAPOAuthEmailSource Failed to get message $iOffsetIndex (UID $sUID): ".$e->getMessage(), static::LOG_CHANNEL);
+			return null;
 			
 		}
 		

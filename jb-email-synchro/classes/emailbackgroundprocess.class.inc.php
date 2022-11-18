@@ -166,10 +166,13 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		$iTotalMoved = 0;
         $iTotalUndesired = 0;
 		foreach(self::$aEmailProcessors as $sProcessorClass) {
+			
 			/** @var \EmailProcessor $oProcessor */
 			$oProcessor = new $sProcessorClass();
 			$aSources = $oProcessor->ListEmailSources();
+			
 			foreach($aSources as $oSource) {
+				
 				$iMsgCount = $oSource->GetMessagesCount();
 				$this->Trace("-----------------------------------------------------------------------------------------");			
 				$this->Trace("Processing Message Source: ".$oSource->GetName()." GetMessagesCount returned: $iMsgCount");			
@@ -195,6 +198,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						// No sorting
 					}
 					
+					// @todo The following 2 lines don't seem to be used anymore?
 					$iStart = 0;
 					$iEnd = ($iMsgCount - 1); // $iMsgCount will already be positive, no additional check needed
 					

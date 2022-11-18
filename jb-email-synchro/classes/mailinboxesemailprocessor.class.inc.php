@@ -70,29 +70,29 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 		static::Trace('-----------------------------------------------------------------------------------------');
 		static::Trace('Listing sources:');
 		
-		$aSources = array();
+		$aSources = [];
 		$oSearch = new DBObjectSearch('MailInboxBase');
 		$oSearch->AddCondition('active', 'yes');
 		$oSet = new DBObjectSet($oSearch);
 		
-		self::Trace('Number of sources found: '.$oSet->Count());
+		static::Trace('Number of sources found: '.$oSet->Count());
 		
 		/** @var \MailInboxBase $oInbox */
 		while($oInbox = $oSet->Fetch()) {
 			
-			self::Trace('Add: '.$oInbox->GetKey());
+			static::Trace('Add: '.$oInbox->GetKey());
 		
 			$this->aInboxes[$oInbox->GetKey()] = $oInbox;
 			try {
 				$oSource = $oInbox->GetEmailSource();
 				$oSource->SetToken($oInbox->GetKey()); // to match the source and the inbox later on
-				$oSource->SetPartsOrder(self::$sBodyPartsOrder); // in which order to decode the message's body
+				$oSource->SetPartsOrder(static::$sBodyPartsOrder); // in which order to decode the message's body
 				$aSources[] = $oSource;
 			}
 			catch(Exception $e) {
 				// Don't use Trace, always output the error so that the log file can be monitored for errors
 				echo "Error - Failed to initialize the mailbox: ".$oInbox->GetName().", the mailbox will not be polled. Reason (".$e->getMessage().")\n";
-				self::Trace("Error - Failed to initialize the mailbox: ".$oInbox->GetName().", the mailbox will not be polled. Reason (".$e->getMessage().")\n");
+				static::Trace("Error - Failed to initialize the mailbox: ".$oInbox->GetName().", the mailbox will not be polled. Reason (".$e->getMessage().")\n");
 			}
 		}
 

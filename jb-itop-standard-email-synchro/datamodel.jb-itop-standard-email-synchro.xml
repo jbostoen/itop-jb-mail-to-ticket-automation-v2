@@ -1058,6 +1058,9 @@ EOF
 								<item id="imap_options">
 									<rank>110</rank>
 								</item>
+								<item id="disable_authenticator">
+									<rank>120</rank>
+								</item>
 							</items>
 						</item>
 						<!-- Default behavior and class -->

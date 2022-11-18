@@ -31,8 +31,24 @@ class IMAPEmailSource extends EmailSource {
 	protected $sMailbox = '';
 	protected $sTargetFolder = '';
 
-	public function __construct($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aOptions, $sTargetFolder = '') {
+	/**
+	 * Constructs a legacy IMAPEmailSource.
+	 *
+	 * @param \String $sServer Server IP or FQDN.
+	 * @param \Integer $iPort Port number.
+	 * @param \String $sLogin Login name.
+	 * @param \String $sPwd Password.
+	 * @param \String $sMailbox The folder which will be accessed.
+	 * @param \Array $aOptions Specified IMAP options.
+	 * @param \String $sTargetFolder Folder to which mails will be moved after processing.
+	 * @param \Array $aImapOpenOptions Allows to specify some specific connection options (e.g. DISABLE_AUTHENTICATOR).
+	 *
+	 * @return void
+	 */
+	public function __construct($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aOptions, $sTargetFolder = '', $aImapOpenOptions = []) {
+		
 		parent::__construct();
+		
 		$this->sLastErrorSubject = '';
 		$this->sLastErrorMessage = '';
 		$this->sLogin = $sLogin;
@@ -48,7 +64,7 @@ class IMAPEmailSource extends EmailSource {
 
 		$sIMAPConnStr = "{{$sServer}:{$iPort}$sOptions}$sMailbox";
 		
-		$this->rImapConn = imap_open($sIMAPConnStr, $sLogin, $sPwd );
+		$this->rImapConn = imap_open($sIMAPConnStr, $sLogin, $sPwd, 0, 0, $aImapOpenOptions);
 		if($this->rImapConn === false) {
 			if(class_exists('EventHealthIssue')) {
 				EventHealthIssue::LogHealthIssue('jb-email-synchro', "Cannot connect to IMAP server: '$sIMAPConnStr', with credentials: '$sLogin/***'");
