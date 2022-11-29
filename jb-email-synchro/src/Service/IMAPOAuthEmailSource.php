@@ -148,10 +148,21 @@ class IMAPOAuthEmailSource extends EmailSource {
 		
 	}
 	
+	/**
+	 * @inheritDoc
+	 */
 	public function GetName() {
 		return $this->sLogin;
 	}
 
+
+	/**
+	 * @inheritDoc
+	 */
+	public function GetSourceId() {
+		return $this->sServer.'/'.$this->sLogin;
+	}
+	
 	public function GetListing() {
 		
 		$aReturn = [];
