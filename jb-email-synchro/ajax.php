@@ -68,7 +68,13 @@ function GetMailboxContent($oPage, $oInbox) {
 			
 		}
 		catch(Exception $e) {
-			IssueLog::Error('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
+			$aContext = array(
+				'file'            => $e->getFile(),
+				'line'            => $e->getLine(),
+				'exception.class' => get_class($e),
+				'exception.stack' => $e->getTraceAsString(),
+			);
+			IssueLog::Error('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage(), null, $aContext);
 			$oPage->p('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
 			return;
 			

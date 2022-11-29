@@ -58,13 +58,18 @@ abstract class EmailSource
 	 * @param $index integer The index between zero and count
 	 */
 	abstract public function DeleteMessage($index);
-	
-	
 	/**
 	 * Name of the eMail source
 	 */
 	abstract public function GetName();
 
+	/**
+	 * @return string something to identify the source in a log
+	 *                this is useful as for example EmailBackgroundProcess is working on this class and not persisted mailboxes
+	 * @since 3.6.1 N°5633 method creation
+	 */
+	abstract public function GetSourceId();
+	
 	/**
 	 * Move the message of the given index [0..Count] from the mailbox to another folder
 	 * @param $index integer The index between zero and count
@@ -83,7 +88,7 @@ abstract class EmailSource
 
 	/**
 	 * Get the list (with their IDs) of all the messages
-	 * @return array An array of hashes: 'msg_id' => index 'uidl' => message identifier
+	 * @return array{msg_id: int, uidl: ?string} 'msg_id' => index, 'uidl' => message identifier (null if message cannot be decoded)
 	 */
 	abstract public function GetListing();
 	
@@ -92,6 +97,25 @@ abstract class EmailSource
 	 */
 	abstract public function Disconnect();
 
+	/**
+	 * Workaround for some email servers (like GMail and MS Office 365) where the UID may change between two sessions, so let's use the MessageID
+	 * as a replacement for the UID !
+	 *
+	 * Note that it is possible to receive twice a message with the same MessageID, but since the content of the message
+	 * will be the same, it's a safe to process such messages only once...
+	 *
+	 * BEWARE: Make sure that you empty the mailbox before toggling this setting in the config file, since all the messages
+	 *    present in the mailbox at the time of the toggle will be considered as "new" and thus processed again.
+	 *
+	 * @return boolean
+	 * @uses `use_message_id_as_uid` config parameter
+	 */
+	public static function UseMessageIdAsUid() {
+		
+		// Note: Contrary to Combodo's version: in most environments it seems better that this is enabled by default.
+		return (bool)MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', true);
+		
+	}
 	
 	public function GetLastErrorSubject() {
 		return $this->sLastErrorSubject;

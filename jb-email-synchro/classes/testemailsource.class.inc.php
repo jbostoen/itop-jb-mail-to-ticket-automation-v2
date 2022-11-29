@@ -95,29 +95,37 @@ class TestEmailSource extends EmailSource
 	}
 
 	/**
-	 * Name of the eMail source
+	 * @inheritDoc
 	 */
-	 public function GetName()
-	 {
-	 	if (!empty($this->sName))
-	 	{
+	 public function GetName() {
+		 
+	 	if (!empty($this->sName)) {
 		 	return $this->sName;
 	 	}
 	 	return 'Test Source (from '.$this->sSourceDir.')';
-	 }
+
+	}
 
 	/**
-	 * Get the list (with their IDs) of all the messages
-	 * @return Array An array of hashes: 'msg_id' => index 'uild' => message identifier
+	 * @inheritDoc
 	 */
-	 public function GetListing()
-	 {
+	public function GetSourceId() {
+		return $this->sName.' ('.$this->sSourceDir.')';
+	}
+
+
+	/**
+	 * @inheritDoc
+	 */
+	 public function GetListing() {
+		 
 		$aListing = array();
 		foreach($this->aMessages as $index => $sName)
 		{
-			$aListing[] = array('msd_id' => $index, 'uidl' => basename($sName));
+			$aListing[] = array('msg_id' => $index, 'uidl' => basename($sName));
 		}
 		return $aListing;
+		
 	 }
 	 
 	 public function Disconnect()

@@ -174,12 +174,28 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 			foreach($aSources as $oSource) {
 				
 				$iMsgCount = $oSource->GetMessagesCount();
-				$this->Trace("-----------------------------------------------------------------------------------------");			
-				$this->Trace("Processing Message Source: ".$oSource->GetName()." GetMessagesCount returned: $iMsgCount");			
+				$this->Trace("-----------------------------------------------------------------------------------------");
+				$this->Trace("Processing Message Source: ".$oSource->GetName());
+				try {
+					$iMsgCount = $oSource->GetMessagesCount();
+				}
+				catch (Exception $e) {
+					$this->LogProcessException($e, $oSource);
+					$oSource->Disconnect();
+					continue;
+				}
+				$this->Trace("GetMessagesCount returned: $iMsgCount");	
 
 				if($iMsgCount != 0) {
 					
-					$aMessages = $oSource->GetListing();
+					try {
+						$aMessages = $oSource->GetListing();
+					}
+					catch (Exception $e) {
+						$this->LogProcessException($e, $oSource);
+						$oSource->Disconnect();
+					}
+					
 					$iMsgCount = count($aMessages);
 					
 					/** @var \MailInboxBase $oInbox Mail inbox */
@@ -207,14 +223,22 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					
 					// Gets all UIDLs to identify EmailReplicas in iTop.
 					foreach(array_keys($aMessages) as $iMessage) {
-												
+						
+						$sUIDL = $aMessages[$iMessage]['uidl'];
+						
+						if(is_null($sUIDL) == true) {
+							continue;
+						}
+						
 						// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
 						if(self::IsMultiSourceMode()) {
-							$aUIDLs[] = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
+							$sUIDL = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
 						}
 						else {
-							$aUIDLs[] = $aMessages[$iMessage]['uidl'];
+							$sUIDL = $aMessages[$iMessage]['uidl'];
 						}
+						
+						$aUIDLs[] = $sUIDL;
 						
 					}
 					
@@ -244,11 +268,14 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							$this->InitMessageTrace($oSource, $iMessage);
 							
 							$iTotalMessages++;
-							if(self::IsMultiSourceMode()) {
-								$sUIDL = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
+
+							$sUIDL = $aMessages[$iMessage]['uidl'];
+							if(is_null($sUIDL)) {
+								continue; // invalid email, see \EmailSource::GetListing and N°5633
 							}
-							else {
-								$sUIDL = $aMessages[$iMessage]['uidl'];
+							
+							if(self::IsMultiSourceMode()) {
+								$sUIDL = $oSource->GetName().'_'.$sUIDL;
 							}
 
 							$oEmailReplica = array_key_exists($sUIDL, $aReplicas) ? $aReplicas[$sUIDL] : null;
@@ -466,6 +493,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								$this->Trace($e->getMessage());
 								$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
 							}
+							
+							$this->LogProcessException($e, $oSource);
+							
 							throw $e;
 						}						
 						
@@ -522,6 +552,61 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 			}
 		}
 		return "Message(s) read: $iTotalMessages, message(s) skipped: $iTotalSkippedError in error / $iTotalSkippedIgnored ignored / $iTotalSkippedUndesired undesired, message(s) processed: $iTotalProcessed, message(s) deleted: $iTotalDeleted, message(s) marked as error: $iTotalMarkedAsError, undesired message(s): $iTotalUndesired, message(s) moved: $iTotalMoved";
+	}
+	
+	/**
+	 * @param \Exception $e
+	 * @param \EmailSource $oSource
+	 *
+	 * @return void
+	 *
+	 * @since 3.6.1 N°5633 Method creation
+	 */
+	protected function LogProcessException($e, $oSource) {
+		
+		$sExceptionMessage = $e->getMessage();
+		$sSourceId = $oSource->GetSourceId();
+		$sSimpleErrorMessage = __CLASS__.': an exception occurred when reading content for mailbox';
+
+		// MailInboxStandard
+		$sMailboxId = $oSource->GetToken(); // see init in \MailInboxesEmailProcessor::ListEmailSources
+		/** @var \MailInboxStandard $oMailbox */
+		try {
+			$oMailbox = MetaModel::GetObject(MailInboxStandard::class, $sMailboxId, false);
+		}
+		catch (ArchivedObjectException $e) { // cannot group exceptions before PHP 7.1.0 (see https://www.php.net/manual/en/language.exceptions.php)
+			$oMailbox = null;
+		}
+		catch (CoreException $e) {
+			$oMailbox = null;
+		}
+		
+		$sDetailedErrorMessage = $sSimpleErrorMessage;
+		
+		if(is_null($oMailbox) == true) {
+			$sDetailedErrorMessage .= " `{$sSourceId}`: {$sExceptionMessage}";
+		}
+		else {
+			
+			$oMailbox->Trace($sSimpleErrorMessage);
+
+			try {
+				$sMailboxName = $oMailbox->GetName();
+			}
+			catch (CoreException $e) {
+				// shouldn't happen, but trying to be defensive !
+				$sMailboxName = 'N/A';
+			}
+			$sDetailedErrorMessage .= " `{$sMailboxName}::id=$sMailboxId`: {$sExceptionMessage}";
+			
+		}
+
+		// BackgroundProcess
+		$this->Trace($sDetailedErrorMessage);
+
+		// LogAPI
+		IssueLog::Error($sDetailedErrorMessage, 'CLI'); // \LogChannels::CLI isn't available in iTop < 3.0.0
+		
 	}
 	
 	private function InitMessageTrace($oSource, $iMessage) {

@@ -99,7 +99,7 @@ class IMAPOAuthEmailSource extends EmailSource {
 
 	public function GetMessage($index) {
 		
-		$bUseMessageId = (bool)MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', true);
+		$bUseMessageId = static::UseMessageIdAsUid();
 		
 		$iOffsetIndex = 1 + $index;
 		$sUID = $this->oStorage->getUniqueId($iOffsetIndex);
@@ -200,7 +200,7 @@ class IMAPOAuthEmailSource extends EmailSource {
 				}
 				
 				
-				$bUseMessageId = (bool)MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', true);
+				$bUseMessageId = static::UseMessageIdAsUid();
 				
 				// Add to the list
 				$aReturn[] = [

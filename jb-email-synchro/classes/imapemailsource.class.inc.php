@@ -27,6 +27,7 @@
 class IMAPEmailSource extends EmailSource {
 	
 	protected $rImapConn = null;
+	protected $sServer = '';
 	protected $sLogin = '';
 	protected $sMailbox = '';
 	protected $sTargetFolder = '';
@@ -51,6 +52,7 @@ class IMAPEmailSource extends EmailSource {
 		
 		$this->sLastErrorSubject = '';
 		$this->sLastErrorMessage = '';
+		$this->sServer = $sServer;
 		$this->sLogin = $sLogin;
 		$this->sMailbox = $sMailbox;
 		$this->sTargetFolder = $sTargetFolder;
@@ -128,7 +130,7 @@ class IMAPEmailSource extends EmailSource {
 		$aOverviews = imap_fetch_overview($this->rImapConn, 1+$index);
 		$oOverview = array_pop($aOverviews);
 
-		$bUseMessageId = (bool) MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', false);
+		$bUseMessageId = static::UseMessageIdAsUid();
 		if($bUseMessageId) {
 			$oOverview->uid = $oOverview->message_id;
 		}
@@ -172,12 +174,19 @@ class IMAPEmailSource extends EmailSource {
 	
 	
 	/**
-	 * Name of the eMail source
+	 * @inheritDoc
 	 */
 	 public function GetName() {
 	 	return $this->sLogin;
 	 }
 
+	/**
+	 * @inheritDoc
+	 */
+	public function GetSourceId() {
+		return $this->sServer.'/'.$this->sLogin;
+	}
+	
 	/**
 	 * Mailbox path of the eMail source
 	 */
@@ -202,7 +211,7 @@ class IMAPEmailSource extends EmailSource {
 			// BEWARE: Make sure that you empty the mailbox before toggling this setting in the config file, since all the messages
 			// present in the mailbox at the time of the toggle will be considered as "new" and thus processed again.
 			// Contrary to the Combodo implementation, this fork defaults to 'true', since it's definitely recommended for GMail and Exchange (IMAP).
-        	$bUseMessageId = (bool)MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', true);
+        	$bUseMessageId = static::UseMessageIdAsUid();
 
         	$ret = array();
 			$aResponse = imap_fetch_overview($this->rImapConn, $sRange);
