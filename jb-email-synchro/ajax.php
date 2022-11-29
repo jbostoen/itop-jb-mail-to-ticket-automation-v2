@@ -105,7 +105,11 @@ function GetMailboxContent($oPage, $oInbox) {
 				
 				// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
 				// Real index does not matter here. Just collecting ALL UIDLs
-				$aUIDLs[] = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
+				$sMessageUidl = $aMessages[$iMessage]['uidl'];
+				if (is_null($sMessageUidl)) {
+					continue;
+				}
+				$aUIDLs[] = $oSource->GetName().'_'.$sMessageUidl;
 				
 			}
 			
