@@ -2678,7 +2678,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 							
 		// Take both the To: and CC:
 		$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
-		$aAllContacts = static::GetAddressesFromRecipients($aAllContacts);
+		$aAllContactsEmailsOnly = static::GetAddressesFromRecipients($aAllContacts);
 		
 		// Mailbox aliases
 		$sMailBoxAliases = $oMailBox->Get('mail_aliases');
@@ -2689,12 +2689,12 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 			// For existing tickets: other people might reply. So only exclude mailbox aliases and the original caller.
 			// If it's someone else replying, it should be seen as a new contact.
 			$sOriginalCallerEmail = $oTicket->Get('caller_id->email');
-			$aAllOtherContacts = array_udiff($aAllContacts, [$sOriginalCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
+			$aAllOtherContactsEmailsOnly = array_udiff($aAllContactsEmailsOnly, [$sOriginalCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
 		}
 		else {
-			$aAllOtherContacts = array_udiff($aAllContacts, [$sCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
+			$aAllOtherContactsEmailsOnly = array_udiff($aAllContactsEmailsOnly, [$sCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
 		}
-		$aAllOtherContacts = array_unique($aAllOtherContacts);
+		$aAllOtherContactsEmailsOnly = array_unique($aAllOtherContactsEmailsOnly);
 
 		$sPolicyBehavior = $oMailBox->Get(static::GetPolicyId().'_behavior');
 		
@@ -2709,7 +2709,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 					$sRecipientName = $aRecipient['name'];
 					
 					// In case this recipient's mail address should not be processed any further (reasons: see above): continue with next one
-					if(in_array($sRecipientEmail, $aAllOtherContacts) == false) {
+					if(in_array($sRecipientEmail, $aAllOtherContactsEmailsOnly) == false) {
 						continue;
 					}
 					
