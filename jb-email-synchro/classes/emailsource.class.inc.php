@@ -63,12 +63,6 @@ abstract class EmailSource
 	 */
 	abstract public function GetName();
 
-	/**
-	 * @return string something to identify the source in a log
-	 *                this is useful as for example EmailBackgroundProcess is working on this class and not persisted mailboxes
-	 * @since 3.6.1 N°5633 method creation
-	 */
-	abstract public function GetSourceId();
 	
 	/**
 	 * Move the message of the given index [0..Count] from the mailbox to another folder
@@ -123,6 +117,17 @@ abstract class EmailSource
 	
 	public function GetLastErrorMessage() {
 		return $this->sLastErrorMessage;
+	}
+	
+	/**
+	 * This impl is bad, but it will lower the risk for children classes in extensions !
+	 *
+	 * @return string something to identify the source in a log
+	 *                this is useful as for example EmailBackgroundProcess is working on this class and not persisted mailboxes ({@link \MailInboxBase})
+	 * @since 3.6.1 N°5633 method creation
+	 */
+	public function GetSourceId() {
+		return $this->token;
 	}
 	
 	/**

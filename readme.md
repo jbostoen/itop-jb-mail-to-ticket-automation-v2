@@ -130,10 +130,9 @@ SourceForge tickets:
 * #1925 Mail to Ticket: malformed headers (some feedback, implemented by Combodo)
 * #1930 Mail to Ticket: improved parsing of from: address (suggested fix, implemented by Combodo)
 * #2039 Return code missing in combodo-email-synchro - GetActionFromCode() (suggested fix, implemented by Combodo)
-* #2124 combodo-oauth-email-synchro / use_message_as_uid (suggested fix, not implemented by Combodo yet)
-
-Internal Combodo tickets:
-* N° 2181 Mail to Ticket: Sometimes duplicate ticket from mail-to-ticket (suggested fix, implemented by Combodo)
+* #2124 / N° 5654 combodo-oauth-email-synchro / use_message_as_uid (suggested fix, implemented by Combodo yet)
+* ? / N° 5633 Fix IMAPOAuthEmailSource crashing when Laminas cannot decode message (suggested fix, implemented and improved by Combodo)
+* ? / N° 2181 Mail to Ticket: Sometimes duplicate ticket from mail-to-ticket (suggested fix, implemented by Combodo)
 
 ## Upgrade notes
 
