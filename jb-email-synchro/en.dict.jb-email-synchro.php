@@ -51,7 +51,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:MailboxContent' => 'Mailbox Content',
 	'MailInbox:MailboxContent:ConfirmMessage' => 'Are you sure?',
 	'MailInbox:EmptyMailbox' => 'The mailbox is empty',
-	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail(s) displayed. There are %2$d e-mail(s) in the mailbox (%3$d unprocessed).',
+	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail(s) displayed. There are %2$d e-mail(s) in the mailbox (%3$d unprocessed and %4$d unreadable/corrupt).',
 	'MailInbox:UnprocessableMessages' => 'There are %1$s e-mail(s) which can not be listed due to a technical issue.',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'MySQL parameter max_allowed_packet in "my.ini" is too small: %1$s. The recommended value is at least: %2$s',
 	'MailInbox:Status' => 'Status',

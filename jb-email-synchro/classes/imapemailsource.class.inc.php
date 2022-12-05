@@ -199,7 +199,8 @@ class IMAPEmailSource extends EmailSource {
 	 * @return Array An array of hashes: 'msg_id' => index 'uild' => message identifier
 	 */
 	 public function GetListing() {
-	 	$ret = null;
+		 
+	 	$ret = [];
 	 	
 	 	$oInfo = imap_check($this->rImapConn);
         if(($oInfo !== false) && ($oInfo->Nmsgs > 0)) {

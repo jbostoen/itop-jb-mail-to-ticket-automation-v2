@@ -50,9 +50,9 @@ function GetMailboxContent($oPage, $oInbox) {
 			
 			/** @var \EmailSource $oSource */
 			$oSource = $oInbox->GetEmailSource();
-			// $iTotalMsgCount = $oSource->GetMessagesCount();
-			$aMessages = $oSource->GetListing(); // Note: this may differ from GetMessagesCount(); as messages with errors could be skipped.
-			$iTotalMsgCount = count($aMessages);
+			$iTotalMsgCount = $oSource->GetMessagesCount();
+			$aMessages = $oSource->GetListing(); // Note: this may differ from $oSource->GetMessagesCount(); as messages with errors could be skipped.
+			$iTotalMsgOkCount = count($aMessages);
 			
 			if($iStartIndex < 0 || $iMaxCount <= 0) {
 				// Don't process, invalid indexes
@@ -64,7 +64,7 @@ function GetMailboxContent($oPage, $oInbox) {
 		
 			// Avoid user specifying a higher number (start + count) than the total mesage number count
 			// The largest index is (message count - 1), since messages are retrieved by index (starting at 0)
-			$iEnd = min($iStart + $iMaxCount - 1, $iTotalMsgCount - 1); 
+			$iEnd = min($iStart + $iMaxCount - 1, $iTotalMsgOkCount - 1); 
 			
 		}
 		catch(Exception $e) {
@@ -79,7 +79,8 @@ function GetMailboxContent($oPage, $oInbox) {
 			return;
 			
 		}
-	
+
+		/** @var \Integer $iProcessedCount number of readable emails in total (whole mailbox content) */
 		$iProcessedCount = 0;
 		
 		if($iTotalMsgCount > 0) {
@@ -113,115 +114,147 @@ function GetMailboxContent($oPage, $oInbox) {
 				
 			}
 			
-			$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox'));
-			IssueLog::Info("Searching EmailReplica: $sOQL");
-			$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
-			$oReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl', 'ticket_id', 'status', 'error_message']]);
-			$iProcessedCount = $oReplicaSet->Count();
-			$aProcessed = [];
-			
-			while($oReplica = $oReplicaSet->Fetch()) {
-				$aProcessed[$oReplica->Get('uidl')] = [
-					'status' => $oReplica->Get('status'),
-					'ticket_id' => $oReplica->Get('ticket_id'),
-					'error_message' => $oReplica->Get('error_message'),
-					'id' => $oReplica->GetKey(),
-				];
-			}
-			
-			// Table config. Will be used as headers while the data is processed.
-			$aTableConfig = [
-				'checkbox' => ['label' => '<input type="checkbox" id="mailbox_checkall"/>', 'description' => ''],
-				'status' => ['label' => Dict::S('MailInbox:Status'), 'description' => ''],
-				'date' => ['label' => Dict::S('MailInbox:Date'), 'description' => ''],
-				'from' => ['label' => Dict::S('MailInbox:From'), 'description' => ''],
-				'subject' => ['label' => Dict::S('MailInbox:Subject'), 'description' => ''],
-				'ticket' => ['label' =>  Dict::S('MailInbox:RelatedTicket'), 'description' => ''],
-				'error' => ['label' =>  Dict::S('MailInbox:ErrorMessage'), 'description' => ''],
-				'details' => ['label' =>  Dict::S('MailInbox:MessageDetails'), 'description' => ''],
-			];
-
-			$aData = [];
-			$aMessageIndexes = array_keys($aMessages);
-			$iUnprocessableMessages = 0;
-			
-			$iCurrentIndex = $iStart;
-			while($iCurrentIndex <= $iEnd) {
+			/** @var \Integer $iMsgOkCount number of readable emails between start and end index */
+			$iMsgOkCount = 0;
+			$iProcessedCount = 0;
+			if($iTotalMsgOkCount > 0) {
 				
-				// Obtain the actual index for the message (take Nth index)
-				$iMessage = $aMessageIndexes[$iCurrentIndex];
-								
-				$oRawEmail = $oSource->GetMessage($iMessage);
+				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox'));
+				IssueLog::Info("Searching EmailReplica: $sOQL");
+				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
+				$oReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl', 'ticket_id', 'status', 'error_message']]);
+				$iProcessedCount = $oReplicaSet->Count();
+				$aProcessed = [];
 				
-				if(is_null($oRawEmail) == true) {
-					
-					// Just ignore.
-					// Adding a dummy record in the table could lead to actions being performed which should not be available for this corrupted message.
-					$iUnprocessableMessages += 1;
-					
-				}
-				else {
-					
-					$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
-
-					// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
-					$sUIDLs = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
-					$sStatus = Dict::S('MailInbox:Status/New');
-					$sLink = '';
-					$sErrorMsg = '';
-					$sDetailsLink = '';
-					if(array_key_exists($sUIDLs, $aProcessed)) {
-						
-						switch($aProcessed[$sUIDLs]['status']) {
-							case 'ok':
-								$sStatus = Dict::S('MailInbox:Status/Processed');
-								break;
-
-							case 'error':
-								$sStatus = Dict::S('MailInbox:Status/Error');
-								break;
-
-							case 'undesired':
-								$sStatus = Dict::S('MailInbox:Status/Undesired');
-								break;
-
-							case 'ignored':
-								$sStatus = Dict::S('MailInbox:Status/Ignored');
-						}
-						$sErrorMsg = $aProcessed[$sUIDLs]['error_message'];
-						if($aProcessed[$sUIDLs]['ticket_id'] != '') {
-							$sTicketUrl = ApplicationContext::MakeObjectUrl($oInbox->Get('target_class'), $aProcessed[$sUIDLs]['ticket_id']);
-							$sLink = '<a href="'.$sTicketUrl.'">'.$oInbox->Get('target_class').'::'.$aProcessed[$sUIDLs]['ticket_id'].'</a>';
-						}
-						$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDLs];
-						$sDetailsURL = utils::GetAbsoluteUrlModulePage(basename(dirname(__FILE__)), 'details.php', $aArgs);
-						$sDetailsLink = '<a href="'.$sDetailsURL.'">'.Dict::S('MailInbox:MessageDetails').'</a>';
-					}
-					$aData[] = [
-						'checkbox' => '<input type="checkbox" class="mailbox_item" value="'.htmlentities($sUIDLs, ENT_QUOTES, 'UTF-8').'"/>',
-						'status' => $sStatus,
-						'date' => $oEmail->sDate,
-						'from' => $oEmail->sCallerEmail,
-						'subject' => $oEmail->sSubject,
-						'ticket' => $sLink,
-						'error' => $sErrorMsg,
-						'details' => $sDetailsLink,
+				while($oReplica = $oReplicaSet->Fetch()) {
+					$aProcessed[$oReplica->Get('uidl')] = [
+						'status' => $oReplica->Get('status'),
+						'ticket_id' => $oReplica->Get('ticket_id'),
+						'error_message' => $oReplica->Get('error_message'),
+						'id' => $oReplica->GetKey(),
 					];
-					
 				}
 				
-				$iCurrentIndex += 1;
+				// Table config. Will be used as headers while the data is processed.
+				$aTableConfig = [
+					'checkbox' => ['label' => '<input type="checkbox" id="mailbox_checkall"/>', 'description' => ''],
+					'status' => ['label' => Dict::S('MailInbox:Status'), 'description' => ''],
+					'date' => ['label' => Dict::S('MailInbox:Date'), 'description' => ''],
+					'from' => ['label' => Dict::S('MailInbox:From'), 'description' => ''],
+					'subject' => ['label' => Dict::S('MailInbox:Subject'), 'description' => ''],
+					'ticket' => ['label' =>  Dict::S('MailInbox:RelatedTicket'), 'description' => ''],
+					'error' => ['label' =>  Dict::S('MailInbox:ErrorMessage'), 'description' => ''],
+					'details' => ['label' =>  Dict::S('MailInbox:MessageDetails'), 'description' => ''],
+				];
+
+				$aData = [];
+				$aMessageIndexes = array_keys($aMessages);
+				
+				$iCurrentIndex = $iStart;
+				while($iCurrentIndex <= $iEnd) {
+					
+					// Obtain the actual index for the message (take Nth index)
+					$iMessage = $aMessageIndexes[$iCurrentIndex];
+									
+					$oRawEmail = $oSource->GetMessage($iMessage);
+					
+					if(is_null($oRawEmail) == true) {
+						
+						// Just ignore.
+						// Adding a dummy record in the table could lead to actions being performed which should not be available for this corrupted message.
+						
+					}
+					else {
+						
+						$iMsgOkCount++;
+						$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
+
+						// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
+						$sUIDLs = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
+						$sStatus = Dict::S('MailInbox:Status/New');
+						$sLink = '';
+						$sErrorMsg = '';
+						$sDetailsLink = '';
+						if(array_key_exists($sUIDLs, $aProcessed)) {
+							
+							switch($aProcessed[$sUIDLs]['status']) {
+								case 'ok':
+									$sStatus = Dict::S('MailInbox:Status/Processed');
+									break;
+
+								case 'error':
+									$sStatus = Dict::S('MailInbox:Status/Error');
+									break;
+
+								case 'undesired':
+									$sStatus = Dict::S('MailInbox:Status/Undesired');
+									break;
+
+								case 'ignored':
+									$sStatus = Dict::S('MailInbox:Status/Ignored');
+							}
+							$sErrorMsg = $aProcessed[$sUIDLs]['error_message'];
+							if($aProcessed[$sUIDLs]['ticket_id'] != '') {
+								$sTicketUrl = ApplicationContext::MakeObjectUrl($oInbox->Get('target_class'), $aProcessed[$sUIDLs]['ticket_id']);
+								$sLink = '<a href="'.$sTicketUrl.'">'.$oInbox->Get('target_class').'::'.$aProcessed[$sUIDLs]['ticket_id'].'</a>';
+							}
+							$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDLs];
+							$sDetailsURL = utils::GetAbsoluteUrlModulePage(basename(dirname(__FILE__)), 'details.php', $aArgs);
+							$sDetailsLink = '<a href="'.$sDetailsURL.'">'.Dict::S('MailInbox:MessageDetails').'</a>';
+						}
+						$aData[] = [
+							'checkbox' => '<input type="checkbox" class="mailbox_item" value="'.htmlentities($sUIDLs, ENT_QUOTES, 'UTF-8').'"/>',
+							'status' => $sStatus,
+							'date' => $oEmail->sDate,
+							'from' => $oEmail->sCallerEmail,
+							'subject' => $oEmail->sSubject,
+							'ticket' => $sLink,
+							'error' => $sErrorMsg,
+							'details' => $sDetailsLink,
+						];
+						
+					}
+					
+					$iCurrentIndex += 1;
+					
+				}
+			
+			}
+
+			if($iTotalMsgCount > 0) {
+				
+				// If we have messages in the mailbox, even if none can be read (meaning they can't be displayed), we are displaying the mailbox stats
+				// This will greatly help the user understanding what's going on !
+				$oPage->p(Dict::Format('MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox',
+					$iMsgOkCount,
+					$iTotalMsgCount,
+					($iTotalMsgCount - $iProcessedCount),
+					($iTotalMsgCount - $iTotalMsgOkCount))
+				);
 				
 			}
 			
-			if($iUnprocessableMessages > 0) {
-				$oPage->p(Dict::Format('MailInbox:UnprocessableMessages', $iUnprocessableMessages));
-			}
-		
-			if(count($aData) > 0) {
-				$oPage->p(Dict::Format('MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox', count($aData), $iTotalMsgCount, ($iTotalMsgCount - $iProcessedCount)));
+			if($iMsgOkCount > 0) {
+				
 				$oPage->table($aTableConfig, $aData);
 				$oPage->add('<div><img alt="" src="../images/tv-item-last.gif" style="vertical-align:bottom;margin-left:10px;"/>&nbsp;'.Dict::S('MailInbox:WithSelectedDo').'&nbsp;&nbsp<button class="mailbox_button ibo-button ibo-is-regular ibo-is-neutral" id="mailbox_reset_status">'.Dict::S('MailInbox:ResetStatus').'</button>&nbsp;&nbsp;<button class="mailbox_button ibo-button ibo-is-regular ibo-is-danger" id="mailbox_delete_messages">'.Dict::S('MailInbox:DeleteMessage').'</button>&nbsp;&nbsp;<button class="mailbox_button ibo-button ibo-is-regular ibo-is-neutral" id="mailbox_ignore_messages">'.Dict::S('MailInbox:IgnoreMessage').'</button></div>');
+			
+			} 
+			else {
+				
+				$oPage->p(Dict::Format('MailInbox:EmptyMailbox'));
+				
+			}
+
+			if($iTotalMsgCount > 0) {
+				// If we have messages in the mailbox, even if none can be read (meaning they can't be displayed), we are displaying the mailbox stats
+				// This will greatly help the user understanding what's going on !
+				$oPage->p(Dict::Format('MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox',
+					$iMsgOkCount,
+					$iTotalMsgCount,
+					($iTotalMsgCount - $iProcessedCount),
+					($iTotalMsgCount - $iTotalMsgOkCount))
+				);
 			}
 			
 		}

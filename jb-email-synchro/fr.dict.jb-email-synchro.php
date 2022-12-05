@@ -51,7 +51,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:MailboxContent' => 'Contenu de la boîte mail',
 	'MailInbox:MailboxContent:ConfirmMessage' => 'Etes-vous sûr(e)?',
 	'MailInbox:EmptyMailbox' => 'La boîte mail est vide.',
-	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d eMail(s) affichés. Il y a au total %2$d eMail(s) dans la boîte (dont %3$d nouveaux).',
+	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d eMail(s) affichés. Il y a au total %2$d eMail(s) dans la boîte (dont %3$d nouveaux et %4$d corrompus).',
 	'MailInbox:UnprocessableMessages' => 'There are %1$s e-mail(s) which can not be listed due to a technical issue.~~',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'Le paramètre MySQL max_allowed_packet dans le fichier "my.ini" est trop petit : %1$s. La valeur recommandée est d\'au minimum : %2$s',
 	'MailInbox:Status' => 'Etat',

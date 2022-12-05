@@ -550,6 +550,24 @@ abstract class Policy implements iPolicy {
 		return $aAddresses;
 	}
 	
+	/**
+	 * Returns an array containing the e-mail aliases, including the primary e-mail address.
+	 *
+	 * @return \String[]
+	 */
+	public static function GetMailBoxAliases() {
+		
+		$oMailBox = static::GetMailBox();
+		
+		$sMailBoxAliases = $oMailBox->Get('mail_aliases');
+		$aMailBoxAliases = (trim($sMailBoxAliases) == '' ? [] : preg_split(NEWLINE_REGEX, $sMailBoxAliases));
+		$aMailBoxAliases[] = $oMailBox->Get('login');
+		
+		return $aMailBoxAliases;
+		
+	}
+	
+	
 }
 
 
@@ -1921,11 +1939,10 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 			$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
 			
 			// Mailbox aliases
-			$sMailBoxAliases = $oMailBox->Get('mail_aliases');
-			$aMailBoxAliases = (trim($sMailBoxAliases) == '' ? [] : preg_split(NEWLINE_REGEX, $sMailBoxAliases));
+			$aMailBoxAliases = static::GetMailBoxAliases();
 			
 			// Ignore sender; helpdesk mailbox; any helpdesk mailbox aliases
-			$aAllowedContacts = array_merge([$oEmail->sCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases);
+			$aAllowedContacts = array_merge([ $oEmail->sCallerEmail ], $aMailBoxAliases);
 			$aAllowedContacts = array_unique($aAllowedContacts);
 
 			$sPolicyBehavior = $oMailBox->Get(static::GetPolicyId().'_behavior');
@@ -2681,18 +2698,17 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 		$aAllContactsEmailsOnly = static::GetAddressesFromRecipients($aAllContacts);
 		
 		// Mailbox aliases
-		$sMailBoxAliases = $oMailBox->Get('mail_aliases');
-		$aMailBoxAliases = (trim($sMailBoxAliases) == '' ? [] : preg_split(NEWLINE_REGEX, $sMailBoxAliases));
+		$aMailBoxAliases = static::GetMailBoxAliases();
 		
 		// Ignore helpdesk mailbox; any helpdesk mailbox aliases, original caller's email address
 		if($oTicket !== null) {
-			// For existing tickets: other people might reply. So only exclude mailbox aliases and the original caller.
+			// For existing tickets: other people might reply. So only exclude mailbox aliases and the original caller (who may be different from the current e-mail sender)
 			// If it's someone else replying, it should be seen as a new contact.
 			$sOriginalCallerEmail = $oTicket->Get('caller_id->email');
-			$aAllOtherContactsEmailsOnly = array_udiff($aAllContactsEmailsOnly, [$sOriginalCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
+			$aAllOtherContactsEmailsOnly = array_udiff($aAllContactsEmailsOnly, [ $sOriginalCallerEmail ], $aMailBoxAliases, 'strcasecmp');
 		}
 		else {
-			$aAllOtherContactsEmailsOnly = array_udiff($aAllContactsEmailsOnly, [$sCallerEmail, $oMailBox->Get('login')], $aMailBoxAliases, 'strcasecmp');
+			$aAllOtherContactsEmailsOnly = array_udiff($aAllContactsEmailsOnly, [ $sCallerEmail ], $aMailBoxAliases, 'strcasecmp');
 		}
 		$aAllOtherContactsEmailsOnly = array_unique($aAllOtherContactsEmailsOnly);
 
@@ -2710,6 +2726,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 					
 					// In case this recipient's mail address should not be processed any further (reasons: see above): continue with next one
 					if(in_array($sRecipientEmail, $aAllOtherContactsEmailsOnly) == false) {
+						static::Trace(".. Ignoring Person with email address '{$sRecipientEmail}'");
 						continue;
 					}
 					
