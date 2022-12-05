@@ -2687,6 +2687,8 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 		// Generic 'before' actions
 		parent::BeforeComplianceCheck();
 		
+		$sPolicyBehavior = $oMailBox->Get(static::GetPolicyId().'_behavior');
+		
 		$oEmail = static::GetMail();
 		$oMailBox = static::GetMailBox();
 		$oTicket = static::GetTicket();
@@ -2695,41 +2697,43 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 							
 		// Take both the To: and CC:
 		$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
-		$aAllContactsEmailsOnly = static::GetAddressesFromRecipients($aAllContacts);
 		
 		// Mailbox aliases
-		$aMailBoxAliases = static::GetMailBoxAliases();
+		$aExcludedAddresses = static::GetMailBoxAliases();
 		
 		// Ignore helpdesk mailbox; any helpdesk mailbox aliases, original caller's email address
 		if($oTicket !== null) {
 			// For existing tickets: other people might reply. So only exclude mailbox aliases and the original caller (who may be different from the current e-mail sender)
 			// If it's someone else replying, it should be seen as a new contact.
-			$sOriginalCallerEmail = $oTicket->Get('caller_id->email');
-			$aAllOtherContactsEmailsOnly = array_udiff($aAllContactsEmailsOnly, [ $sOriginalCallerEmail ], $aMailBoxAliases, 'strcasecmp');
+			$aExcludedAddresses[] = $oTicket->Get('caller_id->email');
+			
 		}
 		else {
-			$aAllOtherContactsEmailsOnly = array_udiff($aAllContactsEmailsOnly, [ $sCallerEmail ], $aMailBoxAliases, 'strcasecmp');
+			$aExcludedAddresses[] = $sCallerEmail;
 		}
-		$aAllOtherContactsEmailsOnly = array_unique($aAllOtherContactsEmailsOnly);
+		
+		$aExcludedAddresses = array_map('strtolower', $aExcludedAddresses);
+		$aExcludedAddresses = array_unique($aExcludedAddresses);
+		
+		static::Trace(".. E-mail addresses to exclude: ".implode(', ', $aExcludedAddresses));
 
-		$sPolicyBehavior = $oMailBox->Get(static::GetPolicyId().'_behavior');
 		
 		switch($sPolicyBehavior) {
 			
 			case 'fallback_add_existing_other_contacts':
 			case 'fallback_add_other_contacts':
 		
+				// Using all contacts again to have access to the 'email' and 'name'.
 				foreach($aAllContacts as $aRecipient) {
 					
 					$sRecipientEmail = $aRecipient['email'];
 					$sRecipientName = $aRecipient['name'];
 					
-					// In case this recipient's mail address should not be processed any further (reasons: see above): continue with next one
-					if(in_array($sRecipientEmail, $aAllOtherContactsEmailsOnly) == false) {
-						static::Trace(".. Ignoring Person with email address '{$sRecipientEmail}'");
+					// Ignoree
+					if(in_array(strtolower($sRecipientEmail), $aExcludedAddresses) == true) {
+						static::Trace('.. Ignore '.$sRecipientEmail.' ('.$sRecipientName.')');
 						continue;
 					}
-					
 					
 					// Found other contacts in To: or CC:
 					static::Trace(".. Looking up Person with email address '{$sRecipientEmail}'");
