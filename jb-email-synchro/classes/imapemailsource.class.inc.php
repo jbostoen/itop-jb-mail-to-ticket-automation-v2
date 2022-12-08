@@ -68,6 +68,16 @@ class IMAPEmailSource extends EmailSource {
 		
 		$this->rImapConn = imap_open($sIMAPConnStr, $sLogin, $sPwd, 0, 0, $aImapOpenOptions);
 		if($this->rImapConn === false) {
+			
+			// It seems to occur regularly with Microsoft Office 365 that this kind of issue is logged:
+			/*
+			
+			2022-12-08 12:15:10 | Error   | 71    | Cannot connect to IMAP server: '{outlook.office365.com:993/imap/ssl/novalidate-cert}Somefolder', with credentials: 'someuser@outlook.com'/***' array (
+			  0 => 'Can not authenticate to IMAP server: [CLOSED] IMAP connection broken (authenticate)',
+			)
+
+			*/
+			
 			if(class_exists('EventHealthIssue')) {
 				EventHealthIssue::LogHealthIssue('jb-email-synchro', "Cannot connect to IMAP server: '$sIMAPConnStr', with credentials: '$sLogin/***'");
 			}
@@ -196,7 +206,7 @@ class IMAPEmailSource extends EmailSource {
 
 	/**
 	 * Get the list (with their IDs) of all the messages
-	 * @return Array An array of hashes: 'msg_id' => index 'uild' => message identifier
+	 * @return Array An array of hashes: 'msg_id' => index 'uidl' => message identifier
 	 */
 	 public function GetListing() {
 		 
@@ -214,14 +224,15 @@ class IMAPEmailSource extends EmailSource {
 			// Contrary to the Combodo implementation, this fork defaults to 'true', since it's definitely recommended for GMail and Exchange (IMAP).
         	$bUseMessageId = static::UseMessageIdAsUid();
 
-        	$ret = array();
+        	$ret = [];
+
+			// There is a known issue here, probably due to SPAM messages.
+			// Tried to figure it out but no example yet.
+			// Sometimes an error is returned which outputs this as subject: "Retrieval using the IMAP4 protocol failed for the following message: <some-id>"
 			$aResponse = imap_fetch_overview($this->rImapConn, $sRange);
 			
 			foreach($aResponse as $aMessage) {
 				if($bUseMessageId) {
-					// There is a known issue here, probably due to SPAM messages.
-					// Tried to figure it out but no example yet.
-					// Sometimes an error is returned which outputs this as subject: "Retrieval using the IMAP4 protocol failed for the following message: <some-id>"
 					$ret[] = array('msg_id' => $aMessage->msgno, 'uidl' => $aMessage->message_id, 'udate' => $aMessage->udate);
 				}
 				else {

@@ -167,6 +167,9 @@ class IMAPOAuthEmailSource extends EmailSource {
 		return $this->sServer.'/'.$this->sLogin;
 	}
 	
+	/**
+	 * @inheritDoc
+	 */
 	public function GetListing() {
 		
 		$iMessageCount = $this->oStorage->countMessages();
@@ -212,7 +215,7 @@ class IMAPOAuthEmailSource extends EmailSource {
 				];
 				
 			}
-			catch (Exception $e) {
+			catch(Exception $e) {
 				IssueLog::Error(__METHOD__." messageId={$iMessageId} for {$this->sServer}: an exception occurred", static::LOG_CHANNEL, [
 					'exception.message' => $e->getMessage(),
 					'exception.stack'   => $e->getTraceAsString(),
