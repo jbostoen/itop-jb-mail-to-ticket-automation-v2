@@ -2687,11 +2687,11 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 		// Generic 'before' actions
 		parent::BeforeComplianceCheck();
 		
-		$sPolicyBehavior = $oMailBox->Get(static::GetPolicyId().'_behavior');
 		
 		$oEmail = static::GetMail();
 		$oMailBox = static::GetMailBox();
 		$oTicket = static::GetTicket();
+		$sPolicyBehavior = $oMailBox->Get(static::GetPolicyId().'_behavior');
 		
 		$sCallerEmail = $oEmail->sCallerEmail;
 							

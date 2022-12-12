@@ -983,6 +983,8 @@ EOF
 		
 		}
 		
+		$this->Trace('.. Processed all policies.');
+		
 		return $oTicket;
 		
 	}]]></code>
