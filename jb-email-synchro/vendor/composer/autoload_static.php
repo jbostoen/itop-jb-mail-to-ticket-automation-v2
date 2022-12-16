@@ -21,7 +21,7 @@ class ComposerStaticInit0e940eb567ab3a81020621709d0371df
     );
 
     public static $classMap = array (
-        'Combodo\\iTop\\Extension\\Helper\\ImapOptionsHelper' => __DIR__ . '/../..' . '/src/Helper/ImapOptionsHelper.php',
+        'Combodo\\iTop\\Extension\\Helper\\MessageHelper' => __DIR__ . '/../..' . '/src/Helper/MessageHelper.php',
         'Combodo\\iTop\\Extension\\Helper\\ProviderHelper' => __DIR__ . '/../..' . '/src/Helper/ProviderHelper.php',
         'Combodo\\iTop\\Extension\\Service\\IMAPOAuthEmailSource' => __DIR__ . '/../..' . '/src/Service/IMAPOAuthEmailSource.php',
         'Combodo\\iTop\\Extension\\Service\\IMAPOAuthLogin' => __DIR__ . '/../..' . '/src/Service/IMAPOAuthLogin.php',

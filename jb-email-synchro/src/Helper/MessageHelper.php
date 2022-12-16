@@ -28,7 +28,7 @@ class MessageHelper {
 	 *
 	 * @return \Integer UNIX timestamp
 	 */
-	public static function GetMessageId($oMessage) {
+	public static function GetMessageSentTime($oMessage) {
 		
 	
 		// Mimic 'udate' from original IMAP implementation.

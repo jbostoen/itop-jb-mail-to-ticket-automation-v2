@@ -6,7 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Combodo\\iTop\\Extension\\Helper\\ImapOptionsHelper' => $baseDir . '/src/Helper/ImapOptionsHelper.php',
+    'Combodo\\iTop\\Extension\\Helper\\MessageHelper' => $baseDir . '/src/Helper/MessageHelper.php',
     'Combodo\\iTop\\Extension\\Helper\\ProviderHelper' => $baseDir . '/src/Helper/ProviderHelper.php',
     'Combodo\\iTop\\Extension\\Service\\IMAPOAuthEmailSource' => $baseDir . '/src/Service/IMAPOAuthEmailSource.php',
     'Combodo\\iTop\\Extension\\Service\\IMAPOAuthLogin' => $baseDir . '/src/Service/IMAPOAuthLogin.php',

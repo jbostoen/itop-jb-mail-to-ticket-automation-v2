@@ -1,8 +1,8 @@
 <?php
 namespace Combodo\iTop\Extension\Helper;
 
-use Combodo\iTop\Core\Authentication\Client\OAuth\OAuthClientProviderFactory;
-use MetaModel;
+use \Combodo\iTop\Core\Authentication\Client\OAuth\OAuthClientProviderFactory;
+use \MetaModel;
 
 class ProviderHelper{
 	public static function getProviderForIMAP($oMailbox)
