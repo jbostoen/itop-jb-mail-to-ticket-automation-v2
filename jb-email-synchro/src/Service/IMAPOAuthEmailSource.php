@@ -220,8 +220,8 @@ class IMAPOAuthEmailSource extends EmailSource {
 					'exception.message' => $e->getMessage(),
 					'exception.stack'   => $e->getTraceAsString(),
 				]);
-				// Note: check if we can simply skip this?
-				// $aReturn[] = ['msg_id' => $iMessageId, 'uidl' => null, 'udate' => null];
+				// Still return something. Skipping is handled elsewhere.
+				$aReturn[] = ['msg_id' => $iMessageId, 'uidl' => null, 'udate' => null];
 				continue;
 			}
 			finally {

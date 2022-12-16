@@ -52,7 +52,9 @@ function GetMailboxContent($oPage, $oInbox) {
 			$oSource = $oInbox->GetEmailSource();
 			$iTotalMsgCount = $oSource->GetMessagesCount();
 			$aMessages = $oSource->GetListing(); // Note: this may differ from $oSource->GetMessagesCount(); as messages with errors could be skipped.
-			$iTotalMsgOkCount = count($aMessages);
+			$iTotalMsgOkCount = count(array_filter($aMessages, function($aMsg) {
+				return (is_null($aMsg['uidl']) == false);
+			}));
 			
 			if($iStartIndex < 0 || $iMaxCount <= 0) {
 				// Don't process, invalid indexes
@@ -64,7 +66,8 @@ function GetMailboxContent($oPage, $oInbox) {
 		
 			// Avoid user specifying a higher number (start + count) than the total mesage number count
 			// The largest index is (message count - 1), since messages are retrieved by index (starting at 0)
-			$iEnd = min($iStart + $iMaxCount - 1, $iTotalMsgOkCount - 1); 
+			// Check the total (readable) message count here.
+			$iEnd = min($iStart + $iMaxCount - 1, $iTotalMsgCount - 1); 
 			
 		}
 		catch(Exception $e) {

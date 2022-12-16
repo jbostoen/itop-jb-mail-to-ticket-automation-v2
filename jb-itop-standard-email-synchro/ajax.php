@@ -57,7 +57,9 @@ try
 	}
 	$oPage->output();
 }
-catch(Exception $e) {	
+catch(Exception $e) {
+	
+	$oPage = new ajax_page('');
 	$oPage->SetContentType('text/html');
 	$oPage->add($e->getMessage());
 	$oPage->output();
