@@ -17,6 +17,7 @@ SetupWebPage::AddModule(
 		'dependencies' => array(
 			'jb-framework/2.6.191216',
 			'jb-email-synchro/2.6.190110',
+			'jb-news/2.7.221207',
 			// no other dependency is listed, for backward 1.x compatibility... though this module uses implicitely the Ticket's derived classes...
 		),
 		'installer' => 'StandardEmailSynchroInstaller',

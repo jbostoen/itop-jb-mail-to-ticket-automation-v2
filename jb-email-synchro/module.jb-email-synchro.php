@@ -12,7 +12,7 @@ SetupWebPage::AddModule(
 		'category' => 'business',
 		// Setup
 		'dependencies' => array(
-			'itop-oauth-client/2.7.7',
+			'itop-oauth-client/2.7.7'
 		),
 		'mandatory' => false,
 		'visible' => true,
