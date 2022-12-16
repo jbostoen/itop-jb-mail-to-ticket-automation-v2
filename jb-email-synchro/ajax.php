@@ -242,7 +242,8 @@ function GetMailboxContent($oPage, $oInbox) {
 			} 
 			else {
 				
-				$oPage->p(Dict::Format('MailInbox:EmptyMailbox'));
+				// Contrary to the original Combodo message: this could mean there are actually e-mails in the mailbox, but they can not be processed.
+				$oPage->p(Dict::Format('MailInbox:NoValidEmailsFound'));
 				
 			}
 
