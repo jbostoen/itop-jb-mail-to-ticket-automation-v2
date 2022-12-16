@@ -1,7 +1,6 @@
 [submodule "jb-news"]
 	path = jb-news
-	url = https://github.com/jbostoen/itop-jb-news
+	url = https://github.com/jbostoen/itop-jb-news.git
 [submodule "jb-framework"]
 	path = jb-framework
-	url = https://github.com/jbostoen/itop-jb-framework
-	
+	url = https://github.com/jbostoen/itop-jb-framework.git
