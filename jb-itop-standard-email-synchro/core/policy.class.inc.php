@@ -2057,7 +2057,7 @@ abstract class PolicyBounceAutoReply extends Policy implements iPolicy {
 				
 				// https://www.iana.org/assignments/auto-submitted-keywords/auto-submitted-keywords.xhtml
 				// Values for auto-submitted: no, auto-generated, auto-replied, auto-notified
-				case (preg_match('/^auto/', strtolower($oEmail->GetHeader('auto-submitted')))):
+				case (preg_match('/^auto/', strtolower($oEmail->oRawEmail->GetHeader('auto-submitted')))):
 				
 					switch($sPolicyBehavior) {
 						
