@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (c) 2019-2022 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     2.7.221223
+ * @version     2.7.221226
  *
  * Policy interface definition and some classes implementing it.
  * 
@@ -2050,10 +2050,10 @@ abstract class PolicyBounceAutoReply extends Policy implements iPolicy {
 			
 			switch(true) {
 				
-				case ($oEmail->GetHeader('x-autoreply') != ''):
-				case ($oEmail->GetHeader('x-autorespond') != ''):
+				case ($oEmail->oRawEmail->GetHeader('x-autoreply') != ''):
+				case ($oEmail->oRawEmail->GetHeader('x-autorespond') != ''):
 				
-				case (strtolower($oEmail->GetHeader('precedence')) == 'auto_reply'):
+				case (strtolower($oEmail->oRawEmail->GetHeader('precedence')) == 'auto_reply'):
 				
 				// https://www.iana.org/assignments/auto-submitted-keywords/auto-submitted-keywords.xhtml
 				// Values for auto-submitted: no, auto-generated, auto-replied, auto-notified

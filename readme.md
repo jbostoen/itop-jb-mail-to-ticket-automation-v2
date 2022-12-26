@@ -23,9 +23,9 @@ Some fixes in this version were accepted by Combodo back over time and are now p
 What is different? In a few cases, Combodo's implementation of Mail to Ticket Automation was not sufficient enough.  
 This extension works in steps. Those steps are called **policies** and they **can** do two things: 
 
-* **determine if further processing should be blocked**
+* **Determine if further processing should be blocked.**
   * Examples: bouncing emails without subjects, with other people as recipient, ...
-* **perform an automated action**
+* **Perform an automated action.**
   * Examples: determining and linking additional contacts, saving emails to a folder, ...
   * Ticket fields should only be filled by one policy. That's why some of the default policies check whether some information (such as related contacts) hasn't been set yet.  
 
@@ -53,7 +53,8 @@ Info on settings and default policies
 
 ## Security recommendations
 
-Highly recommended to read the [security recommendations](documentation/security.md)
+Highly recommended to read!
+* See [security recommendations](documentation/security.md)
 
 ## Customization
 

@@ -8,9 +8,9 @@
 
 Be careful on how you set up e-mail notifications linked to the trigger "When updated by mail".  
 
-Typically this is used for two sorts of notifications:
-* to inform agents a new reply has been added (from a customer)
-* to inform a caller and possibly related contacts that the ticket was updated because someone sent an e-mail with the same ticket reference number.
+Typically this is used for two types of notifications:
+* To inform agents a new reply has been added (from a customer).
+* To inform a caller and possibly related contacts that the ticket was updated because someone sent an e-mail with the same ticket reference number.
 
 In the last case, you might assume this would either be the original caller or an already related contact.  
 However, an attacker could theoretically guess the pattern and spoof an agent's reply - perhaps requesting the recipients to perform a malicious action.  
