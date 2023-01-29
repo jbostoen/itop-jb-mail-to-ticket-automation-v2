@@ -238,7 +238,7 @@ class EmailMessage {
 		}		
 		
 		$this->oDoc = new DOMDocument();
-		$this->oDoc->preserveWhitespace = true;
+		$this->oDoc->preserveWhiteSpace = true;
 		@$this->oDoc->loadHTML('<?xml encoding="UTF-8"?>'.$sBodyText); // For loading HTML chunks where the character set is not specified
 		
 		$this->CleanNode($this->oDoc, $aTagsToRemove);

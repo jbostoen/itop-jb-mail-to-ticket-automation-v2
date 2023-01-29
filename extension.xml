@@ -5,8 +5,8 @@
 	<author><![CDATA[jbostoen]]></author>
 	<label><![CDATA[Feature: Mail to Ticket Automation]]></label>
 	<description><![CDATA[Scan several mailboxes to create or update tickets.]]></description>
-	<version>2.7.221226</version>
-	<release_date>2022-12-26</release_date>
+	<version>2.7.230123</version>
+	<release_date>2023-01-23</release_date>
 	<version_description><![CDATA[]]></version_description>
 	<itop_version_min>2.7.0</itop_version_min>
 	<status>stable</status>
