@@ -356,7 +356,7 @@ EOF
 			if(is_object($oTicket)) { 
 				if($oTicket->Get('status') == 'closed') {
 					// The corresponding ticket was closed, delete the email (and the replica)
-					$this->Trace('. EmailReplica is not new. Ticket closed. Delete message.');
+					$this->Trace('. EmailReplica is not new. Ticket '.$oTicket->Get('ref').' closed. Delete message.');
 					$this->SetNextAction(EmailProcessor::DELETE_MESSAGE);
 				}
 			}
