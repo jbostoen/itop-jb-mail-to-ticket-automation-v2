@@ -118,7 +118,7 @@ class EmailMessage {
 				$aErrors[] = 'No attachment file name';
 			}
 			if(empty($aAttachment['content'])) {
-				$aErrors[] = 'No attachment content for '.$aAttachment['filename'];
+				// This has deliberately been changed to not result in an error anymore, as there were use cases where a valid empty file was attached.
 			}
 		}
   
