@@ -645,7 +645,7 @@ EOF
 		$this->Trace(". UIDL ".htmlspecialchars($oEmail->sUIDL));
 		$this->Trace(". Message-ID ".htmlspecialchars ($oEmail->sMessageId));
 				
-		// Contrary to Combodo's implementation: first check if there is any iTop object mentioned in the headers of the e-mail
+		// Contrary to Combodo's implementation: first check if there is any iTop object mentioned in the headers of the e-mail.
 		// This fork contains policies which might reopen closed/resolved tickets and therefore needs the Ticket object.
         // Check whether a new ticket must be initiated or an existing one updated.
         $oTicket = $this->GetRelatedTicket($oEmail);

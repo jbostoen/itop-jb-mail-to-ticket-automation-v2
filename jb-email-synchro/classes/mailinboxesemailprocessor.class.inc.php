@@ -149,6 +149,11 @@ class MailInboxesEmailProcessor extends EmailProcessor {
             case EmailProcessor::MOVE_MESSAGE:
 				$sRetCode = 'MOVE_MESSAGE';
 				break;
+				
+			case EmailProcessor::ABORT_FURTHER_PROCESSING:
+				$sRetCode = 'ABORT_FURTHER_PROCESSING';
+				break;
+				
 		}
 		return $sRetCode;		
 	}

@@ -23,6 +23,7 @@
  *
  */
 abstract class EmailProcessor {
+	
 	const NO_ACTION = 0;
 	const DELETE_MESSAGE = 1;
 	const PROCESS_MESSAGE = 2;
@@ -30,6 +31,8 @@ abstract class EmailProcessor {
 	const MARK_MESSAGE_AS_ERROR = 4;
 	const MARK_MESSAGE_AS_UNDESIRED = 5;
 	const MOVE_MESSAGE = 6;
+	
+	const ABORT_FURTHER_PROCESSING = 999;
 
 	/**
 	 * @return \EmailSource[]

@@ -341,6 +341,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							$iActionCode = $oProcessor->DispatchMessage($oSource, $iMessage, $sUIDL, $oEmailReplica);
 					
 							switch($iActionCode) {
+								
 								case EmailProcessor::MARK_MESSAGE_AS_ERROR:
 									$iTotalMarkedAsError++;
 									$this->Trace("Marking the message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
@@ -459,12 +460,20 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												}
 												break;
 			
+											
 											default:
 											case EmailProcessor::NO_ACTION:
+											case EmailProcessor::ABORT_FURTHER_PROCESSING:
 
 												$this->Trace("No more action for EmailReplica ID: ".$oEmailReplica->GetKey());
 												$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'ok', $oRawEmail);
 												$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
+												
+												if($iNextActionCode == EmailProcessor::ABORT_FURTHER_PROCESSING) {
+													$this->Trace('Abort further processing.');
+													break 3;
+												}
+												
 												break;
 										}
 
@@ -478,9 +487,10 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									$this->Trace("No action for message (and replica): {$sUIDL}");
 									$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
 									break;
+									
 							}
 
-							if (time() > $iTimeLimit) {
+							if(time() > $iTimeLimit) {
 								
 								$this->Trace(self::CRON_TIME_LIMIT_REACHED_MESSAGE);
 								break; // We'll do the rest later
@@ -503,6 +513,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						}						
 						
 					}
+					
 					if(time() > $iTimeLimit) {
 						// Process the other e-mails later
 

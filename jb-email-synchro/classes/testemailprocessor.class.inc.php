@@ -201,6 +201,10 @@ class TestEmailProcessor extends EmailProcessor
 			case EmailProcessor::MARK_MESSAGE_AS_UNDESIRED:
 				$sRetCode = 'MARK_MESSAGE_AS_UNDESIRED';
 				break;
+				
+			case EmailProcessor::ABORT_FURTHER_PROCESSING:
+				$sRetCode = 'ABORT_FURTHER_PROCESSING';
+				break;
 		}
 		return $sRetCode;
 	}
