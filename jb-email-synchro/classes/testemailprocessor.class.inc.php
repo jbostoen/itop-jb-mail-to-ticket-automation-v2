@@ -149,7 +149,7 @@ class TestEmailProcessor extends EmailProcessor
 				$oInbox->ReprocessOldEmail($oSource, $index, $oEmail, $oEmailReplica);
 			}
 			$iRetCode = $oInbox->GetNextAction();
-			$sRetCode = $this->GetActionFromCode($iRetCode);
+			$sRetCode = EmailProcessor::GetActionFromCode($iRetCode);
 			self::Trace("Test Email Synchro: MailInboxesEmailProcessor: End of processing of the new message $index ({$oEmail->sUIDL}) retCode: ($iRetCode) $sRetCode");
 		}
 		catch(Exception $e)
@@ -168,46 +168,6 @@ class TestEmailProcessor extends EmailProcessor
 		return MetaModel::NewObject('MailInboxStandard');
 	}
 
-	/**
-	 * Returns a action (string) corresponding to the given action code
-	 * @param int $iRetCode The action code from EmailProcessor
-	 * @return string The textual code of the action
-	 */
-	protected function GetActionFromCode($iRetCode)
-	{
-		$sRetCode = 'Unknown Code '.$iRetCode;
-		switch($iRetCode)
-		{
-			case EmailProcessor::NO_ACTION:
-				$sRetCode = 'NO_ACTION';
-				break;
-
-			case EmailProcessor::DELETE_MESSAGE;
-				$sRetCode = 'DELETE_MESSAGE';
-				break;
-
-			case EmailProcessor::PROCESS_MESSAGE:
-				$sRetCode = 'PROCESS_MESSAGE';
-				break;
-
-			case EmailProcessor::PROCESS_ERROR:
-				$sRetCode = 'PROCESS_ERROR';
-				break;
-
-			case EmailProcessor::MARK_MESSAGE_AS_ERROR:
-				$sRetCode = 'MARK_MESSAGE_AS_ERROR';
-				break;
-
-			case EmailProcessor::MARK_MESSAGE_AS_UNDESIRED:
-				$sRetCode = 'MARK_MESSAGE_AS_UNDESIRED';
-				break;
-				
-			case EmailProcessor::ABORT_FURTHER_PROCESSING:
-				$sRetCode = 'ABORT_FURTHER_PROCESSING';
-				break;
-		}
-		return $sRetCode;
-	}
 
 }
 

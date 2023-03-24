@@ -344,36 +344,59 @@ EOF
 					<type>Overload-DBObject</type>
 					<code>
 						<![CDATA[	public function DispatchEmail(EmailReplica $oEmailReplica) {
+						
 		$this->SetNextAction(EmailProcessor::NO_ACTION);
+		
+		// New messages will be processed.
+		// Already processed messages:
+		// - if related ticket is closed, the e-mail will be deleted.
+		// - if no ticket was created before or if it has been deleted, the message will also be deleted (if previously 'ok' or 'undesired').
+		
 		if($oEmailReplica->IsNew()) {
+		
 			// New (unread) message, let's process it
 			$this->Trace('. EmailReplica is new. Process message.');
 			$this->SetNextAction(EmailProcessor::PROCESS_MESSAGE);
+			
 		}
 		else {
+		
 			$iTicketId = $oEmailReplica->Get('ticket_id');
 			$oTicket = MetaModel::GetObject('Ticket', $iTicketId, false /* => may not exist anymore */);
+			
 			if(is_object($oTicket)) { 
+			
 				if($oTicket->Get('status') == 'closed') {
 					// The corresponding ticket was closed, delete the email (and the replica)
 					$this->Trace('. EmailReplica is not new. Ticket '.$oTicket->Get('ref').' closed. Delete message.');
 					$this->SetNextAction(EmailProcessor::DELETE_MESSAGE);
 				}
+				
 			}
 			else {
+			
 				// The corresponding ticket was deleted (or never created!), delete the email (and the replica)
 				$sReplicaStatus = $oEmailReplica->Get('status');
+				
 				if(in_array($sReplicaStatus, ['ok', 'undesired']) == true) {
+				
 					$this->Trace('. EmailReplica is not new. No ticket found. Status: '.$sReplicaStatus.'. Delete message.');
 					$this->SetNextAction(EmailProcessor::DELETE_MESSAGE);
+					
 				}
 				else {
+				
 					$this->Trace('. EmailReplica is not new. No ticket found. Status: '.$sReplicaStatus.'. Do nothing - requires manual intervention.');
 					$this->SetNextAction(EmailProcessor::NO_ACTION);
+					
 				}
+				
 			}
+			
 		}
+		
 		return $this->GetNextAction();
+		
 	}]]></code>
 				</method>
 				<method id="ProcessNewEmail">
@@ -389,6 +412,7 @@ EOF
 					<type>Overload-DBObject</type>
 					<code>
 						<![CDATA[	public function ProcessNewEmail(EmailSource $oSource, $index, EmailMessage $oEmail) {
+						
 		$oTicket = null;
 		$this->SetNextAction(EmailProcessor::NO_ACTION);
 		$this->sLastError = null;

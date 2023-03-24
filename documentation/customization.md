@@ -21,11 +21,11 @@ The most important things about implementing the interface:
   
   
 The most interesting thing to know about custom attributes:  
-If there's an attribute added to the mailbox class with the name ```policyname_behavior``` set to ```do_nothing```, the policy will be processed but is not supposed to perform any actions.  
+If there's an attribute added to the mailbox class with the name ```step_prefix_behavior``` set to ```do_nothing```, the policy will be processed but is not supposed to perform any actions.  
 It's meant for debugging and showing verbose output of what would happen, without doing it.  
 ```inactive``` means it will not be processed at all.
 
-```policyname``` is an example here; it is what is defined in the policy class as ```$sPolicyId```
+```step_prefix``` is an example here; it is what is defined in the policy class as ```$sXMLSettingsPrefix```
 
 Use the methods to set/get info (for instance: ```static::GetMail()```, rather than directly manipulating the static properties.
 
@@ -33,5 +33,5 @@ Use the methods to set/get info (for instance: ```static::GetMail()```, rather t
 ## Examples
 
 Check:
-* [policy.class.inc.php](../jb-itop-standard-email-synchro/core/policy.class.inc.php) - actually implemented policies 
-* [unusedpolicy.class.inc.php](../jb-itop-standard-email-synchro/core/unusedpolicy.class.inc.php) - an very basic unused example and some ideas
+* [steps.php](../jb-itop-standard-email-synchro/core/steps.php) - actually implemented policies 
+* [custom_step_example.php](../jb-itop-standard-email-synchro/core/custom_step_example.php) - an very basic unused example and some ideas

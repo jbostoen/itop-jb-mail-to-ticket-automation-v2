@@ -36,7 +36,7 @@ abstract class _MailInboxBase extends cmdbAbstractObject
 	protected $sBigFilesDir;
 
 	/** @var \String $sLastError Last error message. */
-	protected $sLastError;
+	public $sLastError;
 	
 	const XML_LEGACY_VERSION = '1.7';
 

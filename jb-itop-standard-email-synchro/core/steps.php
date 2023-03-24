@@ -54,61 +54,32 @@ use \Ticket;
 const NEWLINE_REGEX = '/\r\n|\r|\n/';
 
 /**
- * Interface iPolicy defines what the classes implementing policies should look like.
+ * Interface iStep defines what the classes implementing steps should look like.
  */
-interface iPolicy {
-	
-	/**
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing. In this case, it's expected a SetNextAction has been called.
-	 */
-	public static function IsCompliant();
-	
-	/**
-	 * Runs some default functionality BEFORE checking the policy. Use case: logging some information.
-	 * Can be cascaded to subclasses.
-	 *
-	 * @return void
-	 */
-	public static function BeforeComplianceCheck();
-	
-	/**
-	 * Runs some default functionality AFTER checking the policy. Use case: logging some information.
-	 * Can be cascaded to subclasses.
-	 *
-	 * @return void
-	 */
-	public static function AfterPassedComplianceCheck();
-	
-	/**
-	 * Actions executed when the message does not comply with a policy.
-	 * The default method informs the caller that the email was rejected.
-	 *
-	 * @return void
-	 */
-	public static function HandleViolation();
+interface iStep {
 	
 }
 
+
 /**
- * Class Policy. An abstract class defining a policy (an action to take in the processing of the e-mail, often to enforce certain behavior.).
+ * Class Step. An abstract class defining a step (an action to take in the processing of the e-mail).
  */
-abstract class Policy implements iPolicy {
+abstract class Step implements iStep {
 	
 	/**
-	 * @var \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been executed already.
+	 * @var \String[] $aPreviouslyExecutedSteps Array of steps (class names) which have been executed already.
 	 */
-	public static $aPreviouslyExecutedPolicies = [];
+	public static $aPreviouslyExecutedSteps = [];
 	
 	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
+	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all steps are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
 	 */
 	public static $iPrecedence = 20;
 	
 	/**
-	 * @var \String $sPolicyId Shortname for policy
+	 * @var \String $sXMLSettingsPrefix (XML) settings prefix for step.
 	 */
-	public static $sPolicyId = 'policy_generic';
+	public static $sXMLSettingsPrefix = 'step_generic';
 	
 	/**
 	 * @var \EmailMessage $oEmail E-mail message
@@ -143,44 +114,53 @@ abstract class Policy implements iPolicy {
 	 * @param \Integer|\String $index Index of the e-mail in the source
 	 * @param \EmailMessage $oEmail E-mail message
 	 * @param \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
-	 * @param \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
+	 * @param \String[] $aPreviouslyExecutedSteps Array of steps (class names) which have been processed already.
 	 *
 	 */
-	public static function Init(MailInboxStandard $oMailBox, EmailSource $oSource, $index, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedPolicies) {
+	public static function Init(MailInboxStandard $oMailBox, EmailSource $oSource, $index, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedSteps) {
 		
 		static::SetMailBox($oMailBox);
 		static::SetMailSource($oSource);
 		static::SetMailIndex($index);
 		static::SetMail($oEmail);
 		static::SetTicket($oTicket);
-		static::SetExecutedPolicies($aPreviouslyExecutedPolicies);
+		static::SetExecutedSteps($aPreviouslyExecutedSteps);
 	
 	}
 	
 	/**
-	  * Gets the policy ID
+	 * Execution of what needs to happen in this step. This is an individual method; so it can easily be overridden without doing common things defined in the Init() method.
+	 *
+	 * @return void
+	 */
+	public static function Execute() {
+		
+	}
+	
+	/**
+	  * Gets the step's XML settings prefix. In the datamodel, especially for policies, settings can be defined. Most common one would be something like 'example_step_behavior'.
 	  *
 	  * @return \String
 	 */
-	public static function GetPolicyId() {
+	public static function GetXMLSettingsPrefix() {
 		
-		return static::$sPolicyId;
+		return static::$sXMLSettingsPrefix;
 		
 	}
 	
 	/**
-	  * Gets the policy precedence
+	  * Gets the step's precedence.
 	  *
 	  * @return \Integer
 	 */
-	public static function GetPolicyPrecedence() {
+	public static function GetPrecedence() {
 		
 		return static::$iPrecedence;
 		
 	}
 	
 	/**
-	 * Gets the mailbox
+	 * Gets the mailbox.
 	 *
 	 * @return \MailInboxStandard
 	 */
@@ -191,7 +171,7 @@ abstract class Policy implements iPolicy {
 	}
 	
 	/**
-	 * Sets the mailbox
+	 * Sets the mailbox that's being processed.
 	 *
 	 * @param \MailInboxStandard $oMailBox Mailbox
 	 *
@@ -205,7 +185,7 @@ abstract class Policy implements iPolicy {
 	
 	
 	/**
-	 * Gets the e-mail
+	 * Gets the e-mail that's being processed.
 	 *
 	 * @return \EmailMessage
 	 */
@@ -216,9 +196,9 @@ abstract class Policy implements iPolicy {
 	}
 	
 	/**
-	 * Sets the e-mail
+	 * Sets the e-mail that's being processed.
 	 *
-	 * @param \EmailMessage $oMessage E-mail message
+	 * @param \EmailMessage $oMessage E-mail message.
 	 *
 	 * @return void
 	 */
@@ -229,7 +209,7 @@ abstract class Policy implements iPolicy {
 	}
 	
 	/**
-	 * Gets the e-mail source
+	 * Gets the e-mail source.
 	 *
 	 * @return \MailInboxStandard
 	 */
@@ -240,7 +220,7 @@ abstract class Policy implements iPolicy {
 	}
 	
 	/**
-	 * Sets the e-mail source
+	 * Sets the e-mail source.
 	 *
 	 * @param \EmailSource $oSource E-mail source
 	 *
@@ -253,7 +233,7 @@ abstract class Policy implements iPolicy {
 	}
 	
 	/**
-	 * Gets index of e-mail message
+	 * Gets index of e-mail message.
 	 *
 	 * @return \Integer
 	 */
@@ -264,7 +244,7 @@ abstract class Policy implements iPolicy {
 	}
 	
 	/**
-	 * Sets index of e-mail message
+	 * Sets index of e-mail message.
 	 *
 	 * @param \Integer $index For now, expect an integer for the e-mail index.
 	 *
@@ -277,7 +257,7 @@ abstract class Policy implements iPolicy {
 	}
 	
 	/**
-	 * Gets ticket
+	 * Gets ticket.
 	 *
 	 * @return \Ticket
 	 */
@@ -288,7 +268,7 @@ abstract class Policy implements iPolicy {
 	}
 	
 	/**
-	 * Sets ticket
+	 * Sets ticket.
 	 *
 	 * @param \Ticket $oTicket Ticket
 	 *
@@ -301,183 +281,26 @@ abstract class Policy implements iPolicy {
 	}
 	
 	/**
-	 * Gets executed policies
+	 * Gets executed steps.
 	 *
 	 * @return \String[]
 	 */
-	public static function GetExecutedPolicies() {
+	public static function GetExecutedSteps() {
 		
-		return static::$aPreviouslyExecutedPolicies;
+		return static::$aPreviouslyExecutedSteps;
 		
 	}
 	
 	/**
-	 * Sets executed policies
+	 * Sets executed steps.
 	 *
-	 * @param \String[] $aPreviouslyExecutedPolicies Names of previously executed policies
+	 * @param \String[] $aPreviouslyExecutedSteps Class names of previously executed steps.
 	 *
 	 * @return void
 	 */
-	public static function SetExecutedPolicies($aPreviouslyExecutedPolicies) {
+	public static function SetExecutedSteps($aPreviouslyExecutedSteps) {
 		
-		static::$aPreviouslyExecutedPolicies = $aPreviouslyExecutedPolicies;
-		
-	}
-	
-	/**
-	 * Checks if mailbox, email, ticket information is compliant with a certain policy.
-	 *
-	 * @return boolean Whether this is compliant with a specified policy. Returning 'false' blocks further processing. In this case, it's expected a SetNextAction has been called.
-	 */
-	public static function IsCompliant() {
-		
-		return true;
-		
-	}
-	
-	/**
-	 * Runs some default functionality BEFORE checking the policy. Use case: logging some information.
-	 * Can be cascaded to subclasses.
-	 *
-	 * @return void
-	 */
-	public static function BeforeComplianceCheck() {
-	
-		$sCalledClass = get_called_class();
-		$sUnqualifiedName = (new ReflectionClass($sCalledClass))->getShortName();
-		if($sUnqualifiedName != 'Policy') {
-			
-			$sLog = '. Check #'.(count(static::GetExecutedPolicies())+1).' (precedence: '.$sCalledClass::$iPrecedence.'): '.$sUnqualifiedName;
-			
-			// Some classes fake their $sPolicyId to recycle settings
-			$sAttCode = $sCalledClass::$sPolicyId.'_behavior';
-			if(MetaModel::IsValidAttCode(get_class($sCalledClass::$oMailBox), $sAttCode) == true) {
-				$sLog .= ' - Behavior: '.$sCalledClass::$oMailBox->Get($sAttCode);
-			}
-			
-			static::Trace($sLog);
-			
-		}
-	}
-	
-	/**
-	 * Runs some default functionality AFTER checking the policy IF IsCompliant() returned 'true'. Use case: logging some information.
-	 * Can be cascaded to subclasses.
-	 *
-	 * @return void
-	 */
-	public static function AfterPassedComplianceCheck() {
-	
-		$sUnqualifiedName = (new ReflectionClass(get_called_class()))->getShortName();
-		if($sUnqualifiedName != 'Policy') {
-			static::Trace('.. Complete: '.$sUnqualifiedName);
-		}
-	}
-	
-	/**
-	 * Actions executed when the message does not comply with a policy.
-	 * The default method informs the caller that the email was rejected.
-	 *
-	 * @return void
-	 */
-	public static function HandleViolation() {
-		
-		$oEmail = static::GetMail();
-		$oMailBox = static::GetMailBox();
-		
-		$oRawEmail = $oEmail->oRawEmail;
-	
-		// Inform the caller who doesn't follow guidelines.		
-		// User education and communicating the guideliens is great; but sometimes policies need to be enforced.
-		$sTo = $oEmail->sCallerEmail;
-		$sFrom = $oMailBox->Get('notify_from'); 
-	
-		// Policy violations have a typical way of handling.
-		// The behavior is - besides some fallbacks - usually one of the following:
-		// - bounce_delete -> bounce and delete the message
-		// - bounce_mark_as_undesired -> bounce and marks the message as undesired
-		// - delete -> delete the message
-		// - do_nothing -> great, lazy. For testing purposes. To actually see if policies are processed or log additional info without doing anything in the end.
-		// - mark_as_undesired -> stays in the mailbox for a few days
-		// - some sort of fallback -> doesn't matter here
-		
-		$sPolicyId = get_called_class()::$sPolicyId;
-		
-		$sBehavior = $oMailBox->Get($sPolicyId.'_behavior');
-		static::Trace('. Policy violated. Behavior: '.$sBehavior);
-		
-		// First check if email notification must be sent to caller (bounce message)
-		switch($sBehavior) {
-		
-			// Generic cases
-			case 'bounce_delete':
-			case 'bounce_mark_as_undesired':
-			
-				static::Trace('Bounce message: '.$sPolicyId);
-				
-				$sSubject = $oMailBox->Get($sPolicyId.'_subject');
-				$sBody = $oMailBox->Get($sPolicyId.'_notification'); 
-				
-				// Return to sender
-				if($sTo == '') { 
-					static::Trace('.. No "to" defined, skipping bounce message.');
-				}
-				elseif($sFrom == '') { 
-					static::Trace('.. No "from" defined, skipping bounce message.');
-				}
-				elseif($oRawEmail) {
-					
-					// Allow some customization in the bounce message
-					$sSubject = static::ReplaceMailPlaceholders($sSubject);
-					$sBody = static::ReplaceMailPlaceholders($sBody);
-					
-					if($sSubject == '') {
-						$sSubject = 'Message bounced - not compliant with an enforced policy.';
-					}
-
-					static::Trace('Sending bounce message "'.$sSubject.'" to "'.$sTo.'"');
-					$oRawEmail->SendAsAttachment($sTo, $sFrom, $sSubject, $sBody);
-				}
-				
-				break;
-				
-		}
-		
-				
-		switch($sBehavior) {
-				
-			case 'bounce_delete':
-			case 'delete': 
-				static::Trace('Set next action for EmailProcessor to DELETE_MESSAGE');
-				$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
-				break;
-				
-			case 'move':
-				// Remove the processed message from the mailbox
-				static::Trace('Set next action for EmailProcessor to MOVE_MESSAGE');
-				$oMailBox->SetNextAction(EmailProcessor::MOVE_MESSAGE);
-				break;
-				
-			case 'mark_as_error': 
-				// Mark as error should be irrelevant now. Keeping it just in case.
-				static::Trace('Set next action for EmailProcessor to MARK_MESSAGE_AS_ERROR');
-				$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
-				break;
-				 
-			case 'bounce_mark_as_undesired':
-			case 'mark_as_undesired':
-				static::Trace('Set next action for EmailProcessor to MARK_MESSAGE_AS_UNDESIRED');
-				$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_UNDESIRED); // Keep the message temporarily in the mailbox, but marked as undesired
-				break;
-				
-			// Any other action
-			case 'do_nothing':
-			default:
-				static::Trace('Set next action for EmailProcessor to NO_ACTION');
-				$oMailBox->SetNextAction(EmailProcessor::NO_ACTION);
-				break;
-				
-		}
+		static::$aPreviouslyExecutedSteps = $aPreviouslyExecutedSteps;
 		
 	}
 	
@@ -567,21 +390,133 @@ abstract class Policy implements iPolicy {
 		
 	}
 	
+	/**
+	 * Actions executed when the message does not comply with a policy.
+	 * The default method informs the caller that the email was rejected.
+	 *
+	 * @return void
+	 */
+	public static function HandleViolation() {
+		
+		$oEmail = static::GetMail();
+		$oMailBox = static::GetMailBox();
+		
+		$oRawEmail = $oEmail->oRawEmail;
+	
+		// Inform the caller who doesn't follow guidelines.		
+		// User education and communicating the guideliens is great; but sometimes policies need to be enforced.
+		$sTo = $oEmail->sCallerEmail;
+		$sFrom = $oMailBox->Get('notify_from'); 
+	
+		// Policy violations have a typical way of handling.
+		// The behavior is - besides some fallbacks - usually one of the following:
+		// - bounce_delete -> bounce and delete the message
+		// - bounce_mark_as_undesired -> bounce and marks the message as undesired
+		// - delete -> delete the message
+		// - do_nothing -> great, lazy. For testing purposes. To actually see if policies are processed or log additional info without doing anything in the end.
+		// - mark_as_undesired -> stays in the mailbox for a few days
+		// - some sort of fallback -> doesn't matter here
+		
+		$sSettingsPrefix = get_called_class()::GetXMLSettingsPrefix();
+		
+		$sBehavior = $oMailBox->Get($sSettingsPrefix.'_behavior');
+		static::Trace('. Policy violated. Behavior: '.$sBehavior);
+		
+		// First check if email notification must be sent to caller (bounce message)
+		switch($sBehavior) {
+		
+			// Generic cases
+			case 'bounce_delete':
+			case 'bounce_mark_as_undesired':
+			
+				static::Trace('Bounce message: '.$sSettingsPrefix);
+				
+				$sSubject = $oMailBox->Get($sSettingsPrefix.'_subject');
+				$sBody = $oMailBox->Get($sSettingsPrefix.'_notification'); 
+				
+				// Return to sender
+				if($sTo == '') { 
+					static::Trace('.. No "to" defined, skipping bounce message.');
+				}
+				elseif($sFrom == '') { 
+					static::Trace('.. No "from" defined, skipping bounce message.');
+				}
+				elseif($oRawEmail) {
+					
+					// Allow some customization in the bounce message
+					$sSubject = static::ReplaceMailPlaceholders($sSubject);
+					$sBody = static::ReplaceMailPlaceholders($sBody);
+					
+					if($sSubject == '') {
+						$sSubject = 'Message bounced - not compliant with an enforced policy.';
+					}
+
+					static::Trace('Sending bounce message "'.$sSubject.'" to "'.$sTo.'"');
+					$oRawEmail->SendAsAttachment($sTo, $sFrom, $sSubject, $sBody);
+				}
+				
+				break;
+				
+		}
+		
+		// @todo When bumping requirement to PHP 8.0, use 'match' here:
+		$iNextAction = EmailProcessor::NO_ACTION;
+		switch($sBehavior) {
+				
+			case 'bounce_delete':
+			case 'delete':
+				$iNextAction = EmailProcessor::DELETE_MESSAGE;
+				break;
+				
+			case 'move':
+				$iNextAction = EmailProcessor::MOVE_MESSAGE;
+				break;
+				
+			case 'mark_as_error':
+				$iNextAction = EmailProcessor::MARK_MESSAGE_AS_ERROR;
+				break;
+				 
+			case 'bounce_mark_as_undesired':
+			case 'mark_as_undesired':
+				$iNextAction = EmailProcessor::MARK_MESSAGE_AS_UNDESIRED;
+				break;
+				
+			case 'skip_for_now':
+				$iNextAction = EmailProcessor::SKIP_FOR_NOW;
+				break;
+				
+			case 'abort_all_further_processing':
+				$iNextAction = EmailProcessor::ABORT_ALL_FURTHER_PROCESSING;
+				break;
+				
+			// Any other action
+			case 'do_nothing':
+			default:
+				break;
+				
+		}
+		
+		static::Trace('Set next action for EmailProcessor to '.EmailProcessor::GetActionFromCode($iNextAction));
+		$oMailBox->SetNextAction($iNextAction);
+		
+	}
 	
 }
 
 
+
+
 /**
- * Class PolicyCreateOrUpdateTicket Special policy; at this point the Ticket is created or updated.
+ * Class StepCreateOrUpdateTicket. Special step; at this point the Ticket is created or updated.
  * @details Replaces Combodo's MailInboxStandard way of handling incoming emails (creating or updating ticket).
  * This is a fork, a lot of code has been polished but is also still the same or heavily inspired by the original Mail to Ticket Automation.
  * Hence, this (sub)class contains methods with the same name to make it easy to keep retrofitting bug fixes etc.
  */
-abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
+abstract class StepCreateOrUpdateTicket extends Step {
 	
 	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
-	 * 
+	 * @inheritDoc
+	 *
 	 * @details This is a special policy which takes care of only basic Ticket creation or update. 
 	 * Any real checks that block Ticket creation or update, should have been run by now. 
 	 * Any policies following this one, should not be blocking!
@@ -589,9 +524,9 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	public static $iPrecedence = 200;
 	
 	/**
-	 * @var \String $sPolicyId Shortname for policy
+	 * @inheritDoc
 	 */
-	public static $sPolicyId = 'policy_create_or_update_ticket';
+	public static $sXMLSettingsPrefix = 'step_create_or_update_ticket';
 	
 	/*
 	 * @var \Array $aAddedAttachments Array containing info on any attachments in the email
@@ -599,19 +534,11 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	public static $aAddedAttachments = [];
 	
 	/**
-	 * Initiator. Sets some widely used property values.
-	 *
-	 * @param \MailInboxStandard $oMailBox Mailbox
-	 * @param \EmailSource $oSource E-mail source
-	 * @param \Integer|\String $index Index of the e-mail in the source
-	 * @param \EmailMessage $oEmail E-mail message
-	 * @param \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
-	 * @param \String[] $aPreviouslyExecutedPolicies Array of policy (class) names which have been processed already.
-	 *
+	 * @inheritDoc
 	 */
-	public static function Init(MailInboxStandard $oMailBox, EmailSource $oSource, $index, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedPolicies) {
+	public static function Init(MailInboxStandard $oMailBox, EmailSource $oSource, $index, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedSteps) {
 	
-		parent::Init($oMailBox, $oSource, $index, $oEmail, $oTicket, $aPreviouslyExecutedPolicies);
+		parent::Init($oMailBox, $oSource, $index, $oEmail, $oTicket, $aPreviouslyExecutedSteps);
 	
 		// Reset for each email that is processed
 		// @todo Review if this should be in the initialization or moved to another method.
@@ -622,10 +549,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
+	public static function Execute() {
 		
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
@@ -642,6 +566,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 					break;
 				
 				case 'update_only':
+				
 					if(is_object($oTicket) == false) {
 						// No ticket associated with the incoming email, nothing to update, reject the email
 						$oMailBox->HandleError($oEmail, 'nothing_to_update', $oEmail->oRawEmail);
@@ -653,6 +578,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 					break;
 				
 				default: // both: update or create as needed
+				
 					if(is_object($oTicket) == false) {
 						// Create a new ticket
 						static::CreateTicketFromEmail();
@@ -678,11 +604,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 			}
 			
 		}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
 		
-		return true;
 		
 	}
 	
@@ -702,27 +624,35 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// In case of error (exception...) set the behavior
 		// Upon success, this will be overruled again.
 		if($oMailBox->Get('error_behavior') == 'delete') {
+			
 			 // Remove the message from the mailbox
 			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);
+			
 		}
 		elseif($oMailBox->Get('error_behavior') == 'mark_as_error') {
+			
 			 // Keep the message in the mailbox, but marked as error
 			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR);
+			
 		}
 		
 		static::Trace(".. Creating a new Ticket from email '{$oEmail->sSubject}'");
 		$sTargetClass = $oMailBox->Get('target_class');
 			
 		if(MetaModel::IsValidClass($sTargetClass) == false) {
+			
 			$sErrorMessage = "... Invalid 'ticket_class' configured: {$sTargetClass} is not a valid class. Cannot create such an object.";
 			static::Trace($sErrorMessage);
 			throw new Exception($sErrorMessage);
+			
 		}
 		
 		if($oEmail->oInternal_Contact === null || get_class($oEmail->oInternal_Contact) != 'Person') {
+			
 			$sErrorMessage = "... Invalid caller specified: Cannot create Ticket without valid Person.";
 			static::Trace($sErrorMessage);
-			throw new Exception($sErrorMessage);			
+			throw new Exception($sErrorMessage);
+			
 		}
 		
 		$oTicket = MetaModel::NewObject($sTargetClass);
@@ -848,10 +778,12 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		// Check that the ticket is of the expected class
 		$sTargetClass = $oMailBox->Get('target_class');
 		if(is_a($oTicket, $sTargetClass) == false) {
+			
 			$sClass = get_class($oTicket);
 			static::Trace("... Error: the incoming email refers to the ticket '{$oTicket->GetName()}' of class '{$sClass}', but this mailbox is configured to process only tickets of class '{$sTargetClass}'");
 			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 			return;
+			
 		}
 		
 		// Try to extract what's new from the message's body
@@ -989,23 +921,23 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		static::UpdateAttachments();
 		
 		$oMailBox = static::GetMailBox();
+		$iNextAction = EmailProcessor::PROCESS_MESSAGE;
 		
 		// Shall we delete the source email immediately?
 		if($oMailBox->Get('email_storage') == 'delete') {
+			
 			// Remove the processed message from the mailbox
-			static::Trace(".. Deleting the source email");
-			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);		
+			$iNextAction = EmailProcessor::DELETE_MESSAGE;
+			
 		}
 		elseif($oMailBox->Get('email_storage') == 'move' && $oMailBox->Get('target_folder') != '') {
+			
 			// Move the processed message to another folder
-			static::Trace(".. Moving the source email");
-			$oMailBox->SetNextAction(EmailProcessor::MOVE_MESSAGE);	
+			$iNextAction = EmailProcessor::MOVE_MESSAGE;
+			
 		}
-		else {
-			// Keep the message in the mailbox
-			static::Trace(".. Keeping the source email");
-			$oMailBox->SetNextAction(EmailProcessor::NO_ACTION);		
-		}	
+		
+		$oMailBox->SetNextAction($iNextAction);
 	
 	}
 	 
@@ -1147,7 +1079,9 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		
 		$sTargetClass = get_class($oTicket);
 		if(MetaModel::IsValidAttCode($sTargetClass, 'contacts_list') == false) {
+			
 			return;
+			
 		}
 		
 		$oContactsSet = $oTicket->Get('contacts_list');
@@ -1225,19 +1159,25 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 		
 		// Delete the email immediately or keep it stored
 		if($oMailBox->Get('email_storage') == 'delete') {
+			
 			// Remove the processed message from the mailbox
 			static::Trace(".. Deleting the source email");
-			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);		
+			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);	
+			
 		}
 		elseif($oMailBox->Get('email_storage') == 'move') {
+			
 			// Move the message to another folder
 			static::Trace(".. Moving the source email");
 			$oMailBox->SetNextAction(EmailProcessor::MOVE_MESSAGE);
+			
 		}
 		else {
+			
 			// Keep the message in the mailbox
 			static::Trace(".. Keeping the source email");
-			$oMailBox->SetNextAction(EmailProcessor::NO_ACTION);		
+			$oMailBox->SetNextAction(EmailProcessor::PROCESS_MESSAGE);
+			
 		}
 		
 	}
@@ -1503,7 +1443,7 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 				}
 			}
 			else {
-				static::Trace("... The attachment {$aAttachment['filename']} was NOT added to the ticket because its type '{$aAttachment['mimeType']}' is excluded according to the configuration");
+				static::Trace("... The attachment  #{$iIndex} {$aAttachment['filename']} was NOT added to the ticket because its type '{$aAttachment['mimeType']}' is excluded according to the configuration");
 			}
 		}
 		
@@ -1596,24 +1536,24 @@ abstract class PolicyCreateOrUpdateTicket extends Policy implements iPolicy {
 
 
 /**
- * Class PolicyBounceOtherEmailCallerThanTicketCaller Bounce policy in case the email caller is not the ticket caller.
+ * Class PolicyBounceOtherEmailCallerThanTicketCaller. Bounce policy in case the email caller is not the ticket caller.
  */
-abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Policy implements iPolicy {
+abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Step {
 	
 	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
+	 * @inheritDoc
 	 */
 	public static $iPrecedence = 10;
 	
 	/**
-	 * @var \String $sPolicyId Shortname for policy
+	 * @inheritDoc
 	 */
-	public static $sPolicyId = 'policy_other_email_caller_than_ticket_caller';
+	public static $sXMLSettingsPrefix = 'policy_other_email_caller_than_ticket_caller';
 		
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
+	public static function Execute() {
 		
 		// @todo Accept known contacts (from same org)
 		
@@ -1621,13 +1561,10 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Policy imple
 		$oEmail = static::GetMail();
 		$oMailBox = static::GetMailBox();
 		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
-		
 		if($oTicket !== null) {
 				
 			// Checking if attachments are in line with configured policies.
-			switch($oMailBox->Get(static::GetPolicyId().'_behavior')) {
+			switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) {
 			
 				case 'bounce_delete':
 				case 'bounce_mark_as_undesired':
@@ -1641,7 +1578,7 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Policy imple
 						
 						static::Trace('.. Ticket caller\'s email address is different from the email caller\'s email address.');
 						static::HandleViolation();
-						return false;
+						return;
 					
 					}
 				
@@ -1653,11 +1590,6 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Policy imple
 			}
 		
 		}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -1666,32 +1598,29 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Policy imple
 /**
  * Class PolicyBounceAttachmentForbiddenMimeType. A policy to enforce some rules on the attachment.
  */
-abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements iPolicy {
+abstract class PolicyBounceAttachmentForbiddenMimeType extends Step {
 	
 	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
+	 * @inheritDoc
 	 */
 	public static $iPrecedence = 10;
 	
 	/**
-	 * @var \String $sPolicyId Shortname for policy
+	 * @inheritDoc
 	 */
-	public static $sPolicyId = 'policy_attachment_forbidden_mimetype';
+	public static $sXMLSettingsPrefix = 'policy_attachment_forbidden_mimetype';
 		
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
+	public static function Execute() {
 		
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
 		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
-		
 		// Checking if attachments are in line with configured policies.
 		
-			$sForbiddenMimeTypes = $oMailBox->Get(static::GetPolicyId().'_mimetypes');
+			$sForbiddenMimeTypes = $oMailBox->Get(static::GetXMLSettingsPrefix().'_mimetypes');
 			
 			if(trim($sForbiddenMimeTypes) == '') {
 				static::Trace('.. No forbidden MimeTypes specified.');
@@ -1703,7 +1632,7 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements
 				static::Trace('.. Forbidden MimeTypes: '. implode(' - ', $aForbiddenMimeTypes));
 				static::Trace('.. # Attachments: '. count($oEmail->aAttachments));
 				
-				switch($oMailBox->Get(static::GetPolicyId().'_behavior')) {
+				switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) {
 					
 					case 'bounce_delete':
 					case 'bounce_mark_as_undesired':
@@ -1713,7 +1642,7 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements
 						
 						// Forbidden attachments? 
 						foreach($oEmail->aAttachments as $aAttachment) { 
-							static::Trace('.. Attachment MimeType: '.$aAttachment['mimeType']);
+							static::Trace('.. Attachment  #{$iIndex} MimeType: '.$aAttachment['mimeType']);
 							
 							if(in_array($aAttachment['mimeType'], $aForbiddenMimeTypes) == true) {
 								
@@ -1722,7 +1651,7 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements
 								
 								// No specific fallback								
 								// Stop processing any further!
-								return false;
+								return;
 							}
 						}
 					
@@ -1751,10 +1680,6 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements
 		
 			}
 			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -1763,31 +1688,28 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Policy implements
 /**
  * Class PolicyBounceLimitMailSize. A policy to prevent big email messages from being processed.
  */
-abstract class PolicyBounceLimitMailSize extends Policy implements iPolicy {
+abstract class PolicyBounceLimitMailSize extends Step {
 	
 	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
+	 * @inheritDoc
 	 */
 	public static $iPrecedence = 10;
 	
 	/**
-	 * @var \String $sPolicyId Shortname for policy
+	 * @inheritDoc
 	 */
-	public static $sPolicyId = 'policy_mail_size_too_big';
+	public static $sXMLSettingsPrefix = 'policy_mail_size_too_big';
 		
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
+	public static function Execute() {
 		
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
 		
 		// Checking if mail size is not too big
-		$iMaxSizeMB = $oMailBox->Get(static::GetPolicyId().'_max_size_MB');
+		$iMaxSizeMB = $oMailBox->Get(static::GetXMLSettingsPrefix().'_max_size_MB');
 		
 		if($iMaxSizeMB > 0) {
 		
@@ -1803,16 +1725,11 @@ abstract class PolicyBounceLimitMailSize extends Policy implements iPolicy {
 				// No fallback
 				
 				// Stop processing any further!
-				return false;
+				return;
 				
 			}
 			
 		}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -1821,32 +1738,29 @@ abstract class PolicyBounceLimitMailSize extends Policy implements iPolicy {
 /**
  * Class PolicyBounceNoSubject. A policy to enforce non-empty subjects.
  */
-abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
+abstract class PolicyBounceNoSubject extends Step {
 	
 	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
+	 * @inheritDoc
 	 */
 	public static $iPrecedence = 10;
 	
 	/**
-	 * @var \String $sPolicyId Shortname for policy
+	 * @inheritDoc
 	 */
-	public static $sPolicyId = 'policy_no_subject';
+	public static $sXMLSettingsPrefix = 'policy_no_subject';
 		
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
+	public static function Execute() {
 		
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
 		
 		// Checking if subject is not empty.
 		
-			$sPolicyBehavior = $oMailBox->Get(static::GetPolicyId().'_behavior');
+			$sPolicyBehavior = $oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior');
 			
 			if($oEmail->sSubject == '') {
 				
@@ -1865,7 +1779,7 @@ abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
 						// No fallback
 						
 						// Stop processing any further!
-						return false;
+						return;
 						
 						break; // Defensive programming
 						
@@ -1873,31 +1787,28 @@ abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
 					
 						// Set ticket title of email message
 						// Setting the ticket title on the ticket object happens later and not in this policy!
-						$sDefaultTitle = $oMailBox->Get(static::GetPolicyId().'_default_value');
+						$sDefaultTitle = $oMailBox->Get(static::GetXMLSettingsPrefix().'_default_value');
 						
 						// Inproper configuration
 						if(trim($sDefaultTitle) == '') {
 							static::Trace('.. Undesired: Empty subject. Fallback to set a default subject failed, because default subject is empty.');
 							static::HandleViolation();
-							return false;
+							return;
 						}
 						
 						static::Trace('.. Fallback: changing empty subject to "'.$sDefaultTitle.'"');
 						$oEmail->sSubject = $sDefaultTitle;
+						
 						break;
 					
 					default:
+					
 						static::Trace('.. Unexpected "behavior"');
 						break;
 					
 				}
 			
 			}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -1907,25 +1818,22 @@ abstract class PolicyBounceNoSubject extends Policy implements iPolicy {
  * Class PolicyBounceOtherRecipients. A policy to ensure that the service desk mailbox is the sole recipient (no other recipients in To:, CC:).
  * Does NOT change "related contacts" or create new ones!
  */
-abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
-	
-	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
-	 */
-	public static $iPrecedence = 20;
-	
-	/**
-	 * @var \String $sPolicyId Shortname for policy
-	 */
-	public static $sPolicyId = 'policy_other_recipients';
+abstract class PolicyBounceOtherRecipients extends Step {
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
+	public static $iPrecedence = 20;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $sXMLSettingsPrefix = 'policy_other_recipients';
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() {
 		
 		$oEmail = static::GetMail();
 		$oMailBox = static::GetMailBox();
@@ -1945,7 +1853,7 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 			$aAllowedContacts = array_merge([ $oEmail->sCallerEmail ], $aMailBoxAliases);
 			$aAllowedContacts = array_unique($aAllowedContacts);
 
-			$sPolicyBehavior = $oMailBox->Get(static::GetPolicyId().'_behavior');
+			$sPolicyBehavior = $oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior');
 			
 			switch($sPolicyBehavior) {
 				 case 'bounce_delete':
@@ -1983,7 +1891,7 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 						// Did not match caller e-mail or any alias of this helpdesk mailbox
 						static::Trace(".. Undesired: at least one other recipient (missing alias or unwanted other recipient): {$aContactInfo['email']}");
 						static::HandleViolation();
-						return false;
+						return;
 						
 					}
 
@@ -2008,11 +1916,6 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 					break;
 				
 			}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -2021,7 +1924,7 @@ abstract class PolicyBounceOtherRecipients extends Policy implements iPolicy {
 /**
  * Class PolicyBounceAutoReply. A policy to handle auto-reply e-mails.
  */
-abstract class PolicyBounceAutoReply extends Policy implements iPolicy {
+abstract class PolicyBounceAutoReply extends Step {
 	
 	/**
 	 * @inheritDoc
@@ -2031,22 +1934,19 @@ abstract class PolicyBounceAutoReply extends Policy implements iPolicy {
 	/**
 	 * @inheritDoc
 	 */
-	public static $sPolicyId = 'policy_autoreply';
+	public static $sXMLSettingsPrefix = 'policy_autoreply';
 		
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
+	public static function Execute() {
 		
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
 		
 		// Checking if subject is not empty.
 		
-			$sPolicyBehavior = $oMailBox->Get(static::GetPolicyId().'_behavior');
+			$sPolicyBehavior = $oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior');
 			
 			switch(true) {
 				
@@ -2071,7 +1971,7 @@ abstract class PolicyBounceAutoReply extends Policy implements iPolicy {
 							// No fallback
 							
 							// Stop processing any further!
-							return false;
+							return;
 							
 							break; // Defensive programming
 						
@@ -2088,10 +1988,6 @@ abstract class PolicyBounceAutoReply extends Policy implements iPolicy {
 			
 			}
 			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -2100,25 +1996,22 @@ abstract class PolicyBounceAutoReply extends Policy implements iPolicy {
 /**
  * Class PolicyBounceUnknownTicketReference. A policy to handle unknown ticket references. Also see MailInboxStandard::GetRelatedTicket().
  */
-abstract class PolicyBounceUnknownTicketReference extends Policy implements iPolicy {
-	
-	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
-	 */
-	public static $iPrecedence = 10;
-	
-	/**
-	 * @var \String $sPolicyId Shortname for policy
-	 */
-	public static $sPolicyId = 'policy_ticket_unknown';
+abstract class PolicyBounceUnknownTicketReference extends Step {
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
+	public static $iPrecedence = 10;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $sXMLSettingsPrefix = 'policy_ticket_unknown';
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() {
 		
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
@@ -2168,7 +2061,8 @@ abstract class PolicyBounceUnknownTicketReference extends Policy implements iPol
 			$sPattern = $oMailBox->FixPattern($oMailBox->Get('title_pattern'));
 			if(($sPattern != '') && (preg_match($sPattern, $sSubject, $aMatches))) {
 				static::Trace(".. Undesired: unable to find any prior ticket despite a matching ticket reference pattern in the subject ('{$sPattern}'). ".http_build_query($aMatches));
-				return false;
+				$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_UNDESIRED);
+				return;
 			}
 			elseif($oEmail->oRelatedObject != null && !($oTicket instanceof Ticket)) {
 				static::Trace(".. Warning: email header references a (valid) non-ticket object ({$oEmail->oRelatedObject}).");
@@ -2181,11 +2075,6 @@ abstract class PolicyBounceUnknownTicketReference extends Policy implements iPol
 		else {
 			static::Trace(".. Already linked to a Ticket");
 		}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -2194,25 +2083,22 @@ abstract class PolicyBounceUnknownTicketReference extends Policy implements iPol
 /**
  * Class PolicyTicketResolved. A policy to handle replies to resolved tickets.
  */
-abstract class PolicyTicketResolved extends Policy implements iPolicy {
-	
-	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
-	 */
-	public static $iPrecedence = 20;
-	
-	/**
-	 * @var \String $sPolicyId Shortname for policy
-	 */
-	public static $sPolicyId = 'policy_ticket_resolved';
+abstract class PolicyTicketResolved extends Step {
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
+	public static $iPrecedence = 20;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $sXMLSettingsPrefix = 'policy_ticket_resolved';
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() {
 		
 		$oTicket = static::GetTicket();
 		$oMailBox = static::GetMailBox();
@@ -2223,7 +2109,7 @@ abstract class PolicyTicketResolved extends Policy implements iPolicy {
 					
 					static::Trace(".. Ticket was marked as resolved before.");
 							
-					switch($oMailBox->Get(static::GetPolicyId().'_behavior')) { 
+					switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) { 
 						case 'bounce_delete': 
 						case 'bounce_mark_as_undesired':
 						case 'delete':
@@ -2235,11 +2121,12 @@ abstract class PolicyTicketResolved extends Policy implements iPolicy {
 							// No fallback
 							
 							// Stop processing any further!
-							return false;
+							return;
 
 							break; // Defensive programming
 							 
 						case 'fallback_reopen': 
+						
 							// Reopen ticket
 							static::Trace("... Fallback: reopen resolved ticket.");
 							
@@ -2258,11 +2145,6 @@ abstract class PolicyTicketResolved extends Policy implements iPolicy {
 					}
 				}
 			}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -2271,25 +2153,22 @@ abstract class PolicyTicketResolved extends Policy implements iPolicy {
 /**
  * Class PolicyTicketClosed. A policy to handle replies to closed tickets.
  */
-abstract class PolicyTicketClosed extends Policy implements iPolicy {
+abstract class PolicyTicketClosed extends Step {
 	
 	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
+	 * @inheritDoc
 	 */
 	public static $iPrecedence = 20;
 	
 	/**
-	 * @var \String $sPolicyId Shortname for policy
+	 * @inheritDoc
 	 */
-	public static $sPolicyId = 'policy_ticket_closed';
+	public static $sXMLSettingsPrefix = 'policy_ticket_closed';
 	
 	/**
 	 * @inheritDoc
 	 */
 	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
 		
 		$oTicket = static::GetTicket();
 		$oMailBox = static::GetMailBox();
@@ -2298,7 +2177,7 @@ abstract class PolicyTicketClosed extends Policy implements iPolicy {
 			if($oTicket !== null) {
 				if($oTicket->Get('status') == 'closed') {
 						
-					switch($oMailBox->Get(static::GetPolicyId().'_behavior')) { 
+					switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) { 
 						case 'bounce_delete': 
 						case 'bounce_mark_as_undesired':
 						case 'delete':
@@ -2311,7 +2190,7 @@ abstract class PolicyTicketClosed extends Policy implements iPolicy {
 							// No fallback
 							
 							// Stop processing any further!
-							return false;
+							return;
 
 							break; // Defensive programming
 							 
@@ -2333,11 +2212,6 @@ abstract class PolicyTicketClosed extends Policy implements iPolicy {
 					}
 				}
 			}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -2346,35 +2220,32 @@ abstract class PolicyTicketClosed extends Policy implements iPolicy {
 /**
  * Class PolicyBounceUndesiredTitlePatterns. A policy to handle undesired title patterns.
  */
-abstract class PolicyBounceUndesiredTitlePatterns extends Policy implements iPolicy {
-	
-	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
-	 */
-	public static $iPrecedence = 20;
-	
-	/**
-	 * @var \String $sPolicyId Shortname for policy
-	 */
-	public static $sPolicyId = 'policy_undesired_pattern';
+abstract class PolicyBounceUndesiredTitlePatterns extends Step {
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
+	public static $iPrecedence = 20;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $sXMLSettingsPrefix = 'policy_undesired_pattern';
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() {
 		
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
 		
 		// Checking if an undesired title pattern is found
 
-			if(trim($oMailBox->Get(static::GetPolicyId().'_patterns')) != '' ) { 
+			if(trim($oMailBox->Get(static::GetXMLSettingsPrefix().'_patterns')) != '' ) { 
 			
 				// Go over each pattern and check.
-				$aPatterns = preg_split(NEWLINE_REGEX, $oMailBox->Get(static::GetPolicyId().'_patterns')); 
+				$aPatterns = preg_split(NEWLINE_REGEX, $oMailBox->Get(static::GetXMLSettingsPrefix().'_patterns')); 
 				$sMailSubject = $oEmail->sSubject;
 				
 				foreach($aPatterns as $sPattern) {
@@ -2387,7 +2258,7 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Policy implements iPol
 						}
 						elseif(preg_match($sPattern, $sMailSubject)) {
 							
-							switch($oMailBox->Get(static::GetPolicyId().'_behavior')) { 
+							switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) { 
 								case 'bounce_delete': 
 								case 'bounce_mark_as_undesired':
 								case 'delete':
@@ -2400,7 +2271,7 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Policy implements iPol
 									// No fallback
 									
 									// Stop processing any further!
-									return false;
+									return;
 
 									break; // Defensive programming
 									
@@ -2418,11 +2289,6 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Policy implements iPol
 					}
 				}
 			}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -2431,26 +2297,23 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Policy implements iPol
 /**
  * Class PolicyFindCaller. A policy to find the caller and create a Person with default values if the caller appears to be unknown.
  */
-abstract class PolicyFindCaller extends Policy implements iPolicy {
-	
-	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
-	 */
-	public static $iPrecedence = 110;
-	
-	/**
-	 * @var \String $sPolicyId Shortname for policy
-	 * @details Note: different short name because of (legacy) attribute fields!
-	 */
-	public static $sPolicyId = 'policy_unknown_caller';
+abstract class PolicyFindCaller extends Step {
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
+	public static $iPrecedence = 110;
+	
+	/**
+	 * @inheritDoc
+	 * @details Note: different short name because of (legacy) attribute fields!
+	 */
+	public static $sXMLSettingsPrefix = 'policy_unknown_caller';
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() {
 		
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
@@ -2478,7 +2341,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 					case 0:
 
 						// Caller was not found.
-						switch($oMailBox->Get(static::GetPolicyId().'_behavior')) {
+						switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) {
 							
 							case 'bounce_delete':
 							case 'bounce_mark_as_undesired':
@@ -2489,7 +2352,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 								static::HandleViolation();
 								
 								// No fallback
-								return false;
+								return;
 
 								break; // Defensive programming
 
@@ -2498,7 +2361,7 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 								static::Trace("... Creating a new Person for the email: {$sCallerEmail}");
 								$oCaller = new Person();
 								$oCaller->Set('email', $oEmail->sCallerEmail);
-								$sDefaultValues = $oMailBox->Get(static::GetPolicyId().'_default_values');
+								$sDefaultValues = $oMailBox->Get(static::GetXMLSettingsPrefix().'_default_values');
 								
 								if(trim($sDefaultValues) != '') {
 									
@@ -2527,14 +2390,14 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 										static::Trace("... Failed to create a Person for the email address '{$sCallerEmail}'.");
 										static::Trace($e->getMessage());
 										$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oEmail->oRawEmail);
-										return false;
+										return;
 									}
 
 								}
 								else {
 									static::Trace('... Default values are missing. Can not create contact.');
 									$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oEmail->oRawEmail);
-									return false;
+									return;
 								}
 								
 								break;
@@ -2560,11 +2423,6 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
 				static::Trace("... Caller already determined by previous policy. Skip.");
 			}
 		
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
-		
 	}
 	
 }
@@ -2574,32 +2432,29 @@ abstract class PolicyFindCaller extends Policy implements iPolicy {
  * Class PolicyRemoveTitlePatterns. A policy to remove patterns in titles (in message subject and later ticket title).
  * @todo Check if this works properly
  */
-abstract class PolicyRemoveTitlePatterns extends Policy implements iPolicy {
-	
-	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
-	 */
-	public static $iPrecedence = 110;
-	
-	/**
-	 * @var \String $sPolicyId Shortname for policy
-	 */
-	public static $sPolicyId = 'policy_remove_pattern';
+abstract class PolicyRemoveTitlePatterns extends Step {
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
+	public static $iPrecedence = 110;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $sXMLSettingsPrefix = 'policy_remove_pattern';
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() {
 		
 		// Checking if an undesired title pattern is found
 		
 			$oMailBox = static::GetMailBox();
 			$oEmail = static::GetMail();
 			
-			$sPatterns = $oMailBox->Get(static::GetPolicyId().'_patterns');
+			$sPatterns = $oMailBox->Get(static::GetXMLSettingsPrefix().'_patterns');
 
 			if($sPatterns != '' ) { 
 			
@@ -2617,7 +2472,8 @@ abstract class PolicyRemoveTitlePatterns extends Policy implements iPolicy {
 						}
 						elseif(preg_match($sPattern, $sMailSubject)) {
 							
-							switch($oMailBox->Get(static::GetPolicyId().'_behavior')) { 
+							switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) {
+								
 								case 'fallback_remove':
 								
 									$sNewMailSubject = preg_replace($sPattern, '', $sMailSubject);
@@ -2652,11 +2508,6 @@ abstract class PolicyRemoveTitlePatterns extends Policy implements iPolicy {
 					}
 				}
 			}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -2666,32 +2517,27 @@ abstract class PolicyRemoveTitlePatterns extends Policy implements iPolicy {
 /**
  * Class PolicyFindAdditionalContacts. A policy to add "related contacts" to a Ticket. These are people in To: or CC: of processed e-mails that are NOT the original caller.
  */
-abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
-	
-	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
-	 */
-	public static $iPrecedence = 115;
-	
-	/**
-	 * @var \String $sPolicyId Shortname for policy
-	 * @details Deliberately re-uses this $sPolicyId
-	 */
-	public static $sPolicyId = 'policy_other_recipients';
+abstract class PolicyFindAdditionalContacts extends Step {
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
-		
+	public static $iPrecedence = 115;
+
+	/**
+	 * @inheritDoc
+	 */
+	public static $sXMLSettingsPrefix = 'policy_other_recipients';
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() {
 		
 		$oEmail = static::GetMail();
 		$oMailBox = static::GetMailBox();
 		$oTicket = static::GetTicket();
-		$sPolicyBehavior = $oMailBox->Get(static::GetPolicyId().'_behavior');
+		$sPolicyBehavior = $oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior');
 		
 		$sCallerEmail = $oEmail->sCallerEmail;
 							
@@ -2754,7 +2600,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 						static::Trace(".. Creating a new Person with email address '{$sRecipientEmail}'");
 						$oContact = new Person();
 						$oContact->Set('email', $sRecipientEmail);
-						$sDefaultValues = $oMailBox->Get(static::GetPolicyId().'_default_values');
+						$sDefaultValues = $oMailBox->Get(static::GetXMLSettingsPrefix().'_default_values');
 						$aDefaults = preg_split(NEWLINE_REGEX, $sDefaultValues);
 						$aDefaultValues = array();
 						foreach($aDefaults as $sLine) {
@@ -2783,7 +2629,7 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 							static::Trace("... Failed to create a Person for the email address '{$sCallerEmail}'.");
 							static::Trace($e->getMessage());
 							$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oEmail->oRawEmail);
-							return false;
+							return;
 						}									
 						
 					}
@@ -2827,11 +2673,6 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 				break;
 			
 		}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	
@@ -2840,17 +2681,17 @@ abstract class PolicyFindAdditionalContacts extends Policy implements iPolicy {
 /**
  * Class PolicyAttachmentImageDimensions. A policy to ignore small image sizes (likely elements of an email signature) or resize larger images.
  */
-abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy {
+abstract class PolicyAttachmentImageDimensions extends Step {
 	
 	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
+	 * @inheritDoc
 	 */
 	public static $iPrecedence = 20;
 	
 	/**
-	 * @var \String $sPolicyId Shortname for policy
+	 * @inheritDoc
 	 */
-	public static $sPolicyId = 'policy_attachment_image_dimensions';
+	public static $sXMLSettingsPrefix = 'policy_attachment_image_dimensions';
 	
 	/**
 	 * @inheritDoc
@@ -2859,10 +2700,7 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 	 * Function inspired by Combodo's MailInboxBase::AddAttachments()
 	 * Removes image attachments which are too small and also resizes images which are too large using php-gd
 	 */
-	public static function IsCompliant() {
-		
-		// Generic 'before' actions
-		parent::BeforeComplianceCheck();
+	public static function Execute() {
 		
 		// Checking if an undesired title pattern is found
 		
@@ -2870,10 +2708,10 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 			$oEmail = static::GetMail();
 			
 			// Ignore attachment or downsize?
-			$iMinWidth = $oMailBox->Get(static::GetPolicyId().'_min_width');
-			$iMaxWidth = $oMailBox->Get(static::GetPolicyId().'_max_width');
-			$iMinHeight = $oMailBox->Get(static::GetPolicyId().'_min_height');
-			$iMaxHeight = $oMailBox->Get(static::GetPolicyId().'_max_height');
+			$iMinWidth = $oMailBox->Get(static::GetXMLSettingsPrefix().'_min_width');
+			$iMaxWidth = $oMailBox->Get(static::GetXMLSettingsPrefix().'_max_width');
+			$iMinHeight = $oMailBox->Get(static::GetXMLSettingsPrefix().'_min_height');
+			$iMaxHeight = $oMailBox->Get(static::GetXMLSettingsPrefix().'_max_height');
 			
 			static::Trace(".. Min/max dimensions: {$iMinWidth}x{$iMinHeight} / {$iMaxWidth}x{$iMaxHeight}");
 						
@@ -2944,11 +2782,6 @@ abstract class PolicyAttachmentImageDimensions extends Policy implements iPolicy
 				}
 				
 			}
-			
-		// Generic 'after' actions
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 	

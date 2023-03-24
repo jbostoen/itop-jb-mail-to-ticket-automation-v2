@@ -638,20 +638,21 @@ EOF
 					<access>public</access>
 					<type>Overload-DBObject</type>
 					<code>
-						<![CDATA[	public function ProcessNewEmail(EmailSource $oSource, $index, EmailMessage $oEmail)
-	{		
+						<![CDATA[
+	
+	public function ProcessNewEmail(EmailSource $oSource, $index, EmailMessage $oEmail) {		
+	
 	    $this->sLastError = null;
 		$this->Trace("Processing new e-mail ( index = $index )"); 
-		$this->Trace(". UIDL ".htmlspecialchars($oEmail->sUIDL));
-		$this->Trace(". Message-ID ".htmlspecialchars ($oEmail->sMessageId));
+		$this->Trace('. UIDL '.htmlspecialchars($oEmail->sUIDL).' - Message-ID '.htmlspecialchars ($oEmail->sMessageId));
 				
 		// Contrary to Combodo's implementation: first check if there is any iTop object mentioned in the headers of the e-mail.
-		// This fork contains policies which might reopen closed/resolved tickets and therefore needs the Ticket object.
+		// This fork contains steps which might reopen closed/resolved tickets and therefore needs the Ticket object.
         // Check whether a new ticket must be initiated or an existing one updated.
         $oTicket = $this->GetRelatedTicket($oEmail);
 
-		// If there was no related ticket above, it may be created while processing the policies.
-		$oTicket = $this->ProcessPolicies($oEmail, $oTicket, $oSource, $index);
+		// If there was no related ticket above, it may be created while processing the steps.
+		$oTicket = $this->ProcessSteps($oEmail, $oTicket, $oSource, $index);
 
 		return $oTicket;
 		
@@ -679,7 +680,7 @@ EOF
 			$sSubject = $oEmail->sSubject;
 			
 			// Here it's possible to ignore patterns.
-			// @todo Move this to a policy.
+			// @todo Move this to a step.
 		
 			$sPatterns = $this->Get('title_pattern_ignore_patterns');
 			
@@ -741,21 +742,22 @@ EOF
 					<access>public</access>
 					<type>Overload-DBObject</type>
 					<code>
-						<![CDATA[	public function HandleError($oEmail, $sErrorCode, $oRawEmail = null, $sAdditionalErrorMessage = '')
-	{
+						<![CDATA[	public function HandleError($oEmail, $sErrorCode, $oRawEmail = null, $sAdditionalErrorMessage = '') {
 	
 		$sTo = $this->Get('notify_errors_to');
 		$sFrom = $this->Get('notify_from');
+		
 		// The behavior is overriden in case of undesired_message
-		if ($this->Get('error_behavior') == 'delete')
-		{
-			$this->SetNextAction(\EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
+		if ($this->Get('error_behavior') == 'delete') {
+		
+			$this->SetNextAction(EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
 			$sLastAction = "<p>The eMail was deleted from the mailbox.</p>\n";
 		}
-		else
-		{
-			$this->SetNextAction(\EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
+		else {
+		
+			$this->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 			$sLastAction = "<p>The eMail is marked as error and will be ignored in further processing of the mailbox.</p>\n";
+			
 		}
 		
 		switch($sErrorCode)
@@ -874,10 +876,10 @@ EOF
 				
 				// Email has been undesired for multiple days.
 				if(\MetaModel::GetModuleSetting('jb-email-synchro', 'undesired_purge_delay', 7) == 0) {
-					$this->SetNextAction(\EmailProcessor::DELETE_MESSAGE); // immediate delete when delay is 0
+					$this->SetNextAction(EmailProcessor::DELETE_MESSAGE); // immediate delete when delay is 0
 				}
 				else {
-					$this->SetNextAction(\EmailProcessor::MARK_MESSAGE_AS_UNDESIRED);
+					$this->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_UNDESIRED);
 				}
 				
 				$this->sLastError = 'Undesired email';
@@ -904,10 +906,10 @@ EOF
 		}
 	}]]></code>
 				</method>
-				<method id="ProcessPolicies">
+				<method id="ProcessSteps">
 					<comment>
 						<![CDATA[/**
-	 * Processes e-mail in steps (policies)
+	 * Processes e-mail in steps.
 	 *
 	 * @param \EmailMessage $oEmail The message to check
 	 * @param \Ticket $oTicket The ticket
@@ -922,68 +924,91 @@ EOF
 					<access>protected</access>
 					<type>Overload-DBObject</type>
 					<code>
-						<![CDATA[	protected function ProcessPolicies(EmailMessage $oEmail, $oTicket, $oSource, $index)
+						<![CDATA[	protected function ProcessSteps(EmailMessage $oEmail, $oTicket, $oSource, $index)
 	{
 		
-		$oCaller = null;
+		// Process all steps.
+		$aStepClasses = [];
 		
-		// Process all policies
-		$aPolicyClasses = [];
-		foreach(get_declared_classes() as $sClassName) {
+		// Start from pre-filtered class names.
+		foreach(EmailProcessor::$aStepClasses as $sClassName) {
 		
-			if(in_array('jb_itop_extensions\mail_to_ticket\iPolicy', class_implements($sClassName)) && $sClassName != 'jb_itop_extensions\mail_to_ticket\Policy') {
+			if(is_subclass_of($sClassName, 'jb_itop_extensions\mail_to_ticket\Step') == true) {
 			
-				$sAttCode = $sClassName::$sPolicyId.'_behavior';
+				$sAttCode = $sClassName::GetXMLSettingsPrefix().'_behavior';
 				
 				if(MetaModel::IsValidAttCode(get_class($this), $sAttCode) == true) {
-					// Do nothing basically means the policy can be skipped
+				
+					// Policies can easily be turned off.
+					// 'inactive' means the policy can be skipped altogether.
+					// 'do_nothing' means the policy should still be processed, but the policy itself shouldn't have any influence.
 					if($this->Get($sAttCode) != 'inactive') {
-						$aPolicyClasses[] = $sClassName;
+						$aStepClasses[] = $sClassName;
 					}
+					
 				}
 				else {
+				
 					// No default "behavior" attribute; assume this step must always be executed
-					$aPolicyClasses[] = $sClassName;
+					$aStepClasses[] = $sClassName;
+					
 				}
 				
 			}
 			
 		}
 		
-		$this->Trace('.. '.count($aPolicyClasses).' active policies to process...');
 			
-		// Policies must be executed in a certain order.
-		// Some policies may set info on the Ticket or derive the caller; 
-		// other policies may block further processing.
+		// Steps must be executed in a certain order.
+		// Some steps may set info on the Ticket or derive the caller; other steps may block further processing.
 		// The order in which these actions are executed, is important.
-		usort($aPolicyClasses, function($sClassNameA, $sClassNameB) {
+		usort($aStepClasses, function($sClassNameA, $sClassNameB) {
 			return $sClassNameA::$iPrecedence <=> $sClassNameB::$iPrecedence;
 		});
 		
-		$aPreviouslyExecutedPolicies = [];
+		$aPreviouslyExecutedSteps = [];
 		
-		foreach($aPolicyClasses as $sPolicy) {
+		foreach($aStepClasses as $sStep) {
 		
-			// Always overrule each time this is used. Avoid leftovers from previous e-mails!
-			$sPolicy::Init($this, $oSource, $index, $oEmail, $oTicket, $aPreviouslyExecutedPolicies);
+			$sLog = '. Check #'.(count($aPreviouslyExecutedSteps)+1).' (precedence: '.$sStep::$iPrecedence.'): '.end(explode('\\', $sStep));
 			
-			// As soon as there is one policy where IsCompliant() returns false: cancel further processing.
-			// Any other policy violation handling should have been performed by the class implementing the iPolicy interface.
-			if($sPolicy::IsCompliant() == false) {
-				// Action to take should have been set already in the IsCompliant() method
-				// See EmailProcessor::DELETE_MESSAGE, EmailProcessor::MARK_MESSAGE_AS_ERROR, EmailProcessor:MARK_MESSAGE_AS_UNDESIRED, ...
-				$this->sLastError = 'Not compliant with policy '.$sPolicy;
-				return $oTicket;
+			// In case of policy: add behavior
+			$sAttCode = $sStep::GetXMLSettingsPrefix().'_behavior';
+			if(MetaModel::IsValidAttCode(get_class($this), $sAttCode) == true) {
+				$sLog .= ' - Behavior: '.$this->Get($sAttCode);
 			}
 			
-			$aPreviouslyExecutedPolicies[] = $sPolicy;
+			$this->Trace($sLog);
+			
+			// Always override each time this is used. Avoid leftovers from previous e-mails!
+			$sStep::Init($this, $oSource, $index, $oEmail, $oTicket, $aPreviouslyExecutedSteps);
+			$sStep::Execute();
+			$aPreviouslyExecutedSteps[] = $sStep;
 			
 			// At some point (PolicyCreateOrUpdateTicket), a new Ticket might have been created.
-			$oTicket = $sPolicy::$oTicket;
+			$oTicket = $sStep::$oTicket;
+			
+			$this->Trace('.. Complete: '.$sStep.', next action: '.EmailProcessor::GetActionFromCode($iNextAction)););
+			
+			// If a next action has already been set: stop further processing.
+			// It either means one of the steps wants to take an action which makes further processing of this particular e-mail not necessary.
+			// The action could be: delete, move, mark as error, mark as undesired, skip for now, abort all further processing, ...
+			$iNextAction = $this->GetNextAction();
+			if($iNextAction != EmailProcessor::PROCESS_MESSAGE) {
+				break;
+			}
+			
 		
 		}
 		
-		$this->Trace('.. Processed all policies.');
+		if($iNextAction == EmailProcessor::PROCESS_MESSAGE) {
+		
+			// Everything went smoothly, but it's done now.
+			$oMailBox->SetNextAction(EmailProcessor::NO_ACTION);
+			
+		}
+		
+		$this->Trace('.. Processed all steps.');
 		
 		return $oTicket;
 		

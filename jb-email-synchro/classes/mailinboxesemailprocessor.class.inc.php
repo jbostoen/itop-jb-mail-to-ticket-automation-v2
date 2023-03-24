@@ -115,64 +115,22 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	}
 	
 	/**
-	 * Returns a action (string) corresponding to the given action code
-	 * @param int $iRetCode The action code from EmailProcessor
-	 * @return string The textual code of the action
-	 */
-	protected function GetActionFromCode($iRetCode) {
-		$sRetCode = 'Unknown Code '.$iRetCode;
-		switch($iRetCode) {
-			case EmailProcessor::NO_ACTION:
-				$sRetCode = 'NO_ACTION';
-				break;
-			
-			case EmailProcessor::DELETE_MESSAGE;
-				$sRetCode = 'DELETE_MESSAGE';
-				break;
-			
-			case EmailProcessor::PROCESS_MESSAGE:
-				$sRetCode = 'PROCESS_MESSAGE';
-				break;
-			
-			case EmailProcessor::PROCESS_ERROR:
-				$sRetCode = 'PROCESS_ERROR';
-				break;
-				
-			case EmailProcessor::MARK_MESSAGE_AS_ERROR:
-				$sRetCode = 'MARK_MESSAGE_AS_ERROR';
-				break;
-
-            case EmailProcessor::MARK_MESSAGE_AS_UNDESIRED:
-				$sRetCode = 'MARK_MESSAGE_AS_UNDESIRED';
-				break;
-				
-            case EmailProcessor::MOVE_MESSAGE:
-				$sRetCode = 'MOVE_MESSAGE';
-				break;
-				
-			case EmailProcessor::ABORT_FURTHER_PROCESSING:
-				$sRetCode = 'ABORT_FURTHER_PROCESSING';
-				break;
-				
-		}
-		return $sRetCode;		
-	}
-	
-	/**
 	 * Decides whether a message should be downloaded and processed, deleted, or simply ignored
 	 * (i.e left as-is in the mailbox)
 	 *
 	 * @throws \Exception
 	 */
 	public function DispatchMessage(EmailSource $oSource, $index, $sUIDL, $oEmailReplica = null) {
+		
 		self::Trace("Combodo Email Synchro: MailInboxesEmailProcessor: dispatch of the message $index ($sUIDL)");
 
 		$oInbox = $this->GetInboxFromSource($oSource);
 		$iRetCode = $oInbox->DispatchEmail($oEmailReplica);
-		$sRetCode = $this->GetActionFromCode($iRetCode);
+		$sRetCode = EmailProcessor::GetActionFromCode($iRetCode);
 
 		self::Trace("Combodo Email Synchro: MailInboxesEmailProcessor: dispatch of the message $index ($sUIDL) returned $iRetCode ($sRetCode)");
 		return $iRetCode;
+		
 	}
 
 	/**
@@ -230,7 +188,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 					$oInbox->ReprocessOldEmail($oSource, $index, $oEmail, $oEmailReplica);		
 			}
 			$iRetCode = $oInbox->GetNextAction();
-			$sRetCode = $this->GetActionFromCode($iRetCode);
+			$sRetCode = EmailProcessor::GetActionFromCode($iRetCode);
 			self::Trace("Email Synchro: MailInboxesEmailProcessor: End of processing of the new message $index ({$oEmail->sUIDL}) retCode: ($iRetCode) $sRetCode");
 		}
 		catch(Exception $e) {

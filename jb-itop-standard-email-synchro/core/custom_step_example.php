@@ -11,28 +11,28 @@
 namespace jb_itop_extensions\mail_to_ticket;
 
 /**
- * Class PolicyExampleSaveEmailsToPath Offers a policy to save incoming emails as .EML file to a (hardcoded) directory.
+ * Class StepSaveEmailsToPath. Offers a policy to save incoming emails as .EML file to a (hardcoded) directory.
+ *
  * Note: this is NOT in use by default.
  */
-abstract class PolicyExampleSaveEmailsToPath extends Policy implements iPolicy {
+abstract class StepSaveEmailsToPath extends Step {
 	
 	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all policies are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
-	 * Depending on the use case, set a low number (always export the email) or high number (export only if certain policies have been processed and email was compliant)
+	 * @inheritDoc
+	 *
+	 * @details Depending on the use case, set a low number (always export the email) or high number (export only if certain policies have been processed and email was compliant)
 	 */
 	public static $iPrecedence = 1;
 	
 	/**
-	 * @var \String $sPolicyId Shortname for policy
+	 * @inheritDoc
 	 */
-	public static $sPolicyId = 'policy_example_save_emails_to_path';
+	public static $sXMLSettingsPrefix = 'policy_example_save_emails_to_path';
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
-		
-		parent::BeforeComplianceCheck();
+	public static function Execute() {
 		
 		$oRawEmail = self::$oEmail->oRawEmail;
 		
@@ -63,9 +63,6 @@ abstract class PolicyExampleSaveEmailsToPath extends Policy implements iPolicy {
 			self::Trace('.. Unable to export: folder C:/temp does not exist');
 		}
 		
-		parent::AfterPassedComplianceCheck();
-		
-		return true;
 		
 	}
 
@@ -74,11 +71,11 @@ abstract class PolicyExampleSaveEmailsToPath extends Policy implements iPolicy {
 
 /*
 
-abstract class PolicyAttachmentVirusCheck implements iPolicy {
+abstract class PolicyAttachmentVirusCheck extends Step {
 	// could be an example implementing ClamAv, similar to what's mentioned in MailInboxBase
 }
 
-abstract class PolicyStatistics implements iPolicy {
+abstract class PolicyStatistics extends Step {
 	// could be an example of keeping track of statistics. Number of processed e-mails per inbox etc.
 }
 

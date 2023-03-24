@@ -6,6 +6,21 @@ However, some upgrades might break things because technology or use cases change
 A best practice before upgrading this extension, is to remove all e-mail messages which were already processed from the mailbox folders that are still configured in iTop.  
 Otherwise, it is possible in some situations that they are processed again; resulting in duplicate tickets or log entries in existing tickets.
 
+## Upgrading from before 2.7.230324?
+
+There were major revisions. If custom steps were implemented, these will need to be adjusted.
+
+"Policies" no longer exist, they have been simplified into "Steps".  
+The `IsCompliant()` method is now  `Execute()`.  
+ `BeforeComplianceCheck()` and  `AfterPassedComplianceCheck()` have been removed.  
+ `$sPolicyId` is now `
+With minimal effort, everything should work again.
+
+Guideline: if the step is actually trying to enforce something, use "Policy" as prefix for the class name.  
+A policy often could result in an action in regards to the e-mail (delete, mark as error, mark as undesired, skip for now, ...).  
+Otherwise, use "Step".
+
+
 ## Upgrading from before 2.7.220123?
 
 A new behavior has been added to lots of policies: "Inactive".  

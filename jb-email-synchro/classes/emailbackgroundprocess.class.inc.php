@@ -52,12 +52,29 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	}
 	
 	public function __construct() {
+		
 		$this->bDebug = MetaModel::GetModuleSetting('jb-email-synchro', 'debug', false);
 		self::$sSaveErrorsTo = MetaModel::GetModuleSetting('jb-email-synchro', 'save_errors_to', '');
 		self::$sNotifyErrorsTo = MetaModel::GetModuleSetting('jb-email-synchro', 'notify_errors_to', '');
 		self::$sNotifyErrorsFrom = MetaModel::GetModuleSetting('jb-email-synchro', 'notify_errors_from', '');
 		$sMaxEmailSize = MetaModel::GetModuleSetting('jb-email-synchro', 'maximum_email_size', '0');
 		self::$iMaxEmailSize = utils::ConvertToBytes($sMaxEmailSize);
+		
+		
+		// Build filtered list of policy classes only once per process execution.
+		EmailProcessor::$aStepClasses = [];
+				
+		foreach(get_declared_classes() as $sClassName) {
+		
+			if(is_subclass_of($sClassName, 'jb_itop_extensions\mail_to_ticket\Step') == true) {
+				
+				EmailProcessor::$aStepClasses[] = $sClassName;
+				
+			}
+			
+		}
+
+		
 	}
 
 	protected function Trace($sText) {
@@ -156,6 +173,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	}
 	
 	public function Process($iTimeLimit) {
+		
 		$iTotalMessages = 0;
 		$iTotalProcessed = 0;
 		$iTotalMarkedAsError = 0;
@@ -167,11 +185,16 @@ class EmailBackgroundProcess implements iBackgroundProcess {
         $iTotalUndesired = 0;
 		$iTotalUnreadable = 0; // Can not be red by the mail library (N° 5633)
 		
+		$this->Trace("-----------------------------------------------------------------------------------------");
+		$this->Trace('. '.count(EmailProcessor::$aStepClasses[]).' steps to process.');
+		
 		foreach(self::$aEmailProcessors as $sProcessorClass) {
 			
 			/** @var \EmailProcessor $oProcessor */
 			$oProcessor = new $sProcessorClass();
 			$aSources = $oProcessor->ListEmailSources();
+			
+			
 			
 			foreach($aSources as $oSource) {
 				
@@ -295,6 +318,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								
 								// Initialize e-mail which is being processed for the first time
 								$oSource->InitMessage($iMessage);
+								
 							}
 							else {
 								
@@ -359,6 +383,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									break;
 								
 								case EmailProcessor::PROCESS_MESSAGE:
+								
 									$iTotalProcessed++;
 									if($oEmailReplica->IsNew()) {
 										$this->Trace("Processing new message: {$sUIDL}");
@@ -409,6 +434,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 										$this->Trace("EmailReplica ID after ProcessMessage(): ".$oEmailReplica->GetKey());
 						
 										switch($iNextActionCode) {
+											
 											case EmailProcessor::MARK_MESSAGE_AS_ERROR:
 
 												$iTotalMarkedAsError++;
@@ -446,7 +472,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 													$this->Trace("Unable to move message");
 												}
 												break;
-													
+											
+											// @todo Seems to be unused in this fork. Clean up?
 											case EmailProcessor::PROCESS_ERROR:
 											
 												$sSubject = $oProcessor->GetLastErrorSubject();
@@ -463,18 +490,28 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 											
 											default:
 											case EmailProcessor::NO_ACTION:
-											case EmailProcessor::ABORT_FURTHER_PROCESSING:
-
+											
 												$this->Trace("No more action for EmailReplica ID: ".$oEmailReplica->GetKey());
 												$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'ok', $oRawEmail);
 												$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
 												
-												if($iNextActionCode == EmailProcessor::ABORT_FURTHER_PROCESSING) {
+												if($iNextActionCode == EmailProcessor::ABORT_ALL_FURTHER_PROCESSING) {
 													$this->Trace('Abort further processing.');
 													break 3;
 												}
 												
 												break;
+												
+											case EmailProcessor::SKIP_FOR_NOW:
+											
+												$this->Trace('Skip for now.');
+												break 2;
+												
+											case EmailProcessor::ABORT_ALL_FURTHER_PROCESSING:
+
+												$this->Trace('Abort all further processing.');
+												break 3;
+												
 										}
 
 									}

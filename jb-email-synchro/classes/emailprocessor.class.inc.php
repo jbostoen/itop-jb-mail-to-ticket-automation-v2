@@ -24,18 +24,25 @@
  */
 abstract class EmailProcessor {
 	
-	const NO_ACTION = 0;
-	const DELETE_MESSAGE = 1;
-	const PROCESS_MESSAGE = 2;
-	const PROCESS_ERROR = 3;
-	const MARK_MESSAGE_AS_ERROR = 4;
-	const MARK_MESSAGE_AS_UNDESIRED = 5;
-	const MOVE_MESSAGE = 6;
+	const NO_ACTION = 0; // No action taken / don't process message / processing ended.
+	const DELETE_MESSAGE = 1; // Mark message for deletion.
+	const PROCESS_MESSAGE = 2; // Process message. Used when a new e-mail is dispatched.
+	const PROCESS_ERROR = 3; // Mark processing as in error. Unused in this fork?
+	const MARK_MESSAGE_AS_ERROR = 4; // Mark message as error.
+	const MARK_MESSAGE_AS_UNDESIRED = 5; // Marks message as undesired.
+	const MOVE_MESSAGE = 6; // Moves message to specified target folder.
 	
-	const ABORT_FURTHER_PROCESSING = 999;
+	const SKIP_FOR_NOW = 998; // Skip only this message for now.
+	const ABORT_ALL_FURTHER_PROCESSING = 999; // Aborts all further processing.
 
 	/**
+	 * @var \String[] List of class names of steps in e-mail processing.
+	 */
+	public static $aStepClasses = [];
+	
+	/**
 	 * @return \EmailSource[]
+	 */
 	abstract public function ListEmailSources();
 	
 	abstract public function DispatchMessage(EmailSource $oSource, $index, $sUIDL, $oEmailReplica = null);
@@ -108,4 +115,54 @@ abstract class EmailProcessor {
 	public function GetLastErrorMessage() {
 		return $this->sLastErrorMessage;
 	}
+	
+	/**
+	 * Returns a action (string) corresponding to the given action code
+	 * @param int $iRetCode The action code from EmailProcessor
+	 * @return string The textual code of the action
+	 */
+	public static function GetActionFromCode($iRetCode) {
+		
+		$sRetCode = 'Unknown Code '.$iRetCode;
+		switch($iRetCode)
+		{
+			case EmailProcessor::NO_ACTION:
+				$sRetCode = 'NO_ACTION';
+				break;
+
+			case EmailProcessor::DELETE_MESSAGE;
+				$sRetCode = 'DELETE_MESSAGE';
+				break;
+
+			case EmailProcessor::PROCESS_MESSAGE:
+				$sRetCode = 'PROCESS_MESSAGE';
+				break;
+
+			case EmailProcessor::PROCESS_ERROR:
+				$sRetCode = 'PROCESS_ERROR';
+				break;
+
+			case EmailProcessor::MARK_MESSAGE_AS_ERROR:
+				$sRetCode = 'MARK_MESSAGE_AS_ERROR';
+				break;
+
+			case EmailProcessor::MARK_MESSAGE_AS_UNDESIRED:
+				$sRetCode = 'MARK_MESSAGE_AS_UNDESIRED';
+				break;
+				
+            case EmailProcessor::MOVE_MESSAGE:
+				$sRetCode = 'MOVE_MESSAGE';
+				break;
+				
+			case EmailProcessor::SKIP_FOR_NOW:
+				$sRetCode = 'SKIP_FOR_NOW';
+				break;
+				
+			case EmailProcessor::ABORT_ALL_FURTHER_PROCESSING:
+				$sRetCode = 'ABORT_ALL_FURTHER_PROCESSING';
+				break;
+		}
+		return $sRetCode;
+	}
+	
 }
