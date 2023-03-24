@@ -175,7 +175,8 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 				}
 				else {
 					// Other unexpected error
-					$this->sLastErrorSubject = "Failed to create a ticket for the incoming email (" . __METHOD__ . "). No Ticket object.";
+					$sUIDL = htmlentities($oEmail->sUIDL, ENT_QUOTES, 'UTF-8');
+					$this->sLastErrorSubject = "Failed to create a ticket for the incoming email ({$sUIDL}) (" . __METHOD__ . "). No Ticket object. ".(is_object($oResult) ? 'Class: '.get_class($oResult): 'No object.');
 					$this->sLastErrorMessage = $oInbox->sLastError;
 					$sMessage = "Email Synchro: MailInboxesEmailProcessor: Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL})";
 					$aErrors[] = $sMessage;

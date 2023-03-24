@@ -186,7 +186,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		$iTotalUnreadable = 0; // Can not be red by the mail library (N° 5633)
 		
 		$this->Trace("-----------------------------------------------------------------------------------------");
-		$this->Trace('. '.count(EmailProcessor::$aStepClasses[]).' steps to process.');
+		$this->Trace('. '.count(EmailProcessor::$aStepClasses).' steps to process.');
 		
 		foreach(self::$aEmailProcessors as $sProcessorClass) {
 			

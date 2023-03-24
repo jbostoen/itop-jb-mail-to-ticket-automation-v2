@@ -970,7 +970,8 @@ EOF
 		
 		foreach($aStepClasses as $sStep) {
 		
-			$sLog = '. Check #'.(count($aPreviouslyExecutedSteps)+1).' (precedence: '.$sStep::$iPrecedence.'): '.end(explode('\\', $sStep));
+			$aStep = explode('\\', $sStep);
+			$sLog = '. Check #'.(count($aPreviouslyExecutedSteps)+1).' (precedence: '.$sStep::$iPrecedence.'): '.end($aStep);
 			
 			// In case of policy: add behavior
 			$sAttCode = $sStep::GetXMLSettingsPrefix().'_behavior';
@@ -988,12 +989,12 @@ EOF
 			// At some point (PolicyCreateOrUpdateTicket), a new Ticket might have been created.
 			$oTicket = $sStep::$oTicket;
 			
-			$this->Trace('.. Complete: '.$sStep.', next action: '.EmailProcessor::GetActionFromCode($iNextAction)););
+			$iNextAction = $this->GetNextAction();
+			$this->Trace('.. Complete: '.$sStep.', next action: '.EmailProcessor::GetActionFromCode($iNextAction));
 			
 			// If a next action has already been set: stop further processing.
 			// It either means one of the steps wants to take an action which makes further processing of this particular e-mail not necessary.
 			// The action could be: delete, move, mark as error, mark as undesired, skip for now, abort all further processing, ...
-			$iNextAction = $this->GetNextAction();
 			if($iNextAction != EmailProcessor::PROCESS_MESSAGE) {
 				break;
 			}
@@ -1004,7 +1005,7 @@ EOF
 		if($iNextAction == EmailProcessor::PROCESS_MESSAGE) {
 		
 			// Everything went smoothly, but it's done now.
-			$oMailBox->SetNextAction(EmailProcessor::NO_ACTION);
+			$this->SetNextAction(EmailProcessor::NO_ACTION);
 			
 		}
 		
