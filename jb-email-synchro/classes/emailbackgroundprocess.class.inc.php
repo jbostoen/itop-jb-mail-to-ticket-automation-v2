@@ -494,12 +494,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												$this->Trace("No more action for EmailReplica ID: ".$oEmailReplica->GetKey());
 												$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'ok', $oRawEmail);
 												$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
-												
-												if($iNextActionCode == EmailProcessor::ABORT_ALL_FURTHER_PROCESSING) {
-													$this->Trace('Abort further processing.');
-													break 3;
-												}
-												
 												break;
 												
 											case EmailProcessor::SKIP_FOR_NOW:

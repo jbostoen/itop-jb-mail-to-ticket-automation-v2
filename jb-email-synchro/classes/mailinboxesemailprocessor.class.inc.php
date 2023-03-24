@@ -146,6 +146,12 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	 * @return int
 	 */
 	public function ProcessMessage(EmailSource $oSource, $index, EmailMessage $oEmail, EmailReplica $oEmailReplica, &$aErrors = array()) {
+				
+		// Reset error messages before processing.
+		// If not, they may be (incorrectly) transferred to the next email replicas too.
+		$this->sLastErrorSubject = '';
+		$this->sLastErrorMessage = '';
+		
 		try {			
 			$oInbox = $this->GetInboxFromSource($oSource);
 			self::Trace("Combodo Email Synchro: MailInboxesEmailProcessor: Processing message $index ({$oEmail->sUIDL})");

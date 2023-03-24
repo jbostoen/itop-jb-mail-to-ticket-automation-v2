@@ -134,6 +134,7 @@ SourceForge tickets:
 * #2124 / N° 5654 combodo-oauth-email-synchro / use_message_as_uid (suggested fix, implemented by Combodo yet)
 * ? / N° 5633 Fix IMAPOAuthEmailSource crashing when Laminas cannot decode message (suggested fix, implemented and improved by Combodo)
 * ? / N° 2181 Mail to Ticket: Sometimes duplicate ticket from mail-to-ticket (suggested fix, implemented by Combodo)
+* #2158 Mail to Ticket: Incorrect 'error_message' for replica (suggested fix, not solution in Combodo version)
 
 ## Upgrade notes
 
