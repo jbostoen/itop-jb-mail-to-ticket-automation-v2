@@ -62,13 +62,13 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		
 		
 		// Build filtered list of policy classes only once per process execution.
-		EmailProcessor::$aStepClasses = [];
-				
+		EmailProcessor::$aAvailableStepClasses = [];
+
 		foreach(get_declared_classes() as $sClassName) {
 		
 			if(is_subclass_of($sClassName, 'jb_itop_extensions\mail_to_ticket\Step') == true) {
 				
-				EmailProcessor::$aStepClasses[] = $sClassName;
+				EmailProcessor::$aAvailableStepClasses[] = $sClassName;
 				
 			}
 			
@@ -186,7 +186,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		$iTotalUnreadable = 0; // Can not be red by the mail library (N° 5633)
 		
 		$this->Trace("-----------------------------------------------------------------------------------------");
-		$this->Trace('. '.count(EmailProcessor::$aStepClasses).' steps to process.');
+		$this->Trace('. '.count(EmailProcessor::$aAvailableStepClasses).' steps to process.');
 		
 		foreach(self::$aEmailProcessors as $sProcessorClass) {
 			
@@ -209,7 +209,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					$oSource->Disconnect();
 					continue;
 				}
-				$this->Trace("GetMessagesCount returned: $iMsgCount");	
+				$this->Trace("GetMessagesCount returned: $iMsgCount");
+				
+				
 
 				if($iMsgCount != 0) {
 					
@@ -225,6 +227,32 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					
 					/** @var \MailInboxBase $oInbox Mail inbox */
 					$oInbox = $oProcessor->GetInboxFromSource($oSource);
+					
+					// Whether a policy is active or inactive, is determined per mailbox.
+					EmailProcessor::$aActiveStepClasses = [];
+					
+					// Start from pre-filtered class names.
+					foreach(EmailProcessor::$aAvailableStepClasses as $sClassName) {
+					
+						// Policies can easily be turned off.
+						// 'inactive' means the policy can be skipped altogether.
+						// 'do_nothing' means the policy should still be processed, but the policy itself shouldn't have any influence.
+						$sAttCode = $sClassName::GetXMLSettingsPrefix().'_behavior';
+						
+						if(MetaModel::IsValidAttCode(get_class($oInbox), $sAttCode) == true && $oInbox->Get($sAttCode) != 'inactive') {
+							
+							EmailProcessor::$aActiveStepClasses[] = $sClassName;
+							
+						}
+						else {
+						
+							// No default "behavior" attribute; assume this step must always be executed
+							EmailProcessor::$aActiveStepClasses[] = $sClassName;
+							
+						}
+						
+					}
+					
 					
 					// Sort but keep original index (to request right message)
 					if($oInbox->Get('protocol') == 'imap') {

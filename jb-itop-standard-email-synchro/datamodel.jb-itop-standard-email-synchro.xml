@@ -928,37 +928,8 @@ EOF
 	{
 		
 		// Process all steps.
-		$aStepClasses = [];
+		$aStepClasses = EmailProcessor::$aActiveStepClasses;
 		
-		// Start from pre-filtered class names.
-		foreach(EmailProcessor::$aStepClasses as $sClassName) {
-		
-			if(is_subclass_of($sClassName, 'jb_itop_extensions\mail_to_ticket\Step') == true) {
-			
-				$sAttCode = $sClassName::GetXMLSettingsPrefix().'_behavior';
-				
-				if(MetaModel::IsValidAttCode(get_class($this), $sAttCode) == true) {
-				
-					// Policies can easily be turned off.
-					// 'inactive' means the policy can be skipped altogether.
-					// 'do_nothing' means the policy should still be processed, but the policy itself shouldn't have any influence.
-					if($this->Get($sAttCode) != 'inactive') {
-						$aStepClasses[] = $sClassName;
-					}
-					
-				}
-				else {
-				
-					// No default "behavior" attribute; assume this step must always be executed
-					$aStepClasses[] = $sClassName;
-					
-				}
-				
-			}
-			
-		}
-		
-			
 		// Steps must be executed in a certain order.
 		// Some steps may set info on the Ticket or derive the caller; other steps may block further processing.
 		// The order in which these actions are executed, is important.

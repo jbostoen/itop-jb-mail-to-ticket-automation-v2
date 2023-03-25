@@ -38,7 +38,12 @@ abstract class EmailProcessor {
 	/**
 	 * @var \String[] List of class names of steps in e-mail processing.
 	 */
-	public static $aStepClasses = [];
+	public static $aAvailableStepClasses = [];
+	
+	/**
+	 * @var \String[] List of class names of steps which are active (so not 'inactive') in e-mail processing.
+	 */
+	public static $aActiveStepClasses = [];
 	
 	/**
 	 * @return \EmailSource[]
