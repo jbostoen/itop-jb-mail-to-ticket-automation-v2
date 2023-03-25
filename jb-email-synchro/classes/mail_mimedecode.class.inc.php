@@ -52,7 +52,7 @@
  * @author     Sean Coates <sean@php.net>
  * @copyright  2003-2006 PEAR <pear-group@php.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
- * @version    2.7.221226
+ * @version    2.7.230325
  * @link       http://pear.php.net/package/Mail_mime
  */
 
@@ -89,7 +89,7 @@ if (class_exists('PEAR'))
  * @author     Sean Coates <sean@php.net>
  * @copyright  2003-2006 PEAR <pear-group@php.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
- * @version    2.7.221226
+ * @version    2.7.230325
  * @link       http://pear.php.net/package/Mail_mime
  */
 class Mail_mimeDecode extends PEAR

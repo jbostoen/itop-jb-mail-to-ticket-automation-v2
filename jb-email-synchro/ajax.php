@@ -18,7 +18,7 @@
 /**
  * Processing of AJAX calls for the CalendarView
  *
- * @copyright   Copyright (c) 2013-2022 Combodo SARL
+ * @copyright   Copyright (c) 2013-2023 Combodo SARL
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
