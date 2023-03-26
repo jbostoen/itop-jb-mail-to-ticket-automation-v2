@@ -140,7 +140,7 @@ uidl
 * **Ticket Default Values** - Default values for tickets (see iTop data model, example below).
 * **Title Pattern** - Pattern which will be used to match tickets based on a reference. Example: /R-([0-9]{6})/
 * **Ignore patterns in subject** - Regex patterns, one per line. To make other patterns ignored while processing/finding related ticket (e.g. another ticket system with IR-123456 numbering).
-* **Stimuli to apply** - Example: reopen a ticket which was in a pending state (pending:ev_reopen)
+* **Stimuli to apply** - Example: reopen a ticket which was in a pending state (pending:ev_reopen). Note: this only works when a ticket is updated, not when it's created.
 * **Target folder**  
   When enabled (see "After processing the email") and a target folder is specified, processed e-mail messages will be moved to this folder.  
   Use case: useful when the e-mail should be kept (for archive purposes), but the inbox should contain as few e-mails as possible (for performance).

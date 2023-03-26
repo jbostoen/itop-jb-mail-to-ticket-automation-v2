@@ -64,7 +64,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	
 	'Class:MailInboxStandard/Attribute:stimuli' => 'Stimuli to apply',
 	'Class:MailInboxStandard/Attribute:stimuli+' => 'Apply a stimulus when the ticket is in a given state',
-	'Class:MailInboxStandard/Attribute:stimuli?' => 'A list of state_code:stimulus_code (one per line) to define the stimulus to apply (after updating a ticket), for the given state of the ticket. This is useful for example to automatically reassign a ticket which is in the state “pending”. Use the format <state_code>:<stimulus_code>',
+	'Class:MailInboxStandard/Attribute:stimuli?' => 'A list of state_code:stimulus_code (one per line) to define the stimulus to apply (only after updating an existing ticket), for the given state of the ticket. This is useful for example to automatically reassign a ticket which is in the state “pending”. Use the format <state_code>:<stimulus_code>',
 
 
 	'Class:MailInboxStandard/Attribute:trace' => 'Debug trace',

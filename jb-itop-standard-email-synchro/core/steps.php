@@ -920,24 +920,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		// Process attachments now the ID is known
 		static::UpdateAttachments();
 		
-		$oMailBox = static::GetMailBox();
-		$iNextAction = EmailProcessor::PROCESS_MESSAGE;
-		
-		// Shall we delete the source email immediately?
-		if($oMailBox->Get('email_storage') == 'delete') {
-			
-			// Remove the processed message from the mailbox
-			$iNextAction = EmailProcessor::DELETE_MESSAGE;
-			
-		}
-		elseif($oMailBox->Get('email_storage') == 'move' && $oMailBox->Get('target_folder') != '') {
-			
-			// Move the processed message to another folder
-			$iNextAction = EmailProcessor::MOVE_MESSAGE;
-			
-		}
-		
-		$oMailBox->SetNextAction($iNextAction);
 	
 	}
 	 
@@ -1156,29 +1138,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 
 		// Apply a stimulus if needed, will write the ticket to the database, may launch triggers, etc...
 		static::ApplyConfiguredStimulus($oTicket);
-		
-		// Delete the email immediately or keep it stored
-		if($oMailBox->Get('email_storage') == 'delete') {
-			
-			// Remove the processed message from the mailbox
-			static::Trace(".. Deleting the source email");
-			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);	
-			
-		}
-		elseif($oMailBox->Get('email_storage') == 'move') {
-			
-			// Move the message to another folder
-			static::Trace(".. Moving the source email");
-			$oMailBox->SetNextAction(EmailProcessor::MOVE_MESSAGE);
-			
-		}
-		else {
-			
-			// Keep the message in the mailbox
-			static::Trace(".. Keeping the source email");
-			$oMailBox->SetNextAction(EmailProcessor::PROCESS_MESSAGE);
-			
-		}
 		
 	}
 	
@@ -1532,6 +1491,45 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		return $sInputText;
 	}
 	 
+}
+
+/**
+ * Class StepFinalAction. Final action: keep, move, delete, ...
+ */
+abstract class StepFinalAction extends Step {
+	
+	/**
+	 * @inheritDoc
+	 * @details This should really be the final step. After successful processing, take the final action (keep, move, delete, ...).
+	 */
+	public static $iPrecedence = 9999;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() {
+		
+		$oMailBox = static::GetMailBox();
+		$iNextAction = EmailProcessor::PROCESS_MESSAGE;
+		
+		// Delete the source email immediately?
+		if($oMailBox->Get('email_storage') == 'delete') {
+			
+			// Remove the processed message from the mailbox.
+			$iNextAction = EmailProcessor::DELETE_MESSAGE;
+			
+		}
+		elseif($oMailBox->Get('email_storage') == 'move' && $oMailBox->Get('target_folder') != '') {
+			
+			// Move the processed message to another folder.
+			$iNextAction = EmailProcessor::MOVE_MESSAGE;
+			
+		}
+		
+		$oMailBox->SetNextAction($iNextAction);
+		
+	}
+	
 }
 
 
