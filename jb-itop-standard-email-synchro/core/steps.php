@@ -606,6 +606,11 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		}
 		
 		
+		// No error occurred. Revert to default (continue processing).
+		$oMailBox = static::GetMailBox();
+		$oMailBox->SetNextAction(EmailProcessor::PROCESS_MESSAGE);
+		
+		
 	}
 	
 	/**
@@ -773,7 +778,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		}
 		elseif($oMailBox->Get('error_behavior') == 'mark_as_error') {
 			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
-		}		
+		}
 		
 		// Check that the ticket is of the expected class
 		$sTargetClass = $oMailBox->Get('target_class');
@@ -919,7 +924,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		 
 		// Process attachments now the ID is known
 		static::UpdateAttachments();
-		
 	
 	}
 	 
@@ -1138,6 +1142,10 @@ abstract class StepCreateOrUpdateTicket extends Step {
 
 		// Apply a stimulus if needed, will write the ticket to the database, may launch triggers, etc...
 		static::ApplyConfiguredStimulus($oTicket);
+		
+		// No error occurred
+		$oMailBox = static::GetMailBox();
+		$oMailBox->SetNextAction(EmailProcessor::PROCESS_MESSAGE);
 		
 	}
 	
