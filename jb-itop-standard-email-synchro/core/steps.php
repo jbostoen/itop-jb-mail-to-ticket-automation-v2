@@ -749,7 +749,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		catch(Exception $e) {
 			static::Trace("... Ticket {$oTicket->GetName()} might not be properly created or something else went wrong (for instance: notifications).");
 			static::Trace($e->GetMessage()); // Add actual error message (if available)
-			throw new Exception('Ticket creation failed'); // Match in IsCompliant()
+			throw new Exception('Ticket creation failed');
 		}
 			
 		static::AfterInsertTicket();
@@ -889,7 +889,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		catch(Exception $e) {
 			static::Trace("... Ticket {$oTicket->GetName()} might not be properly updated or something else went wrong (for instance: notifications).");
 			static::Trace($e->GetMessage()); // Add actual error message (if available)
-			throw new Exception('Ticket update failed'); // Match in IsCompliant()
+			throw new Exception('Ticket update failed');
 		}
 		
 		static::AfterUpdateTicket();
@@ -2110,46 +2110,45 @@ abstract class PolicyTicketResolved extends Step {
 		$oMailBox = static::GetMailBox();
 		
 		// Checking if a previous ticket was found
-			if($oTicket !== null) {
-				if($oTicket->Get('status') == 'resolved') {
+			if($oTicket !== null && $oTicket->Get('status') == 'resolved') {
 					
-					static::Trace(".. Ticket was marked as resolved before.");
-							
-					switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) { 
-						case 'bounce_delete': 
-						case 'bounce_mark_as_undesired':
-						case 'delete':
-						case 'do_nothing':
-						case 'mark_as_undesired':
+				static::Trace(".. Ticket was marked as resolved before.");
 						
-							static::HandleViolation();
-							
-							// No fallback
-							
-							// Stop processing any further!
-							return;
+				switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) { 
+					case 'bounce_delete': 
+					case 'bounce_mark_as_undesired':
+					case 'delete':
+					case 'do_nothing':
+					case 'mark_as_undesired':
+					
+						static::HandleViolation();
+						
+						// No fallback
+						
+						// Stop processing any further!
+						return;
 
-							break; // Defensive programming
-							 
-						case 'fallback_reopen': 
+						break; // Defensive programming
+						 
+					case 'fallback_reopen': 
+					
+						// Reopen ticket
+						static::Trace("... Fallback: reopen resolved ticket.");
 						
-							// Reopen ticket
-							static::Trace("... Fallback: reopen resolved ticket.");
-							
-							$bRet = $oTicket->ApplyStimulus('ev_reopen');
-							
-							if($bRet == false) {
-								static::Trace('... Stimulus ev_reopen is not possible for this ticket. Hint: the stimulus may not be defined or not allowed in the current ticket state: '.$oTicket->GetState());
-							}
-							break; 
-							
-						default:
-							// Should not happen.
-							static::Trace("... Unknown action for resolved tickets.");
-							break; 
+						$bRet = $oTicket->ApplyStimulus('ev_reopen');
 						
-					}
+						if($bRet == false) {
+							static::Trace('... Stimulus ev_reopen is not possible for this ticket. Hint: the stimulus may not be defined or not allowed in the current ticket state: '.$oTicket->GetState());
+						}
+						break; 
+						
+					default:
+						// Should not happen.
+						static::Trace("... Unknown action for resolved tickets.");
+						break; 
+					
 				}
+				
 			}
 		
 	}
@@ -2174,48 +2173,47 @@ abstract class PolicyTicketClosed extends Step {
 	/**
 	 * @inheritDoc
 	 */
-	public static function IsCompliant() {
+	public static function Execute() {
 		
 		$oTicket = static::GetTicket();
 		$oMailBox = static::GetMailBox();
 		
 		// Checking if a previous ticket was found
-			if($oTicket !== null) {
-				if($oTicket->Get('status') == 'closed') {
+			if($oTicket !== null && $oTicket->Get('status') == 'closed') {
 						
-					switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) { 
-						case 'bounce_delete': 
-						case 'bounce_mark_as_undesired':
-						case 'delete':
-						case 'do_nothing':
-						case 'mark_as_undesired':
+				switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) { 
+					case 'bounce_delete': 
+					case 'bounce_mark_as_undesired':
+					case 'delete':
+					case 'do_nothing':
+					case 'mark_as_undesired':
+					
+						static::Trace(".. Undesired: ticket was marked as closed before.");
+						static::HandleViolation();
 						
-							static::Trace(".. Undesired: ticket was marked as closed before.");
-							static::HandleViolation();
-							
-							// No fallback
-							
-							// Stop processing any further!
-							return;
+						// No fallback
+						
+						// Stop processing any further!
+						return;
 
-							break; // Defensive programming
-							 
-						case 'fallback_reopen': 
-							// Reopen ticket
-							static::Trace("... Fallback: reopen closed ticket."); 
-							$bRet = $oTicket->ApplyStimulus('ev_reopen');
-							
-							if($bRet == false) {
-								static::Trace('... Stimulus ev_reopen is not possible for this ticket. Hint: the stimulus may not be defined or not allowed in the current ticket state: '.$oTicket->GetState());
-							}
-							break; 
-							
-						default:
-							// Should not happen.
-							static::Trace("... Unknown action for closed tickets.");
-							break; 
+						break; // Defensive programming
+						 
+					case 'fallback_reopen': 
+						// Reopen ticket
+						static::Trace("... Fallback: reopen closed ticket."); 
+						$bRet = $oTicket->ApplyStimulus('ev_reopen');
 						
-					}
+						if($bRet == false) {
+							static::Trace('... Stimulus ev_reopen is not possible for this ticket. Hint: the stimulus may not be defined or not allowed in the current ticket state: '.$oTicket->GetState());
+						}
+						break; 
+						
+					default:
+						// Should not happen.
+						static::Trace("... Unknown action for closed tickets.");
+						break; 
+					
+					
 				}
 			}
 		
