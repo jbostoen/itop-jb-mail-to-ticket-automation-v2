@@ -520,11 +520,17 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 											case EmailProcessor::SKIP_FOR_NOW:
 											
 												$this->Trace('Skip for now.');
+												if($oEmailReplica->IsNew() == false) {
+													$oEmailReplica->DBDelete();
+												}
 												break 2;
 												
 											case EmailProcessor::ABORT_ALL_FURTHER_PROCESSING:
 
 												$this->Trace('Abort all further processing.');
+												if($oEmailReplica->IsNew() == false) {
+													$oEmailReplica->DBDelete();
+												}
 												break 3;
 												
 											default:
