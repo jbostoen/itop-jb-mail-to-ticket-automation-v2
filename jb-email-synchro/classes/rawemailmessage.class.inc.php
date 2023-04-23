@@ -180,7 +180,7 @@ class RawEmailMessage {
 				}
 				
 				$bInline = true;
-				if(stripos($sContentDisposition, 'attachment;') !== false) {
+				if(stripos($sContentDisposition, 'attachment') !== false) {
 					$bInline = false;
 				}
 				
