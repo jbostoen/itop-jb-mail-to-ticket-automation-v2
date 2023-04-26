@@ -79,6 +79,25 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:TriggerOnMailUpdate' => 'Déclencheur sur mise à jour par mail',
 	'Class:TriggerOnMailUpdate+' => 'Déclencheur activé sur la mise à jour de tickets par mail',
 	
-	'MailInbox:EmptyMailbox' => 'La boîte mail est vide.';
+	'MailInbox:EmptyMailbox' => 'La boîte mail est vide.',
+	
+	'Class:EmailReplica' => 'Email Replica~~',
+	'Class:EmailReplica/Attribute:ticket_id' => 'Ticket ID~~',
+	'Class:EmailReplica/Attribute:uidl' => 'UIDL~~',
+	'Class:EmailReplica/Attribute:mailbox_path' => 'Mailbox path~~',
+	'Class:EmailReplica/Attribute:message_id' => 'Message ID~~',
+	'Class:EmailReplica/Attribute:message_text' => 'Message text~~',
+	'Class:EmailReplica/Attribute:references' => 'References~~',
+	'Class:EmailReplica/Attribute:thread_index' => 'Thread index~~',
+	'Class:EmailReplica/Attribute:message_date' => 'Message date~~',
+	'Class:EmailReplica/Attribute:last_seen' => 'Last seen~~',
+	'Class:EmailReplica/Attribute:status' => 'Status~~',
+	'Class:EmailReplica/Attribute:status/Value:error' => 'Error~~',
+	'Class:EmailReplica/Attribute:status/Value:ignored' => 'Ignored~~',
+	'Class:EmailReplica/Attribute:status/Value:ok' => 'OK~~',
+	'Class:EmailReplica/Attribute:status/Value:undesired' => 'Undesired~~',
+	'Class:EmailReplica/Attribute:error_message' => 'Error message~~',
+	'Class:EmailReplica/Attribute:error_trace' => 'Error trace~~',
+	'Class:EmailReplica/Attribute:contents' => 'Contents~~',
 	
 ));
