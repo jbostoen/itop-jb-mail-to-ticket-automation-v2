@@ -79,6 +79,22 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:TriggerOnMailUpdate' => 'Trigger (when updated by mail)',
 	'Class:TriggerOnMailUpdate+' => 'Trigger activated when a ticket is updated by processing an incoming email',
 	
-	'MailInbox:EmptyMailbox' => 'Empty mailbox';
+	'MailInbox:EmptyMailbox' => 'Empty mailbox',
+	
+	'Class:EmailReplica' => 'Email Replica',
+	'Class:EmailReplica/Attribute:ticket_id' => 'Ticket ID',
+	'Class:EmailReplica/Attribute:uidl' => 'UIDL',
+	'Class:EmailReplica/Attribute:mailbox_path' => 'Mailbox path',
+	'Class:EmailReplica/Attribute:message_id' => 'Message ID',
+	'Class:EmailReplica/Attribute:message_text' => 'Message text',
+	'Class:EmailReplica/Attribute:references' => 'References',
+	'Class:EmailReplica/Attribute:thread_index' => 'Thread index',
+	'Class:EmailReplica/Attribute:message_date' => 'Message date',
+	'Class:EmailReplica/Attribute:last_seen' => 'Last seen',
+	'Class:EmailReplica/Attribute:status' => 'Status',
+	'Class:EmailReplica/Attribute:error_message' => 'Error message',
+	'Class:EmailReplica/Attribute:error_trace' => 'Error trace',
+	'Class:EmailReplica/Attribute:contents' => 'Contents',
+	
 	
 ));
