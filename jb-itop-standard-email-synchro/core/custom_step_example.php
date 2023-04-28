@@ -11,7 +11,7 @@
 namespace jb_itop_extensions\mail_to_ticket;
 
 /**
- * Class StepSaveEmailsToPath. Offers a policy to save incoming emails as .EML file to a (hardcoded) directory.
+ * Class StepSaveEmailsToPath. Step to save incoming emails as .EML file to a (hardcoded) directory.
  *
  * Note: this is NOT in use by default.
  */
@@ -34,7 +34,7 @@ abstract class StepSaveEmailsToPath extends Step {
 	 */
 	public static function Execute() {
 		
-		$oRawEmail = self::$oEmail->oRawEmail;
+		$oRawEmail = static::GetMail();
 		
 		// Add some logic for file name. Mind time zones!
 		$sDateTime = strtotime($oRawEmail->GetHeader('date'));
@@ -52,15 +52,15 @@ abstract class StepSaveEmailsToPath extends Step {
 		
 		if(file_exists('C:/temp/') == true) {
 			if(file_exists($sFolder) == false) {
-				self::Trace('.. Create folder: '.$sFolder);
+				static::Trace('.. Create folder: '.$sFolder);
 				mkdir($sFolder);
 			}
 			$sFilePath = $sFolder.'/'.$sSanitizedMessageId.'.eml';
-			self::Trace('.. Save e-mail to '.$sFilePath);
+			static::Trace('.. Save e-mail to '.$sFilePath);
 			$oRawEmail->SaveToFile($sFilePath);
 		}
 		else {
-			self::Trace('.. Unable to export: folder C:/temp does not exist');
+			static::Trace('.. Unable to export: folder C:/temp does not exist');
 		}
 		
 		

@@ -149,6 +149,18 @@ abstract class Step implements iStep {
 	}
 	
 	/**
+	 * Shorthand to obtain a setting configured in the maibox properties for a specific step.
+	 *
+	 * @return \String
+	 */
+	public static function GetStepSetting($sSetting) {
+	
+		$oMailBox = static::GetMailBox();
+		return $oMailBox->Get(static::GetXMLSettingsPrefix().'_'.$sSetting);
+		
+	}
+	
+	/**
 	  * Gets the step's precedence.
 	  *
 	  * @return \Integer
@@ -1570,7 +1582,7 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Step {
 		if($oTicket !== null) {
 				
 			// Checking if attachments are in line with configured policies.
-			switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) {
+			switch(static::GetStepSetting('behavior')) {
 			
 				case 'bounce_delete':
 				case 'bounce_mark_as_undesired':
@@ -1626,7 +1638,7 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Step {
 		
 		// Checking if attachments are in line with configured policies.
 		
-			$sForbiddenMimeTypes = $oMailBox->Get(static::GetXMLSettingsPrefix().'_mimetypes');
+			$sForbiddenMimeTypes = static::GetStepSetting('mimetypes');
 			
 			if(trim($sForbiddenMimeTypes) == '') {
 				static::Trace('.. No forbidden MimeTypes specified.');
@@ -1638,7 +1650,7 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Step {
 				static::Trace('.. Forbidden MimeTypes: '. implode(' - ', $aForbiddenMimeTypes));
 				static::Trace('.. # Attachments: '. count($oEmail->aAttachments));
 				
-				switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) {
+				switch(static::GetStepSetting('behavior')) {
 					
 					case 'bounce_delete':
 					case 'bounce_mark_as_undesired':
@@ -1715,7 +1727,7 @@ abstract class PolicyBounceLimitMailSize extends Step {
 		$oEmail = static::GetMail();
 		
 		// Checking if mail size is not too big
-		$iMaxSizeMB = $oMailBox->Get(static::GetXMLSettingsPrefix().'_max_size_MB');
+		$iMaxSizeMB = static::GetStepSetting('max_size_MB');
 		
 		if($iMaxSizeMB > 0) {
 		
@@ -1766,7 +1778,7 @@ abstract class PolicyBounceNoSubject extends Step {
 		
 		// Checking if subject is not empty.
 		
-			$sPolicyBehavior = $oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior');
+			$sPolicyBehavior = static::GetStepSetting('behavior');
 			
 			if($oEmail->sSubject == '') {
 				
@@ -1793,7 +1805,7 @@ abstract class PolicyBounceNoSubject extends Step {
 					
 						// Set ticket title of email message
 						// Setting the ticket title on the ticket object happens later and not in this policy!
-						$sDefaultTitle = $oMailBox->Get(static::GetXMLSettingsPrefix().'_default_value');
+						$sDefaultTitle = static::GetStepSetting('default_value');
 						
 						// Inproper configuration
 						if(trim($sDefaultTitle) == '') {
@@ -1859,7 +1871,7 @@ abstract class PolicyBounceOtherRecipients extends Step {
 			$aAllowedContacts = array_merge([ $oEmail->sCallerEmail ], $aMailBoxAliases);
 			$aAllowedContacts = array_unique($aAllowedContacts);
 
-			$sPolicyBehavior = $oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior');
+			$sPolicyBehavior = static::GetStepSetting('behavior');
 			
 			switch($sPolicyBehavior) {
 				 case 'bounce_delete':
@@ -1952,7 +1964,7 @@ abstract class PolicyBounceAutoReply extends Step {
 		
 		// Checking if subject is not empty.
 		
-			$sPolicyBehavior = $oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior');
+			$sPolicyBehavior = static::GetStepSetting('behavior');
 			
 			switch(true) {
 				
@@ -2114,7 +2126,7 @@ abstract class PolicyTicketResolved extends Step {
 					
 				static::Trace(".. Ticket was marked as resolved before.");
 						
-				switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) { 
+				switch(static::GetStepSetting('behavior')) { 
 					case 'bounce_delete': 
 					case 'bounce_mark_as_undesired':
 					case 'delete':
@@ -2181,7 +2193,7 @@ abstract class PolicyTicketClosed extends Step {
 		// Checking if a previous ticket was found
 			if($oTicket !== null && $oTicket->Get('status') == 'closed') {
 						
-				switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) { 
+				switch(static::GetStepSetting('behavior')) { 
 					case 'bounce_delete': 
 					case 'bounce_mark_as_undesired':
 					case 'delete':
@@ -2246,10 +2258,10 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Step {
 		
 		// Checking if an undesired title pattern is found
 
-			if(trim($oMailBox->Get(static::GetXMLSettingsPrefix().'_patterns')) != '' ) { 
+			if(trim(static::GetStepSetting('patterns')) != '' ) { 
 			
 				// Go over each pattern and check.
-				$aPatterns = preg_split(NEWLINE_REGEX, $oMailBox->Get(static::GetXMLSettingsPrefix().'_patterns')); 
+				$aPatterns = preg_split(NEWLINE_REGEX, static::GetStepSetting('patterns')); 
 				$sMailSubject = $oEmail->sSubject;
 				
 				foreach($aPatterns as $sPattern) {
@@ -2262,7 +2274,7 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Step {
 						}
 						elseif(preg_match($sPattern, $sMailSubject)) {
 							
-							switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) { 
+							switch(static::GetStepSetting('behavior')) { 
 								case 'bounce_delete': 
 								case 'bounce_mark_as_undesired':
 								case 'delete':
@@ -2345,7 +2357,7 @@ abstract class PolicyFindCaller extends Step {
 					case 0:
 
 						// Caller was not found.
-						switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) {
+						switch(static::GetStepSetting('behavior')) {
 							
 							case 'bounce_delete':
 							case 'bounce_mark_as_undesired':
@@ -2365,7 +2377,7 @@ abstract class PolicyFindCaller extends Step {
 								static::Trace("... Creating a new Person for the email: {$sCallerEmail}");
 								$oCaller = new Person();
 								$oCaller->Set('email', $oEmail->sCallerEmail);
-								$sDefaultValues = $oMailBox->Get(static::GetXMLSettingsPrefix().'_default_values');
+								$sDefaultValues = static::GetStepSetting('default_values');
 								
 								if(trim($sDefaultValues) != '') {
 									
@@ -2458,7 +2470,7 @@ abstract class PolicyRemoveTitlePatterns extends Step {
 			$oMailBox = static::GetMailBox();
 			$oEmail = static::GetMail();
 			
-			$sPatterns = $oMailBox->Get(static::GetXMLSettingsPrefix().'_patterns');
+			$sPatterns = static::GetStepSetting('patterns');
 
 			if($sPatterns != '' ) { 
 			
@@ -2476,7 +2488,7 @@ abstract class PolicyRemoveTitlePatterns extends Step {
 						}
 						elseif(preg_match($sPattern, $sMailSubject)) {
 							
-							switch($oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior')) {
+							switch(static::GetStepSetting('behavior')) {
 								
 								case 'fallback_remove':
 								
@@ -2541,7 +2553,7 @@ abstract class PolicyFindAdditionalContacts extends Step {
 		$oEmail = static::GetMail();
 		$oMailBox = static::GetMailBox();
 		$oTicket = static::GetTicket();
-		$sPolicyBehavior = $oMailBox->Get(static::GetXMLSettingsPrefix().'_behavior');
+		$sPolicyBehavior = static::GetStepSetting('behavior');
 		
 		$sCallerEmail = $oEmail->sCallerEmail;
 							
@@ -2604,7 +2616,7 @@ abstract class PolicyFindAdditionalContacts extends Step {
 						static::Trace(".. Creating a new Person with email address '{$sRecipientEmail}'");
 						$oContact = new Person();
 						$oContact->Set('email', $sRecipientEmail);
-						$sDefaultValues = $oMailBox->Get(static::GetXMLSettingsPrefix().'_default_values');
+						$sDefaultValues = static::GetStepSetting('default_values');
 						$aDefaults = preg_split(NEWLINE_REGEX, $sDefaultValues);
 						$aDefaultValues = array();
 						foreach($aDefaults as $sLine) {
@@ -2712,10 +2724,10 @@ abstract class PolicyAttachmentImageDimensions extends Step {
 			$oEmail = static::GetMail();
 			
 			// Ignore attachment or downsize?
-			$iMinWidth = $oMailBox->Get(static::GetXMLSettingsPrefix().'_min_width');
-			$iMaxWidth = $oMailBox->Get(static::GetXMLSettingsPrefix().'_max_width');
-			$iMinHeight = $oMailBox->Get(static::GetXMLSettingsPrefix().'_min_height');
-			$iMaxHeight = $oMailBox->Get(static::GetXMLSettingsPrefix().'_max_height');
+			$iMinWidth = static::GetStepSetting('min_width');
+			$iMaxWidth = static::GetStepSetting('max_width');
+			$iMinHeight = static::GetStepSetting('min_height');
+			$iMaxHeight = static::GetStepSetting('max_height');
 			
 			static::Trace(".. Min/max dimensions: {$iMinWidth}x{$iMinHeight} / {$iMaxWidth}x{$iMaxHeight}");
 						
