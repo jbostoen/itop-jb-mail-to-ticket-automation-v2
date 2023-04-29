@@ -432,7 +432,7 @@ abstract class Step implements iStep {
 		$sSettingsPrefix = get_called_class()::GetXMLSettingsPrefix();
 		
 		$sBehavior = $oMailBox->Get($sSettingsPrefix.'_behavior');
-		static::Trace('. Policy violated. Behavior: '.$sBehavior);
+		static::Trace('.. Policy violated. Behavior: '.$sBehavior);
 		
 		// First check if email notification must be sent to caller (bounce message)
 		switch($sBehavior) {
@@ -508,7 +508,7 @@ abstract class Step implements iStep {
 				
 		}
 		
-		static::Trace('Set next action for EmailProcessor to '.EmailProcessor::GetActionFromCode($iNextAction));
+		static::Trace('.. Set next action for EmailProcessor to '.EmailProcessor::GetActionFromCode($iNextAction));
 		$oMailBox->SetNextAction($iNextAction);
 		
 	}

@@ -84,7 +84,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Alias d\'email',
 	'Class:MailInboxStandard/Attribute:mail_aliases+' => 'Alias d\'email : un par ligne. Les schémas en exp. rég. sont autorisés.',
 	
-	// Policy: mail size too large
+	// mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_mark_as_undesired' => 'Renvoyer à l\'expéditeur et marquer comme indésirable',
@@ -95,7 +95,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_notification' => 'Rejeter le message',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB' => 'Taille max. (Mo)',
 	
-	// Policy: attachment - forbidden MimeType
+	// attachment - forbidden MimeType
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:fallback_ignore_forbidden_attachments' => 'Solution de secours : ignorer les PJs interdites',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
@@ -107,7 +107,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_notification' => 'Rejeter le message',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_mimetypes' => 'Types MIME (un par ligne)',
 	
-	// Policy: no subject
+	// no subject
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:fallback_default_subject' => 'Solution de secours : utiliser l\'objet par défaut',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
@@ -119,7 +119,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_no_subject_notification' => 'Rejeter le message',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_default_value' => 'Objet par défaut',
 	
-	// Policy: unknown caller
+	// unknown caller
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:fallback_create_person' => 'Solution de secours : créer la personne',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
@@ -130,7 +130,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_notification' => 'Rejeter le message',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_default_values' => 'Valeurs par défaut pour une nouvelle personne (une par ligne, example : org_id:1)',
 	
-	// Policy: other recipients
+	// other recipients
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_other_contacts' => 'Solution de secours : ajouter un contact existant',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_other_contacts' => 'Solution de secours : ajouter le contact / le créer si besoin',
@@ -144,7 +144,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_notification' => 'Rejeter le message',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_default_values' => 'Valeurs par défaut pour une nouvelle personne (une par ligne, example : org_id:1)',
 	
-	// Policy: closed ticket
+	// closed ticket
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:fallback_reopen' => 'Solution de secours : réouvrir le ticket',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
@@ -155,7 +155,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_subject' => 'Rejeter l\'objet',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_notification' => 'Rejeter le message',
 	
-	// Policy: resolved ticket
+	// resolved ticket
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:fallback_reopen' => 'Solution de secours : réouvrir le ticket',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
@@ -166,7 +166,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_subject' => 'Rejeter l\'objet',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_notification' => 'Rejeter le message',
 	 
-	// Policy: unknown ticket
+	// unknown ticket
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_mark_as_undesired' => 'Renvoyer à l\'expéditeur et marquer comme indésirable',
@@ -176,7 +176,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_subject' => 'Rejeter l\'objet',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_notification' => 'Rejeter le message',
 	
-	// Policy: undesired title patterns
+	// undesired title patterns
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_mark_as_undesired' => 'Renvoyer à l\'expéditeur et marquer comme indésirable',
@@ -188,13 +188,13 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_patterns' => 'Schémas indésirables dans l\'objet (Schémas en exp. rég., un par ligne)',
 	
 	
-	// Policy: remove parts of title
+	// remove parts of title
 	'Class:MailInboxStandard/Attribute:policy_remove_pattern_behavior' => 'Retirer les schémas de l\'objet',
 	'Class:MailInboxStandard/Attribute:policy_remove_pattern_behavior/Value:do_nothing' => 'Ne rien faire',
 	'Class:MailInboxStandard/Attribute:policy_remove_pattern_behavior/Value:fallback_remove' => 'Retirer des parties de l\'objet',
 	'Class:MailInboxStandard/Attribute:policy_remove_pattern_patterns' => 'Schémas à retirer du sujet (Schémas en exp. rég., un par ligne)',
 	
-	// Policy: Attachments - Image dimensions
+	// Attachments - Image dimensions
 	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_min_width' => 'Largeur min. (px)',
 	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_min_width+' => 'Largeur min. (px). Doit être d\'au minimum 1.',
 	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_width' => 'Largeur max. (px)',
@@ -204,7 +204,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_height' => 'Hauteur max. (px)',
 	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_height+' => 'hauteur max. (px). Mettre à 0 pour ne pas limiter.',
 	
-	// Policy: Auto reply
+	// Auto reply
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Behavior on violation',
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:delete' => 'Delete the message from the mailbox',
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:do_nothing' => 'Do nothing',
@@ -218,19 +218,19 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:Policies' => 'Policies', 
 	
 	// Policies
-	'MailInbox:PolicyMailSize' => 'Politique : Taille de l\'email',
-	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Politique : Pièce jointe - type MIME interdit',
-	'MailInbox:PolicyAttachmentImageDimensions' => 'Politique : Pièce jointe - dimensions de l\'image',
-	'MailInbox:PolicyUndesiredPattern' => 'Politique : Schémas indésirables dans l\'objet',
-	'MailInbox:PolicyRemovePattern' => 'Politique : Schémas retirés dans l\'objet',
-	'MailInbox:PolicyIgnorePattern' => 'Politique : Schémas ignorés dans l\'objet',
-	'MailInbox:PolicyResolvedTicket' => 'Politique : Tickets résolus',
-	'MailInbox:PolicyClosedTicket' => 'Politique : Tickets clos',
-	'MailInbox:PolicyUnknownTicket' => 'Politique : Tickets inconnus',
-	'MailInbox:PolicyNoSubject' => 'Politique : Pas d\'objet',
-	'MailInbox:PolicyUnknownCaller' => 'Politique : Bénéficiaire inconnu',
-	'MailInbox:PolicyOtherRecipients' => 'Politique : Autres destinataires',
-	'MailInbox:PolicyAutoReply' => 'Policy: Auto reply',
+	'MailInbox:PolicyMailSize' => 'Taille de l\'email',
+	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Pièce jointe - type MIME interdit',
+	'MailInbox:PolicyAttachmentImageDimensions' => 'Pièce jointe - dimensions de l\'image',
+	'MailInbox:PolicyUndesiredPattern' => 'Schémas indésirables dans l\'objet',
+	'MailInbox:PolicyRemovePattern' => 'Schémas retirés dans l\'objet',
+	'MailInbox:PolicyIgnorePattern' => 'Schémas ignorés dans l\'objet',
+	'MailInbox:PolicyResolvedTicket' => 'Tickets résolus',
+	'MailInbox:PolicyClosedTicket' => 'Tickets clos',
+	'MailInbox:PolicyUnknownTicket' => 'Tickets inconnus',
+	'MailInbox:PolicyNoSubject' => 'Pas d\'objet',
+	'MailInbox:PolicyUnknownCaller' => 'Bénéficiaire inconnu',
+	'MailInbox:PolicyOtherRecipients' => 'Autres destinataires',
+	'MailInbox:PolicyAutoReply' => 'Auto réponse',
 	
 	'Menu:MailInboxes' => 'Boîtes emails de réception',
 	'Menu:MailInboxes+' => 'Configuration des boîtes emails à scanner pour de nouveaux messages',

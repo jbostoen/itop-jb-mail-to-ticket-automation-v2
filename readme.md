@@ -67,20 +67,21 @@ Sponsor to specify priority of these features:
 
 - [ ] Auto responder or auto dispatcher. Terms can be discussed (rules based on contact, organization, subject, ...)
 - [ ] Support to strip "original message" part from e-mails ( https://github.com/jbostoen/itop-jb-mail-to-ticket-automation-v2/issues/15 )
-- [ ] If there's a bounce message indicating a mail address no longer exists, mark the related person as "inactive"
 - [ ] Your own idea
 
 
-## Customizations on top of this Mail to Ticket automation
+## Custom steps in this Mail to Ticket automation
 
-Some organizations have even more specific needs. You can either implement new processing steps yourself or contact me.  
-Some of the customizations based on this generic Mail to Ticket Automation extension that have been done so far (professional services):
+Some organizations have specific needs. You can either implement new processing steps yourself or contact me.  
+Some of the customizations based on this generic Mail to Ticket Automation extension that I've developed so far (professional services):
 
+* Move to specific target folder (dedicated to customer).
+* Map incoming unknown callers to organization based on e-mail domain in their e-mail address.
+* When receiving a non-delivery report because the recipient's mailbox no longer exists: mark peson as inactive.
 * Match with open ticket based on subject (strip RE:/FW:/FWD:) and original caller in To: or CC:
 * Match with open ticket based on subject (same event ID being used in every email sent to iTop).
 * Match with open ticket based on Message-ID of very first e-mail for which a ticket was created and same Message-ID still in the 'References' or 'In-Reply-To' e-mail headers.
-* Move to specific target folder (dedicated to customer).
-* Map incoming unknown callers to organization based on e-mail domain in their e-mail address.
+
 * ...
 
 
