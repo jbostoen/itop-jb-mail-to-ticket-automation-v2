@@ -1422,7 +1422,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 				}
 			}
 			else {
-				static::Trace("... The attachment  #{$iIndex} {$aAttachment['filename']} was NOT added to the ticket because its type '{$aAttachment['mimeType']}' is excluded according to the configuration");
+				static::Trace("... The attachment #{$iIndex} {$aAttachment['filename']} was NOT added to the ticket because its type '{$aAttachment['mimeType']}' is excluded according to the configuration");
 			}
 		}
 		
@@ -1660,7 +1660,7 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Step {
 						
 						// Forbidden attachments? 
 						foreach($oEmail->aAttachments as $aAttachment) { 
-							static::Trace('.. Attachment  #{$iIndex} MimeType: '.$aAttachment['mimeType']);
+							static::Trace('.. Attachment #'.$iIndex.' MimeType: '.$aAttachment['mimeType']);
 							
 							if(in_array($aAttachment['mimeType'], $aForbiddenMimeTypes) == true) {
 								
