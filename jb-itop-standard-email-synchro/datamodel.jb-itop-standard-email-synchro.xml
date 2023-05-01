@@ -945,7 +945,7 @@ EOF
 			$sLog = '. Check #'.(count($aPreviouslyExecutedSteps)+1).' (precedence: '.$sStep::$iPrecedence.'): '.$sShortStep;
 			
 			// In case of policy: add behavior
-			$sAttCode = $sStep::GetSetting('behavior');
+			$sAttCode = $sStep::GetXMLSettingsPrefix().'_behavior';
 			if(MetaModel::IsValidAttCode(get_class($this), $sAttCode) == true) {
 				$sLog .= ' - Behavior: '.$this->Get($sAttCode);
 			}

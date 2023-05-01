@@ -106,8 +106,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 				}
 			}
 			
-			if(!in_array($sErrorCode, MetaModel::GetAllowedValues_att('EmailReplica', 'status'))) {
-				$this->Trace('Unable to set error code to "'.$sErrorCode.'". Fallback to "error"').
+			// Note: originally, the error codes were not translated. But MetaModel::GetAllowedValues_att() returns an array in the form of key/value, where key = attcode and value = localized string.
+			if(!in_array($sErrorCode, array_keys(MetaModel::GetAllowedValues_att('EmailReplica', 'status')))) {
+				$this->Trace('Unable to set error code to "'.$sErrorCode.'". Fallback to "error".').
 				$sErrorCode = 'error';
 			}
 			$oEmailReplica->Set('status', $sErrorCode);

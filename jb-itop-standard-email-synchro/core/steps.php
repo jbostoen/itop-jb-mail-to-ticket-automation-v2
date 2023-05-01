@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (c) 2019-2023 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     2.7.230423
+ * @version     2.7.230501
  *
  * Policy interface definition and some classes implementing it.
  * 
@@ -429,7 +429,7 @@ abstract class Step implements iStep {
 		// - mark_as_undesired -> stays in the mailbox for a few days
 		// - some sort of fallback -> doesn't matter here
 		
-		$sBehavior = static::GetSetting('behavior');
+		$sBehavior = static::GetStepSetting('behavior');
 		static::Trace('.. Policy violated. Behavior: '.$sBehavior);
 		
 		// First check if email notification must be sent to caller (bounce message)
