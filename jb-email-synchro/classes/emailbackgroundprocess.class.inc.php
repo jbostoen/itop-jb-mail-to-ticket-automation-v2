@@ -240,17 +240,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						// 'do_nothing' means the policy should still be processed, but the policy itself shouldn't have any influence.
 						$sAttCode = $sClassName::GetXMLSettingsPrefix().'_behavior';
 						
-						if(MetaModel::IsValidAttCode(get_class($oInbox), $sAttCode) == true) {
+						if(MetaModel::IsValidAttCode(get_class($oInbox), $sAttCode) == false) {
 
-							// Only include if behavior is NOT set to inactive.
-							if($oInbox->Get($sAttCode) != 'inactive') {
-							
-								EmailProcessor::$aActiveStepClasses[] = $sClassName;
-								
-							}
+							EmailProcessor::$aActiveStepClasses[] = $sClassName;
 							
 						}
-						else {
+						elseif($oInbox->Get($sAttCode) != 'inactive') {
 						
 							// No default "behavior" attribute; assume this step must always be executed
 							EmailProcessor::$aActiveStepClasses[] = $sClassName;
