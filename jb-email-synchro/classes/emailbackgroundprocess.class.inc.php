@@ -107,6 +107,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 			}
 			
 			if(!in_array($sErrorCode, MetaModel::GetAllowedValues_att('EmailReplica', 'status'))) {
+				$this->Trace('Unable to set error code to "'.$sErrorCode.'". Fallback to "error"').
 				$sErrorCode = 'error';
 			}
 			$oEmailReplica->Set('status', $sErrorCode);
@@ -239,9 +240,14 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						// 'do_nothing' means the policy should still be processed, but the policy itself shouldn't have any influence.
 						$sAttCode = $sClassName::GetXMLSettingsPrefix().'_behavior';
 						
-						if(MetaModel::IsValidAttCode(get_class($oInbox), $sAttCode) == true && $oInbox->Get($sAttCode) != 'inactive') {
+						if(MetaModel::IsValidAttCode(get_class($oInbox), $sAttCode) == true) {
+
+							// Only include if behavior is NOT set to inactive.
+							if($oInbox->Get($sAttCode) != 'inactive') {
 							
-							EmailProcessor::$aActiveStepClasses[] = $sClassName;
+								EmailProcessor::$aActiveStepClasses[] = $sClassName;
+								
+							}
 							
 						}
 						else {

@@ -514,6 +514,7 @@ EOF
 					<type>Overload-DBObject</type>
 					<code>
 						<![CDATA[	protected function GetRelatedTicket(EmailMessage $oEmail) {
+						
 		$oTicket = $oEmail->oRelatedObject;
 		
 		// There is a related object, but it's not a ticket.

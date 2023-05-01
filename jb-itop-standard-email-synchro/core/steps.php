@@ -429,9 +429,7 @@ abstract class Step implements iStep {
 		// - mark_as_undesired -> stays in the mailbox for a few days
 		// - some sort of fallback -> doesn't matter here
 		
-		$sSettingsPrefix = get_called_class()::GetXMLSettingsPrefix();
-		
-		$sBehavior = $oMailBox->Get($sSettingsPrefix.'_behavior');
+		$sBehavior = static::GetSetting('behavior');
 		static::Trace('.. Policy violated. Behavior: '.$sBehavior);
 		
 		// First check if email notification must be sent to caller (bounce message)

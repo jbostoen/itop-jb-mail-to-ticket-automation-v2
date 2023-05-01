@@ -127,7 +127,7 @@ SourceForge tickets:
 * #1628 Mail to Ticket: FindCaller (suggested fix, implemented by Combodo)
 * #1781 Mail to Ticket Automation: Case log - link to user; caselog enhancement (no solution in Combodo version)
 * #1793 Mail to Ticket Automation: set IMAP undelete  (no solution in Combodo version. Pull request made, but not accepted because of worries about conflicts.)
-* #1859 / N° 4170 Mail to Ticket Automation - issue with long subjects (+ solution) (some feedback, implemented by Combodo)
+* #1859 / N° 4170 Mail to Ticket Automation - issue with long subjects (+ solution) (some feedback, partially implemented by Combodo)
 * #1924 Mail to Ticket: processing order of e-mails is not chronologically on Microsoft Exchange/O365 and Google GMail (no solution in Combodo version)
 * #1925 Mail to Ticket: malformed headers (some feedback, implemented by Combodo)
 * #1930 Mail to Ticket: improved parsing of from: address (suggested fix, implemented by Combodo)

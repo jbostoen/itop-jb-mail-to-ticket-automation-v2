@@ -135,11 +135,11 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 
 	/**
 	 * Process the email downloaded from the mailbox.
-	 * This implementation delegates the processing the MailInbox instances
-	 * The caller (identified by its email) must already exists in the database
-	 * @param EmailSource $oSource The source from which the email was read
-	 * @param integer $index The index of the message in the mailbox
-	 * @param EmailMessage $oEmail The downloaded/decoded email message
+	 * This implementation delegates the processing the MailInbox instances.
+	 * The caller (identified by its email) must already exists in the database.
+	 * @param EmailSource $oSource The source from which the email was read.
+	 * @param integer $index The index of the message in the mailbox.
+	 * @param EmailMessage $oEmail The downloaded/decoded email message.
 	 * @param EmailReplica $oEmailReplica The information associating a ticket to the email. This replica is new (i.e. not yet in DB for new messages)
 	 * @param array $aErrors
 	 *
@@ -153,6 +153,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 		$this->sLastErrorMessage = '';
 		
 		try {			
+		
 			$oInbox = $this->GetInboxFromSource($oSource);
 			self::Trace("Combodo Email Synchro: MailInboxesEmailProcessor: Processing message $index ({$oEmail->sUIDL})");
 			if($oEmailReplica->IsNew()) {

@@ -175,7 +175,9 @@ class MessageFromMailbox extends RawEmailMessage {
 	 * @return mixed Either the related object or null if none
 	 */
 	protected function GetRelatedObject() {
+		
 		if (!class_exists('MetaModel')) return null;
+		
 		// First look if the message is not a direct reply to a message sent by iTop
 		if($this->GetHeader('in-reply-to') != '') {
 			$ret = $this->ParseMessageId($this->GetHeader('in-reply-to'));

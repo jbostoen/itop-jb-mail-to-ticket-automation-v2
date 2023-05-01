@@ -629,10 +629,10 @@ EOF
 				<method id="ProcessNewEmail">
 					<comment>/**
 	 * Process an new (unread) incoming email
-	 * @param EmailSource $oSource The source from which this email was read
-	 * @param int $index The index of the message in the source
-	 * @param EmailMessage $oEmail The decoded email
-	 * @return Ticket|null The ticket created or updated in response to the email or null on error
+	 * @param EmailSource $oSource The source from which this email was read.
+	 * @param int $index The index of the message in the source.
+	 * @param EmailMessage $oEmail The decoded email.
+	 * @return Ticket|null The ticket created or updated in response to the email or null on error.
 	 */</comment>
 					<static>false</static>
 					<access>public</access>
@@ -673,8 +673,7 @@ EOF
 		// First check if there is any iTop object mentioned in the headers of the eMail
 		$oTicket = parent::GetRelatedTicket($oEmail);
 		
-		if ( $oTicket == null )
-		{
+		if($oTicket == null) {
 			
 			// To find the reference, make sure subject is handled in same way as original ticket (removing unwanted pattern)
 			$sSubject = $oEmail->sSubject;
@@ -946,7 +945,7 @@ EOF
 			$sLog = '. Check #'.(count($aPreviouslyExecutedSteps)+1).' (precedence: '.$sStep::$iPrecedence.'): '.$sShortStep;
 			
 			// In case of policy: add behavior
-			$sAttCode = $sStep::GetXMLSettingsPrefix().'_behavior';
+			$sAttCode = $sStep::GetSetting('behavior');
 			if(MetaModel::IsValidAttCode(get_class($this), $sAttCode) == true) {
 				$sLog .= ' - Behavior: '.$this->Get($sAttCode);
 			}
