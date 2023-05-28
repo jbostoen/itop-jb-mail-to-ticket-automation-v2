@@ -1397,6 +1397,12 @@ abstract class StepCreateOrUpdateTicket extends Step {
 					else {
 						static::Trace("... Attachment {$aAttachment['filename']} will be stored as an Attachment.");
 						$oAttachment = new Attachment();
+						
+						// @todo: Remove condition when support for iTop 2.7 is dropped
+						if(MetaModel::IsValidAttCode('Attachment', 'creation_date') == true) {
+							$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
+						}
+						
 					}
 					if ($oTicket->IsNew()) {
 						$oAttachment->Set('item_class', get_class($oTicket));
@@ -2787,7 +2793,7 @@ abstract class PolicyAttachmentImageDimensions extends Step {
 					
 					}
 					else {
-						static::Trace("... Could not determine dimensiosn of {$aAttachment['filename']}");
+						static::Trace("... Could not determine dimensions of {$aAttachment['filename']}");
 					}
 					
 				}
