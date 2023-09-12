@@ -273,4 +273,9 @@ Dict::Add('EN US', 'English', 'English', array(
 	'UI:OAuthEmailSynchro:Wizard:ResultConf:Panel:CreateNewMailbox' => 'Create a new mailbox',
 	'UI:OAuthEmailSynchro:Error:UnknownVendor' => 'OAuth provider %1$s does not exist',
 	
+	// lnkEmailUidToTicket
+	'Class:lnkEmailUidToTicket' => 'Link Email UID / Ticket',
+	'Class:lnkEmailUidToTicket/Attribute:message_uid' => 'Message UID',
+	'Class:lnkEmailUidToTicket/Attribute:ticket_id' => 'Ticket ID',
+	
 ));

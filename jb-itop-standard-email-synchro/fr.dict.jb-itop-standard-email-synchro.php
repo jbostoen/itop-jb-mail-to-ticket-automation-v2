@@ -239,4 +239,10 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInboxStandard:DebugTraceNotActive' => 'Activer la trace de debug de cette boîte email pour avoir un journal détaillé de ce qui se produit.',
 	
 	'MailPolicy:CreateOrUpdateTicket:NoDescriptionProvided' => 'Aucune description',
+	
+	// lnkEmailUidToTicket
+	'Class:lnkEmailUidToTicket' => 'Link Email UID / Ticket~~',
+	'Class:lnkEmailUidToTicket/Attribute:message_uid' => 'Message UID~~',
+	'Class:lnkEmailUidToTicket/Attribute:ticket_id' => 'Ticket ID~~',
+	
 ));
