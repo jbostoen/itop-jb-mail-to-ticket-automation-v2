@@ -149,7 +149,7 @@ class RawEmailMessage {
 	 * @return string The message-id
 	 */
 	public function GetMessageId() {
-		return $this->GetHeader('message-id');
+		return substr($this->GetHeader('message-id'), 0, 255);
 	}
 	
 	/**
