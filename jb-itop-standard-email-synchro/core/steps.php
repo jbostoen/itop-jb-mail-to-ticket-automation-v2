@@ -208,6 +208,17 @@ abstract class Step implements iStep {
 	}
 	
 	/**
+	 * Gets the raw e-mail that's being processed.
+	 *
+	 * @return \RawEmailMessage
+	 */
+	public static function GetRawMail() {
+		
+		return static::$oEmail->oRawEmail;
+		
+	}
+	
+	/**
 	 * Sets the e-mail that's being processed.
 	 *
 	 * @param \EmailMessage $oMessage E-mail message.
@@ -543,23 +554,14 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	 */
 	public static $aAddedAttachments = [];
 	
-	/**
-	 * @inheritDoc
-	 */
-	public static function Init(MailInboxStandard $oMailBox, EmailSource $oSource, $index, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedSteps) {
-	
-		parent::Init($oMailBox, $oSource, $index, $oEmail, $oTicket, $aPreviouslyExecutedSteps);
-	
-		// Reset for each email that is processed
-		// @todo Review if this should be in the initialization or moved to another method.
-		static::$aAddedAttachments = [];
-		
-	}
 	
 	/**
 	 * @inheritDoc
 	 */
 	public static function Execute() {
+		
+		// Reset before processing each mail.
+		static::$aAddedAttachments = [];
 		
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
@@ -1517,6 +1519,200 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	 
 }
 
+
+/**
+ * Class StepMatchByInReplyToOrReferences. If no related ticket was found yet, this step tries to find one based on In-reply-to or References e-mail headers.
+ */
+abstract class StepMatchByInReplyToOrReferences extends Step {
+	
+	/**
+	 * @inheritDoc
+	 *
+	 * @details This must run before policies such as PolicyBounceUnknownTicketReference, PolicyTicketResolved, PolicyTicketClosed
+	 * @todo Re-evaluate PolicyBounceUnknownTicketReference. Should this step run before or after?
+	 */
+	public static $iPrecedence = 9;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $sXMLSettingsPrefix = 'step_match_by_in_reply_to_or_references';
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() {
+		
+		
+		$oRawEmail = static::GetRawMail();
+		$oTicket = static::GetTicket();
+		$oMailBox = static::GetMailBox();
+		
+		// Reset before processing each mail.
+		StepSaveReferences::$aNewUIDLs = [
+			$oRawEmail->GetMessageId()
+		];
+		
+		$sReferences = $oRawEmail->GetHeader('References');
+		$sInReplyTo = $oRawEmail->GetHeader('In-Reply-To');
+		
+		
+		// Only if Ticket has not been matched yet.
+		// Just a safety measure.
+		if($sReferences == '' && $sInReplyTo == '') {
+			
+			static::Trace('.. Empty headers: "References" and "In-Reply-To".');
+			return;
+			
+		}
+	
+		// To avoid a random order of references: build an array of unique references.
+		preg_match_all('/<.+?>/', $sReferences, $aMatches);
+		$aReferences = $aMatches[0];
+		
+		// Fallback: also check "In-Reply-To"
+		if($sInReplyTo != '') {
+			$aReferences[] = $sInReplyTo;
+		}
+		
+		// Just to prevent re-processing of an existing e-mail in this mailbox configuration:
+		$aReferences[] = $oRawEmail->GetMessageId();
+		
+		if(count($aReferences) == 0) {
+			
+			// Should not happen due to first check above.
+			static::Trace('.. No e-mail references found in headers.');
+			return;
+			
+			}
+			
+		$aReferences = array_unique($aReferences);
+		static::Trace('.. '.count($aReferences).' references: '.implode(', ', $aReferences));
+		
+		// Safety measure to enforce Message-ID to only be 255 characters. Should be safe enough. This is assumed by Combodo's implementation as well.
+		foreach($aReferences as &$sRef) {
+			$sRef = substr($sRef, 0, 255);
+		}
+		
+		// Find all references linking to a ticket.
+		$oFilterLinks = new DBObjectSearch('lnkEmailUidToTicket');
+		$oFilterLinks->AddCondition('mailbox_id', $oMailBox->GetKey(), '=');
+		$oFilterLinks->AddCondition('message_uid', $aReferences, 'IN');
+		$oSetLinks = new DBObjectSet($oFilterLinks);
+		
+		$aTicketIds = [-1];
+		$aKnownReferences = [];
+		
+		while($oLink = $oSetLinks->Fetch()) {
+			$aTicketIds[] = $oLink->Get('ticket_id');
+			$aKnownReferences[] = $oLink->Get('message_uid');
+		}
+		
+		// Store the not found referenced as new references, so they can be saved once the ticket is known.
+		StepSaveReferences::$aNewUIDLs = array_diff($aReferences, $aKnownReferences);
+
+		if($oTicket === null) {
+			
+			$oFilterTickets = new DBObjectSearch('Ticket');
+			$oFilterTickets->AddCondition('id', $aTicketIds, 'IN');
+			$oSetTickets = new DBObjectSet($oFilterTickets, ['id' => false]);
+			
+			static::Trace('.. No related ticket yet. Try matching based on "References" and "In-Reply-To".');
+			
+			// Process and build a list of ticket IDs.
+			// Note that this could result in: no prior ticket; one prior ticket; multiple prior tickets.
+			switch($oSetTickets->Count()) {
+				
+				case 0:
+					static::Trace('.. No links to tickets found.');
+					break;
+					
+				case 1:
+					
+					// One ticket found.
+					static::Trace('.. Link to 1 ticket found.');
+					$oTicket = $oSetTickets->Fetch();
+					break;
+					
+				default:
+				
+					// Build list of unique ticket IDs.
+					// In this basic implementation, it will just use the latest ticket (even if that's marked as resolved/closed and there's an older open one).
+					static::Trace('.. Link to multiple tickets found.');
+					$oTicket = $oSetTickets->Fetch();
+					break;
+				
+			}
+		
+		
+		}
+		
+		// By this time, a ticket may have been identified.
+		static::SetTicket($oTicket);
+		
+		
+	}
+	
+}
+
+
+/**
+ * Class StepSaveReferences. Creates records to relate In-reply-to or References e-mail headers to the current ticket.
+ */
+abstract class StepSaveReferences extends Step {
+	
+	/**
+	 * @inheritDoc
+	 *
+	 * @details This must run after StepCreateOrUpdateTicket.
+	 */
+	public static $iPrecedence = 201;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $sXMLSettingsPrefix = 'step_save_references';
+	
+	/*
+	 * @var \String[] $aUIDLs Array of previously unknown references in the e-mail message.
+	 */
+	public static $aNewUIDLs = [];
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() {
+		
+		$oTicket = static::GetTicket();
+		$oMailBox = static::GetMailBox();
+		
+		if($oTicket !== null) {
+			
+			// Create a record for each reference, so it gets associated with the ticket that was just created/updated.
+			foreach(static::$aNewUIDLs as $sUIDL) {
+				
+				$oLink = MetaModel::NewObject('lnkEmailUidToTicket', [
+					'mailbox_id' => $oMailBox->GetKey(),
+					'message_uid' => $sUIDL,
+					'ticket_id' => $oTicket->GetKey()
+				]);
+				
+				try {
+					$oLink->DBInsert();
+				}
+				catch(Exception $e) {
+					static::Trace('.. The message ID '.$sUIDL.' is already linked to ticket .'.$oTicket->GetKey());
+				}
+				
+			}
+		
+		
+		}
+		
+	}
+	
+}
+
 /**
  * Class StepFinalAction. Final action: keep, move, delete, ...
  */
@@ -1598,7 +1794,7 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Step {
 					$sTicketCallerEmail = $oTicket->Get('caller_id->email');
 					if($sTicketCallerEmail != $oEmail->sCallerEmail) {
 						
-						static::Trace('.. Ticket caller\'s email address is different from the email caller\'s email address.');
+						static::Trace('.. Ticket caller\'s email address is different from the sender\'s email address.');
 						static::HandleViolation();
 						return;
 					
@@ -1728,14 +1924,14 @@ abstract class PolicyBounceLimitMailSize extends Step {
 	public static function Execute() {
 		
 		$oMailBox = static::GetMailBox();
-		$oEmail = static::GetMail();
+		$oRawEmail = static::GetRawMail();
 		
 		// Checking if mail size is not too big
 		$iMaxSizeMB = static::GetStepSetting('max_size_MB');
 		
 		if($iMaxSizeMB > 0) {
 		
-			$iMailSize = $oEmail->oRawEmail->GetSize();
+			$iMailSize = $oRawEmail->GetSize();
 			$iLimitMailSize = utils::ConvertToBytes($iMaxSizeMB.'M');
 			
 			if($iMailSize > $iLimitMailSize) {
@@ -1964,7 +2160,7 @@ abstract class PolicyBounceAutoReply extends Step {
 	public static function Execute() {
 		
 		$oMailBox = static::GetMailBox();
-		$oEmail = static::GetMail();
+		$oRawEmail = static::GetRawMail();
 		
 		// Checking if subject is not empty.
 		
@@ -1972,14 +2168,14 @@ abstract class PolicyBounceAutoReply extends Step {
 			
 			switch(true) {
 				
-				case ($oEmail->oRawEmail->GetHeader('x-autoreply') != ''):
-				case ($oEmail->oRawEmail->GetHeader('x-autorespond') != ''):
+				case ($oRawEmail->GetHeader('x-autoreply') != ''):
+				case ($oRawEmail->GetHeader('x-autorespond') != ''):
 				
-				case (strtolower($oEmail->oRawEmail->GetHeader('precedence')) == 'auto_reply'):
+				case (strtolower($oRawEmail->GetHeader('precedence')) == 'auto_reply'):
 				
 				// https://www.iana.org/assignments/auto-submitted-keywords/auto-submitted-keywords.xhtml
 				// Values for auto-submitted: no, auto-generated, auto-replied, auto-notified
-				case (preg_match('/^auto/', strtolower($oEmail->oRawEmail->GetHeader('auto-submitted')))):
+				case (preg_match('/^auto/', strtolower($oRawEmail->GetHeader('auto-submitted')))):
 				
 					switch($sPolicyBehavior) {
 						

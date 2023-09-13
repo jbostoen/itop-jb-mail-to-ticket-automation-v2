@@ -75,12 +75,12 @@ Sponsor to specify priority of these features:
 Some organizations have specific needs. You can either implement new processing steps yourself or contact me.  
 Some of the customizations based on this generic Mail to Ticket Automation extension that I've developed so far (professional services):
 
-* Move to specific target folder (dedicated to customer).
+* Move to specific target folder (Dedicated to the caller's organization).
 * Map incoming unknown callers to organization based on e-mail domain in their e-mail address.
 * When receiving a non-delivery report because the recipient's mailbox no longer exists: mark peson as inactive.
-* Match with open ticket based on subject (strip RE:/FW:/FWD:) and original caller in To: or CC:
-* Match with open ticket based on subject (same event ID being used in every email sent to iTop).
-* Match with open ticket based on Message-ID of very first e-mail for which a ticket was created and same Message-ID still in the 'References' or 'In-Reply-To' e-mail headers.
+* Match with open ticket based on subject (Strip RE:/FW:/FWD:) and original caller in To: or CC:
+* Match with open ticket based on subject (Same event ID being used in every email sent to iTop).
+* Match with open ticket based on Message-ID of very first e-mail for which a ticket was created and same Message-ID still in the 'References' or 'In-Reply-To' e-mail headers. (Now integrated in the main extension).
 
 * ...
 

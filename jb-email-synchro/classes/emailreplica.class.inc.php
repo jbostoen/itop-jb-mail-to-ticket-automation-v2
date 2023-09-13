@@ -33,7 +33,10 @@ class EmailReplica extends DBObject
 			"db_key_field" => "id",
 			"db_finalclass_field" => "",
 			'indexes' => array(
-					array('uidl'), // Index on UIDLs for faster search
+				// Indexes for faster search
+				array('uidl'),
+				array('uidl', 'mailbox_path'),
+				array('uidl', 'mailbox_path', 'id', 'last_seen'),
 			),		
 		);
 		MetaModel::Init_Params($aParams);

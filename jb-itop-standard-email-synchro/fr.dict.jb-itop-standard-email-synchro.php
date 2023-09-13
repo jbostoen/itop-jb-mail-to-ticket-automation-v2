@@ -244,5 +244,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:lnkEmailUidToTicket' => 'Link Email UID / Ticket~~',
 	'Class:lnkEmailUidToTicket/Attribute:message_uid' => 'Message UID~~',
 	'Class:lnkEmailUidToTicket/Attribute:ticket_id' => 'Ticket ID~~',
+	'Class:lnkEmailUidToTicket/Attribute:mailbox_id' => 'Mailbox ID~~',
+	'Class:lnkEmailUidToTicket/UniquenessRule:unique_message_uid_and_mailbox_id' => 'The combination of mailbox ID and message UID must be unique.~~',
+	'Class:lnkEmailUidToTicket/UniquenessRule:unique_message_uid_and_mailbox_id_and_ticket_id' => 'The combination of mailbox ID, message UID and ticket ID must be unique.~~',
 	
 ));

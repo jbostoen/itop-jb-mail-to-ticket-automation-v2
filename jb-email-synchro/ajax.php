@@ -305,7 +305,7 @@ try {
 	$sOperation = utils::ReadParam('operation', '');
 	$iMailInboxId = utils::ReadParam('id', 0, false, 'raw_data');
 	if(empty($iMailInboxId)) {
-		$oInbox = null;
+		$oInbox = null; // The Combodo implementation has this, but it will result in errors anyway later on in the operations below?
 	}
 	else {
 		/** @var MailInboxBase $oInbox */						   
@@ -323,7 +323,9 @@ try {
 			$aUIDLs = utils::ReadParam('aUIDLs', [], false, 'raw_data');
 			if(count($aUIDLs) > 0) {
 				
-				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).')';
+				// In case the same mailbox happens to be configured multiple times in iTop:
+				// The message will be deleted from the actual mailbox and each replica (even for a different configuration) should be removed too.
+				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') '; 
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 				$oReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl']]);
 				$aReplicas = [];
@@ -356,9 +358,13 @@ try {
 			break;
 
 		case 'mailbox_ignore_messages':
+		
 			$aUIDLs = utils::ReadParam('aUIDLs', [], false, 'raw_data');
 			if(count($aUIDLs) > 0) {
-				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).')';
+				
+				// In case the same mailbox happens to be configured multiple times in iTop:
+				// Contrary to deletion, the intention may be to ignore the message for some specific reason only for this particular configuration.
+				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_path = '. CMDBSource::Quote($oInbox->Get('mailbox'));
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 				$aReplicas = [];
 				/** @var \DBObject $oReplica */
@@ -367,8 +373,11 @@ try {
 					$oReplica->DBUpdate();
 					$aReplicas[$oReplica->Get('uidl')] = true;
 				}
+				
 			}
+			
 			if(count($aReplicas) < count($aUIDLs)) {
+				
 				// Some "New" messages are marked as ignore
 				// Add them to the database
 				$oSource = $oInbox->GetEmailSource();
@@ -391,6 +400,7 @@ try {
 					}
 				}
 			}
+			
 			GetMailboxContent($oPage, $oInbox);
 			break;
 	}

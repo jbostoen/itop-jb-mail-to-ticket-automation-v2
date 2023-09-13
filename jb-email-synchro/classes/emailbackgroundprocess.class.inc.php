@@ -594,14 +594,14 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						$aIDs = [ -1 ]; // Make sure that the array is never empty...
 						foreach($aReplicas as $oUsedReplica) {
 							if(is_object($oUsedReplica) && ($oUsedReplica->GetKey() != null)) {
-								// Fix IMAP: remember last seen. Aka: do not delete message because connection failed.
+								// Remember last seen in order to not delete message because the IMAP connection failed only briefly. Occurs often with Microsoft Exchange Online.
 								$oUsedReplica->Set('last_seen', date('Y-m-d H:i:s'));
 								$oUsedReplica->DBUpdate();
 								$aIDs[] = (Int)$oUsedReplica->GetKey();
 							}
 						}
 						
-						// Cleanup the unused replicas based on the pattern of their UIDL, unfortunately this is not possible in NON multi-source mode
+						// Clean up the unused replicas based on the pattern of their UIDL, unfortunately this is not possible in NON multi-source mode
 						$iRetentionPeriod = MetaModel::GetModuleSetting('jb-email-synchro', 'retention_period', 24);
 						$sOQL = "SELECT EmailReplica WHERE uidl LIKE " . CMDBSource::Quote($oSource->GetName() . '_%') .
 							" AND mailbox_path = " . CMDBSource::Quote($oSource->GetMailbox()) .
