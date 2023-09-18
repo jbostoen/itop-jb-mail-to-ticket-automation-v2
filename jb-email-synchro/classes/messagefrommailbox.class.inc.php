@@ -153,7 +153,11 @@ class MessageFromMailbox extends RawEmailMessage {
   		$oEmail->SetBody($sTextMessage, 'text/html');
   		// Turn the original message into an attachment
   		$sAttachment = 	$this->sRawContent;
-  		$oEmail->AddAttachment($sAttachment, 'Original-Message.eml', 'text/plain'); // Using the appropriate MimeType (message/rfc822) causes troubles with Thunderbird
+		
+		// Using the appropriate MimeType (message/rfc822) causes troubles with Thunderbird
+  		// N°6746 - Using text/plain makes the message disappear (without error) on some email gateways
+  		$sEMLAttachmentMimeType = MetaModel::GetModuleSetting('jb-email-synchro', 'eml_attachment_mime_type', 'application/octet-stream');
+  		$oEmail->AddAttachment($sAttachment, 'Original-Message.eml', $sEMLAttachmentMimeType);
 
   		$aIssues = array();
   		$oEmail->SetRecipientFrom($sFrom);

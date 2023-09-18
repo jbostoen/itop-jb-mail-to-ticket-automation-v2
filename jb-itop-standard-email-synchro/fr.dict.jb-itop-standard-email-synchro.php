@@ -211,6 +211,18 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:inactive' => 'Inactive',
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
 	
+	// Policy: Non Delivery Report
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior' => 'Behavior~~',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:delete' => 'Delete~~',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:do_nothing' => 'Do nothing~~',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:inactive' => 'Inactive~~',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:mark_as_undesired' => 'Mark as undesired~~',
+	
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive' => 'Mark caller as inactive~~',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive+' => 'The caller will be marked as inactive, if the mail delivery failure seems to be permanent and there is high confidence the recipient is no longer reachable through this e-mail address.~~',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:yes' => 'Yes~~',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:no' => 'No~~',
+	
 	// Headers
 	'MailInbox:Server' => 'Configuration de la boîte mail',
 	'MailInbox:Behavior' => 'Comportement pour les nouveaux emails',
@@ -231,6 +243,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:PolicyUnknownCaller' => 'Bénéficiaire inconnu',
 	'MailInbox:PolicyOtherRecipients' => 'Autres destinataires',
 	'MailInbox:PolicyAutoReply' => 'Auto réponse',
+	'MailInbox:PolicyNonDeliveryReport' => 'Non Delivery Reports~~',
 	
 	'Menu:MailInboxes' => 'Boîtes emails de réception',
 	'Menu:MailInboxes+' => 'Configuration des boîtes emails à scanner pour de nouveaux messages',

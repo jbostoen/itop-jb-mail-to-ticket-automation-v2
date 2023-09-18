@@ -310,6 +310,31 @@ name:Caller
 
 
 	 
+### Limit accepted e-mail replies to original ticket caller's e-mail address
+
+* Use case: security measure. Only accept e-mail replies to a ticket if it's from the same e-mail address as the original caller.
+  * Limitation: it will still be problematic if the ticket reference pattern is exactly the same!
+* **Policy violation behavior**
+  * Bounce to sender and delete
+  * Bounce to sender and mark as undesired
+  * Delete
+  * Do nothing
+  * Inactive
+  * Mark as undesired
+* **Bounce subject**
+* **Bounce message**
+
+### Non Delivery Reports
+
+* Use case: avoid spending time on Non Delivery Reports (Mail Delivery Failure).
+* **Policy violation behavior**
+  * Delete
+  * Do nothing
+  * Inactive
+  * Mark as undesired
+* **Mark caller as inactive**: The caller will be marked as inactive, if the mail delivery failure seems to be permanent and there is high confidence the recipient is no longer reachable through this e-mail address.
+
+
 ### Other recipients specified in To: or CC:
 
 * Use case:
@@ -372,19 +397,6 @@ $recipient->name$
 * **Bounce message**
 * **Patterns to remove from subject** - (regex patterns, one per line)
 
-### Limit accepted e-mail replies to original ticket caller's e-mail address
-
-* Use case: security measure. Only accept e-mail replies to a ticket if it's from the same e-mail address as the original caller.
-  * Limitation: it will still be problematic if the ticket reference pattern is exactly the same!
-* **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
-  * Delete
-  * Do nothing
-  * Inactive
-  * Mark as undesired
-* **Bounce subject**
-* **Bounce message**
 
 
 
