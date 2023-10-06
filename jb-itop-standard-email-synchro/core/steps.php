@@ -627,7 +627,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	
 	/**
 	 * Function inspired by Combodo's MailInboxStandard::CreateTicketFromEmail()
-	 * Creates a new Ticket from an email
+	 * Creates a new Ticket from an email.
 	 *
 	 * @return void
 	 *
@@ -689,9 +689,9 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		$sSubject = $oEmail->sSubject;
 		$oTicket->Set('title', substr($sSubject, 0, $iTitleMaxSize));
 		
-		// Insert the remaining attachments so that their ID is known and the attachments can be referenced in the message's body
-		// Cannot insert them for real since the Ticket is not saved yet (so Ticket id is unknown)
-		// UpdateAttachments() will be called once the ticket is properly saved
+		// Insert the remaining attachments so that their ID is known and the attachments can be referenced in the message's body.
+		// Cannot insert them for real since the Ticket is not saved yet (so Ticket id is unknown).
+		// UpdateAttachments() will be called once the ticket is properly saved.
 		static::AddAttachments(true);
 		
 		// Seems to be for backward compatibility / plain text.
@@ -716,9 +716,9 @@ abstract class StepCreateOrUpdateTicket extends Step {
 
 		$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize(); // Keep some room just in case...
 		
-		if(strlen($sTicketDescription) > $iDescriptionMaxSize) {
+		if(mb_strlen($sTicketDescription) > $iDescriptionMaxSize) {
 			
-			$sMsg = "CreateTicketFromEmail: Truncated description for [{$oTicket->Get('title')}] actual length: ".strlen($sTicketDescription)." maximum: $iDescriptionMaxSize";
+			$sMsg = "CreateTicketFromEmail: Truncated description for [{$oTicket->Get('title')}] actual length: ".mb_strlen($sTicketDescription)." maximum: $iDescriptionMaxSize";
 		    IssueLog::Error($sMsg);
 			static::Trace($sMsg);
 			
@@ -820,7 +820,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 			}
 		}
 
-		// Process attachments
+		// Process attachments.
 		static::AddAttachments(true);
 		
 		$sCaseLogEntry = static::BuildCaseLogEntry();
@@ -1307,7 +1307,9 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	 
 	/**
 	 * Function inspired by Combodo's MailInboxBase::AddAttachments()
-	 * @param bool $bNoDuplicates If true, don't add attachment that seem already attached to the ticket (same type, same name, same size, same md5 checksum)
+	 * @param \Boolean $bNoDuplicates If true, don't add attachment that seem already attached to the ticket (same type, same name, same size, same md5 checksum).
+	 * @param \Person $oCaller The caller.
+	 * @param \User $oUser The user (account).
 	 *
 	 * @return array array of cid => attachment_id
 	 * @throws \CoreException
@@ -1365,6 +1367,14 @@ abstract class StepCreateOrUpdateTicket extends Step {
 			}
 		}
 		
+		$oCaller = $oEmail->oInternal_Contact;
+		$oUser = null;
+		if(method_exists('UserRights', 'GetUserFromPerson') && $oCaller !== null) {
+			
+			$oUser = UserRights::GetUserFromPerson($oCaller, true);
+			
+		}
+		
 		foreach($oEmail->aAttachments as $aAttachment) {
 			
 			$bIgnoreAttachment = false;
@@ -1403,6 +1413,17 @@ abstract class StepCreateOrUpdateTicket extends Step {
 						// @todo: Remove condition when support for iTop 2.7 is dropped
 						if(MetaModel::IsValidAttCode('Attachment', 'creation_date') == true) {
 							$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
+						}
+						
+						
+						$oAttachment->SetIfNull('creation_date', time());
+
+						if($oUser !== null) {
+							$oAttachment->Set('user_id', $oUser);
+						}
+						// Difference between iTop 3.0 (AttributeExternalField) and iTop 3.1 (AttributeExternalKey).
+						if(get_class(MetaModel::GetAttributeDef('Attachment', 'contact_id')) == 'AttributeExternalKey' && $oCaller !== null) {
+							$oAttachment->Set('contact_id', $oCaller);
 						}
 						
 					}
@@ -1507,14 +1528,16 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	 * @return \String The fitted text
 	 */
 	public static function FitTextIn($sInputText, $iMaxLength) {
+		
 		$sInputText = trim($sInputText);
 		$sInputText = str_replace("\r\n", "\r", $sInputText);
 		$sInputText = str_replace("\n", "\r", $sInputText);
 		$sInputText = str_replace("\r", "\r\n", $sInputText);
-		if (strlen($sInputText) > $iMaxLength) {
-			$sInputText = trim(substr($sInputText, 0, $iMaxLength-3)).'...';
+		if(mb_strlen($sInputText) > $iMaxLength) {
+			$sInputText = trim(mb_substr($sInputText, 0, $iMaxLength - 3)).'...';
 		}
 		return $sInputText;
+		
 	}
 	 
 }
@@ -2913,7 +2936,7 @@ abstract class PolicyAttachmentImageDimensions extends Step {
 	 * @inheritDoc
 	 *
 	 * @details
-	 * Function inspired by Combodo's MailInboxBase::AddAttachments()
+	 * Function inspired by Combodo's MailInboxBase::Execute()
 	 * Removes image attachments which are too small and also resizes images which are too large using php-gd
 	 */
 	public static function Execute() {

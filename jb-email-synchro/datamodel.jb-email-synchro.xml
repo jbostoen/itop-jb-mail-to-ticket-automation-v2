@@ -586,14 +586,18 @@ EOF
 				<method id="AddAttachments">
 					<comment>
 						<![CDATA[/**
+						
+	 * @todo Seems unneccessary in this fork, as it's implemented in a different way.
 
 	 * Add the eMail's attachments to the given Ticket. Avoid duplicates (based on name/size/md5),
 	 * avoid attaching blacklisted file types, and can potentially call an AntiVirus before adding the attachment
 	 *
-	 * @param Ticket $oTicket
-	 * @param EmailMessage $oEmail
-	 * @param bool $bNoDuplicates If true, don't add attachment that seem already attached to the ticket (same type, same name, same size, same md5 checksum)
-	 * @param array $aIgnoredAttachments
+	 * @param \Ticket $oTicket The ticket to which attachments will be added.
+	 * @param \EmailMessage $oEmail The e-mail message.
+	 * @param \Boolean $bNoDuplicates If true, don't add attachment that seem already attached to the ticket (same type, same name, same size, same md5 checksum).
+	 * @param \Array $aIgnoredAttachments Attachments to ignore.
+	 * @param \Person $oCaller The caller.
+	 * @param \User $oUser The user (account).
 	 *
 	 * @return array array of cid => attachment_id
 	 * @throws \CoreException
@@ -606,7 +610,7 @@ EOF
 					<access>protected</access>
 					<type>Overload-DBObject</type>
 					<code>
-						<![CDATA[	protected function AddAttachments(Ticket $oTicket, EmailMessage $oEmail, $bNoDuplicates = true, &$aIgnoredAttachments = array()) {
+						<![CDATA[ protected function AddAttachments(Ticket $oTicket, EmailMessage $oEmail, $bNoDuplicates = true, &$aIgnoredAttachments = array(), $oCaller = null, $oUser = null) {
 		if (self::$iMinImageWidth === null)
 		{
 			$sMinImagesSize = MetaModel::GetModuleSetting('jb-email-synchro', 'images_minimum_size','0x0');
@@ -756,34 +760,47 @@ EOF
 						}
 					}
 				}
-				if (!$bIgnoreAttachment && $this->ContainsViruses($aAttachment))
-				{
+				if (!$bIgnoreAttachment && $this->ContainsViruses($aAttachment)) {
+				
 					// Skip this attachment
 					MailInboxesEmailProcessor::Trace("Info: attachment {$aAttachment['filename']} is reported as containing a virus, skipped.");
 					$aRejectedAttachments[] = "attachment {$aAttachment['filename']} was reported as containing a virus, it has been skipped.";
 					$bIgnoreAttachment = true;
 				}
-				if (!$bIgnoreAttachment)
-				{
+				if (!$bIgnoreAttachment) {
+				
 					if ($this->IsImage($aAttachment['mimeType']) && class_exists('InlineImage') && $aAttachment['inline'])
 					{
 						$oAttachment = new InlineImage();
 						MailInboxesEmailProcessor::Trace("Info: email attachment {$aAttachment['filename']} will be stored as an InlineImage.");
 						$oAttachment->Set('secret', sprintf ('%06x', mt_rand(0, 0xFFFFFF))); // something not easy to guess
 					}
-					else
-					{
+					
+					else {
+					
 						MailInboxesEmailProcessor::Trace("Info: email attachment {$aAttachment['filename']} will be stored as an Attachment.");
 						$oAttachment = new Attachment();
+						$oAttachment->SetIfNull('creation_date', time());
+
+						if($oUser !== null) {
+							$oAttachment->Set('user_id', $oUser);
+						}
+						// Difference between iTop 3.0 (AttributeExternalField) and iTop 3.1 (AttributeExternalKey).
+						if(get_class(MetaModel::GetAttributeDef('Attachment', 'contact_id')) == 'AttributeExternalKey' && $oCaller !== null) {
+							$oAttachment->Set('contact_id', $oCaller);
+						}
+						
 					}
-					if ($oTicket->IsNew())
-					{
+					
+					if ($oTicket->IsNew()) {
+					
 						$oAttachment->Set('item_class', get_class($oTicket));
+						
 					}
-					else
-					{
+					else {
 						$oAttachment->SetItem($oTicket);
 					}
+					
 					$oBlob = new ormDocument($aAttachment['content'], $aAttachment['mimeType'], $aAttachment['filename']);
 					$oAttachment->Set('contents', $oBlob);
 					$oAttachment->DBInsert();
@@ -796,10 +813,10 @@ EOF
 					$iId = $oMyChangeOp->DBInsertNoReload();
 					MailInboxesEmailProcessor::Trace("Info: Attachment {$aAttachment['filename']} added to the ticket.");
 					$aAddedAttachments[$aAttachment['content-id']] = $oAttachment;
+					
 				}
 			}
-			else
-			{
+			else {
 				MailInboxesEmailProcessor::Trace("Info: The attachment {$aAttachment['filename']} was NOT added to the ticket because its type '{$aAttachment['mimeType']}' is excluded according to the configuration");
 			}
 		}
