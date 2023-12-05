@@ -1466,7 +1466,7 @@ EOF
 			<presentation>
 				<details>
 					<items>
-						<item id="mailinbox_id">
+						<item id="mailbox_id">
 							<rank>1</rank>
 						</item>
 						<item id="message_uid">
@@ -1479,7 +1479,7 @@ EOF
 				</details>
 				<search>
 					<items>
-						<item id="mailinbox_id">
+						<item id="mailbox_id">
 							<rank>1</rank>
 						</item>
 						<item id="message_uid">
@@ -1492,7 +1492,7 @@ EOF
 				</search>
 				<list>
 					<items>
-						<item id="mailinbox_id">
+						<item id="mailbox_id">
 							<rank>1</rank>
 						</item>
 						<item id="message_uid">
