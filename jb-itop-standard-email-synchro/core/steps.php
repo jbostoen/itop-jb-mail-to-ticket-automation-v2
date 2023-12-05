@@ -22,6 +22,7 @@ use \jb_itop_extensions\components\ormCustomCaseLog;
 
 // iTop internals
 use \Attachment;
+use \AttributeExternalKey;
 use \AttributeHTML;
 use \AttributeText;
 use \CMDBChangeOpPlugin;
@@ -1422,7 +1423,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 							$oAttachment->Set('user_id', $oUser);
 						}
 						// Difference between iTop 3.0 (AttributeExternalField) and iTop 3.1 (AttributeExternalKey).
-						if(get_class(MetaModel::GetAttributeDef('Attachment', 'contact_id')) == 'AttributeExternalKey' && $oCaller !== null) {
+						if(MetaModel::GetAttributeDef('Attachment', 'contact_id') instanceof AttributeExternalKey && $oCaller !== null) {
 							$oAttachment->Set('contact_id', $oCaller);
 						}
 						

@@ -16,7 +16,7 @@
 //   You should have received a copy of the GNU Affero General Public License
 //   along with iTop. If not, see <http://www.gnu.org/licenses/>
 /**
- * Processing of AJAX calls for the CalendarView
+ * Processing of AJAX calls
  *
  * @copyright   Copyright (c) 2013-2023 Combodo SARL
  * @license     http://opensource.org/licenses/AGPL-3.0
@@ -42,7 +42,11 @@ try
 	require_once(APPROOT.'/application/loginwebpage.class.inc.php');
 	LoginWebPage::DoLogin(false /* bMustBeAdmin */, false /* IsAllowedToPortalUsers */); // Check user rights and prompt if needed
 	
-	$oPage = new ajax_page('');
+	if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
+		$oPage = new ajax_page('');
+	} else {
+		$oPage = new AjaxPage('');
+	}
 
 	$sOperation = utils::ReadParam('operation', '');
 	$iMailInboxId = utils::ReadParam('id', 0, false, 'raw_data');
@@ -67,7 +71,11 @@ try
 }
 catch(Exception $e) {
 	
-	$oPage = new ajax_page('');
+	if (version_compare(ITOP_DESIGN_LATEST_VERSION , '3.0') < 0) {
+		$oPage = new ajax_page('');
+	} else {
+		$oPage = new AjaxPage('');
+	}
 	$oPage->SetContentType('text/html');
 	$oPage->add($e->getMessage());
 	$oPage->output();

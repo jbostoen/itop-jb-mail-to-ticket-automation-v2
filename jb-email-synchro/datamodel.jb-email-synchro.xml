@@ -587,7 +587,7 @@ EOF
 					<comment>
 						<![CDATA[/**
 						
-	 * @todo Seems unneccessary in this fork, as it's implemented in a different way.
+	 * @todo Seems unneccessary in this fork, as it's implemented in a different way.belg	
 
 	 * Add the eMail's attachments to the given Ticket. Avoid duplicates (based on name/size/md5),
 	 * avoid attaching blacklisted file types, and can potentially call an AntiVirus before adding the attachment
@@ -983,9 +983,8 @@ EOF
 		$sInputText = str_replace("\r\n", "\r", $sInputText);
 		$sInputText = str_replace("\n", "\r", $sInputText);
 		$sInputText = str_replace("\r", "\r\n", $sInputText);
-		if (strlen($sInputText) > $iMaxLength)
-		{
-			$sInputText = trim(substr($sInputText, 0, $iMaxLength-3)).'...';
+		if(mb_strlen($sInputText) > $iMaxLength) {
+			$sInputText = trim(mb_substr($sInputText, 0, $iMaxLength-3)).'...';
 		}
 		return $sInputText;
 	}]]></code>
