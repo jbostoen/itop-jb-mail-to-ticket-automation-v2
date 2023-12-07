@@ -58,12 +58,14 @@ offline_access
 ```
 
 
-And obviously, the mailbox user (linked to the OAuth client) needs proper permissions on the mailbox.
-Otherwise, you might run into this error:
+Known issue:
 
 ```
 Failed to initialize the mailbox: xxx@xxx.org. Reason: cannot change folder, maybe it does not exist
 ```
+
+* Verify in Microsoft Entra (Azure) - Apps (the place where you registred the application) whether the 3 APIs mentioned above, are configured for this application.
+* Verify if the mailbox user (linked to the OAuth client) needs proper permissions on the mailbox.
 
 
 ### Office 365 with shared mailbox
