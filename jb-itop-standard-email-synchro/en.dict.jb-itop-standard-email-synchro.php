@@ -88,6 +88,18 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:oauth_client_id' => 'OAuth client',
 	'Class:MailInboxStandard/Attribute:oauth_client_id+' => '',
 	
+	// Policy: Attachments - Criteria
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_width' => 'Min. width (px)',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_width+' => 'Min. width (px). Must be at least 1.',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_width' => 'Max. width (px)',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_width+' => 'Max. width (px). Set to 0 for unlimited',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_height' => 'Min. height (px)',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_height+' => 'Min. height (px). Must be at least 1.',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_height' => 'Max. height (px)',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_height+' => 'Max. height (px). Set to 0 for unlimited',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Exclude MIME types',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Attachments of these MIME types will not be processed. Specify one per line.',
+	
 	// Policy: mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Behavior on violation',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_delete' => 'Bounce to sender and delete',
@@ -101,7 +113,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB' => 'Max size (MB)',
 	'Error:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB+' => 'Maximum size of e-mail and its attachments. Larger e-mails will not be processed. Set to 0 to disable.',
 	
-	// Policy: attachment - forbidden MimeType
+	// Policy: attachment - forbidden MIME type
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior' => 'Behavior on violation',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:fallback_ignore_forbidden_attachments' => 'Fallback: ignore forbidden attachments',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_delete' => 'Bounce to sender and delete',
@@ -209,16 +221,6 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:policy_remove_pattern_behavior/Value:fallback_remove' => 'Remove part(s) from subject',
 	'Class:MailInboxStandard/Attribute:policy_remove_pattern_patterns' => 'Patterns to remove from subject (regex patterns, one per line)', 
 	
-	// Policy: Attachments - Image dimensions
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_min_width' => 'Min. width (px)',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_min_width+' => 'Min. width (px). Must be at least 1.',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_width' => 'Max. width (px)',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_width+' => 'Max. width (px). Set to 0 for unlimited',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_min_height' => 'Min. height (px)',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_min_height+' => 'Min. height (px). Must be at least 1.',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_height' => 'Max. height (px)',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_height+' => 'Max. height (px). Set to 0 for unlimited',
-	
 	// Policy: Caller must be same as original ticket caller
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior' => 'Behavior on violation',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:delete' => 'Delete the message from the mailbox',
@@ -254,12 +256,12 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:Server' => 'Mailbox Configuration',
 	'MailInbox:Behavior' => 'Behavior on Incoming e-mails',
 	'MailInbox:Errors' => 'E-mails in error', 
-	'MailInbox:Policies' => 'Policies', 
+	'MailInbox:Settings' => 'Settings', 
 	
-	// Policies
+	// Steps
+	'MailInbox:StepAttachmentCriteria' => 'Attachment - criteria',
 	'MailInbox:PolicyMailSize' => 'Mail Size',
-	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Attachment - forbidden MimeType',
-	'MailInbox:PolicyAttachmentImageDimensions' => 'Attachment - image dimensions',
+	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Attachment - forbidden MIME type',
 	'MailInbox:PolicyUndesiredPattern' => 'Undesired title patterns',
 	'MailInbox:PolicyRemovePattern' => 'Remove unwanted title patterns',
 	'MailInbox:PolicyIgnorePattern' => 'Ignore unwanted title patterns',

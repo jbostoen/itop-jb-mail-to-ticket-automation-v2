@@ -151,6 +151,34 @@ status:assigned]]></default_value>
 					<default_value/>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
+				<!-- Attachments - criteria -->
+				<field id="step_attachment_criteria_image_min_width" xsi:type="AttributeInteger">
+					<sql>step_attachment_criteria_image_min_width</sql>
+					<default_value>100</default_value>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
+				<field id="step_attachment_criteria_image_min_height" xsi:type="AttributeInteger">
+					<sql>step_attachment_criteria_image_min_height</sql>
+					<default_value>100</default_value>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
+				<field id="step_attachment_criteria_image_max_width" xsi:type="AttributeInteger">
+					<sql>step_attachment_criteria_image_max_width</sql>
+					<default_value>1000</default_value>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
+				<field id="step_attachment_criteria_image_max_height" xsi:type="AttributeInteger">
+					<sql>step_attachment_criteria_image_max_height</sql>
+					<default_value>1000</default_value>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
+				<field id="step_attachment_criteria_exclude_mimetypes" xsi:type="AttributeText">
+					<sql>step_attachment_criteria_exclude_mimetypes</sql>
+					<!-- By default, ignore the smime.p7s (application/pkcs7-signature) file which is generated for signed e-mails. -->
+					<default_value>application/pkcs7-signature</default_value>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
+				<!-- Policy: E-mail size. -->
 				<field id="policy_mail_size_too_big_notification" xsi:type="AttributeHTML">
 					<sql>policy_mail_size_too_big_notification</sql>
 					<default_value/>
@@ -159,27 +187,6 @@ status:assigned]]></default_value>
 				<field id="policy_mail_size_too_big_max_size_MB" xsi:type="AttributeInteger">
 					<sql>policy_mail_size_too_big_max_size_MB</sql>
 					<default_value>25</default_value>
-					<is_null_allowed>false</is_null_allowed>
-				</field>
-				<!-- Attachments - image dimensions -->
-				<field id="policy_attachment_image_dimensions_min_width" xsi:type="AttributeInteger">
-					<sql>policy_attachment_image_dimensions_min_width</sql>
-					<default_value>100</default_value>
-					<is_null_allowed>false</is_null_allowed>
-				</field>
-				<field id="policy_attachment_image_dimensions_min_height" xsi:type="AttributeInteger">
-					<sql>policy_attachment_image_dimensions_min_height</sql>
-					<default_value>100</default_value>
-					<is_null_allowed>false</is_null_allowed>
-				</field>
-				<field id="policy_attachment_image_dimensions_max_width" xsi:type="AttributeInteger">
-					<sql>policy_attachment_image_dimensions_max_width</sql>
-					<default_value>1000</default_value>
-					<is_null_allowed>false</is_null_allowed>
-				</field>
-				<field id="policy_attachment_image_dimensions_max_height" xsi:type="AttributeInteger">
-					<sql>policy_attachment_image_dimensions_max_height</sql>
-					<default_value>1000</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<!-- Forbidden e-mail attachments -->
@@ -1125,12 +1132,33 @@ EOF
 								</item>
 							</items>
 						</item>
-						<item id="tab:MailInbox:Policies">
+						<item id="tab:MailInbox:Settings">
 							<rank>40</rank>
 							<items>
+								<!-- Image attachments: min/max dimensions -->
+								<item id="fieldset:MailInbox:StepAttachmentCriteria">
+									<rank>1</rank>
+									<items>
+										<item id="step_attachment_criteria_image_min_width">
+											<rank>10</rank>
+										</item>
+										<item id="step_attachment_criteria_image_max_width">
+											<rank>15</rank>
+										</item>
+										<item id="step_attachment_criteria_image_min_height">
+											<rank>20</rank>
+										</item>
+										<item id="step_attachment_criteria_image_max_height">
+											<rank>30</rank>
+										</item>
+										<item id="step_attachment_criteria_exclude_mimetypes">
+											<rank>40</rank>
+										</item>
+									</items>
+								</item>
 								<!-- Mail (attachments) size too large -->
 								<item id="fieldset:MailInbox:PolicyMailSize">
-									<rank>110</rank>
+									<rank>120</rank>
 									<items>
 										<item id="policy_mail_size_too_big_behavior">
 											<rank>10</rank>
@@ -1142,24 +1170,6 @@ EOF
 											<rank>20</rank>
 										</item>
 										<item id="policy_mail_size_too_big_max_size_MB">
-											<rank>30</rank>
-										</item>
-									</items>
-								</item>
-								<!-- Image attachments: min/max dimensions -->
-								<item id="fieldset:MailInbox:PolicyAttachmentImageDimensions">
-									<rank>120</rank>
-									<items>
-										<item id="policy_attachment_image_dimensions_min_width">
-											<rank>10</rank>
-										</item>
-										<item id="policy_attachment_image_dimensions_max_width">
-											<rank>15</rank>
-										</item>
-										<item id="policy_attachment_image_dimensions_min_height">
-											<rank>20</rank>
-										</item>
-										<item id="policy_attachment_image_dimensions_max_height">
 											<rank>30</rank>
 										</item>
 									</items>

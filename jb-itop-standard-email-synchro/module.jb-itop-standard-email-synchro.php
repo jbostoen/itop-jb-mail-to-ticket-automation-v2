@@ -73,6 +73,16 @@ if (!class_exists('StandardEmailSynchroInstaller')) {
 		 */
 		public static function BeforeDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion) {
 			
+			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.7.231208', '<')) {
+			
+				// 20191229-1549: renamed policy
+				self::MoveColumnInDB('MailInboxStandard', 'policy_attachment_image_dimensions_min_width', 'MailInboxStandard', 'step_attachment_criteria_image_min_width');
+				self::MoveColumnInDB('MailInboxStandard', 'policy_attachment_image_dimensions_max_width', 'MailInboxStandard', 'step_attachment_criteria_image_max_width');
+				self::MoveColumnInDB('MailInboxStandard', 'policy_attachment_image_dimensions_min_height', 'MailInboxStandard', 'step_attachment_criteria_image_min_height');
+				self::MoveColumnInDB('MailInboxStandard', 'policy_attachment_image_dimensions_max_height', 'MailInboxStandard', 'step_attachment_criteria_image_max_height');
+				
+			}
+			
 			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.191123', '<')) {
 			
 				// 20191123-2011: renamed enum values, indicating they're fallbacks and doing a specific action; even if there's only one fallback.

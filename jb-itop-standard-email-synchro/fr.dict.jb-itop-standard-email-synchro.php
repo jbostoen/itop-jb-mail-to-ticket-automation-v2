@@ -23,8 +23,6 @@
 
 Dict::Add('FR FR', 'French', 'Français', array(
 
-	// Hopefully iTop 2.8 brings console tooltips out of the box?
-
 	// Dictionary entries go here
 	'Class:MailInboxStandard' => 'Boîte Mail Standard',
 	'Class:MailInboxStandard+' => 'Source d\'eMails',
@@ -83,6 +81,23 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Alias d\'email',
 	'Class:MailInboxStandard/Attribute:mail_aliases+' => 'Alias d\'email : un par ligne. Les schémas en exp. rég. sont autorisés.',
+
+	'Class:MailInboxStandard/Attribute:oauth_provider' => 'Oauth provider',
+	'Class:MailInboxStandard/Attribute:oauth_provider+' => '',
+	'Class:MailInboxStandard/Attribute:oauth_client_id' => 'OAuth client',
+	'Class:MailInboxStandard/Attribute:oauth_client_id+' => '',
+	
+	// Attachments - criteria
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_width' => 'Largeur min. (px)',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_width+' => 'Largeur min. (px). Doit être d\'au minimum 1.',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_width' => 'Largeur max. (px)',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_width+' => 'Largeur max. (px). Mettre à 0 pour ne pas limiter.',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_height' => 'Hauteur min. (px)',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_height+' => 'Hauteur min. (px). Doit être d\'au minimum 1.',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_height' => 'Hauteur max. (px)',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_height+' => 'hauteur max. (px). Mettre à 0 pour ne pas limiter.',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Exclude MIME types',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Attachments of these MIME types will not be processed. Specify one per line.',
 	
 	// mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportement en cas d\'infraction',
@@ -106,6 +121,9 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_subject' => 'Rejeter l\'objet',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_notification' => 'Rejeter le message',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_mimetypes' => 'Types MIME (un par ligne)',
+	
+	// Policy: attachment - ignore MIME type
+	'Class:MailInboxStandard/Attribute:step_attachment_ignore_mimetypes' => 'Ignore MIME Types (one per line)',
 	
 	// no subject
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior' => 'Comportement en cas d\'infraction',
@@ -194,16 +212,6 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_remove_pattern_behavior/Value:fallback_remove' => 'Retirer des parties de l\'objet',
 	'Class:MailInboxStandard/Attribute:policy_remove_pattern_patterns' => 'Schémas à retirer du sujet (Schémas en exp. rég., un par ligne)',
 	
-	// Attachments - Image dimensions
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_min_width' => 'Largeur min. (px)',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_min_width+' => 'Largeur min. (px). Doit être d\'au minimum 1.',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_width' => 'Largeur max. (px)',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_width+' => 'Largeur max. (px). Mettre à 0 pour ne pas limiter.',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_min_height' => 'Hauteur min. (px)',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_min_height+' => 'Hauteur min. (px). Doit être d\'au minimum 1.',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_height' => 'Hauteur max. (px)',
-	'Class:MailInboxStandard/Attribute:policy_attachment_image_dimensions_max_height+' => 'hauteur max. (px). Mettre à 0 pour ne pas limiter.',
-	
 	// Auto reply
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Behavior on violation',
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:delete' => 'Delete the message from the mailbox',
@@ -227,12 +235,12 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:Server' => 'Configuration de la boîte mail',
 	'MailInbox:Behavior' => 'Comportement pour les nouveaux emails',
 	'MailInbox:Errors' => 'E-mails en erreur',
-	'MailInbox:Policies' => 'Policies', 
+	'MailInbox:Settings' => 'Configuration', 
 	
-	// Policies
+	// Steps
+	'MailInbox:StepAttachmentCriteria' => 'Pièce jointe - criteria',
 	'MailInbox:PolicyMailSize' => 'Taille de l\'email',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Pièce jointe - type MIME interdit',
-	'MailInbox:PolicyAttachmentImageDimensions' => 'Pièce jointe - dimensions de l\'image',
 	'MailInbox:PolicyUndesiredPattern' => 'Schémas indésirables dans l\'objet',
 	'MailInbox:PolicyRemovePattern' => 'Schémas retirés dans l\'objet',
 	'MailInbox:PolicyIgnorePattern' => 'Schémas ignorés dans l\'objet',

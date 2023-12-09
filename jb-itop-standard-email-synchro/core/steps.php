@@ -2919,9 +2919,14 @@ abstract class PolicyFindAdditionalContacts extends Step {
 }
 
 /**
- * Class PolicyAttachmentImageDimensions. A policy to ignore small image sizes (likely elements of an email signature) or resize larger images.
+ * Class StepAttachmentCriteria. A step which validates if attachments meet certain criteria.
+ * 
+ * @details The default implementation includes:
+ * - Image dimensions: too small images (which are likely elements of an email signature) get ignored.
+ * - Image dimensions: too large images get resized, if possible.
+ * - Files of a certain MIME type, will get ignored.
  */
-abstract class PolicyAttachmentImageDimensions extends Step {
+abstract class StepAttachmentCriteria extends Step {
 	
 	/**
 	 * @inheritDoc
@@ -2931,7 +2936,7 @@ abstract class PolicyAttachmentImageDimensions extends Step {
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_attachment_image_dimensions';
+	public static $sXMLSettingsPrefix = 'step_attachment_criteria';
 	
 	/**
 	 * @inheritDoc
@@ -2948,10 +2953,10 @@ abstract class PolicyAttachmentImageDimensions extends Step {
 			$oEmail = static::GetMail();
 			
 			// Ignore attachment or downsize?
-			$iMinWidth = static::GetStepSetting('min_width');
-			$iMaxWidth = static::GetStepSetting('max_width');
-			$iMinHeight = static::GetStepSetting('min_height');
-			$iMaxHeight = static::GetStepSetting('max_height');
+			$iMinWidth = static::GetStepSetting('image_min_width');
+			$iMaxWidth = static::GetStepSetting('image_max_width');
+			$iMinHeight = static::GetStepSetting('image_min_height');
+			$iMaxHeight = static::GetStepSetting('image_max_height');
 			
 			static::Trace(".. Min/max dimensions: {$iMinWidth}x{$iMinHeight} / {$iMaxWidth}x{$iMaxHeight}");
 						
@@ -2974,9 +2979,15 @@ abstract class PolicyAttachmentImageDimensions extends Step {
 				$bCheckImageDimensionTooLarge = false;
 			}
 
+
+			$sMimeTypes = static::GetStepSetting('exclude_mimetypes');
+			$aMimeTypes = preg_split(NEWLINE_REGEX, $sMimeTypes);
+
+			static::Trace('.. Excluded MIME types: '.implode(', ', $aMimeTypes));
+
 			foreach($oEmail->aAttachments as $sAttachmentRef => &$aAttachment) {
 				
-				static::Trace("... Processing attachment ref {$sAttachmentRef}");
+				static::Trace('... Processing attachment ref {$sAttachmentRef} / MIME type '.$aAttachment['mimeType']);
 							
 				if(static::IsImage($aAttachment['mimeType']) == true) {
 					
@@ -3019,6 +3030,17 @@ abstract class PolicyAttachmentImageDimensions extends Step {
 				}
 				else {
 					static::Trace("... Attachment {$aAttachment['filename']} is not an image.");
+				}
+				
+				
+				// Ignore certain MIME types (This could include images).
+				if(in_array($aAttachment['mimeType'], $aMimeTypes) == true) {
+					
+					static::Trace('... Ignore this attachment (excluded MIME type).');
+					
+					// Removing attachment
+					unset($oEmail->aAttachments[$sAttachmentRef]);
+								
 				}
 				
 			}
