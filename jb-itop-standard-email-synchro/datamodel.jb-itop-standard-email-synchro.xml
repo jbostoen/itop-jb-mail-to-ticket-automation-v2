@@ -175,7 +175,8 @@ status:assigned]]></default_value>
 				<field id="step_attachment_criteria_exclude_mimetypes" xsi:type="AttributeText">
 					<sql>step_attachment_criteria_exclude_mimetypes</sql>
 					<!-- By default, ignore the smime.p7s (application/pkcs7-signature) file which is generated for signed e-mails. -->
-					<default_value>application/pkcs7-signature</default_value>
+					<default_value><![CDATA[application/x-pkcs7-signature
+application/x-pkcs7-signature]]></default_value>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
 				<!-- Policy: E-mail size. -->
