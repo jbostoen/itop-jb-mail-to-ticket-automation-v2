@@ -1,9 +1,9 @@
 # Configuration
 
 This document describes most of the settings.
-It also contains additional info about the available default policies.
+It also contains additional info about the available default steps and policies.
 
-A policy should be interpreted as a 'mail processing step'.
+A policy should be interpreted as a 'mail processing step' which may entirely block the processing. 
 It can be used to check a condition; but it can also actually perform a step in the ticket creation/update process (for example: matching a caller).
 
 Mailbox settings are mostly similar to [Combodo's original version](https://www.itophub.io/wiki/page?id=extensions%3Aticket-from-email).
@@ -126,6 +126,7 @@ body_format
 body_text
 body_text_plain (not a property of Email Message, but gives a version with HTML tags stripped)
 caller_email
+caller_email_suffix
 caller_name
 date
 message_id

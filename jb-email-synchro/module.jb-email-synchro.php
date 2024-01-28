@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'jb-email-synchro/2.7.231206',
+	'jb-email-synchro/2.7.240128',
 	array(
 		// Identification
 		'label' => 'Mail to Ticket Automation (core)',

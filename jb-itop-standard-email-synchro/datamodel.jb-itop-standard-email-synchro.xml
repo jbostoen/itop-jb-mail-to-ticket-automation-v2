@@ -1193,6 +1193,15 @@ EOF
 										</item>
 									</items>
 								</item>
+								<!-- Auto-reply -->
+								<item id="fieldset:MailInbox:PolicyAutoReply">
+									<rank>122</rank>
+									<items>
+										<item id="policy_autoreply_behavior">
+											<rank>10</rank>
+										</item>
+									</items>
+								</item>
 								<!-- No subject -->
 								<item id="fieldset:MailInbox:PolicyNoSubject">
 									<rank>130</rank>
@@ -1346,15 +1355,6 @@ EOF
 										</item>
 										<item id="policy_remove_pattern_patterns">
 											<rank>20</rank>
-										</item>
-									</items>
-								</item>
-								<!-- Auto-reply -->
-								<item id="fieldset:MailInbox:PolicyAutoReply">
-									<rank>121</rank>
-									<items>
-										<item id="policy_autoreply_behavior">
-											<rank>10</rank>
 										</item>
 									</items>
 								</item>

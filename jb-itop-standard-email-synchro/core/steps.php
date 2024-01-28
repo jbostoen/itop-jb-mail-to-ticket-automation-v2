@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @copyright   Copyright (c) 2019-2023 Jeffrey Bostoen
+ * @copyright   Copyright (c) 2019-2024 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     2.7.231206
+ * @version     2.7.240128
  *
  * Policy interface definition and some classes implementing it.
  * 
@@ -160,6 +160,7 @@ abstract class Step implements iStep {
 		return $oMailBox->Get(static::GetXMLSettingsPrefix().'_'.$sSetting);
 		
 	}
+	
 	
 	/**
 	  * Gets the step's precedence.
@@ -347,6 +348,7 @@ abstract class Step implements iStep {
 			'mail->message_id' => $oEmail->sMessageId,
 			'mail->subject' => $oEmail->sSubject,
 			'mail->caller_email' => $oEmail->sCallerEmail,
+			'mail->caller_email_suffix' => explode('@', $oEmail->sCallerEmail)[1],
 			'mail->caller_name' => $oEmail->sCallerName,
 			'mail->recipient' => $oEmail->sRecipient,
 			'mail->date' => $oEmail->sDate,
@@ -2822,7 +2824,6 @@ abstract class PolicyFindAdditionalContacts extends Step {
 					}
 					
 					// Found other contacts in To: or CC:
-					static::Trace(".. Looking up Person with email address '{$sRecipientEmail}'");
 							
 					// Check if this contact exists.
 					// Non-existing contacts must be created.
@@ -2832,7 +2833,7 @@ abstract class PolicyFindAdditionalContacts extends Step {
 						'email' => $sRecipientEmail
 					]);
 					
-					static::Trace(".. Results: {$oSet_Person->Count()}");
+					static::Trace(".. Results for Person with email address '{$sRecipientEmail}: {$oSet_Person->Count()}");
 					
 					if($oSet_Person->Count() == 0) {
 						

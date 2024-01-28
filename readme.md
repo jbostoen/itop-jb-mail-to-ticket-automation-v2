@@ -1,6 +1,6 @@
 # Mail to Ticket Automation
 
-Copyright (c) 2019-2023 Jeffrey Bostoen
+Copyright (c) 2019-2024 Jeffrey Bostoen
 
 [![License](https://img.shields.io/github/license/jbostoen/iTop-custom-extensions)](https://github.com/jbostoen/iTop-custom-extensions/blob/master/license.md)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/jbostoen)
