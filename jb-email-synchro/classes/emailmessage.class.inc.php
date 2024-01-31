@@ -42,6 +42,10 @@ class EmailMessage {
 	public $aTos;
 	public $aCCs;
 	
+
+	/** @var DOMDocument */
+	protected $oDoc = null;
+	
 	/**
 	 * @var \Person[] $aInternal_Additional_Contacts Set by a Policy. Zero or more Person objects.
 	 */

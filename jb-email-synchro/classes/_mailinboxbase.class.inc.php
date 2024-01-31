@@ -29,6 +29,9 @@ abstract class _MailInboxBase extends cmdbAbstractObject
 	protected static $iMaxImageHeight = null;
 	protected static $aExcludeAttachments = null;
 	
+	/** @var int */
+	protected $iNextAction = null;
+
 	/**
 	 * @var int
 	 * Property is public as it is used by outside scripts. The declaration was just made to make it compatible with PHP 8.2, for a better fix we might want to make a proper getter / setter.
