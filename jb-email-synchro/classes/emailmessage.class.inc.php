@@ -47,15 +47,15 @@ class EmailMessage {
 	protected $oDoc = null;
 	
 	/**
-	 * @var \Person[] $aInternal_Additional_Contacts Set by a Policy. Zero or more Person objects.
+	 * @var \Person[] $aInternal_Additional_Contacts Zero or more Person objects.
 	 */
 	public $aInternal_Additional_Contacts = [];
 	
 	/**
-	 * @var \Person $oInternal_Contact Set by a Policy. Person object.
+	 * @var \Person $oInternal_Contact An iTop person (the caller of the ticket).
 	 */
 	public $oInternal_Contact = null;
-	
+
 	const NEW_LINE_MARKER = '__NEWLINE__'; // unlikely to be found in the body of an email message
 	
 	public function __construct($sUIDL, $sMessageId, $sSubject, $sCallerEmail, $sCallerName, $sRecipient, $aReferences, $sThreadIndex, $sBodyText, $sBodyFormat, $aAttachments, $oRelatedObject, $aHeaders, $sDecodeStatus, $sDate = '', $aTos = array(), $aCCs = array()) {
@@ -81,13 +81,13 @@ class EmailMessage {
 	}
 
 	/**
-	 * Archives the message into a file
+	 * Archives the message into a file.
 	 */
 	public function SaveToFile($sFile) {
 		
 	}
 	/**
-	 * Read the message from an archived file
+	 * Read the message from an archived file.
 	 */
 	public function ReadFromFile($sFile) {
 		
@@ -435,4 +435,55 @@ class EmailMessage {
 		}
 		return null;
 	}
+
+	/**
+	 * Sets the sender of the e-mail.
+	 * 
+	 * @param \Person $oPerson Person object.
+	 *
+	 * @return void
+	 */
+	public function SetSender(Person $oPerson) {
+
+		$this->oInternal_Contact = $oPerson;
+
+	}
+
+	/**
+	 * Returns the sender of the e-mail.
+	 *
+	 * @return \Person|null The related person object (if found).
+	 */
+	public function GetSender() {
+
+		return $this->oInternal_Contact;
+
+	}
+
+	/**
+	 * Adds a related contact.
+	 *
+	 * @param \Person $oPerson The related person object.
+	 *
+	 * @return void
+	 */
+	public function AddRelatedContact(Person $oPerson) {
+
+		$this->aInternal_Additional_Contacts[] = $oPerson;
+
+	}
+
+	/**
+	 * Gets related contacts.
+	 * 
+	 * @param \Boolean $bIncludeSender Whether or not to include the sender of the e-mail.
+	 * 
+	 * @return \Person[] Array of related person objects.
+	 */
+	public function GetRelatedContacts($bIncludeSender) {
+
+		return ($bIncludeSender ? array_merge([ $this->oInternal_Contact ], $this->aInternal_Additional_Contacts) : $this->aInternal_Additional_Contacts);
+
+	}
+
 }

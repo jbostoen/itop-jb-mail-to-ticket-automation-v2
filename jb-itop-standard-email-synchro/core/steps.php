@@ -641,6 +641,8 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		$oEmail = static::GetMail();
 		$oMailBox = static::GetMailBox();
 		
+		$oCaller = $oEmail->GetSender();
+
 		// In case of error (exception...) set the behavior
 		// Upon success, this will be overruled again.
 		if($oMailBox->Get('error_behavior') == 'delete') {
@@ -667,7 +669,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 			
 		}
 		
-		if($oEmail->oInternal_Contact === null || get_class($oEmail->oInternal_Contact) != 'Person') {
+		if($oCaller === null) {
 			
 			$sErrorMessage = "... Invalid caller specified: Cannot create Ticket without valid Person.";
 			static::Trace($sErrorMessage);
@@ -678,9 +680,10 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		$oTicket = MetaModel::NewObject($sTargetClass);
 		static::SetTicket($oTicket);
 		
-		$oTicket->Set('org_id', $oEmail->oInternal_Contact->Get('org_id'));
+		// If the Ticket class contains an org_id, it should inherit this from the user.
+		$oTicket->Set('org_id', $oCaller->Get('org_id'));
 		if(MetaModel::IsValidAttCode($sTargetClass, 'caller_id')) {
-			$oTicket->Set('caller_id', $oEmail->oInternal_Contact->GetKey());
+			$oTicket->Set('caller_id', $oCaller->GetKey());
 		}
 		if(MetaModel::IsValidAttCode($sTargetClass, 'origin')) {
 			$oTicket->Set('origin', 'mail');
@@ -784,7 +787,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
 		$oTicket = static::GetTicket();
-		$oCaller = $oEmail->oInternal_Contact;
+		$oCaller = $oEmail->GetSender();
 		
 		// In case of error (exception...) set the behavior
 		// Upon success, this will be overruled again.
@@ -839,17 +842,17 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		// Fallback to e-mail address if name is unknown.
 		$sCallerName = $oEmail->sCallerName;
 		$iCallerUserId = null;
-		if($oEmail->oInternal_Contact === null) {
+		if($oCaller === null) {
 			$sCallerName = $oEmail->sCallerEmail;
 			// $iCallerUserId remains null
 		}
 		else {
 			
-			$sCallerName = $oEmail->oInternal_Contact->GetName(); // Derive name from Person
+			$sCallerName = $oCaller->GetName(); // Derive name from Person
 			
 			// @todo Note: iTop 3.0 introduces UserRights::GetUserFromPerson().
 			$sOQL = 'SELECT User AS u JOIN Person AS p ON u.contactid = p.id WHERE p.id = :id';
-			$oUsers = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['id' => $oEmail->oInternal_Contact->GetKey()]);
+			$oUsers = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['id' => $oCaller->GetKey()]);
 			
 			// Only first user will be matched. Multiple accounts could theoretically be linked to 1 Person.
 			$oUser = $oUsers->Fetch();
@@ -1370,7 +1373,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 			}
 		}
 		
-		$oCaller = $oEmail->oInternal_Contact;
+		$oCaller = $oEmail->GetSender();
 		$oUser = null;
 		if(method_exists('UserRights', 'GetUserFromPerson') && $oCaller !== null) {
 			
@@ -2060,7 +2063,12 @@ abstract class PolicyBounceNoSubject extends Step {
 
 /**
  * Class PolicyBounceOtherRecipients. A policy to ensure that the service desk mailbox is the sole recipient (no other recipients in To:, CC:).
- * Does NOT change "related contacts" or create new ones!
+ * 
+ * @details Does NOT change "related contacts" or create new ones!
+ * This step only checks whether the e-mail needs to be bounced.
+ * For the actual creation/linking of contacts, see PolicyFindAdditionalContacts.
+ * 
+ * Reason: The need to 'bounce' just comes way earlier than the handling of iTop person objects.
  */
 abstract class PolicyBounceOtherRecipients extends Step {
 	
@@ -2100,10 +2108,12 @@ abstract class PolicyBounceOtherRecipients extends Step {
 			$sPolicyBehavior = static::GetStepSetting('behavior');
 			
 			switch($sPolicyBehavior) {
-				 case 'bounce_delete':
-				 case 'bounce_mark_as_undesired':
-				 case 'delete':
-				 case 'mark_as_undesired':
+
+				// Perform action if:
+				case 'bounce_delete':
+				case 'bounce_mark_as_undesired':
+				case 'delete':
+				case 'mark_as_undesired':
 				
 					foreach($aAllContacts as $aContactInfo) {
 						
@@ -2125,7 +2135,7 @@ abstract class PolicyBounceOtherRecipients extends Step {
 							}
 							elseif(preg_match($sPattern, $sCurrentEmail)) {
 								
-								// This e-mail (from:) is allowed
+								// This e-mail (from:) is allowed; it's within the allowed contacts.
 								continue 2;
 								
 							}
@@ -2140,19 +2150,13 @@ abstract class PolicyBounceOtherRecipients extends Step {
 					}
 
 					break; // Defensive programming
-					
+				
+				// These behaviors will be handled in PolicyFindAdditionalContacts:
 				case 'do_nothing':
 				case 'fallback_ignore_other_contacts':
-				
-					// Will be handled later (by default in PolicyFindAdditionalContacts)
-					static::Trace(".. Other contacts in To: or CC: will be ignored for this email in further processing.");
-					break;
-					
 				case 'fallback_add_other_contacts':
 				case 'fallback_add_existing_other_contacts':
-				
-					// Will be handled later (by default in PolicyFindAdditionalContacts)
-					static::Trace(".. Other contacts in To: or CC: will be handled in PolicyFindAdditionalContacts.");
+					
 					break;
 				
 				default:
@@ -2559,10 +2563,11 @@ abstract class PolicyFindCaller extends Step {
 		
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
+		$oCaller = $oEmail->GetSender();
 		
 		// Checking if there's an unknown caller
 		
-			if(isset($oEmail->oInternal_Contact) == false || $oEmail->oInternal_Contact === null) {
+			if($oCaller === null) {
 				
 				$sCallerEmail = $oEmail->sCallerEmail;
 				static::Trace("... Determine caller: Person with email '{$sCallerEmail}'");
@@ -2658,7 +2663,7 @@ abstract class PolicyFindCaller extends Step {
 				}
 				
 				// Set caller for email
-				$oEmail->oInternal_Contact = $oCaller;
+				$oEmail->SetSender($oCaller);
 				
 			}
 			else {
@@ -2791,7 +2796,8 @@ abstract class PolicyFindAdditionalContacts extends Step {
 		
 		// Ignore helpdesk mailbox; any helpdesk mailbox aliases, original caller's email address
 		if($oTicket !== null) {
-			// For existing tickets: other people might reply. So only exclude mailbox aliases and the original caller (who may be different from the current e-mail sender)
+			// For existing tickets: other people might reply.
+			// So only exclude mailbox aliases and the original caller (who may be different from the current e-mail sender).
 			// If it's someone else replying, it should be seen as a new contact.
 			$aExcludedAddresses[] = $oTicket->Get('caller_id->email');
 			
@@ -2805,19 +2811,21 @@ abstract class PolicyFindAdditionalContacts extends Step {
 		
 		static::Trace(".. E-mail addresses to exclude: ".implode(', ', $aExcludedAddresses));
 
+		// While the mailbox may be configured NOT to *create* or *link* related contacts,
+		// It may still be good to match them to iTop objects if they do exist.
 		
 		switch($sPolicyBehavior) {
 			
 			case 'fallback_add_existing_other_contacts':
 			case 'fallback_add_other_contacts':
 		
-				// Using all contacts again to have access to the 'email' and 'name'.
+				// Loop over all contacts again to have access to the 'email' and 'name'.
 				foreach($aAllContacts as $aRecipient) {
 					
 					$sRecipientEmail = $aRecipient['email'];
 					$sRecipientName = $aRecipient['name'];
 					
-					// Ignoree
+					// Is this an e-mail address that should be ignored?
 					if(in_array(strtolower($sRecipientEmail), $aExcludedAddresses) == true) {
 						static::Trace('.. Ignore '.$sRecipientEmail.' ('.$sRecipientName.')');
 						continue;
@@ -2835,7 +2843,7 @@ abstract class PolicyFindAdditionalContacts extends Step {
 					
 					static::Trace(".. Results for Person with email address '{$sRecipientEmail}: {$oSet_Person->Count()}");
 					
-					if($oSet_Person->Count() == 0) {
+					if($oSet_Person->Count() == 0 && $sPolicyBehavior == 'fallback_add_other_contacts') {
 						
 						// Create
 						static::Trace(".. Creating a new Person with email address '{$sRecipientEmail}'");
@@ -2862,7 +2870,7 @@ abstract class PolicyFindAdditionalContacts extends Step {
 							$oContact->DBInsert();
 
 							// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
-							$oEmail->aInternal_Additional_Contacts[] = $oContact;
+							$oEmail->AddRelatedContact($oContact);
 							
 						}
 						catch(Exception $e) {
@@ -2877,13 +2885,13 @@ abstract class PolicyFindAdditionalContacts extends Step {
 					elseif($oSet_Person->Count() == 1) {
 						// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
 						$oContact = $oSet_Person->Fetch();
-						$oEmail->aInternal_Additional_Contacts[] = $oContact;
+						$$oEmail->AddRelatedContact($oContact);
 					}
 					else {
 						// More than one Person returned. Inconclusive. Ignore?
 						static::Trace(".. Multiple Persons found. Returning the first one.");
 						$oContact = $oSet_Person->Fetch();
-						$oEmail->aInternal_Additional_Contacts[] = $oContact;
+						$oEmail->AddRelatedContact($oContact);
 						
 					}
 					
