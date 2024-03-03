@@ -474,16 +474,30 @@ class EmailMessage {
 	}
 
 	/**
-	 * Gets related contacts.
-	 * 
-	 * @param \Boolean $bIncludeSender Whether or not to include the sender of the e-mail.
+	 * Gets recipients. This includes (if identified, and eligible) recipients, but not the sender.
 	 * 
 	 * @return \Person[] Array of related person objects.
 	 */
-	public function GetRelatedContacts($bIncludeSender) {
+	public function GetRecipients() {
 
-		return ($bIncludeSender ? array_merge([ $this->oInternal_Contact ], $this->aInternal_Additional_Contacts) : $this->aInternal_Additional_Contacts);
+		return $this->aInternal_Additional_Contacts;
 
+	}
+
+	/**
+	 * Gets related contacts. This includes (if identified, and eligible) the sender and recipients.
+	 * 
+	 * @return \Person[] Array of related person objects.
+	 */
+	public function GetRelatedContacts() {
+
+		if($this->oInternal_Contact !== null) {
+			return array_merge([ $this->oInternal_Contact ], $this->aInternal_Additional_Contacts);
+		}
+		else {
+			return $this->aInternal_Additional_Contacts;
+		}
+		
 	}
 
 }
