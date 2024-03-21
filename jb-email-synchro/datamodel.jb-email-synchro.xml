@@ -1183,7 +1183,9 @@ EOF
 				break;
 			
 			default:
+				// This can happen if customers come from Combodo's extension.
 				self::Trace("Error: unsupported protocol: $sProtocol - please use: imap.");	
+				throw new Exception('Unsupported protocol: '.$sProtocol.' - Only IMAP is supported.');
 		}
 		return $oSource;
 	}]]></code>
