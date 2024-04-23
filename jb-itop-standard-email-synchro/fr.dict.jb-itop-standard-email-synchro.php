@@ -240,6 +240,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Pièce jointe - criteria',
 	'MailInbox:PolicyMailSize' => 'Taille de l\'email',
+	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Attachment - Ignored MIME type~~',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Pièce jointe - type MIME interdit',
 	'MailInbox:PolicyUndesiredPattern' => 'Schémas indésirables dans l\'objet',
 	'MailInbox:PolicyRemovePattern' => 'Schémas retirés dans l\'objet',

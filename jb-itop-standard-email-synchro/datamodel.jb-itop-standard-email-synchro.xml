@@ -1152,9 +1152,6 @@ EOF
 										<item id="step_attachment_criteria_image_max_height">
 											<rank>30</rank>
 										</item>
-										<item id="step_attachment_criteria_exclude_mimetypes">
-											<rank>40</rank>
-										</item>
 									</items>
 								</item>
 								<!-- Mail (attachments) size too large -->
@@ -1193,9 +1190,17 @@ EOF
 										</item>
 									</items>
 								</item>
+								<item id="fieldset:MailInbox:PolicyAttachmentIgnoredMimeType">
+									<rank>122</rank>
+									<items>
+										<item id="step_attachment_criteria_exclude_mimetypes">
+											<rank>40</rank>
+										</item>
+									</items>
+								</item>
 								<!-- Auto-reply -->
 								<item id="fieldset:MailInbox:PolicyAutoReply">
-									<rank>122</rank>
+									<rank>125</rank>
 									<items>
 										<item id="policy_autoreply_behavior">
 											<rank>10</rank>

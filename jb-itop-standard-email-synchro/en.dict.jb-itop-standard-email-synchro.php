@@ -90,13 +90,14 @@ Dict::Add('EN US', 'English', 'English', array(
 	
 	// Policy: Attachments - Criteria
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_width' => 'Min. width (px)',
-	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_width+' => 'Min. width (px). Must be at least 1.',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_width+' => 'Minimum image width (px). Must be at least 1.',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_width' => 'Max. width (px)',
-	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_width+' => 'Max. width (px). Set to 0 for unlimited',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_width+' => 'Maximum image width (px). Set to 0 for unlimited',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_height' => 'Min. height (px)',
-	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_height+' => 'Min. height (px). Must be at least 1.',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_height+' => 'Minimum height (px). Must be at least 1.',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_height' => 'Max. height (px)',
-	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_height+' => 'Max. height (px). Set to 0 for unlimited',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_height+' => 'Maximum height (px). Set to 0 for unlimited',
+
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Exclude MIME types',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Attachments of these MIME types will not be processed. Specify one per line.',
 	
@@ -259,9 +260,10 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:Settings' => 'Settings', 
 	
 	// Steps
-	'MailInbox:StepAttachmentCriteria' => 'Attachment - criteria',
+	'MailInbox:StepAttachmentCriteria' => 'Embedded e-mail images',
 	'MailInbox:PolicyMailSize' => 'Mail Size',
-	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Attachment - forbidden MIME type',
+	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Attachment - Forbidden MIME type',
+	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Attachment - Ignored MIME type',
 	'MailInbox:PolicyUndesiredPattern' => 'Undesired title patterns',
 	'MailInbox:PolicyRemovePattern' => 'Remove unwanted title patterns',
 	'MailInbox:PolicyIgnorePattern' => 'Ignore unwanted title patterns',
