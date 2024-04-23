@@ -445,6 +445,8 @@ abstract class Step implements iStep {
 		
 		$sBehavior = static::GetStepSetting('behavior');
 		static::Trace('.. Policy violated. Behavior: '.$sBehavior);
+
+		$sSettingsPrefix = static::GetXMLSettingsPrefix();
 		
 		// First check if email notification must be sent to caller (bounce message)
 		switch($sBehavior) {
@@ -1147,13 +1149,14 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	public static function AfterUpdateTicket() {
 		
 		$oMailBox = static::GetMailBox();
-		$oEmail = static::GetMail();
 		$oTicket = static::GetTicket();
 		
 		// If there are any TriggerOnMailUpdate defined, let's activate them
 		$aClasses = MetaModel::EnumParentClasses(get_class($oTicket), ENUM_PARENT_CLASSES_ALL);
 		$sClassList = implode(', ', CMDBSource::Quote($aClasses));
 		$oSet_TriggerMailUpdate = new DBObjectSet(DBObjectSearch::FromOQL_AllData("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
+
+		/** @var \Trigger $oTrigger iTop Trigger. */
 		while($oTrigger = $oSet_TriggerMailUpdate->Fetch()) {
 			$oTrigger->DoActivate($oTicket->ToArgs('this'));
 		}
@@ -1233,7 +1236,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 							if ($oAllowedValues->Count() == 1) 	{
 								$oRemoteObj = $oAllowedValues->Fetch();
 								$oTicket->Set($sAttCode, $oRemoteObj->GetKey());
-								static::race("... Setting the mandatory External Key {$sAttCode} to the only allowed value: {$oRemoteObj->GetKey()}");
+								static::Trace("... Setting the mandatory External Key {$sAttCode} to the only allowed value: {$oRemoteObj->GetKey()}");
 							}
 							else {
 								static::Trace("... Cannot apply the stimulus since the attribute {$sAttCode} is mandatory in the target state {$sTargetState} and is neither currently set nor has just one allowed value.");
@@ -1381,7 +1384,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 			
 		}
 		
-		foreach($oEmail->aAttachments as $aAttachment) {
+		foreach($oEmail->aAttachments as $iIndex => $aAttachment) {
 			
 			$bIgnoreAttachment = false;
 			
@@ -1888,7 +1891,7 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Step {
 					case 'do_nothing':
 						
 						// Forbidden attachments? 
-						foreach($oEmail->aAttachments as $aAttachment) { 
+						foreach($oEmail->aAttachments as $iIndex => $aAttachment) { 
 							static::Trace('.. Attachment #'.$iIndex.' MimeType: '.$aAttachment['mimeType']);
 							
 							if(in_array($aAttachment['mimeType'], $aForbiddenMimeTypes) == true) {
@@ -2968,24 +2971,25 @@ abstract class StepAttachmentCriteria extends Step {
 			$iMaxHeight = static::GetStepSetting('image_max_height');
 			
 			static::Trace(".. Min/max dimensions: {$iMinWidth}x{$iMinHeight} / {$iMaxWidth}x{$iMaxHeight}");
-						
-			$bCheckImageDimensionTooSmall = true;
-			$bCheckImageDimensionTooLarge = true;
+
+			// Determine if the conditions must be checked.
+			$bDoCheckIfImageDimensionTooSmall = true;
+			$bDoCheckIfImageDimensionTooLarge = true;
 			
-			// Remove images which are too small
+			// Remove images which are too small.
 			if($iMinWidth < 1 || $iMinWidth < 1) {
 				static::Trace(".. Min dimensions can not be negative and should be at least 1x1 px.");
-				$bCheckTooSmall = false;
+				$bDoCheckIfImageDimensionTooSmall = false;
 			}
 			
 			if($iMaxWidth < 0 || $iMaxHeight < 0) {
 				static::Trace(".. Max dimensions can not be negative.");
-				$bCheckImageDimensionTooLarge = false;
+				$bDoCheckIfImageDimensionTooLarge = false;
 			}
 			
 			if(function_exists('imagecopyresampled') == false) {
 				static::Trace(".. php-gd seems to be missing. Resizing is not possible.");
-				$bCheckImageDimensionTooLarge = false;
+				$bDoCheckIfImageDimensionTooLarge = false;
 			}
 
 
@@ -3007,7 +3011,7 @@ abstract class StepAttachmentCriteria extends Step {
 						$iHeight = $aImgInfo[1];
 						
 						// Image too small?
-						if($bCheckImageDimensionTooSmall == true && ($iWidth < $iMinWidth || $iHeight < $iMinHeight)) {
+						if($bDoCheckIfImageDimensionTooSmall == true && ($iWidth < $iMinWidth || $iHeight < $iMinHeight)) {
 							
 							// Unset
 							static::Trace("... Image too small; unsetting {$sAttachmentRef}");
@@ -3020,7 +3024,7 @@ abstract class StepAttachmentCriteria extends Step {
 						}
 						
 						// Image too large?
-						if($bCheckImageDimensionTooLarge == true && ($iWidth > $iMaxWidth || $iHeight > $iMaxHeight)) {
+						if($bDoCheckIfImageDimensionTooLarge == true && ($iWidth > $iMaxWidth || $iHeight > $iMaxHeight)) {
 							
 							// Resize
 							static::Trace("... Image too large; resizing {$sAttachmentRef}");

@@ -44,7 +44,7 @@ ssl
 novalidate-cert
 ```
 
-### Office 365 / OAuth2
+### Office 365 / OAuth 2.0
 
 * [Combodo's documentation: Configure OAuth2 in iTop](https://www.itophub.io/wiki/page?id=2_7_0%3Aadmin%3Aoauth)
 * [Microsoft documentation: Configuration on Azure / Exchange Online](https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth#use-client-credentials-grant-flow-to-authenticate-imap-and-pop-connections)
@@ -66,6 +66,7 @@ Failed to initialize the mailbox: xxx@xxx.org. Reason: cannot change folder, may
 
 * Verify in Microsoft Entra (Azure) - Apps (the place where you registred the application) whether the 3 APIs mentioned above, are configured for this application.
 * Verify if the mailbox user (linked to the OAuth client) needs proper permissions on the mailbox.
+* Verify if the mailbox folder name is fully correct. It may appear with a different/localized name in Microsoft Outlook.
 
 
 ### Office 365 with shared mailbox
@@ -88,7 +89,7 @@ user=shared@mailbox.org
 * Often Google blocks initial requests. You'll receive an e-mail notification from Google in the inbox to address this. 
 * It will involve enabling 'less secure access'. It takes some time on Google's end before this is active.
 
-### OAuth2
+### OAuth 2.0
 
 * Nothing special here, just check .
 
@@ -176,7 +177,7 @@ If it's a common use case, make a pull request to include it.
 
 ### Email Size
 
-* **Use case:** email size is too big (often related to PHP or MySQL limits)
+* Use case: The e-mail size is too big (often related to PHP or MySQL limits).
 * **Policy violation behavior**
   * Bounce to sender and delete
   * Bounce to sender and mark as undesired
@@ -186,11 +187,11 @@ If it's a common use case, make a pull request to include it.
   * Mark as undesired
 * **Bounce subject**
 * **Bounce message**
-* **Max size (MB)** - default is 10 MB
+* **Max size (MB)** - The default limit is 10 MB.
  
-### Attachment - forbidden mime types
+### Attachment - Forbidden mime types
 
-* Use case: you might not want .exe attachments
+* Use case: You might not want .exe attachments
 * **Policy violation behavior**
   * Bounce to sender and delete
   * Bounce to sender and mark as undesired
@@ -201,16 +202,19 @@ If it's a common use case, make a pull request to include it.
   * Mark as undesired
 * **Bounce subject**
 * **Bounce message**
-* **MIME Types** - one per line. Example: application/exe
+* **MIME Types** - One per line. Example: application/exe
 	
 ### Attachment - image dimensions
 
-* Use case: ignoring images which are too small (likely part of email signatures) or resize images which are too big.
-* Requires php-gd
+* Use case: Ignoring images which are too small (likely part of email signatures) or resize images which are too big. Resizing requires the php-gd extension).
 * **Min width**
 * **Max width**
 * **Min height**
 * **Max height**
+
+Only inline images are processed.
+
+If the e-mail points to external images, they are not processed by this policy.
  
 ### No subject
 
