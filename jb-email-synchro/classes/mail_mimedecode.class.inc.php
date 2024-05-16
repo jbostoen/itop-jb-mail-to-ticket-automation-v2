@@ -244,13 +244,15 @@ class Mail_mimeDecode extends PEAR
      * @return object Results of decoding process
      * @access private
      */
-    function _decode($headers, $body, $default_ctype = 'text/plain')
-    {
+    function _decode($headers, $body, $default_ctype = 'text/plain') {
+
         $return = new stdClass;
         $return->headers = array();
         $headers = $this->_parseHeaders($headers);
 
-        foreach ($headers as $value) {
+        // This
+        foreach($headers as $key => $value) {
+
             if (isset($return->headers[strtolower($value['name'])]) AND !is_array($return->headers[strtolower($value['name'])])) {
                 $return->headers[strtolower($value['name'])]   = array($return->headers[strtolower($value['name'])]);
                 $return->headers[strtolower($value['name'])][] = $value['value'];
@@ -261,10 +263,8 @@ class Mail_mimeDecode extends PEAR
             } else {
                 $return->headers[strtolower($value['name'])] = $value['value'];
             }
-        }
+            
 
-        reset($headers);
-        while (list($key, $value) = each($headers)) {
             $headers[$key]['name'] = strtolower($headers[$key]['name']);
             switch ($headers[$key]['name']) {
 
@@ -277,7 +277,8 @@ class Mail_mimeDecode extends PEAR
                     }
 
                     if (isset($content_type['other'])) {
-                        while (list($p_name, $p_value) = each($content_type['other'])) {
+                        
+                        foreach($content_type['other'] as $p_name => $p_value) {
                             $return->ctype_parameters[$p_name] = $this->_decodeHeader($p_value);
                         }
                     }
@@ -285,9 +286,9 @@ class Mail_mimeDecode extends PEAR
 
                 case 'content-disposition':
                     $content_disposition = $this->_parseHeaderValue($headers[$key]['value']);
-                    $return->disposition   = $content_disposition['value'];
+                    $return->disposition = $content_disposition['value'];
                     if (isset($content_disposition['other'])) {
-                        while (list($p_name, $p_value) = each($content_disposition['other'])) {
+                       foreach($content_disposition['other'] as $p_name => $p_value) {
                             $return->d_parameters[$p_name] = $this->_decodeHeader($p_value);
                         }
                     }
@@ -297,9 +298,10 @@ class Mail_mimeDecode extends PEAR
                     $content_transfer_encoding = $this->_parseHeaderValue($headers[$key]['value']);
                     break;
             }
-        }
 
-        if (isset($content_type)) {
+        }
+        
+        if(isset($content_type)) {
             switch (strtolower($content_type['value'])) {
                 case 'text/plain':
                     $encoding = isset($content_transfer_encoding) ? $content_transfer_encoding['value'] : '7bit';
@@ -355,11 +357,14 @@ class Mail_mimeDecode extends PEAR
                     break;
             }
 
-        } else {
+        } 
+        else {
+            
             $ctype = explode('/', $default_ctype);
             $return->ctype_primary   = $ctype[0];
             $return->ctype_secondary = $ctype[1];
             $this->_include_bodies ? $return->body = ($this->_decode_bodies ? $this->_decodeBody($body) : $body) : null;
+
         }
 
         return $return;
@@ -433,8 +438,7 @@ class Mail_mimeDecode extends PEAR
      * @return array Contains parsed headers
      * @access private
      */
-    function _parseHeaders($input)
-    {
+    function _parseHeaders($input) {
 
         if ($input !== '') {
             // Unfold the input
@@ -449,9 +453,9 @@ class Mail_mimeDecode extends PEAR
                     $hdr_value = substr($hdr_value, 1);
 
                 $return[] = array(
-                                  'name'  => strtolower($hdr_name),
-                                  'value' => $this->_decode_headers ? $this->_decodeHeader($hdr_value) : $hdr_value
-                                 );
+                    'name'  => strtolower($hdr_name),
+                    'value' => $this->_decode_headers ? $this->_decodeHeader($hdr_value) : $hdr_value
+                );
             }
         } else {
             $return = array();
