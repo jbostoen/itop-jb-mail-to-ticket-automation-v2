@@ -21,6 +21,13 @@
 class MessageFromMailbox extends RawEmailMessage {
 	protected $sUIDL;
 	
+	/**
+	 * Constructs an e-mail message.
+	 *
+	 * @param string $sUIDL
+	 * @param string $sRawHeaders
+	 * @param string $sBody
+	 */
 	public function __construct($sUIDL, $sRawHeaders, $sBody) {
 		$this->sUIDL = $sUIDL;
 		parent::__construct( $sRawHeaders."\r\n".$sBody);

@@ -2898,7 +2898,7 @@ abstract class PolicyFindAdditionalContacts extends Step {
 					elseif($oSet_Person->Count() == 1) {
 						// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
 						$oContact = $oSet_Person->Fetch();
-						$$oEmail->AddRelatedContact($oContact);
+						$oEmail->AddRelatedContact($oContact);
 					}
 					else {
 						// More than one Person returned. Inconclusive. Ignore?
@@ -3010,7 +3010,7 @@ abstract class StepAttachmentCriteria extends Step {
 
 			foreach($oEmail->aAttachments as $sAttachmentRef => &$aAttachment) {
 				
-				static::Trace('... Processing attachment ref {$sAttachmentRef} / MIME type '.$aAttachment['mimeType']);
+				static::Trace('... Processing attachment ref '.$sAttachmentRef.' / MIME type '.$aAttachment['mimeType']);
 							
 				if(static::IsImage($aAttachment['mimeType']) == true) {
 					

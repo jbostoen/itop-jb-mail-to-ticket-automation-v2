@@ -44,7 +44,6 @@ function GetMailboxContent($oPage, $oInbox) {
 		
 		$iStartIndex = utils::ReadParam('start', 0);
 		$iMaxCount = utils::ReadParam('count', 10);
-		$iMsgCount = 0;
 		
 		try {
 			
@@ -169,7 +168,7 @@ function GetMailboxContent($oPage, $oInbox) {
 					}
 					else {
 						
-						$iMsgOkCount++;
+						$iMsgOkCount =+ 1;
 						$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
 
 						// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true

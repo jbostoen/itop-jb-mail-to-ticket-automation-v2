@@ -27,6 +27,9 @@ class IMAPOAuthEmailSource extends EmailSource {
 	protected $sTargetFolder;
 	protected $sMailbox;
 
+	protected $iPort;
+	protected $oMailbox;
+
 	/**
 	 * Constructor.
 	 *
