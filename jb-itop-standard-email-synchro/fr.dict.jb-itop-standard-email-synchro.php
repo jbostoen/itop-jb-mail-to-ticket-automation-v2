@@ -123,7 +123,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_mimetypes' => 'Types MIME (un par ligne)',
 	
 	// Policy: attachment - ignore MIME type
-	'Class:MailInboxStandard/Attribute:step_attachment_ignore_mimetypes' => 'Ignore MIME Types (one per line)',
+	'Class:MailInboxStandard/Attribute:step_attachment_ignore_mimetypes' => 'Ignore MIME Types (one per line)~~',
 	
 	// no subject
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior' => 'Comportement en cas d\'infraction',
@@ -240,7 +240,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Pièce jointe - criteria',
 	'MailInbox:PolicyMailSize' => 'Taille de l\'email',
-	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Attachment - Ignored MIME type~~',
+	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Pièce jointe - type MIME ignoré',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Pièce jointe - type MIME interdit',
 	'MailInbox:PolicyUndesiredPattern' => 'Schémas indésirables dans l\'objet',
 	'MailInbox:PolicyRemovePattern' => 'Schémas retirés dans l\'objet',

@@ -100,11 +100,19 @@ class RawEmailMessage {
 	}
 	
 	/**
-	 * Retrieves the address(es) from the originator of the message... tries: From, Sender and Reply-To
+	 * Retrieves the address(es) from the originator of the message.
+	 * 
+	 * It tries so by analyzing the e-mail headers in in the following order:
+	 * 1) "From"
+	 * 2) "Sender"
+	 * 3) "Reply-To".
+	 * 
+	 * See RFC 822, RFC 2822, RFC 5322 which allows this.
+	 * In the real world, it's rather rare though.
 	 *
-	 * @return array An array of ('email' => email_address, 'name' => display_name) one per 'sender'
+	 * @return \EmailRecipient[] one per sender.
 	 */
-	public function GetSender() {
+	public function GetSender() : Array {
 		$sSender = $this->GetHeader('from');
 		if(empty($sSender)) {
 			$sSender = $this->GetHeader('sender');
@@ -119,7 +127,7 @@ class RawEmailMessage {
 	 * Retrieves the address(es) from the recipient of the message... "To". Note that in some cases
 	 * there is no 'email', just a description like "undisclosed recipients"
 	 *
-	 * @return array An array of ('email' => email_address, 'name' => display_name) one per recipient
+	 * @return \EmailRecipient[] An array of recipients.
 	 */
 	public function GetTo() {
 		return self::ParseAddresses($this->GetHeader('to'));
@@ -128,7 +136,7 @@ class RawEmailMessage {
 	/**
 	 * Retrieves the address(es) from the recipient in copy of the message... "CC".
 	 *
-	 * @return array An array of ('email' => email_address, 'name' => display_name) one per recipient
+	 * @return \EmailRecipient[] An array of recipients.
 	 */
 	public function GetCc() {
 		return self::ParseAddresses($this->GetHeader('cc'));
@@ -760,7 +768,7 @@ class RawEmailMessage {
 	 *
 	 * @param string $sAddresses The whole list of addresses as read from the email header
 	 *
-	 * @return array An array of ('name' => friendly_name, 'email' => email_address)
+	 * @return \EmailRecipient[] An array of e-mail recipients.
 	 */
 	protected static function ParseAddresses($sAddresses) {
 		$sTextQualifier = '"';
@@ -807,7 +815,7 @@ class RawEmailMessage {
 	 *
 	 * @param string $sAddress The address to split
 	 *
-	 * @return array An array of ('name' => friendly_name, 'email' => email_address)
+	 * @return \EmailRecipient An e-mail recipient.
 	 */
 	protected static function ExtractAddressPieces($sAddress) {
 		$sAddress = trim($sAddress);
@@ -843,7 +851,7 @@ class RawEmailMessage {
 				}
 			}
 		}
-		return array('name' => $sName, 'email' => $sEmail);
+		return new EmailRecipient($sEmail, $sName);
 	}
 
 	/**
@@ -853,4 +861,46 @@ class RawEmailMessage {
 		return array();
 	}
 	
+}
+
+/**
+ * Class EmailRecipient. An e-mail recipient.
+ */
+class EmailRecipient {
+
+	private $sEmailAddress;
+
+	private $sName;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param String $sEmailAddress The e-mail address of the recipient.
+	 * @param String $sName The display name of the recipient.
+	 * 
+	 * @return void
+	 */
+	public function __construct(String $sEmailAddress, String $sName) {
+		$this->sEmailAddress = $sEmailAddress;
+		$this->sName = $sName;
+	}
+
+	/**
+	 * Returns the e-mail address of the recipient.
+	 *
+	 * @return \String
+	 */
+	public function GetEmailAddress() {
+		return $this->sEmailAddress;
+	}
+
+	/**
+	 * Returns the display name of the recipient.
+	 *
+	 * @return \String
+	 */
+	public function GetName() {
+		return $this->sName;
+	}
+
 }

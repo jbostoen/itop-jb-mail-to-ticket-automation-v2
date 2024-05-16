@@ -43,9 +43,7 @@ use \UserRights;
 use \EmailMessage;
 use \EmailProcessor;
 use \EmailSource;
-use \MailInboxBase;
 use \MailInboxStandard;
-
 
 // iTop classes
 use \lnkContactToTicket;
@@ -383,24 +381,32 @@ abstract class Step implements iStep {
 	}
 	
 	/**
-	 * For logging information about the processing of emails.
-	 *
-	 * @param \Array $aRecipients Hash table of recipients ('name', 'email')
+	 * Returns the e-mail addresses of all recipients in the original e-mail.
 	 *
 	 * @return \String[]
-	 *
-	 * @todo move this to helper
 	 */
-	public static function GetAddressesFromRecipients($aRecipients) {
+	public static function GetRecipientAddresses() {
+
+		// @todo Fix this!
+
+		/** @var \RawEmailMessage $oRawEmail Raw e-mail message. */
+		$oRawEmail = static::GetRawMail();
+
+		/** @var \EmailRecipient[] $aRecipients An array of recipients. */
+		$aRecipients = array_merge($oRawEmail->GetTo(), $oRawEmail->GetCc());
+
+		/** @var \String[] $aAddresses An array of e-mail addresses. */
 		$aAddresses = [];
-		foreach($aRecipients as $aRecipient) {
-			$aAddresses[] = $aRecipient['email'];
+
+		foreach($aRecipients as $aRecipient ) {
+			$aAddresses[] = $aRecipient->GetEmailAddress();
 		}
 		return $aAddresses;
+
 	}
 	
 	/**
-	 * Returns an array containing the e-mail aliases, including the primary e-mail address.
+	 * Returns an array containing the e-mail aliases of the mailbox, including the primary e-mail address.
 	 *
 	 * @return \String[]
 	 */
@@ -408,11 +414,14 @@ abstract class Step implements iStep {
 		
 		$oMailBox = static::GetMailBox();
 		
+		// Retrieve the configured aliases.
 		$sMailBoxAliases = $oMailBox->Get('mail_aliases');
 		$aMailBoxAliases = (trim($sMailBoxAliases) == '' ? [] : preg_split(NEWLINE_REGEX, $sMailBoxAliases));
+
+		// Also retrieve the actual mailbox.
 		$aMailBoxAliases[] = $oMailBox->Get('login');
 		
-		return $aMailBoxAliases;
+		return array_unique($aMailBoxAliases);
 		
 	}
 	
@@ -2096,9 +2105,8 @@ abstract class PolicyBounceOtherRecipients extends Step {
 		
 		// Checking if there are no other recipients mentioned.
 		
-			$sCallerEmail = $oEmail->sCallerEmail;
-								
 			// Take both the To: and CC:
+			/** @var \EmailRecipient[] $aAllContacts All contacts (except BCC). */
 			$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
 			
 			// Mailbox aliases
@@ -2118,9 +2126,9 @@ abstract class PolicyBounceOtherRecipients extends Step {
 				case 'delete':
 				case 'mark_as_undesired':
 				
-					foreach($aAllContacts as $aContactInfo) {
+					foreach($aAllContacts as $oRecipient) {
 						
-						$sCurrentEmail = $aContactInfo['email'];
+						$sCurrentEmail = $oRecipient->GetEmailAddress();
 						
 						foreach($aAllowedContacts as $sPattern) {
 							
@@ -2146,7 +2154,7 @@ abstract class PolicyBounceOtherRecipients extends Step {
 						}
 						
 						// Did not match caller e-mail or any alias of this helpdesk mailbox
-						static::Trace(".. Undesired: at least one other recipient (missing alias or unwanted other recipient): {$aContactInfo['email']}");
+						static::Trace(".. Undesired: at least one other recipient (missing alias or unwanted other recipient): {$oRecipient->GetEmailAddress()}");
 						static::HandleViolation();
 						return;
 						
@@ -2566,13 +2574,14 @@ abstract class PolicyFindCaller extends Step {
 		
 		$oMailBox = static::GetMailBox();
 		$oEmail = static::GetMail();
+		$oRawEmail = static::GetRawMail();
 		$oCaller = $oEmail->GetSender();
 		
 		// Checking if there's an unknown caller
 		
 			if($oCaller === null) {
 				
-				$sCallerEmail = $oEmail->sCallerEmail;
+				$sCallerEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
 				static::Trace("... Determine caller: Person with email '{$sCallerEmail}'");
 				
 				$oCaller = null;
@@ -2639,14 +2648,14 @@ abstract class PolicyFindCaller extends Step {
 										// This is an actual error.
 										static::Trace("... Failed to create a Person for the email address '{$sCallerEmail}'.");
 										static::Trace($e->getMessage());
-										$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oEmail->oRawEmail);
+										$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oRawEmail);
 										return;
 									}
 
 								}
 								else {
 									static::Trace('... Default values are missing. Can not create contact.');
-									$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oEmail->oRawEmail);
+									$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oRawEmail);
 									return;
 								}
 								
@@ -2665,7 +2674,7 @@ abstract class PolicyFindCaller extends Step {
 						
 				}
 				
-				// Set caller for email
+				// Set caller for e-mail.
 				$oEmail->SetSender($oCaller);
 				
 			}
@@ -2792,6 +2801,7 @@ abstract class PolicyFindAdditionalContacts extends Step {
 		$sCallerEmail = $oEmail->sCallerEmail;
 							
 		// Take both the To: and CC:
+		/** @var \EmailRecipient[] All e-mail recipients in To: and CC: */
 		$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
 		
 		// Mailbox aliases
@@ -2823,10 +2833,10 @@ abstract class PolicyFindAdditionalContacts extends Step {
 			case 'fallback_add_other_contacts':
 		
 				// Loop over all contacts again to have access to the 'email' and 'name'.
-				foreach($aAllContacts as $aRecipient) {
+				foreach($aAllContacts as $oRecipient) {
 					
-					$sRecipientEmail = $aRecipient['email'];
-					$sRecipientName = $aRecipient['name'];
+					$sRecipientEmail = $oRecipient->GetEmailAddress();
+					$sRecipientName = $oRecipient->GetName();
 					
 					// Is this an e-mail address that should be ignored?
 					if(in_array(strtolower($sRecipientEmail), $aExcludedAddresses) == true) {

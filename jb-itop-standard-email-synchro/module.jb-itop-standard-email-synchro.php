@@ -29,7 +29,6 @@ SetupWebPage::AddModule(
 		'datamodel' => array(
 			'model.jb-itop-standard-email-synchro.php',
 			'core/steps.php',
-			// 'core/policy.contactmethod.class.inc.php',
 		),
 		'webservice' => array(
 			

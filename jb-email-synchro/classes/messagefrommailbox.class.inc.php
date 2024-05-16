@@ -41,13 +41,13 @@ class MessageFromMailbox extends RawEmailMessage {
 	 *
 	 * @param string $sPreferredDecodingOrder
 	 *
-	 * @return EmailMessage
+	 * @return \EmailMessage
 	 */
 	public function Decode($sPreferredDecodingOrder = 'text/plain,text/html') {
 		$sMessageId = $this->GetMessageId();
 		$aCallers = $this->GetSender();
 		if(count($aCallers) > 0) {
-			$sCallerEmail = $aCallers[0]['email'];
+			$sCallerEmail = $aCallers[0]->GetEmailAddress();
 			$sCallerName = $this->GetCallerName();
 		}
 		else {
@@ -111,20 +111,21 @@ class MessageFromMailbox extends RawEmailMessage {
 	protected function GetMSThreadIndex() {
 		return $this->GetHeader('thread-index');
 	}
-	 
+
 	protected function GetCallerName() {
+		
 		$aSender = $this->GetSender();
 		$sName = '';
 		
 		if(count($aSender) > 0) {
-			if(!empty($aSender[0]['name'])) {
-				$sName = $aSender[0]['name'];
+			if(!empty($aSender[0]->GetName())) {
+				$sName = $aSender[0]->GetName();
 				if(preg_match("/.+ \(([^\)]+) at [^\)]+\)$/", $sName, $aMatches)) {
 					$sName = $aMatches[1];	
 				}			
 			}
 			else {
-				if(preg_match("/^([^@]+)@.+$/", $aSender[0]['email'], $aMatches)) {
+				if(preg_match("/^([^@]+)@.+$/", $aSender[0]->GetEmailAddress(), $aMatches)) {
 					$sName = $aMatches[1]; // Use the first part of the email address before the @
 				}
 			}
