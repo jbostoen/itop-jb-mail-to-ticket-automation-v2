@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright (c) 2019-2024 Jeffrey Bostoen
+ * @copyright   Copyright (c) 2020-2024 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
  * @version     2.7.240524
  *
@@ -20,3 +20,4 @@
 // This file remains in the module's template only for the cases where there is:
 // - either no new class or menu defined in the XML file
 // - or no XML file at all supplied by the module
+

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension format="1.0">
-	<extension_code>jb-mail-to-ticket-automation-v2</extension_code>
+	<extension_code><![CDATA[jb-mail-to-ticket-automation-v2-contactmethod]]></extension_code>
 	<company></company>
 	<author><![CDATA[Jeffrey Bostoen]]></author>
-	<label><![CDATA[Feature: Mail to Ticket Automation]]></label>
-	<description><![CDATA[Scan several mailboxes to create or update tickets.]]></description>
+	<label><![CDATA[Feature: Mail to Ticket Automation - Find contacts by contact method / e-mail alias]]></label>
+	<description><![CDATA[Additional attempts to find a contacts by their contact methods and/or e-mail aliases.]]></description>
 	<version>2.7.240524</version>
 	<release_date>2024-05-24</release_date>
 	<version_description><![CDATA[]]></version_description>

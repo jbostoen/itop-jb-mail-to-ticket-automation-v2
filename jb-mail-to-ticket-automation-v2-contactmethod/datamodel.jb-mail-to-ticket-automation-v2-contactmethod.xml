@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<itop_design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.7">
+	<classes>
+		<class id="MailInboxStandard">
+			<!-- 
+                Note: These methods are unused and should remain unused. 
+                They're defined here only to ensure Combodo's email alias extension can be installed.
+            -->
+            <methods>
+				<method id="FindCaller" _delta="define_if_not_exists">
+				<comment/>
+				<static>false</static>
+				<access>protected</access>
+				<type>Overload-DBObject</type>
+				<code><![CDATA[	protected function FindCaller($sEmail)
+			{
+				
+			}]]></code>
+				</method>
+				<method id="FindAdditionalContact" _delta="define_if_not_exists">
+				<comment/>
+				<static>false</static>
+				<access>protected</access>
+				<type>Overload-DBObject</type>
+				<code><![CDATA[	protected function FindAdditionalContact($sEmail)
+			{
+				
+			}]]></code>
+				</method>
+			</methods>
+        </class>
+    </classes>
+</itop_design>

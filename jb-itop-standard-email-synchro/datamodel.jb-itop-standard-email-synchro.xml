@@ -1043,27 +1043,6 @@ EOF
 		return $sReturn;
 	}]]></code>
 			</method>
-				<!-- Note: These methods are unused and should remain unused. They're here for compatibility with Combodo's email alias extension. -->
-				<method id="FindCaller" _delta="redefine">
-				<comment/>
-				<static>false</static>
-				<access>protected</access>
-				<type>Overload-DBObject</type>
-				<code><![CDATA[	protected function FindCaller($sEmail)
-			{
-				
-			}]]></code>
-				</method>
-				<method id="FindAdditionalContact" _delta="redefine">
-				<comment/>
-				<static>false</static>
-				<access>protected</access>
-				<type>Overload-DBObject</type>
-				<code><![CDATA[	protected function FindAdditionalContact($sEmail)
-			{
-				
-			}]]></code>
-				</method>
 			</methods>
 			<presentation>
 				<details>
