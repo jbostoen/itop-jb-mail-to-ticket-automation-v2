@@ -776,7 +776,10 @@ abstract class StepCreateOrUpdateTicket extends Step {
 			static::Trace(".. Ticket ".$oTicket->GetName()." created.");
 		}
 		catch(Exception $e) {
-			static::Trace("... Ticket {$oTicket->GetName()} might not be properly created or something else went wrong (for instance: notifications).");
+			// Known issues:
+			// - Incorrect related contacts
+			// - E-mail notifications (?)
+			static::Trace("... Ticket {$oTicket->GetName()} could not be created.");
 			static::Trace($e->GetMessage()); // Add actual error message (if available)
 			throw new Exception('Ticket creation failed');
 		}
@@ -1107,10 +1110,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 			$aExistingContacts[] = $oLnk->Get('contact_id');
 		}
 
-		// (Different) policies may have accidentally added contacts multiple times, even if they are supposed to check this.
-		$oEmail->aInternal_Additional_Contacts = array_unique($oEmail->aInternal_Additional_Contacts, SORT_REGULAR);
-
-		foreach($oEmail->aInternal_Additional_Contacts as $oContact) {
+		foreach($oEmail->GetRelatedContacts() as $oContact) {
 			
 			$sContactName = $oContact->GetName();
 				

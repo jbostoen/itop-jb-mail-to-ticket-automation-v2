@@ -49,7 +49,7 @@ class EmailMessage {
 	/**
 	 * @var \Person[] $aInternal_Additional_Contacts Zero or more Person objects.
 	 */
-	public $aInternal_Additional_Contacts = [];
+	private $aInternal_Additional_Contacts = [];
 	
 	/**
 	 * @var \Person $oInternal_Contact An iTop person (the caller of the ticket).
@@ -469,21 +469,17 @@ class EmailMessage {
 	 */
 	public function AddRelatedContact(Person $oPerson) {
 
-		$this->aInternal_Additional_Contacts[] = $oPerson;
+		$aCurrentIds = array_map(function($oPerson) {
+			return $oPerson->GetKey();
+		}, $this->aInternal_Additional_Contacts);
+
+		// Safety check to ensure contacts are unique.
+		if(in_array($oPerson->GetKey(), $aCurrentIds) == false) {
+			$this->aInternal_Additional_Contacts[] = $oPerson;
+		}
 
 	}
-
-	/**
-	 * Gets recipients. This includes (if identified, and eligible) recipients, but not the sender.
-	 * 
-	 * @return \Person[] Array of related person objects.
-	 */
-	public function GetRecipients() {
-
-		return $this->aInternal_Additional_Contacts;
-
-	}
-
+	
 	/**
 	 * Gets related contacts. This includes (if identified, and eligible) the sender and recipients.
 	 * 
