@@ -34,7 +34,8 @@ abstract class StepSaveEmailsToPath extends Step {
 	 */
 	public static function Execute() {
 		
-		$oRawEmail = static::GetMail();
+		/** @var \RawEmailMessage $oEmail */
+		$oRawEmail = static::GetRawMail();
 		
 		// Add some logic for file name. Mind time zones!
 		$sDateTime = strtotime($oRawEmail->GetHeader('date'));

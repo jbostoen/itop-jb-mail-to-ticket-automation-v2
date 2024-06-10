@@ -92,14 +92,18 @@ abstract class EmailSource
 	abstract public function Disconnect();
 
 	/**
-	 * Workaround for some email servers (like GMail and MS Office 365) where the UID may change between two sessions, so let's use the MessageID
-	 * as a replacement for the UID !
+	 * Returns the value of the "use_message_id_as_uid" setting.
+	 * 
+	 * For some e-mail providers such as Microsoft Outlook 365 and GMail, it's recommended to set this setting to "true".  
+	 * With those e-mail providers, the UID may change between two sessions, which makes it an unreliable value.  
+	 * Instead, when enabled, the Message-Id can be used instead to uniquely identify a message.
 	 *
-	 * Note that it is possible to receive twice a message with the same MessageID, but since the content of the message
-	 * will be the same, it's a safe to process such messages only once...
-	 *
-	 * BEWARE: Make sure that you empty the mailbox before toggling this setting in the config file, since all the messages
-	 *    present in the mailbox at the time of the toggle will be considered as "new" and thus processed again.
+	 * Notes:
+	 * - It's possible to receive twice a message with the same Message-Id (or the message gets copied).
+	 *   Since the contents of the message will be the same, it's a safe to process such messages only once...
+	 * - When changing this setting in the configuration file, 
+	 *   all the messages present in the mailbox will be considered as "new" and thus processed again.  
+	 * - Some e-mail providers do not return a "Message-Id" property.
 	 *
 	 * @return boolean
 	 * @uses `use_message_id_as_uid` config parameter

@@ -139,8 +139,8 @@ class IMAPEmailSource extends EmailSource {
 
 		$aOverviews = imap_fetch_overview($this->rImapConn, 1+$index);
 		$oOverview = array_pop($aOverviews);
+		$bUseMessageId = static::UseMessageIdAsUid() && property_exists($oOverview, 'message_id');
 
-		$bUseMessageId = static::UseMessageIdAsUid();
 		if($bUseMessageId) {
 			$oOverview->uid = $oOverview->message_id;
 		}
@@ -215,6 +215,7 @@ class IMAPEmailSource extends EmailSource {
 	 	$oInfo = imap_check($this->rImapConn);
         if(($oInfo !== false) && ($oInfo->Nmsgs > 0)) {
         	$sRange = "1:".$oInfo->Nmsgs;
+
 			// Workaround for some email servers (like GMail!) where the UID may change between two sessions, so let's use the
 			// MessageID as a replacement for the UID.
 			// Note that it is possible to receive a message with the same MessageID two times, but since the content of the message

@@ -2,14 +2,12 @@
 
 namespace Combodo\iTop\Extension\Service;
 
-use \Combodo\iTop\Extension\Helper\ImapOptionsHelper;
 use \Combodo\iTop\Extension\Helper\MessageHelper;
 use \Combodo\iTop\Extension\Helper\ProviderHelper;
 use \EmailSource;
 use \Exception;
 use \IssueLog;
 use \MessageFromMailbox;
-use \MetaModel;
 
 class IMAPOAuthEmailSource extends EmailSource {
 	
@@ -103,8 +101,6 @@ class IMAPOAuthEmailSource extends EmailSource {
 
 	public function GetMessage($index) {
 		
-		$bUseMessageId = static::UseMessageIdAsUid();
-		
 		$iOffsetIndex = 1 + $index;
 		$sUIDL = $this->oStorage->getUniqueId($iOffsetIndex);
 		
@@ -129,7 +125,7 @@ class IMAPOAuthEmailSource extends EmailSource {
 			
 		}
 		
-		$sUIDL = ($bUseMessageId == true ? $oMail->getHeader('message-id', 'string') : $sUIDL);
+		$sUIDL = (static::UseMessageIdAsUid() == true && MessageHelper::GetMessageId($oMail) != '' ? MessageHelper::GetMessageId($oMail) : $sUIDL);
 		
 		$oNewMail = new MessageFromMailbox($sUIDL, $oMail->getHeaders()->toString(), $oMail->getContent());
 		$this->oMailbox->Trace(__METHOD__." End GetMessage $iOffsetIndex for $this->sServer");
