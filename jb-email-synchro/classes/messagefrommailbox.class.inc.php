@@ -24,12 +24,14 @@ class MessageFromMailbox extends RawEmailMessage {
 	/**
 	 * Constructs an e-mail message.
 	 *
-	 * @param string $sUIDL
+	 * @param string $sUIDL The UIDL of this message.
 	 * @param string $sRawHeaders
 	 * @param string $sBody
 	 */
 	public function __construct($sUIDL, $sRawHeaders, $sBody) {
-		$this->sUIDL = $sUIDL;
+
+		// The message will take a raw UIDL, which could be a raw and encoded e-mail header.
+		$this->sUIDL = $this->DecodeHeaderString($sUIDL);
 		parent::__construct( $sRawHeaders."\r\n".$sBody);
 	}
 	

@@ -192,7 +192,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		
 		foreach(self::$aEmailProcessors as $sProcessorClass) {
 			
-			/** @var \EmailProcessor $oProcessor */
+			/** @var \MailInboxesEmailProcessor $oProcessor */
 			$oProcessor = new $sProcessorClass();
 			$aSources = $oProcessor->ListEmailSources();
 			
@@ -268,10 +268,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						// In case of POP3 (no longer supported) or other protocols
 						// No sorting
 					}
-					
-					// @todo The following 2 lines don't seem to be used anymore?
-					$iStart = 0;
-					$iEnd = ($iMsgCount - 1); // $iMsgCount will already be positive, no additional check needed
 					
 					// Get the corresponding EmailReplica object for each message
 					$aUIDLs = array();

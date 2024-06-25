@@ -144,7 +144,6 @@ class IMAPEmailSource extends EmailSource {
 		if($bUseMessageId) {
 			$oOverview->uid = $oOverview->message_id;
 		}
-
 		return new MessageFromMailbox($oOverview->uid, $sRawHeaders, $sBody);
 	}
 
