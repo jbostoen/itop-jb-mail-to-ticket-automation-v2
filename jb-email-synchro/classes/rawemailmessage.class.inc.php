@@ -520,9 +520,9 @@ class RawEmailMessage {
 				}
 			}
 			else {
-				// the current header continues on this line
+				// The current header continues on this line.
 				if(isset($aRawFields[$sCurrentHeader])) {
-					// Fix for long subjects where spaces get lost on split header lines. At the moment, Combodo's version doesn't have this.
+					// Fix for long subjects where spaces get lost on split header lines.
 					$aRawFields[$sCurrentHeader] .= (in_array($sCurrentHeader, ['references', 'subject']) == true ? $sLine : substr($sLine, 1));
 				}
 			}

@@ -175,7 +175,7 @@ class MessageFromMailbox extends RawEmailMessage {
 	protected function ParseMessageId($sMessageId) {
 		$aMatches = array();
 		$ret = false;
-		if (preg_match('/^<iTop_(.+)_([0-9]+)_.+@.+openitop\.org>$/', $sMessageId, $aMatches))
+		if (preg_match('/^<iTop_(.+)_([0-9]+)(?:_.+)?@.+openitop\.org>$/', $sMessageId, $aMatches))
 		{
 			$ret = array('class' => $aMatches[1], 'id' => $aMatches[2]);
 		}
