@@ -32,7 +32,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:behavior/Value:both' => 'Create or Update Tickets',
 
 	'Class:MailInboxStandard/Attribute:email_storage' => 'After processing the e-mail',
-	'Class:MailInboxStandard/Attribute:email_storage/Value:keep' => 'Keep it on the mail server',
+	'Class:MailInboxStandard/Attribute:email_storage+' => 'Action to take after processing the e-mail. For best performance: if archiving is desired, it is recommended to move successfully processed e-mails to another folder.',
+	'Class:MailInboxStandard/Attribute:email_storage/Value:keep' => 'Keep it in the same folder',
 	'Class:MailInboxStandard/Attribute:email_storage/Value:delete' => 'Delete it immediately',
 	'Class:MailInboxStandard/Attribute:email_storage/Value:move' => 'Move to another folder',
 

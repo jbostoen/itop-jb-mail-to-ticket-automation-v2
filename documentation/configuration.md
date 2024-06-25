@@ -139,7 +139,10 @@ uidl
 ## Behavior on Incoming emails
 
 * **Policy violation behavior** - Only create new tickets, only update existing tickets; or do both.
-* **After processing the email** - Delete the e-mail right away, keep the e-mail on the mail server in the same folder or move to a different folder.
+* **After processing the email** - Options:
+  * Delete the e-mail right away. Best for clean-up.
+  * Keep the e-mail on the mail server in the same folder. Will slow down processing, as iTop needs to go over each e-mail every time.
+  * Move to a different folder. Best for archiving purposes.
 * **Ticket Class** - Which ticket class (see iTop data model, usually UserRequest)
 * **Ticket Default Values** - Default values for tickets (see iTop data model, example below).
 * **Title Pattern** - Pattern which will be used to match tickets based on a reference. Example: /R-([0-9]{6})/
