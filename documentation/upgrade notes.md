@@ -3,8 +3,17 @@
 Backward compatibility is something that is important.  
 However, some upgrades might break things because technology or use cases change.  
 
-A best practice before upgrading this extension, is to remove all e-mail messages which were already processed from the mailbox folders that are still configured in iTop.  
-Otherwise, it is possible in some situations that they are processed again; resulting in duplicate tickets or log entries in existing tickets.
+A **best practice** before upgrading this extension:  
+Remove all e-mail messages that were already successfully processed from the mailbox folders that are still configured in iTop.  
+Otherwise, it is possible in some situations that they are processed again.  
+This could result in duplicate tickets or log entries in existing tickets.
+
+
+## Upgrading from before 2.7.240625?
+
+There has been a small change in the internal processing of an e-mail's UIDL.  
+See the best practice on top to avoid duplicate tickets or log entries.
+
 
 ## Upgrading from before 2.7.230324?
 
