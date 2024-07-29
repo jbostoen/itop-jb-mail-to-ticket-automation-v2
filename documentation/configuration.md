@@ -408,18 +408,3 @@ $recipient->name$
 * **Patterns to remove from subject** - (regex patterns, one per line)
 
 
-
-
-# Troubleshoot
-
-## HTML e-mails are processed as plain text (Exchange servers - on premises)
-
-Solution provided by Dejan Skubic for Exchange (on premises) editions:
-
-Run these commands in PowerShell:
-``` 
-Set-CASMailbox -Identity 'mailboxusername' -ImapUseProtocolDefaults $false
-Set-CASMailbox -Identity 'mailboxusername' -ImapMessagesRetrievalMimeFormat HtmlOnly
- ```
- 
-

@@ -234,7 +234,7 @@ abstract class Step implements iStep {
 	/**
 	 * Gets the e-mail source.
 	 *
-	 * @return \MailInboxStandard
+	 * @return \EmailSource The e-mail source.
 	 */
 	public static function GetMailSource() {
 		
@@ -534,6 +534,17 @@ abstract class Step implements iStep {
 		static::Trace('.. Set next action for EmailProcessor to '.EmailProcessor::GetActionFromCode($iNextAction));
 		$oMailBox->SetNextAction($iNextAction);
 		
+	}
+
+	/**
+	 * Whether the step is applicable.
+	 * 
+	 * @return bool
+	 */
+	public static function IsApplicable() {
+		
+		return true;
+
 	}
 	
 }
@@ -1582,6 +1593,16 @@ abstract class StepMatchByInReplyToOrReferences extends Step {
 	/**
 	 * @inheritDoc
 	 */
+	public static function IsApplicable() {
+
+		$oSource = static::GetMailSource();
+		return $oSource::UseMessageIdAsUid();
+		
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public static function Execute() {
 		
 		
@@ -1626,8 +1647,12 @@ abstract class StepMatchByInReplyToOrReferences extends Step {
 			return;
 			
 			}
-			
-		$aReferences = array_unique($aReferences);
+
+		// In the wild, it was observed that In-Reply-To is sometimes set - but empty, e.g.:
+		// In-Reply-To: <>
+		$aReferences = array_unique(array_diff($aReferences, ['']));
+		
+
 		static::Trace('.. '.count($aReferences).' references: '.implode(', ', $aReferences));
 		
 		// Safety measure to enforce Message-ID to only be 255 characters. Should be safe enough. This is assumed by Combodo's implementation as well.
@@ -1642,6 +1667,7 @@ abstract class StepMatchByInReplyToOrReferences extends Step {
 		$oSetLinks = new DBObjectSet($oFilterLinks);
 		
 		$aTicketIds = [-1];
+
 		$aKnownReferences = [];
 		
 		while($oLink = $oSetLinks->Fetch()) {
@@ -1649,7 +1675,7 @@ abstract class StepMatchByInReplyToOrReferences extends Step {
 			$aKnownReferences[] = $oLink->Get('message_uid');
 		}
 		
-		// Store the not found referenced as new references, so they can be saved once the ticket is known.
+		// Store the referenced that were NOT found, as new references; so they can be saved once the ticket is known.
 		StepSaveReferences::$aNewUIDLs = array_diff($aReferences, $aKnownReferences);
 
 		if($oTicket === null) {
@@ -1718,6 +1744,16 @@ abstract class StepSaveReferences extends Step {
 	 * @var \String[] $aUIDLs Array of previously unknown references in the e-mail message.
 	 */
 	public static $aNewUIDLs = [];
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function IsApplicable() {
+
+		$oSource = static::GetMailSource();
+		return $oSource::UseMessageIdAsUid();
+		
+	}
 	
 	/**
 	 * @inheritDoc

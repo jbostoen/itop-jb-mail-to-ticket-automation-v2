@@ -61,7 +61,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		self::$iMaxEmailSize = utils::ConvertToBytes($sMaxEmailSize);
 		
 		
-		// Build filtered list of policy classes only once per process execution.
+		// Build a filtered list of classes. Do so only once per process execution.
 		EmailProcessor::$aAvailableStepClasses = [];
 
 		foreach(get_declared_classes() as $sClassName) {
@@ -236,21 +236,24 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					// Start from pre-filtered class names.
 					foreach(EmailProcessor::$aAvailableStepClasses as $sClassName) {
 					
-						// Policies can easily be turned off.
-						// 'inactive' means the policy can be skipped altogether.
-						// 'do_nothing' means the policy should still be processed, but the policy itself shouldn't have any influence.
-						$sAttCode = $sClassName::GetXMLSettingsPrefix().'_behavior';
-						
-						if(MetaModel::IsValidAttCode(get_class($oInbox), $sAttCode) == false) {
+						if($sClassName::IsApplicable() == true) {
+								
+							// Policies can easily be turned off.
+							// 'inactive' means the policy can be skipped altogether.
+							// 'do_nothing' means the policy should still be processed, but the policy itself shouldn't have any influence.
+							$sAttCode = $sClassName::GetXMLSettingsPrefix().'_behavior';
+							if(MetaModel::IsValidAttCode(get_class($oInbox), $sAttCode) == false) {
 
-							EmailProcessor::$aActiveStepClasses[] = $sClassName;
+								EmailProcessor::$aActiveStepClasses[] = $sClassName;
+								
+							}
+							elseif($oInbox->Get($sAttCode) != 'inactive') {
 							
-						}
-						elseif($oInbox->Get($sAttCode) != 'inactive') {
-						
-							// No default "behavior" attribute; assume this step must always be executed
-							EmailProcessor::$aActiveStepClasses[] = $sClassName;
-							
+								// No default "behavior" attribute; assume this step must always be executed if it's applicable.
+								EmailProcessor::$aActiveStepClasses[] = $sClassName;
+								
+							}
+
 						}
 						
 					}

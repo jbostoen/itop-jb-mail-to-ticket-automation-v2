@@ -99,9 +99,10 @@ abstract class EmailSource
 	 * Instead, when enabled, the Message-Id can be used instead to uniquely identify a message.
 	 *
 	 * Notes:
-	 * - It's possible to receive twice a message with the same Message-Id (or the message gets copied).
-	 *   Since the contents of the message will be the same, it's a safe to process such messages only once...
-	 * - When changing this setting in the configuration file, 
+	 * - It's possible to receive multiple messages with the same Message-Id. 
+	 *   This could also simply occur because the message gets copied.
+	 *   Since the contents of the message will be the same, the behavior is to process such messages only once.
+	 * - When changing the "use_message_id_as_uid" setting in the configuration file, 
 	 *   all the messages present in the mailbox will be considered as "new" and thus processed again.  
 	 * - Some e-mail providers do not return a "Message-Id" property.
 	 *

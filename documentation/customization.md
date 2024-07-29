@@ -18,13 +18,13 @@ Adding your own logic to can be done by extending the **Step** class.
 
 **Other pointers**
 
-Use the methods to set/get info (for instance: ```static::GetMail()```, rather than directly manipulating the static properties.
+Use the methods to set/get info, rather than directly manipulating the static properties.
 
 
 
 Enforcing certain rules means that at some point you might want to interrupt the processing of this particular e-mail.  
 If there's an attribute added to the mailbox class with the name ```step_prefix_behavior``` set to ```do_nothing```, the policy will be processed but is not supposed to perform any actions.  
-It's meant for debugging and showing verbose output of what would happen, without doing it.  
+It is meant for debugging and showing verbose output of what would happen, without doing it.  
 ```inactive``` means it will not be processed at all.
 
 ```step_prefix``` is a placeholder in the example above; it is the prefix defined in the step class (```$sXMLSettingsPrefix``` property).
