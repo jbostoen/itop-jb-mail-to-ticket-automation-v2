@@ -226,21 +226,29 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					}
 					
 					$iMsgCount = count($aMessages);
+
+					if($iMsgCount == 0) {
+						$this->Trace("Unexpected: listing of e-mail messages returned 0 messages.");
+						continue;
+					}
 					
 					/** @var \MailInboxBase $oInbox Mail inbox */
 					$oInbox = $oProcessor->GetInboxFromSource($oSource);
 					
-					// Whether a policy is active or inactive, is determined per mailbox.
+					// Whether a step is active or inactive, is determined per mailbox.
 					EmailProcessor::$aActiveStepClasses = [];
 					
 					// Start from pre-filtered class names.
 					foreach(EmailProcessor::$aAvailableStepClasses as $sClassName) {
+
+						// Do a basic initialization first with the details that are known at this point.
+						$sClassName::PreInit($oInbox, $oSource);
 					
 						if($sClassName::IsApplicable() == true) {
 								
 							// Policies can easily be turned off.
-							// 'inactive' means the policy can be skipped altogether.
-							// 'do_nothing' means the policy should still be processed, but the policy itself shouldn't have any influence.
+							// 'inactive' means it can be skipped altogether.
+							// 'do_nothing' means it should still be processed, but it shouldn't have any influence nor take any.
 							$sAttCode = $sClassName::GetXMLSettingsPrefix().'_behavior';
 							if(MetaModel::IsValidAttCode(get_class($oInbox), $sAttCode) == false) {
 
@@ -457,7 +465,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									}
 									 
 									else {
-										
 
 										$iNextActionCode = $oProcessor->ProcessMessage($oSource, $iMessage, $oEmail, $oEmailReplica);									  
 										$this->Trace("EmailReplica ID after ProcessMessage(): ".$oEmailReplica->GetKey());
@@ -647,7 +654,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		
 		$sExceptionMessage = $e->getMessage();
 		$sSourceId = $oSource->GetSourceId();
-		$sSimpleErrorMessage = __CLASS__.': an exception occurred when reading content for mailbox';
+		$sSimpleErrorMessage = __CLASS__.': an exception occurred when reading content for mailbox: '.$e->getMessage();
 
 		// MailInboxStandard
 		$sMailboxId = $oSource->GetToken(); // see init in \MailInboxesEmailProcessor::ListEmailSources

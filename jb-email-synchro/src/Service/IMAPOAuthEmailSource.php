@@ -240,6 +240,10 @@ class IMAPOAuthEmailSource extends EmailSource {
 	 * @param $index integer The index between zero and count
 	 */
 	public function MoveMessage($index) {
+
+		
+		$this->oMailbox->Trace('Move message '.$index.' to '.$this->sTargetFolder);
+
 		$this->oStorage->moveMessage(1 + $index, $this->sTargetFolder);
 
 		return true;
@@ -254,13 +258,13 @@ class IMAPOAuthEmailSource extends EmailSource {
 	}
 	
 	 /**
-	  * Get IMAP connection. Exposed to dedicated extensions.
+	  * Get storage. Exposed to dedicated extensions.
 	  *
-	  * @return IMAP connection
+	  * @return IMAPOAuthStorage IMAP connection
 	  */
-	 public function GetConnection() {
+	 public function GetStorage() {
 		
-		return $this->rImapConn;
+		return $this->oStorage;
 		
 	 }
 	 

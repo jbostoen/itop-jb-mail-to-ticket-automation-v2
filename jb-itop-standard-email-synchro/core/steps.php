@@ -71,7 +71,7 @@ abstract class Step implements iStep {
 	public static $aPreviouslyExecutedSteps = [];
 	
 	/**
-	 * @var \Integer $iPrecedence It's not necessary that this number is unique; but when all steps are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
+	 * @var int $iPrecedence It's not necessary that this number is unique; but when all steps are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
 	 */
 	public static $iPrecedence = 20;
 	
@@ -104,16 +104,33 @@ abstract class Step implements iStep {
 	 * @var \String $sEmailIndex Index in the e-mail source. Note: name is experimental; use methods instead to set/get
 	 */
 	public static $iEmailIndex = null;
-	
+
+
 	/**
-	 * Initiator. Sets some widely used property values.
+	 * Pre-initiator. Sets some commonly used properties before execution of the step (and before checking whether the step is applicable).
 	 *
-	 * @param \MailInboxStandard $oMailBox Mailbox
-	 * @param \EmailSource $oSource E-mail source
-	 * @param \Integer|\String $index Index of the e-mail in the source
-	 * @param \EmailMessage $oEmail E-mail message
-	 * @param \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found)
+	 * @param \MailInboxStandard $oMailBox Mailbox.
+	 * @param \EmailSource $oSource E-mail source.
+	 *
+	 */
+	public static function PreInit(MailInboxStandard $oMailBox, EmailSource $oSource) {
+		
+		static::SetMailBox($oMailBox);
+		static::SetMailSource($oSource);
+	
+	}
+
+	/**
+	 * Initiator. Sets some commonly used properties upon execution of the step.
+	 *
+	 * @param \MailInboxStandard $oMailBox Mailbox.
+	 * @param \EmailSource $oSource E-mail source.
+	 * @param int|\String $index Index of the e-mail in the source.
+	 * @param \EmailMessage $oEmail E-mail message.
+	 * @param \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found).
 	 * @param \String[] $aPreviouslyExecutedSteps Array of steps (class names) which have been processed already.
+	 * 
+	 * @todo Optimize this; as the mailbox and mail source should be known already.
 	 *
 	 */
 	public static function Init(MailInboxStandard $oMailBox, EmailSource $oSource, $index, EmailMessage $oEmail, ?Ticket $oTicket, $aPreviouslyExecutedSteps) {
@@ -163,7 +180,7 @@ abstract class Step implements iStep {
 	/**
 	  * Gets the step's precedence.
 	  *
-	  * @return \Integer
+	  * @return int
 	 */
 	public static function GetPrecedence() {
 		
@@ -258,7 +275,7 @@ abstract class Step implements iStep {
 	/**
 	 * Gets index of e-mail message.
 	 *
-	 * @return \Integer
+	 * @return int
 	 */
 	public static function GetMailIndex() {
 		
@@ -269,7 +286,7 @@ abstract class Step implements iStep {
 	/**
 	 * Sets index of e-mail message.
 	 *
-	 * @param \Integer $index For now, expect an integer for the e-mail index.
+	 * @param int $index For now, expect an integer for the e-mail index.
 	 *
 	 * @return void
 	 */
@@ -537,7 +554,8 @@ abstract class Step implements iStep {
 	}
 
 	/**
-	 * Whether the step is applicable.
+	 * Whether the step is applicable. 
+	 * Make sure the initiation of the step has already happened!
 	 * 
 	 * @return bool
 	 */

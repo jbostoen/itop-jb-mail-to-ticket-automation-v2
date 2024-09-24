@@ -253,7 +253,7 @@ class IMAPEmailSource extends EmailSource {
 	 /**
 	  * Get IMAP connection. Exposed to dedicated extensions.
 	  *
-	  * @return IMAP connection
+	  * @return \IMAP\Connection The IMAP connection.
 	  */
 	 public function GetConnection() {
 		

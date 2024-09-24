@@ -957,6 +957,7 @@ EOF
 	{
 		
 		// Process all steps.
+		// Whether a step is active or inactive, is determined per mailbox.
 		$aStepClasses = EmailProcessor::$aActiveStepClasses;
 		
 		// Steps must be executed in a certain order.
