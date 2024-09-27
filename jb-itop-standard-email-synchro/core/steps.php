@@ -2910,43 +2910,52 @@ abstract class PolicyFindAdditionalContacts extends Step {
 					
 					static::Trace(".. Results for Person with email address '{$sRecipientEmail}: {$oSet_Person->Count()}");
 					
-					if($oSet_Person->Count() == 0 && $sPolicyBehavior == 'fallback_add_other_contacts') {
+					if($oSet_Person->Count() == 0) {
 						
-						// Create
-						static::Trace(".. Creating a new Person with email address '{$sRecipientEmail}'");
-						$oContact = new Person();
-						$oContact->Set('email', $sRecipientEmail);
-						$sDefaultValues = static::GetStepSetting('default_values');
-						$aDefaults = preg_split(NEWLINE_REGEX, $sDefaultValues);
-						$aDefaultValues = array();
-						foreach($aDefaults as $sLine) {
-							if(preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
-								$sAttCode = trim($aMatches[1]);
-								$sValue = trim($aMatches[2]);
-								$sValue = static::ReplaceMailPlaceholders($sValue, [
-									'recipient->name' => $sRecipientName,
-									'recipient->email' => $sRecipientEmail,
-								]);
-								$aDefaultValues[$sAttCode] = $sValue;
-							}
-						}
-						
-						$oMailBox->InitObjectFromDefaultValues($oContact, $aDefaultValues);
-						try {
-							static::Trace("... Try to create user with default values");
-							$oContact->DBInsert();
-
-							// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
-							$oEmail->AddRelatedContact($oContact);
+						if($sPolicyBehavior != 'fallback_add_other_contacts') {
 							
+							// No existing contacts were found; and no new person should be created.
+
 						}
-						catch(Exception $e) {
-							// This is an actual error.
-							static::Trace("... Failed to create a Person for the email address '{$sCallerEmail}'.");
-							static::Trace($e->getMessage());
-							$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oEmail->oRawEmail);
-							return;
-						}									
+						elseif($sPolicyBehavior == 'fallback_add_other_contacts') {
+							
+							// Create
+							static::Trace(".. Creating a new Person with email address '{$sRecipientEmail}'");
+							$oContact = new Person();
+							$oContact->Set('email', $sRecipientEmail);
+							$sDefaultValues = static::GetStepSetting('default_values');
+							$aDefaults = preg_split(NEWLINE_REGEX, $sDefaultValues);
+							$aDefaultValues = array();
+							foreach($aDefaults as $sLine) {
+								if(preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
+									$sAttCode = trim($aMatches[1]);
+									$sValue = trim($aMatches[2]);
+									$sValue = static::ReplaceMailPlaceholders($sValue, [
+										'recipient->name' => $sRecipientName,
+										'recipient->email' => $sRecipientEmail,
+									]);
+									$aDefaultValues[$sAttCode] = $sValue;
+								}
+							}
+							
+							$oMailBox->InitObjectFromDefaultValues($oContact, $aDefaultValues);
+							try {
+								static::Trace("... Try to create user with default values");
+								$oContact->DBInsert();
+
+								// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
+								$oEmail->AddRelatedContact($oContact);
+								
+							}
+							catch(Exception $e) {
+								// This is an actual error.
+								static::Trace("... Failed to create a Person for the email address '{$sCallerEmail}'.");
+								static::Trace($e->getMessage());
+								$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oEmail->oRawEmail);
+								return;
+							}
+
+						}
 						
 					}
 					elseif($oSet_Person->Count() == 1) {
