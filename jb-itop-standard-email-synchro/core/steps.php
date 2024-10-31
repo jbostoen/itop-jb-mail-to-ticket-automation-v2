@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (c) 2019-2024 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     2.7.240524
+ * @version     3.2.241031
  *
  * Policy interface definition and some classes implementing it.
  * 
@@ -14,41 +14,39 @@
 
 namespace jb_itop_extensions\mail_to_ticket;
 
-use \Exception;
-use \ReflectionClass;
+use Exception;
 
 // jb-framework
-use \jb_itop_extensions\components\ormCustomCaseLog;
+use jb_itop_extensions\components\ormCustomCaseLog;
 
 // iTop internals
-use \Attachment;
-use \AttributeExternalKey;
-use \AttributeHTML;
-use \AttributeText;
-use \CMDBChangeOpPlugin;
-use \CMDBObject;
-use \CMDBSource;
-use \DBObjectSearch;
-use \DBObjectSet;
-use \Dict;
-use \InlineImage;
-use \IssueLog;
-use \MetaModel;
-use \ormDocument;
-use \SetupUtils;
-use \utils;
-use \UserRights;
+use Attachment;
+use AttributeExternalKey;
+use AttributeHTML;
+use AttributeText;
+use CMDBObject;
+use CMDBSource;
+use DBObjectSearch;
+use DBObjectSet;
+use Dict;
+use InlineImage;
+use IssueLog;
+use MetaModel;
+use ormDocument;
+use SetupUtils;
+use utils;
+use UserRights;
 
 // iTop email processing
-use \EmailMessage;
-use \EmailProcessor;
-use \EmailSource;
-use \MailInboxStandard;
+use EmailMessage;
+use EmailProcessor;
+use EmailSource;
+use MailInboxStandard;
 
 // iTop classes
-use \lnkContactToTicket;
-use \Person;
-use \Ticket;
+use lnkContactToTicket;
+use Person;
+use Ticket;
 
 const NEWLINE_REGEX = '/\r\n|\r|\n/';
 
@@ -66,7 +64,7 @@ interface iStep {
 abstract class Step implements iStep {
 	
 	/**
-	 * @var \String[] $aPreviouslyExecutedSteps Array of steps (class names) which have been executed already.
+	 * @var String[] $aPreviouslyExecutedSteps Array of steps (class names) which have been executed already.
 	 */
 	public static $aPreviouslyExecutedSteps = [];
 	
@@ -76,32 +74,32 @@ abstract class Step implements iStep {
 	public static $iPrecedence = 20;
 	
 	/**
-	 * @var \String $sXMLSettingsPrefix (XML) settings prefix for step.
+	 * @var String $sXMLSettingsPrefix (XML) settings prefix for step.
 	 */
 	public static $sXMLSettingsPrefix = 'step_generic';
 	
 	/**
-	 * @var \EmailMessage $oEmail E-mail message
+	 * @var EmailMessage $oEmail E-mail message
 	 */
 	public static $oEmail = null;
 	
 	/**
-	 * @var \MailInboxStandard $oMailBox Mailbox
+	 * @var MailInboxStandard $oMailBox Mailbox
 	 */
 	public static $oMailBox = null;
 	
 	/**
-	 * @var \EmailSource $oSource E-mail source (e.g. IMAPEmailSource)
+	 * @var EmailSource $oSource E-mail source (e.g. IMAPEmailSource)
 	 */
 	public static $oSource = null;
 	
 	/**
-	 * @var \Ticket $oTicket Ticket object (in iTop)
+	 * @var Ticket $oTicket Ticket object (in iTop)
 	 */
 	public static $oTicket = null;
 	
 	/**
-	 * @var \String $sEmailIndex Index in the e-mail source. Note: name is experimental; use methods instead to set/get
+	 * @var String $sEmailIndex Index in the e-mail source. Note: name is experimental; use methods instead to set/get
 	 */
 	public static $iEmailIndex = null;
 
@@ -109,8 +107,8 @@ abstract class Step implements iStep {
 	/**
 	 * Pre-initiator. Sets some commonly used properties before execution of the step (and before checking whether the step is applicable).
 	 *
-	 * @param \MailInboxStandard $oMailBox Mailbox.
-	 * @param \EmailSource $oSource E-mail source.
+	 * @param MailInboxStandard $oMailBox Mailbox.
+	 * @param EmailSource $oSource E-mail source.
 	 *
 	 */
 	public static function PreInit(MailInboxStandard $oMailBox, EmailSource $oSource) {
@@ -123,12 +121,12 @@ abstract class Step implements iStep {
 	/**
 	 * Initiator. Sets some commonly used properties upon execution of the step.
 	 *
-	 * @param \MailInboxStandard $oMailBox Mailbox.
-	 * @param \EmailSource $oSource E-mail source.
+	 * @param MailInboxStandard $oMailBox Mailbox.
+	 * @param EmailSource $oSource E-mail source.
 	 * @param int|\String $index Index of the e-mail in the source.
-	 * @param \EmailMessage $oEmail E-mail message.
-	 * @param \Ticket|null $oTicket Ticket found based on ticket reference (or null if not found).
-	 * @param \String[] $aPreviouslyExecutedSteps Array of steps (class names) which have been processed already.
+	 * @param EmailMessage $oEmail E-mail message.
+	 * @param Ticket|null $oTicket Ticket found based on ticket reference (or null if not found).
+	 * @param String[] $aPreviouslyExecutedSteps Array of steps (class names) which have been processed already.
 	 * 
 	 * @todo Optimize this; as the mailbox and mail source should be known already.
 	 *
@@ -156,7 +154,7 @@ abstract class Step implements iStep {
 	/**
 	  * Gets the step's XML settings prefix. In the datamodel, especially for policies, settings can be defined. Most common one would be something like 'example_step_behavior'.
 	  *
-	  * @return \String
+	  * @return String
 	 */
 	public static function GetXMLSettingsPrefix() {
 		
@@ -167,7 +165,7 @@ abstract class Step implements iStep {
 	/**
 	 * Shorthand to obtain a setting configured in the maibox properties for a specific step.
 	 *
-	 * @return \String
+	 * @return String
 	 */
 	public static function GetStepSetting($sSetting) {
 	
@@ -191,7 +189,7 @@ abstract class Step implements iStep {
 	/**
 	 * Gets the mailbox.
 	 *
-	 * @return \MailInboxStandard
+	 * @return MailInboxStandard
 	 */
 	public static function GetMailBox() {
 		
@@ -202,7 +200,7 @@ abstract class Step implements iStep {
 	/**
 	 * Sets the mailbox that's being processed.
 	 *
-	 * @param \MailInboxStandard $oMailBox Mailbox
+	 * @param MailInboxStandard $oMailBox Mailbox
 	 *
 	 * @return void
 	 */
@@ -216,7 +214,7 @@ abstract class Step implements iStep {
 	/**
 	 * Gets the e-mail that's being processed.
 	 *
-	 * @return \EmailMessage
+	 * @return EmailMessage
 	 */
 	public static function GetMail() {
 		
@@ -227,7 +225,7 @@ abstract class Step implements iStep {
 	/**
 	 * Gets the raw e-mail that's being processed.
 	 *
-	 * @return \RawEmailMessage
+	 * @return RawEmailMessage
 	 */
 	public static function GetRawMail() {
 		
@@ -238,7 +236,7 @@ abstract class Step implements iStep {
 	/**
 	 * Sets the e-mail that's being processed.
 	 *
-	 * @param \EmailMessage $oMessage E-mail message.
+	 * @param EmailMessage $oMessage E-mail message.
 	 *
 	 * @return void
 	 */
@@ -251,7 +249,7 @@ abstract class Step implements iStep {
 	/**
 	 * Gets the e-mail source.
 	 *
-	 * @return \EmailSource The e-mail source.
+	 * @return EmailSource The e-mail source.
 	 */
 	public static function GetMailSource() {
 		
@@ -262,7 +260,7 @@ abstract class Step implements iStep {
 	/**
 	 * Sets the e-mail source.
 	 *
-	 * @param \EmailSource $oSource E-mail source
+	 * @param EmailSource $oSource E-mail source
 	 *
 	 * @return void
 	 */
@@ -299,7 +297,7 @@ abstract class Step implements iStep {
 	/**
 	 * Gets ticket.
 	 *
-	 * @return \Ticket
+	 * @return Ticket
 	 */
 	public static function GetTicket() {
 		
@@ -310,7 +308,7 @@ abstract class Step implements iStep {
 	/**
 	 * Sets ticket.
 	 *
-	 * @param \Ticket $oTicket Ticket
+	 * @param Ticket $oTicket Ticket
 	 *
 	 * @return void
 	 */
@@ -323,7 +321,7 @@ abstract class Step implements iStep {
 	/**
 	 * Gets executed steps.
 	 *
-	 * @return \String[]
+	 * @return String[]
 	 */
 	public static function GetExecutedSteps() {
 		
@@ -334,7 +332,7 @@ abstract class Step implements iStep {
 	/**
 	 * Sets executed steps.
 	 *
-	 * @param \String[] $aPreviouslyExecutedSteps Class names of previously executed steps.
+	 * @param String[] $aPreviouslyExecutedSteps Class names of previously executed steps.
 	 *
 	 * @return void
 	 */
@@ -347,8 +345,8 @@ abstract class Step implements iStep {
 	/**
 	 * Replace email placeholders in a string.
 	 * 
-	 * @param \String $sString Input string.
-	 * @param \Array $aExtraPlaceholders Optional: extra place holders.
+	 * @param String $sString Input string.
+	 * @param Array $aExtraPlaceholders Optional: extra place holders.
 	 *
 	 * @details Also exposes some properties which are not likely to be useful (body_format) at any time, but who knows?
 	 *
@@ -389,7 +387,7 @@ abstract class Step implements iStep {
 	/**
 	 * For logging information about the processing of emails.
 	 *
-	 * @param \String $sString Input string
+	 * @param String $sString Input string
 	 *
 	 * @return void
 	 */
@@ -400,19 +398,19 @@ abstract class Step implements iStep {
 	/**
 	 * Returns the e-mail addresses of all recipients in the original e-mail.
 	 *
-	 * @return \String[]
+	 * @return String[]
 	 */
 	public static function GetRecipientAddresses() {
 
-		// @todo Fix this!
+		// @todo Fix this! - What fix is needed?
 
-		/** @var \RawEmailMessage $oRawEmail Raw e-mail message. */
+		/** @var RawEmailMessage $oRawEmail Raw e-mail message. */
 		$oRawEmail = static::GetRawMail();
 
-		/** @var \EmailRecipient[] $aRecipients An array of recipients. */
+		/** @var EmailRecipient[] $aRecipients An array of recipients. */
 		$aRecipients = array_merge($oRawEmail->GetTo(), $oRawEmail->GetCc());
 
-		/** @var \String[] $aAddresses An array of e-mail addresses. */
+		/** @var String[] $aAddresses An array of e-mail addresses. */
 		$aAddresses = [];
 
 		foreach($aRecipients as $aRecipient ) {
@@ -425,7 +423,7 @@ abstract class Step implements iStep {
 	/**
 	 * Returns an array containing the e-mail aliases of the mailbox, including the primary e-mail address.
 	 *
-	 * @return \String[]
+	 * @return String[]
 	 */
 	public static function GetMailBoxAliases() {
 		
@@ -593,7 +591,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	public static $sXMLSettingsPrefix = 'step_create_or_update_ticket';
 	
 	/*
-	 * @var \Array $aAddedAttachments Array containing info on any attachments in the email
+	 * @var Array $aAddedAttachments Array containing info on any attachments in the email
 	 */
 	public static $aAddedAttachments = [];
 	
@@ -992,8 +990,8 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	 * Function inspired by Combodo's MailInboxStandard::BuildDescription().
 	 * Returns a description for a new Ticket.
 	 *
-	 * @param \Boolean $bForPlainText True if the desired output format is plain text, false if HTML
-	 * @return \String Ticket description
+	 * @param Boolean $bForPlainText True if the desired output format is plain text, false if HTML
+	 * @return String Ticket description
 	 */
 	public static function BuildDescription($bForPlainText) {
 		
@@ -1030,10 +1028,10 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	/**
 	 * Function inspired by Combodo's MailInboxStandard::ManageInlineImages().
 	 *
-	 * @param \String $sBodyText Body text
-	 * @param \Boolean $bForPlainText Plain text (true) or HTML (false)
+	 * @param String $sBodyText Body text
+	 * @param Boolean $bForPlainText Plain text (true) or HTML (false)
 	 * 
-	 * @return \String Body text
+	 * @return String Body text
 	 */
 	public static function ManageInlineImages($sBodyText, $bForPlainText) {
 		 
@@ -1194,7 +1192,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		$sClassList = implode(', ', CMDBSource::Quote($aClasses));
 		$oSet_TriggerMailUpdate = new DBObjectSet(DBObjectSearch::FromOQL_AllData("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
 
-		/** @var \Trigger $oTrigger iTop Trigger. */
+		/** @var Trigger $oTrigger iTop Trigger. */
 		while($oTrigger = $oSet_TriggerMailUpdate->Fetch()) {
 			$oTrigger->DoActivate($oTicket->ToArgs('this'));
 		}
@@ -1322,7 +1320,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	 * Build the text/html to be inserted in the case log when the ticket is updated
 	 * Starting with iTop 2.3.0, the format is always HTML
 	 *
-	 * @return \String The HTML text to be inserted in the case log
+	 * @return String The HTML text to be inserted in the case log
 	 */
 	 public static function BuildCaseLogEntry() {
 		 
@@ -1354,9 +1352,9 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	 
 	/**
 	 * Function inspired by Combodo's MailInboxBase::AddAttachments()
-	 * @param \Boolean $bNoDuplicates If true, don't add attachment that seem already attached to the ticket (same type, same name, same size, same md5 checksum).
-	 * @param \Person $oCaller The caller.
-	 * @param \User $oUser The user (account).
+	 * @param Boolean $bNoDuplicates If true, don't add attachment that seem already attached to the ticket (same type, same name, same size, same md5 checksum).
+	 * @param Person $oCaller The caller.
+	 * @param User $oUser The user (account).
 	 *
 	 * @return array array of cid => attachment_id
 	 * @throws \CoreException
@@ -1532,9 +1530,9 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	 * Function inspired by Combodo's MailInboxBase::IsImage()
 	 * Checks whether a MimeType is an image which can be processed by iTop (PHP GD)
 	 *
-	 * @param \String $sMimeType
+	 * @param String $sMimeType
 	 *
-	 * @return \Boolean
+	 * @return Boolean
 	 */
 	public static function IsImage($sMimeType) {
 				
@@ -1569,10 +1567,10 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	 * 1) Takes care of replacing line endings by \r\n since the browser produces this kind of line endings inside a TEXTAREA
 	 * 2) Trims the result to emulate the behavior of iTop's inputs
 	 *
-	 * @param \String $sInputText
-	 * @param \Int $iMaxLength
+	 * @param String $sInputText
+	 * @param Int $iMaxLength
 	 *
-	 * @return \String The fitted text
+	 * @return String The fitted text
 	 */
 	public static function FitTextIn($sInputText, $iMaxLength) {
 		
@@ -1759,7 +1757,7 @@ abstract class StepSaveReferences extends Step {
 	public static $sXMLSettingsPrefix = 'step_save_references';
 	
 	/*
-	 * @var \String[] $aUIDLs Array of previously unknown references in the e-mail message.
+	 * @var String[] $aUIDLs Array of previously unknown references in the e-mail message.
 	 */
 	public static $aNewUIDLs = [];
 
@@ -2160,7 +2158,7 @@ abstract class PolicyBounceOtherRecipients extends Step {
 		// Checking if there are no other recipients mentioned.
 		
 			// Take both the To: and CC:
-			/** @var \EmailRecipient[] $aAllContacts All contacts (except BCC). */
+			/** @var EmailRecipient[] $aAllContacts All contacts (except BCC). */
 			$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
 			
 			// Mailbox aliases
@@ -2855,7 +2853,7 @@ abstract class PolicyFindAdditionalContacts extends Step {
 		$sCallerEmail = $oEmail->sCallerEmail;
 							
 		// Take both the To: and CC:
-		/** @var \EmailRecipient[] All e-mail recipients in To: and CC: */
+		/** @var EmailRecipient[] All e-mail recipients in To: and CC: */
 		$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
 		
 		// Mailbox aliases
@@ -3137,9 +3135,9 @@ abstract class StepAttachmentCriteria extends Step {
 	 * Function inspired by Combodo's MailInboxBase::IsImage()
 	 * Checks whether a MimeType is an image which can be processed by iTop (PHP GD)
 	 *
-	 * @param \String $sMimeType
+	 * @param String $sMimeType
 	 *
-	 * @return \Boolean
+	 * @return Boolean
 	 */
 	public static function IsImage($sMimeType) {
 				
@@ -3172,13 +3170,13 @@ abstract class StepAttachmentCriteria extends Step {
 	 * Function inspired by Combodo's MailInboxBase::ResizeImageToFit()
 	 * Resize an image attachment so that it fits in the given dimensions.
 	 *
-	 * @param \Array $aAttachment The original image stored as an attached array (content / mimetype / filename)
-	 * @param \Int $iWidth image's original width
-	 * @param \Int $iHeight image's original height
-	 * @param \Int $iMaxImageWidth Maximum width for the resized image
-	 * @param \Int $iMaxImageHeight Maximum height for the resized image
+	 * @param Array $aAttachment The original image stored as an attached array (content / mimetype / filename)
+	 * @param Int $iWidth image's original width
+	 * @param Int $iHeight image's original height
+	 * @param Int $iMaxImageWidth Maximum width for the resized image
+	 * @param Int $iMaxImageHeight Maximum height for the resized image
 	 *
-	 * @return \Array The modified attachment array with the resized image in the 'content'
+	 * @return Array The modified attachment array with the resized image in the 'content'
 	 */
 	public static function ResizeImageToFit($aAttachment, $iWidth, $iHeight, $iMaxImageWidth, $iMaxImageHeight)
 	{
@@ -3251,9 +3249,9 @@ abstract class StepAttachmentCriteria extends Step {
 	 * Function inspired by Combodo's MailInboxBase::GetImageSize()
 	 * Resize an image attachment so that it fits in the given dimensions.
 	 *
-	 * @param \String $sImageData Image data
+	 * @param String $sImageData Image data
 	 *
-	 * @return \Array Array with image dimensions
+	 * @return Array Array with image dimensions
 	 */
 	public static function GetImageSize($sImageData) {
 		
@@ -3364,7 +3362,7 @@ abstract class PolicyNonDeliveryReport extends Step {
 									
 								}
 								
-								/** @var \Person $oPerson Person(s) in iTop with email set to that of the recipient. */
+								/** @var Person $oPerson Person(s) in iTop with email set to that of the recipient. */
 								while($oPerson = $oSetPerson->Fetch()) {
 									
 									if($sBehavior == 'do_nothing') {

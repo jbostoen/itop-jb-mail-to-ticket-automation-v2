@@ -26,29 +26,35 @@ require_once('../../approot.inc.php');
 require_once(APPROOT.'/application/application.inc.php');
 require_once(APPROOT.'/application/ajaxwebpage.class.inc.php');
 
+use Combodo\iTop\Application\WebPage\AjaxPage;
+
 /**
- * @param \ajax_page $oPage
- * @param \MailInboxBase $oInbox
+ * @param AjaxPage $oPage
+ * @param MailInboxBase $oInbox
  *
- * @throws \ArchivedObjectException
- * @throws \CoreException
- * @throws \CoreUnexpectedValue
- * @throws \MissingQueryArgument
- * @throws \MySQLException
- * @throws \MySQLHasGoneAwayException
- * @throws \OQLException
+ * @throws ArchivedObjectException
+ * @throws CoreException
+ * @throws CoreUnexpectedValue
+ * @throws MissingQueryArgument
+ * @throws MySQLException
+ * @throws MySQLHasGoneAwayException
+ * @throws OQLException
  */
 function GetMailboxContent($oPage, $oInbox) {
 	
 	if(is_object($oInbox)) {
 		
+		/** @var int $iStartIndex Pagination: Index of e-mail to start with. */
 		$iStartIndex = utils::ReadParam('start', 0);
+		/** @var int $iStartIndex Pagination: The number of e-mails to retrieve. */
 		$iMaxCount = utils::ReadParam('count', 10);
 		
 		try {
 			
-			/** @var \EmailSource $oSource */
+			/** @var EmailSource $oSource */
 			$oSource = $oInbox->GetEmailSource();
+
+			/** @var int $iTotalMsgCount The number of available messages. */
 			$iTotalMsgCount = $oSource->GetMessagesCount();
 			$aMessages = $oSource->GetListing(); // Note: this may differ from $oSource->GetMessagesCount(); as messages with errors could be skipped.
 			$iTotalMsgOkCount = count(array_filter($aMessages, function($aMsg) {
@@ -82,8 +88,7 @@ function GetMailboxContent($oPage, $oInbox) {
 			
 		}
 
-		/** @var \Integer $iProcessedCount number of readable emails in total (whole mailbox content) */
-		$iProcessedCount = 0;
+		
 		
 		if($iTotalMsgCount > 0) {
 			
@@ -116,9 +121,12 @@ function GetMailboxContent($oPage, $oInbox) {
 				
 			}
 			
-			/** @var \Integer $iMsgOkCount number of readable emails between start and end index */
+			/** @var int $iMsgOkCount The number of readable emails between start and end index. */
 			$iMsgOkCount = 0;
+
+			/** @var int $iProcessedCount The number of processed (non-corrupted) emails / Existing e-mail replicas. */
 			$iProcessedCount = 0;
+
 			if($iTotalMsgOkCount > 0) {
 				
 				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox'));
@@ -366,7 +374,7 @@ try {
 				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_path = '. CMDBSource::Quote($oInbox->Get('mailbox'));
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 				$aReplicas = [];
-				/** @var \DBObject $oReplica */
+				/** @var DBObject $oReplica */
 				while($oReplica = $oReplicaSet->Fetch()) {
 					$oReplica->Set('status', 'ignored');
 					$oReplica->DBUpdate();

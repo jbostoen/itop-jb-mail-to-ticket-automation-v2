@@ -124,22 +124,26 @@ class RawEmailMessage {
 	}
 	
 	/**
-	 * Retrieves the address(es) from the recipient of the message... "To". Note that in some cases
-	 * there is no 'email', just a description like "undisclosed recipients"
+	 * Retrieves the address(es) from the recipient of the message... "To".
 	 *
-	 * @return \EmailRecipient[] An array of recipients.
+	 * @return EmailRecipient[] An array of recipients.
 	 */
 	public function GetTo() {
+
 		return self::ParseAddresses($this->GetHeader('to'));
+
 	}
 	
 	/**
-	 * Retrieves the address(es) from the recipient in copy of the message... "CC".
+	 * Retrieves the address(es) from the recipient in copy of the message.
+	 * So the recipients in "CC".
 	 *
-	 * @return \EmailRecipient[] An array of recipients.
+	 * @return EmailRecipient[] An array of recipients.
 	 */
 	public function GetCc() {
+
 		return self::ParseAddresses($this->GetHeader('cc'));
+
 	}
 	
 	/**
@@ -764,14 +768,14 @@ class RawEmailMessage {
 	}
 	
 	/**
-	 * Turn the string of addresses into an array (one entry per address) where the two components of each address
-	 * are separated: 'name' (human readable) and 'email'
+	 * Turn the string of addresses into an array (one entry per recipient).
 	 *
 	 * @param string $sAddresses The whole list of addresses as read from the email header
 	 *
-	 * @return \EmailRecipient[] An array of e-mail recipients.
+	 * @return EmailRecipient[] An array of e-mail recipients.
 	 */
 	protected static function ParseAddresses($sAddresses) {
+
 		$sTextQualifier = '"';
 		$sAddressDelimiter = ',';
 		
@@ -865,12 +869,14 @@ class RawEmailMessage {
 }
 
 /**
- * Class EmailRecipient. An e-mail recipient.
+ * Class EmailRecipient. An e-mail recipient. 
  */
 class EmailRecipient {
 
+ 	/** @var string $sEmailAddress The e-mail address of the recipient. Important note: in some cases there is no e-mail address (e.g. "undisclosed recipients"). */
 	private $sEmailAddress;
 
+ 	/** @var string $sName The name of the recipient. */
 	private $sName;
 
 	/**
