@@ -81,7 +81,6 @@ class MessageFromMailbox extends RawEmailMessage {
 		$sRecipient = '';
 		$sReferences = $this->GetHeader('references');
 		$aReferences = explode(' ', $sReferences );
-		$sThreadIndex = $this->GetMSThreadIndex();
 		$aAttachments = $this->GetAttachments();
 		$sDecodeStatus = '';
 		$oRelatedObject = $this->GetRelatedObject();
@@ -99,7 +98,6 @@ class MessageFromMailbox extends RawEmailMessage {
 			$sCallerName,
 			$sRecipient,
 			$aReferences,
-			$sThreadIndex,
 			$sBodyText,
 			$sBodyFormat,
 			$aAttachments,
@@ -112,13 +110,6 @@ class MessageFromMailbox extends RawEmailMessage {
 		);
 		$oMessage->oRawEmail = $this; // Keep the source raw email for reference and further processing if needed
 		return $oMessage;
-	}
-	
-	/**
-	 * Get MS Thread-index for this message
-	 */
-	protected function GetMSThreadIndex() {
-		return $this->GetHeader('thread-index');
 	}
 
 	protected function GetCallerName() {
@@ -216,9 +207,6 @@ class MessageFromMailbox extends RawEmailMessage {
 			}
 		}
 		
-		// Third attempt: check the MS thread-index header, either via a direct pattern match
-		// or by finding a similar message already processed
-		// return EmailReplica::FindTicketFromMSThreadIndex($sMSThreadIndex);
 		return null;
 	}
 }

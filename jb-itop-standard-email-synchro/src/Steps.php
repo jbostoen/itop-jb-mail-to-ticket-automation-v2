@@ -398,11 +398,9 @@ abstract class Step implements iStep {
 	/**
 	 * Returns the e-mail addresses of all recipients in the original e-mail.
 	 *
-	 * @return String[]
+	 * @return string[]
 	 */
 	public static function GetRecipientAddresses() {
-
-		// @todo Fix this! - What fix is needed?
 
 		/** @var RawEmailMessage $oRawEmail Raw e-mail message. */
 		$oRawEmail = static::GetRawMail();
@@ -509,42 +507,18 @@ abstract class Step implements iStep {
 				
 		}
 		
-		// @todo When bumping requirement to PHP 8.0, use 'match' here:
-		$iNextAction = EmailProcessor::NO_ACTION;
-		switch($sBehavior) {
-				
-			case 'bounce_delete':
-			case 'delete':
-				$iNextAction = EmailProcessor::DELETE_MESSAGE;
-				break;
-				
-			case 'move':
-				$iNextAction = EmailProcessor::MOVE_MESSAGE;
-				break;
-				
-			case 'mark_as_error':
-				$iNextAction = EmailProcessor::MARK_MESSAGE_AS_ERROR;
-				break;
-				 
-			case 'bounce_mark_as_undesired':
-			case 'mark_as_undesired':
-				$iNextAction = EmailProcessor::MARK_MESSAGE_AS_UNDESIRED;
-				break;
-				
-			case 'skip_for_now':
-				$iNextAction = EmailProcessor::SKIP_FOR_NOW;
-				break;
-				
-			case 'abort_all_further_processing':
-				$iNextAction = EmailProcessor::ABORT_ALL_FURTHER_PROCESSING;
-				break;
-				
-			// Any other action
-			case 'do_nothing':
-			default:
-				break;
-				
-		}
+		$iNextAction = match($sBehavior) {
+			'bounce_delete' => EmailProcessor::DELETE_MESSAGE,
+			'delete' => EmailProcessor::DELETE_MESSAGE,
+			'move' => EmailProcessor::MOVE_MESSAGE,
+			'mark_as_error' => EmailProcessor::MARK_MESSAGE_AS_ERROR,
+			'bounce_mark_as_undesired' => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
+			'mark_as_undesired' => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
+			'skip_for_now' => EmailProcessor::SKIP_FOR_NOW,
+			'abort_all_further_processing' => EmailProcessor::ABORT_ALL_FURTHER_PROCESSING,
+			'do_nothing' =>  EmailProcessor::NO_ACTION,
+			default =>  EmailProcessor::NO_ACTION
+		};
 		
 		static::Trace('.. Set next action for EmailProcessor to '.EmailProcessor::GetActionFromCode($iNextAction));
 		$oMailBox->SetNextAction($iNextAction);
@@ -890,18 +864,14 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		else {
 			
 			$sCallerName = $oCaller->GetName(); // Derive name from Person
-			
-			// @todo Note: iTop 3.0 introduces UserRights::GetUserFromPerson().
-			$sOQL = 'SELECT User AS u JOIN Person AS p ON u.contactid = p.id WHERE p.id = :id';
-			$oUsers = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['id' => $oCaller->GetKey()]);
-			
+
 			// Only first user will be matched. Multiple accounts could theoretically be linked to 1 Person.
-			$oUser = $oUsers->Fetch();
+			$oUser = UserRights::GetUserFromPerson($oCaller, false);
 			
 			if($oUser !== null) {
 				$iCallerUserId = $oUser->GetKey();
 			}
-			// else: $iCallerUserId remains null
+			
 		}
 					
 		// Determine which field to update
@@ -1455,12 +1425,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 						static::Trace("... Attachment {$aAttachment['filename']} will be stored as an Attachment.");
 						$oAttachment = new Attachment();
 						
-						// @todo: Remove condition when support for iTop 2.7 is dropped
-						if(MetaModel::IsValidAttCode('Attachment', 'creation_date') == true) {
-							$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
-						}
-						
-						
+						$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
 						$oAttachment->SetIfNull('creation_date', time());
 
 						if($oUser !== null) {
@@ -1870,7 +1835,6 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Step {
 		
 		$oTicket = static::GetTicket();
 		$oEmail = static::GetMail();
-		$oMailBox = static::GetMailBox();
 		
 		if($oTicket !== null) {
 				
@@ -2761,8 +2725,6 @@ abstract class PolicyRemoveTitlePatterns extends Step {
 	public static function Execute() {
 		
 		// Checking if an undesired title pattern is found
-		
-			$oMailBox = static::GetMailBox();
 			$oEmail = static::GetMail();
 			
 			$sPatterns = static::GetStepSetting('patterns');
