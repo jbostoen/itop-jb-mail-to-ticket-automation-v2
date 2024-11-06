@@ -100,8 +100,7 @@ Also more flexible in title patterns (no regex group required).
 
 ### Lost IMAP connections
 
-There's an attempt to fix issues with lost IMAP connections (to Office 365).
-Contrary to the original extension, EmailReplicas don't immediately disappear when the mail can not be seen anymore.
+There's an attempt to fix issues with lost IMAP connections (to Microsoft Exchange Online / Office 365).
 The email record is still kept for 7 days after the email was last seen.
 
 Benefit: if the email wasn't seen due to a lost IMAP connection, the EmailReplica got deleted with the original Combodo extension.

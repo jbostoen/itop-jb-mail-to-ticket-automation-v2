@@ -103,5 +103,6 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:EmailReplica/Attribute:error_message' => 'Error message~~',
 	'Class:EmailReplica/Attribute:error_trace' => 'Error trace~~',
 	'Class:EmailReplica/Attribute:contents' => 'Contents~~',
+	'Class:EmailReplica/Attribute:mailbox_id' => 'Mailbox ID',
 	
 ));

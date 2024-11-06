@@ -104,23 +104,18 @@ class TestEmailProcessor extends EmailProcessor
 	{
 		try
 		{
+
+			/** @var MailInboxStandard $oInbox */
 			$oInbox = $this->GetInboxFromSource($oSource);
 			self::Trace("Test Email Synchro: MailInboxesEmailProcessor: Processing message $index ({$oEmail->sUIDL})");
-			if ($oEmailReplica->IsNew())
-			{
+			if ($oEmailReplica->IsNew()) {
+
 				$oTicket = $oInbox->ProcessNewEmail($oSource, $index, $oEmail);
 
-				if (is_object($oTicket))
-				{
-					if (EmailBackgroundProcess::IsMultiSourceMode())
-					{
-
-						$oEmailReplica->Set('uidl', $oSource->GetName() . '_' . $oEmail->sUIDL);
-					}
-					else
-					{
-						$oEmailReplica->Set('uidl', $oEmail->sUIDL);
-					}
+				if (is_object($oTicket)) {
+					
+					$oEmailReplica->Set('uidl',$oEmail->sUIDL);
+					$oEmailReplica->Set('mailbox_id', $oInbox->GetKey());
 					$oEmailReplica->Set('mailbox_path', $oSource->GetMailbox());
 					$oEmailReplica->Set('message_id', $oEmail->sMessageId);
 					$oEmailReplica->Set('ticket_id', $oTicket->GetKey());

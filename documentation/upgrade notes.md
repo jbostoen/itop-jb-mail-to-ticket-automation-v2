@@ -8,6 +8,11 @@ Remove all e-mail messages that were already successfully processed from the mai
 Otherwise, it is possible in some situations that they are processed again.  
 This could result in duplicate tickets or log entries in existing tickets.
 
+## Upgrading from before 3.2.241106?
+
+There has been a major change in the internal processing of an e-mail's UIDL.  
+See the best practice on top to avoid duplicate tickets or log entries.
+
 
 ## Upgrading from before 2.7.240625?
 

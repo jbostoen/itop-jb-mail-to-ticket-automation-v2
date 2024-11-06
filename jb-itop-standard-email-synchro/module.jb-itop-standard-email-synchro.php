@@ -28,7 +28,7 @@ SetupWebPage::AddModule(
 		//
 		'datamodel' => array(
 			'model.jb-itop-standard-email-synchro.php',
-			'core/steps.php',
+			'src/Steps.php',
 		),
 		'webservice' => array(
 			
@@ -71,14 +71,21 @@ if (!class_exists('StandardEmailSynchroInstaller')) {
 		 * @since 20191123-2008
 		 */
 		public static function BeforeDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion) {
+
+			if($sPreviousVersion == '' || version_compare($sPreviousVersion, '2.7.231208', '>')) {
+				return;
+			}
+
 			
 			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.7.231208', '<')) {
 			
 				// 20191229-1549: renamed policy
-				self::MoveColumnInDB('MailInboxStandard', 'policy_attachment_image_dimensions_min_width', 'MailInboxStandard', 'step_attachment_criteria_image_min_width');
-				self::MoveColumnInDB('MailInboxStandard', 'policy_attachment_image_dimensions_max_width', 'MailInboxStandard', 'step_attachment_criteria_image_max_width');
-				self::MoveColumnInDB('MailInboxStandard', 'policy_attachment_image_dimensions_min_height', 'MailInboxStandard', 'step_attachment_criteria_image_min_height');
-				self::MoveColumnInDB('MailInboxStandard', 'policy_attachment_image_dimensions_max_height', 'MailInboxStandard', 'step_attachment_criteria_image_max_height');
+				$sTableName = 'mailinbox_standard';
+				self::MoveColumnInDB($sTableName, 'policy_attachment_image_dimensions_min_width', $sTableName, 'step_attachment_criteria_image_min_width');
+				self::MoveColumnInDB($sTableName, 'policy_attachment_image_dimensions_max_width', $sTableName, 'step_attachment_criteria_image_max_width');
+				self::MoveColumnInDB($sTableName, 'policy_attachment_image_dimensions_min_height', $sTableName, 'step_attachment_criteria_image_min_height');
+				self::MoveColumnInDB($sTableName, 'policy_attachment_image_dimensions_max_height', $sTableName, 'step_attachment_criteria_image_max_height');
+
 				
 			}
 			
@@ -111,6 +118,7 @@ if (!class_exists('StandardEmailSynchroInstaller')) {
 					WHERE policy_unknown_caller_behavior = "do_nothing"
 				');
 			}
+
 			
 		}
 		

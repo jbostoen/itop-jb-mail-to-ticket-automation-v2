@@ -38,8 +38,8 @@ require_once(APPROOT.'/application/itopwebpage.class.inc.php');
  * @throws \CoreUnexpectedValue
  * @throws \MySQLException
  */
-function GetMessageDetails($oPage, $sUIDL)
-{
+function GetMessageDetails($oPage, $sUIDL) {
+	
 	$oReplicaSearch = new DBObjectSearch('EmailReplica');
 	$oReplicaSearch->AddCondition('uidl', $sUIDL);
 	$oReplicaSet = new DBObjectSet($oReplicaSearch);

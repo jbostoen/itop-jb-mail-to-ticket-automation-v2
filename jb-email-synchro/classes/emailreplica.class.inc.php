@@ -18,17 +18,16 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
-class EmailReplica extends DBObject
-{
-	public static function Init()
-	{
-		$aParams = array
-		(
+class EmailReplica extends DBObject {
+
+	public static function Init() {
+
+		$aParams = array(
 			"category" => "requestmgmt,grant_by_profile",
 			"key_type" => "autoincrement",
 			"name_attcode" => "uidl",
 			"state_attcode" => "",
-			"reconc_keys" => array("message_id"),
+			"reconc_keys" => array("uidl", "mailbox_id", "mailbox_path"),
 			"db_table" => "email_replica",
 			"db_key_field" => "id",
 			"db_finalclass_field" => "",
@@ -37,6 +36,7 @@ class EmailReplica extends DBObject
 				array('uidl'),
 				array('uidl', 'mailbox_path'),
 				array('uidl', 'mailbox_path', 'id', 'last_seen'),
+				array('mailbox_id'),
 			),		
 		);
 		MetaModel::Init_Params($aParams);
@@ -54,6 +54,8 @@ class EmailReplica extends DBObject
 		MetaModel::Init_AddAttribute(new AttributeText("error_message", array("allowed_values"=>null, "sql"=>"error_message", "default_value"=>null, "is_null_allowed"=>true, "depends_on"=>array())));
 		MetaModel::Init_AddAttribute(new AttributeHTML("error_trace", array("allowed_values"=>null, "sql"=>'error_trace', "default_value"=>'', "is_null_allowed"=>true, "depends_on"=>array(), "always_load_in_tables"=>false)));
 		MetaModel::Init_AddAttribute(new AttributeBlob("contents", array("is_null_allowed"=>true, "depends_on"=>array(), "always_load_in_tables"=>false)));
+		MetaModel::Init_AddAttribute(new AttributeExternalKey("mailbox_id", array("allowed_values" => null, "sql" => "mailbox_id", "targetclass" => "MailInboxBase", "default_value" => null, "is_null_allowed" => false, "on_target_delete"=>DEL_AUTO, "depends_on" => array())));
+
 	}
 	
 	/**

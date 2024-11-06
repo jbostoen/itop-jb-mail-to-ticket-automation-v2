@@ -43,8 +43,6 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 		self::$sBodyPartsOrder = MetaModel::GetModuleSetting(self::$sModuleName, 'body_parts_order', 'text/html,text/plain');
 		$this->aInboxes = array();
 		
-		EmailBackgroundProcess::SetMultiSourceMode(true); // make sure that we can support several email source with potentially overlapping UIDLs
-		
 	}
 	
 	/**
@@ -163,13 +161,8 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 				if(is_object($oResult) && $oResult instanceof Ticket) {
 					self::Trace('Linked mail to ticket. Handle email replica.');
 					
-					if (EmailBackgroundProcess::IsMultiSourceMode()) {
-				
-						$oEmailReplica->Set('uidl', $oSource->GetName() . '_' . $oEmail->sUIDL);
-					}
-					else {
-						$oEmailReplica->Set('uidl', $oEmail->sUIDL);	
-					}
+					$oEmailReplica->Set('uidl', $oEmail->sUIDL);
+					$oEmailReplica->Set('mailbox_id', $oInbox->GetKey());
 					$oEmailReplica->Set('mailbox_path', $oSource->GetMailbox());
 					$oEmailReplica->Set('message_id', $oEmail->sMessageId);
 					$oEmailReplica->Set('ticket_id', $oResult->GetKey());

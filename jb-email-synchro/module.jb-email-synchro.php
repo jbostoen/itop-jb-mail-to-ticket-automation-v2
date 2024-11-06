@@ -60,7 +60,7 @@ SetupWebPage::AddModule(
 				'/\\R-----Message d\'origine-----\\R/m',
 			),
 			
-			'use_message_id_as_uid' => true, // Do NOT change this unless you known what you are doing! Despite being 'false' in Combodo's Mail to Ticket Automation (3.0.5), it works better if set to true on IMAP connections.
+			'use_message_id_as_uid' => true, // Do NOT change this unless you know what you are doing! Despite being 'false' in Combodo's Mail to Ticket Automation (3.0.5), it works better if set to true on IMAP connections.
 			
 			// These settings existed with a - instead of _ 
 			// To make them more consistent:
@@ -124,43 +124,58 @@ if (!class_exists('EmailSynchroInstaller')) {
 		 * @param $sCurrentVersion string Current version number of the module
 		 */
 		public static function AfterDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion) {
+
+			if($sPreviousVersion == '' || version_compare($sPreviousVersion, '3.2.241105', '>')) {
+
+				SetupLog::Info('Mail to Ticket Automation: No database changes needed.');
+				return;
+
+			}
 			
-			// For each email sources, update email replicas by setting mailbox_path to source.mailbox where mailbox_path is null
 
 			// Preparing mailboxes search
 			$oSearch = new DBObjectSearch('MailInboxBase');
 
 			// Retrieving definition of attribute to update
-			$sTableName = MetaModel::DBGetTable('EmailReplica');
+			$sTableNameReplica = MetaModel::DBGetTable('EmailReplica');
 
-			$UidlAttDef = MetaModel::GetAttributeDef('EmailReplica', 'uidl');
-			$sUidlColName = $UidlAttDef->Get('sql');
+			$sUidlColName = MetaModel::GetAttributeDef('EmailReplica', 'uidl')->Get('sql');
+			$sMailboxPathColName = MetaModel::GetAttributeDef('EmailReplica', 'mailbox_path')->Get('sql');
+			$sMailboxIdAttDef = MetaModel::GetAttributeDef('EmailReplica', 'mailbox_id')->Get('sql');
 
-			$oMailboxAttDef = MetaModel::GetAttributeDef('EmailReplica', 'mailbox_path');
-			$sMailboxColName = $oMailboxAttDef->Get('sql');
-
-			// 2020-10-29: IMAP options were moved to individual mailbox settings and will always be prefilled
-			$bUpgradeOptionsIMAP = ($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.201029', '<'));
-			
-			// Looping on inboxes to update
 			$oSet = new DBObjectSet($oSearch);
-			while($oInbox = $oSet->Fetch()) {
-				$sUpdateQuery = "UPDATE $sTableName SET $sMailboxColName = " . CMDBSource::Quote($oInbox->Get('mailbox')) . " WHERE $sUidlColName LIKE " . CMDBSource::Quote($oInbox->Get('login') . '_%') . " AND $sMailboxColName IS NULL";
+
+			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.201029', '<=')) {
 				
-				$iRet = CMDBSource::Query($sUpdateQuery); // Throws an exception in case of error
+				// 2020-10-29: IMAP options were moved to individual mailbox settings and will always be prefilled
+				$bUpgradeOptionsIMAP = ($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.201029', '<'));
 				
-				
-				if($bUpgradeOptionsIMAP == true && trim($oInbox->Get('imap_options') == '')) {
-					$aOptionsIMAP = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap', 'ssl', 'novalidate-cert'));
-					$oInbox->Set('imap_options', implode(PHP_EOL, $aOptionsIMAP));
-					$oInbox->DBUpdate();
+				// Looping over inboxes to update the related email replicas.
+				$oSet->Rewind();
+				while($oInbox = $oSet->Fetch()) {
+
+					$sUpdateQuery = "
+						UPDATE $sTableNameReplica 
+						SET $sMailboxPathColName = " . CMDBSource::Quote($oInbox->Get('mailbox')) . " 
+						WHERE $sUidlColName LIKE " . CMDBSource::Quote($oInbox->Get('login') . '_%') . " 
+						AND $sMailboxPathColName IS NULL";
+					
+					$iRet = CMDBSource::Query($sUpdateQuery); // Throws an exception in case of error
+					
+					if($bUpgradeOptionsIMAP == true && trim($oInbox->Get('imap_options') == '')) {
+						$aOptionsIMAP = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap', 'ssl', 'novalidate-cert'));
+						$oInbox->Set('imap_options', implode(PHP_EOL, $aOptionsIMAP));
+						$oInbox->DBUpdate();
+					}
+					
 				}
-				
+
 			}
 			
 			// Workaround for BeforeWritingConfig() not having $sPreviousVersion
 			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.201219', '<=')) {
 				
+
 				// In previous versions, these parameters were not named in a consistent way. Rename.
 				$aSettings = array(
 					'html_tags_to_remove', 
@@ -185,6 +200,46 @@ if (!class_exists('EmailSynchroInstaller')) {
 				// Update existing configuration PRIOR to iTop installation actually processing this.
 				$oExistingConfig->WriteToFile();
 				
+			}
+
+			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '3.2.241105', '<=')) {
+
+				SetupLog::Info('Mail to Ticket Automation: Add mailbox_id to EmailReplica and remove prefix from UIDL.');
+
+				// Update EmailReplicas: link mailbox.
+				// Based on the first part of the UIDL and the mailbox path, it should be possible to derive an existing mailbox configuration.
+				
+				// Looping over inboxes to update the related email replicas.
+				// Objective: Add the correct mailbox_id.
+				$oSet->Rewind();
+				while($oInbox = $oSet->Fetch()) {
+
+					// Try to match the mailbox based on login and folder / mailbox path.
+					$sUpdateQuery = "
+						UPDATE $sTableNameReplica 
+						SET 
+							$sMailboxIdAttDef = " . $oInbox->GetKey() . " 
+						WHERE 
+							$sUidlColName LIKE " . CMDBSource::Quote($oInbox->Get('login') . '_%') . " 
+							AND $sMailboxPathColName = " . CMDBSource::Quote($oInbox->Get('mailbox')) . "
+							AND ($sMailboxIdAttDef IS NULL OR $sMailboxIdAttDef = 0)";
+
+					SetupLog::Info($sUpdateQuery);
+					
+					// For this mailbox, also remove the prefix.
+					$sUpdateQuery = "
+						UPDATE $sTableNameReplica 
+						SET 
+							$sUidlColName = REPLACE($sUidlColName, " . CMDBSource::Quote($oInbox->Get('login') . '_') . ", '') 
+						WHERE 
+							$sMailboxIdAttDef = " . $oInbox->GetKey();
+
+					SetupLog::Info($sUpdateQuery);
+
+					$iRet = CMDBSource::Query($sUpdateQuery);
+					
+				}
+
 			}
 			
 		}

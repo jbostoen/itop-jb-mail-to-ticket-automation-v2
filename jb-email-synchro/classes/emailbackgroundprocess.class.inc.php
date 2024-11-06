@@ -27,7 +27,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	protected static $sSaveErrorsTo = '';
 	protected static $sNotifyErrorsTo = '';
 	protected static $sNotifyErrorsFrom = '';
-	protected static $bMultiSourceMode = false;
 	public static $iMaxEmailSize = 0;
 	protected $bDebug;
 	private $aMessageTrace = array();
@@ -159,20 +158,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		}
 	}
 	
-	/**
-	 * Call this function to set this mode to true if you want to
-	 * process several incoming mailboxes and if the mail server
-	 * does not assign unique UIDLs across all mailboxes
-	 * For example with MS Exchange the UIDL is just a sequential
-	 * number 1,2,3... inside each mailbox.
-	 */
-	public static function SetMultiSourceMode($bMode = true) {
-		self::$bMultiSourceMode = $bMode;
-	}
-	
-	public static function IsMultiSourceMode() {
-		return self::$bMultiSourceMode;
-	}
 	
 	public function Process($iTimeLimit) {
 		
@@ -293,19 +278,18 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							continue;
 						}
 						
-						// Assume that EmailBackgroundProcess::IsMultiSourceMode() is always set to true
-						if(self::IsMultiSourceMode()) {
-							$sUIDL = $oSource->GetName().'_'.$aMessages[$iMessage]['uidl'];
-						}
-						else {
-							$sUIDL = $aMessages[$iMessage]['uidl'];
-						}
-						
+						$sUIDL = $aMessages[$iMessage]['uidl'];
 						$aUIDLs[] = $sUIDL;
 						
 					}
 					
-					$sOQL = 'SELECT EmailReplica WHERE uidl IN (' . implode(',', CMDBSource::Quote($aUIDLs)) . ') AND mailbox_path = ' . CMDBSource::Quote($oSource->GetMailbox());
+					$sOQL = '
+						SELECT EmailReplica 
+						WHERE
+							uidl IN (' . implode(',', CMDBSource::Quote($aUIDLs)) . ') 
+							AND mailbox_path = ' . CMDBSource::Quote($oSource->GetMailbox()).'
+							AND mailbox_id = '.$oInbox->GetKey();
+
 					$this->Trace("Searching EmailReplicas: '$sOQL'");
 					$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 					$aReplicas = array();
@@ -337,9 +321,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								continue; // invalid email, see \EmailSource::GetListing and N°5633
 							}
 							
-							if(self::IsMultiSourceMode()) {
-								$sUIDL = $oSource->GetName().'_'.$sUIDL;
-							}
+							$sUIDL = $sUIDL;
 
 							$oEmailReplica = array_key_exists($sUIDL, $aReplicas) ? $aReplicas[$sUIDL] : null;
 		
@@ -348,6 +330,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								$this->Trace("\nDispatching new message: uidl=$sUIDL index=$iMessage");
 								// Create a replica to keep track that we've processed this email
 								$oEmailReplica = new EmailReplica();
+								$oEmailReplica->Set('mailbox_id', $oInbox->GetKey());
 								$oEmailReplica->Set('uidl', $sUIDL);
 								$oEmailReplica->Set('mailbox_path', $oSource->GetMailbox());
 								$oEmailReplica->Set('message_id', $iMessage); // This will be set to the actual Message-ID/UIDL in ProcessMessage().
@@ -435,7 +418,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									// IMAP error occurred?
 									if(is_null($oRawEmail)) {
 										$this->Trace("Could not get message (raw email): {$sUIDL}");
-										return "Stopped processing due to (possible temporary) IMAP error. Message(s) read: $iTotalMessages, message(s) skipped: {$iTotalSkipped}, message(s) processed: {$iTotalProcessed}, message(s) deleted: {$iTotalDeleted}, message(s) marked as error: {$iTotalMarkedAsError}, undesired message(s): {$iTotalUndesired}";
+										return "Stopped processing due to (possible temporary) IMAP error. Message(s) read: {$iTotalMessages}, message(s) skipped: {$iTotalSkippedUndesired}, message(s) processed: {$iTotalProcessed}, message(s) deleted: {$iTotalDeleted}, message(s) marked as error: {$iTotalMarkedAsError}, undesired message(s): {$iTotalUndesired}";
 									}
 
 
@@ -595,40 +578,40 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					}
 					
 
-					if(self::IsMultiSourceMode()) {
-						
-						$aIDs = [ -1 ]; // Make sure that the array is never empty...
-						foreach($aReplicas as $oUsedReplica) {
-							if(is_object($oUsedReplica) && ($oUsedReplica->GetKey() != null)) {
-								// Remember last seen in order to not delete message because the IMAP connection failed only briefly. Occurs often with Microsoft Exchange Online.
-								$oUsedReplica->Set('last_seen', date('Y-m-d H:i:s'));
-								$oUsedReplica->DBUpdate();
-								$aIDs[] = (Int)$oUsedReplica->GetKey();
-							}
-						}
-						
-						// Clean up the unused replicas based on the pattern of their UIDL, unfortunately this is not possible in NON multi-source mode
-						$iRetentionPeriod = MetaModel::GetModuleSetting('jb-email-synchro', 'retention_period', 24);
-						$sOQL = "SELECT EmailReplica WHERE uidl LIKE " . CMDBSource::Quote($oSource->GetName() . '_%') .
-							" AND mailbox_path = " . CMDBSource::Quote($oSource->GetMailbox()) .
-							" AND id NOT IN (" . implode(',', CMDBSource::Quote($aIDs)) . ")".
-							" AND last_seen <	DATE_SUB(NOW(), INTERVAL ".$iRetentionPeriod." HOUR)";
-						$this->Trace("Searching for unused EmailReplicas: {$sOQL}");
-						$oUnusedReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
-						$oUnusedReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl']]);
-						while($oReplica = $oUnusedReplicaSet->Fetch()) {
-							// Replica not used for at least 7 days
-							$this->Trace("Deleting unused EmailReplica since ".$iRetentionPeriod." hours (#".$oReplica->GetKey()."), UIDL: ".$oReplica->Get('uidl'));
-							$oReplica->DBDelete();
-							
-							if (time() > $iTimeLimit)  {
-				
-								$this->Trace(self::CRON_TIME_LIMIT_REACHED_MESSAGE);
-								break; // We'll do the rest later
-								
-							}
+					
+					$aIDs = [ -1 ]; // Make sure that the array is never empty...
+					foreach($aReplicas as $oUsedReplica) {
+						if(is_object($oUsedReplica) && ($oUsedReplica->GetKey() != null)) {
+							// Remember last seen in order to not delete message because the IMAP connection failed only briefly. Occurs often with Microsoft Exchange Online.
+							$oUsedReplica->Set('last_seen', date('Y-m-d H:i:s'));
+							$oUsedReplica->DBUpdate();
+							$aIDs[] = (Int)$oUsedReplica->GetKey();
 						}
 					}
+					
+					// Clean up the unused replicas for this mailbox configuration.
+					$iRetentionPeriod = MetaModel::GetModuleSetting('jb-email-synchro', 'retention_period', 24);
+					$sOQL = "SELECT EmailReplica ".
+						" WHERE mailbox_path = " . CMDBSource::Quote($oSource->GetMailbox()) .
+						" AND mailbox_id = ".$oInbox->GetKey().
+						" AND id NOT IN (" . implode(',', CMDBSource::Quote($aIDs)) . ")".
+						" AND last_seen < DATE_SUB(NOW(), INTERVAL ".$iRetentionPeriod." HOUR)";
+					$this->Trace("Searching for unused EmailReplicas: {$sOQL}");
+					$oUnusedReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
+					$oUnusedReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl']]);
+					while($oReplica = $oUnusedReplicaSet->Fetch()) {
+						// Replica not used for at least 7 days
+						$this->Trace("Deleting unused EmailReplica since ".$iRetentionPeriod." hours (#".$oReplica->GetKey()."), UIDL: ".$oReplica->Get('uidl'));
+						$oReplica->DBDelete();
+						
+						if (time() > $iTimeLimit)  {
+			
+							$this->Trace(self::CRON_TIME_LIMIT_REACHED_MESSAGE);
+							break; // We'll do the rest later
+							
+						}
+					}
+					
 				}
 				$oSource->Disconnect();
 			}
