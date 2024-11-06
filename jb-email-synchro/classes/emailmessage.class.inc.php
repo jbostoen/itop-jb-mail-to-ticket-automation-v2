@@ -29,7 +29,6 @@ class EmailMessage {
 	public $sCallerName;
 	public $sRecipient;
 	public $aReferences;
-	public $sThreadIndex;
 	public $sBodyText;
 	public $sBodyFormat;
 	public $aAttachments;
@@ -58,7 +57,27 @@ class EmailMessage {
 
 	const NEW_LINE_MARKER = '__NEWLINE__'; // unlikely to be found in the body of an email message
 	
-	public function __construct($sUIDL, $sMessageId, $sSubject, $sCallerEmail, $sCallerName, $sRecipient, $aReferences, $sThreadIndex, $sBodyText, $sBodyFormat, $aAttachments, $oRelatedObject, $aHeaders, $sDecodeStatus, $sDate = '', $aTos = array(), $aCCs = array()) {
+	/**
+	 * Constructor for EmailMessage
+	 *
+	 * @param string $sUIDL A message UIDL.
+	 * @param string $sMessageId A message ID.
+	 * @param string $sSubject The subject of the message.
+	 * @param string $sCallerEmail The sender's email address.
+	 * @param string $sCallerName The sender's name.
+	 * @param string $sRecipient The recipient.
+	 * @param string[] $aReferences References.
+	 * @param string $sBodyText The body text.
+	 * @param string $sBodyFormat The body format.
+	 * @param array $aAttachments Any attachments.
+	 * @param Ticket $oRelatedObject A related object (ticket).
+	 * @param array[] $aHeaders The e-mail headers.
+	 * @param string $sDecodeStatus The decode status.
+	 * @param string $sDate The date of the e-mail.
+	 * @param array $aTos Any recipients in To:.
+	 * @param array $aCCs Any recipients in CC:.
+	 */
+	public function __construct($sUIDL, $sMessageId, $sSubject, $sCallerEmail, $sCallerName, $sRecipient, $aReferences, $sBodyText, $sBodyFormat, $aAttachments, $oRelatedObject, $aHeaders, $sDecodeStatus, $sDate = '', $aTos = array(), $aCCs = array()) {
 		$this->sUIDL = $sUIDL;
 		$this->sMessageId = $sMessageId;
 		$this->sSubject = $sSubject;
@@ -66,7 +85,6 @@ class EmailMessage {
 		$this->sCallerName = $sCallerName;
 		$this->sRecipient = $sRecipient;
 		$this->aReferences = $aReferences;
-		$this->sThreadIndex = $sThreadIndex;
 		$this->sBodyText = @iconv("UTF-8", "UTF-8//IGNORE", $sBodyText); // Filter out NON UTF-8 characters
 		$this->sBodyFormat = $sBodyFormat;
 		$this->aAttachments = $aAttachments;
@@ -271,6 +289,7 @@ class EmailMessage {
 	 * @param unknown $aTagsToRemove
 	 */
 	protected function CleanNode(DOMNode $oElement, $aTagsToRemove) {
+
 		$aAttrToRemove = array();
 		
 		if($oElement->hasChildNodes()) {
