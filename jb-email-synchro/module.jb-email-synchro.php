@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'jb-email-synchro/3.2.241031',
+	'jb-email-synchro/3.2.241108',
 	array(
 		// Identification
 		'label' => 'Mail to Ticket Automation (core)',
@@ -215,7 +215,7 @@ if (!class_exists('EmailSynchroInstaller')) {
 				while($oInbox = $oSet->Fetch()) {
 
 					// Try to match the mailbox based on login and folder / mailbox path.
-					$sUpdateQuery = "
+					$sQuery = "
 						UPDATE $sTableNameReplica 
 						SET 
 							$sMailboxIdAttDef = " . $oInbox->GetKey() . " 
@@ -224,19 +224,30 @@ if (!class_exists('EmailSynchroInstaller')) {
 							AND $sMailboxPathColName = " . CMDBSource::Quote($oInbox->Get('mailbox')) . "
 							AND ($sMailboxIdAttDef IS NULL OR $sMailboxIdAttDef = 0)";
 
-					SetupLog::Info($sUpdateQuery);
-					
+					SetupLog::Info($sQuery);
+					CMDBSource::Query($sQuery);
+
 					// For this mailbox, also remove the prefix.
-					$sUpdateQuery = "
+					$sQuery = "
 						UPDATE $sTableNameReplica 
 						SET 
 							$sUidlColName = REPLACE($sUidlColName, " . CMDBSource::Quote($oInbox->Get('login') . '_') . ", '') 
 						WHERE 
 							$sMailboxIdAttDef = " . $oInbox->GetKey();
 
-					SetupLog::Info($sUpdateQuery);
+					SetupLog::Info($sQuery);
+					CMDBSource::Query($sQuery);
+					
+					// Remove unmatched email replicas.
+					$sQuery = "
+						DELETE FROM $sTableNameReplica 
+						WHERE 
+							$sMailboxIdAttDef IS NULL OR $sMailboxIdAttDef = 0
+					";
 
-					$iRet = CMDBSource::Query($sUpdateQuery);
+					SetupLog::Info($sQuery);
+					CMDBSource::Query($sQuery);
+
 					
 				}
 

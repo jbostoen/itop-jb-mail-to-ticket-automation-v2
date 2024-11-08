@@ -13,6 +13,8 @@ This could result in duplicate tickets or log entries in existing tickets.
 There has been a major change in the internal processing of an e-mail's UIDL.  
 See the best practice on top to avoid duplicate tickets or log entries.
 
+The minimum requirement is now iTop 3.2.
+
 
 ## Upgrading from before 2.7.240625?
 

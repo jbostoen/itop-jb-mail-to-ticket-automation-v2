@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (c) 2019-2024 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     3.2.241031
+ * @version     3.2.241108
  *
  * Policy interface definition and some classes implementing it.
  * 
@@ -1562,7 +1562,7 @@ abstract class StepMatchByInReplyToOrReferences extends Step {
 	 * @inheritDoc
 	 *
 	 * @details This must run before policies such as PolicyBounceUnknownTicketReference, PolicyTicketResolved, PolicyTicketClosed
-	 * @todo Re-evaluate PolicyBounceUnknownTicketReference. Should this step run before or after?
+	 * @todo Re-evaluate PolicyBounceUnknownTicketReference. Should this step be executed before or after?
 	 */
 	public static $iPrecedence = 9;
 	
@@ -2294,7 +2294,8 @@ abstract class PolicyBounceUnknownTicketReference extends Step {
 		
 		// Is the ticket valid in the iTop database or does the number NOT match?
 		// Checking if ticket reference is invalid
-		// Due to an earlier GetRelatedTicket() call in MailInboxStandard, Ticket would NOT have been null if there was a valid reference.
+		// Due to an earlier GetRelatedTicket() call in MailInboxStandard, 
+		// the related ticket should NOT have been null if there was a valid reference to it.
 		if($oTicket === null) {
 		
 			// This could be a new ticket. Then it's logical the Ticket object is null. 
@@ -2305,7 +2306,9 @@ abstract class PolicyBounceUnknownTicketReference extends Step {
 			$sSubject = $oEmail->sSubject;
 			
 			// Here the removal/ignoring of patterns happens; on a copy of the subject string; only to find related tickets.
+			// The only purpose of this is to add some extra debug info.
 			foreach(['policy_remove_pattern_patterns', 'title_pattern_ignore_patterns'] as $sAttCode) {
+
 				$sPatterns = $oMailBox->Get($sAttCode);
 				
 				if(trim($sPatterns) != '') {
@@ -2704,13 +2707,14 @@ abstract class PolicyFindCaller extends Step {
 
 
 /**
- * Class PolicyRemoveTitlePatterns. A policy to remove patterns in titles (in message subject and later ticket title).
- * @todo Check if this works properly
+ * Class PolicyRemoveTitlePatterns. 
+ * A policy to remove patterns in titles (in message subject and later ticket title).
  */
 abstract class PolicyRemoveTitlePatterns extends Step {
 	
 	/**
 	 * @inheritDoc
+	 * Must be executed before StepCreateOrUpdateTicket ( precedence = 200 ).
 	 */
 	public static $iPrecedence = 110;
 	

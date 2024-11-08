@@ -587,7 +587,7 @@ EOF
 					<comment>
 						<![CDATA[/**
 						
-	 * @todo Seems unneccessary in this fork, as it's implemented in a different way.belg	
+	 * @details This is unused in the fork. Keeping it only to remain a bit in sync with Combodo's implementation.
 
 	 * Add the eMail's attachments to the given Ticket. Avoid duplicates (based on name/size/md5),
 	 * avoid attaching blacklisted file types, and can potentially call an AntiVirus before adding the attachment
