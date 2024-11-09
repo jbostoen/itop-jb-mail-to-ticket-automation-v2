@@ -705,7 +705,7 @@ EOF
 		
 		if($oTicket == null) {
 			
-			// To find the reference, make sure subject is handled in same way as original ticket (removing unwanted pattern)
+			// To find the reference, make sure subject is handled in the same way as with the original ticket (removing unwanted pattern)
 			$sSubject = $oEmail->sSubject;
 			
 			// Here it's possible to ignore patterns.
