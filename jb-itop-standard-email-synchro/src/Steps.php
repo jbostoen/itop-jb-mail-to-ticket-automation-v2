@@ -1636,12 +1636,14 @@ abstract class StepMatchByInReplyToOrReferences extends Step {
 
 		static::Trace('.. '.count($aReferences).' references: '.implode(', ', $aReferences));
 		
-		// Safety measure to enforce Message-ID to only be 255 characters. Should be safe enough. This is assumed by Combodo's implementation as well.
+		// Safety measure to enforce Message-ID to only be 255 characters.
+		// Should be safe enough. This is assumed by Combodo's implementation as well.
 		foreach($aReferences as &$sRef) {
 			$sRef = substr($sRef, 0, 255);
 		}
 		
-		// Find all references linking to a ticket.
+		// For this mailbox, find the e-mail references that were already known in the system (previously processed).
+		// Keep in mind, it's possible the same e-mail UID is linked to multiple tickets (copy of a ticket plus linked references).
 		$oFilterLinks = new DBObjectSearch('lnkEmailUidToTicket');
 		$oFilterLinks->AddCondition('mailbox_id', $oMailBox->GetKey(), '=');
 		$oFilterLinks->AddCondition('message_uid', $aReferences, 'IN');
@@ -1656,7 +1658,8 @@ abstract class StepMatchByInReplyToOrReferences extends Step {
 			$aKnownReferences[] = $oLink->Get('message_uid');
 		}
 		
-		// Store the referenced that were NOT found, as new references; so they can be saved once the ticket is known.
+		// Store the references that were NOT found, as new references;
+		// so they can be saved once the ticket is known.
 		StepSaveReferences::$aNewUIDLs = array_diff($aReferences, $aKnownReferences);
 
 		if($oTicket === null) {
@@ -2116,8 +2119,6 @@ abstract class PolicyBounceOtherRecipients extends Step {
 	public static function Execute() {
 		
 		$oEmail = static::GetMail();
-		$oMailBox = static::GetMailBox();
-		
 		
 		// Checking if there are no other recipients mentioned.
 		
@@ -2379,7 +2380,6 @@ abstract class PolicyTicketResolved extends Step {
 	public static function Execute() {
 		
 		$oTicket = static::GetTicket();
-		$oMailBox = static::GetMailBox();
 		
 		// Checking if a previous ticket was found
 			if($oTicket !== null && $oTicket->Get('status') == 'resolved') {

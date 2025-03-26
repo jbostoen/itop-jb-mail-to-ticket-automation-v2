@@ -1439,13 +1439,6 @@ EOF
 					</index>
 				</indexes>
 				<uniqueness_rules>
-					<!-- In the current implementation, the message_uid should also be unique. It will only be matched to one ticket; or otherwise ignored. -->
-					<rule id="unique_message_uid_and_mailbox_id">
-						<attributes>
-							<attribute id="message_uid"/>
-							<attribute id="mailbox_id"/>
-						</attributes>
-					</rule>
 					<rule id="unique_message_uid_and_mailbox_id_and_ticket_id">
 						<attributes>
 							<attribute id="message_uid"/>

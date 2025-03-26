@@ -11,13 +11,18 @@
 namespace jb_itop_extensions\mail_to_ticket;
 
 // iTop internals
-use \DBObjectSet;
-use \DBObjectSearch;
-use \MetaModel;
-use \Person;
+use DBObjectSet;
+use DBObjectSearch;
+use MetaModel;
+use Person;
+use Ticket;
+
+// Mail
+use EmailMessage;
+use RawEmailMessage;
 
 // Generic
-use \Exception;
+use Exception;
  
 /**
  * Class StepFindCallerByContactMethod. Step to find the caller (Person) based on ContactMethod.
@@ -38,13 +43,13 @@ abstract class StepFindCallerByContactMethod extends Step {
 	/**
 	 * Finds contacts by contact method (ContactMethod) or e-mail alias (Combodo's EmailAlias).
 	 * 
-	 * @param \String $sEmail E-mail address.
+	 * @param string $sEmail E-mail address.
 	 *
-	 * @return \Person|null
+	 * @return Person|null
 	 */
 	public static function FindContactByEmail(String $sEmail) : ?Person {
 
-		/** @var \Person $oPerson|null A person object in iTop. */
+		/** @var Person $oPerson|null A person object in iTop. */
 		$oPerson = null;
 
 		foreach([
@@ -60,9 +65,10 @@ abstract class StepFindCallerByContactMethod extends Step {
 				$oSet_Person = new DBObjectSet($oFilter_Person, ['id' => true], [
 					'email' => $sEmail	
 				]);
-				$oPerson = $oSet_Person->Fetch();
 
-				static::Trace('... OQL '.$sClass.' returned '.$oSet_Person->Count().' results.');
+				static::Trace(sprintf('... OQL %1$s returned %2$s results.', $sClass, $oSet_Person->Count()));
+
+				$oPerson = $oSet_Person->Fetch();
 
 				// If one of the queries finds a person: exit.
 				if($oPerson !== null) {
@@ -84,10 +90,10 @@ abstract class StepFindCallerByContactMethod extends Step {
 	public static function Execute() {
 		
 
-		/** @var \EmailMessage $oEmail E-mail message. */
+		/** @var\EmailMessage $oEmail E-mail message. */
 		$oEmail = static::GetMail();
 
-		/** @var \RawEmailMessage $oRawEmail Raw e-mail message. */
+		/** @var RawEmailMessage $oRawEmail Raw e-mail message. */
 		$oRawEmail = static::GetRawMail();
 	
 		// Don't even bother if jb-contactmethod is not enabled as an extension.
@@ -96,7 +102,7 @@ abstract class StepFindCallerByContactMethod extends Step {
 			return;
 		}
 
-		/** @var \Person $oCaller Person. */
+		/** @var Person $oCaller Person. */
 		$oCaller = $oEmail->GetSender();
 		
 		// Don't bother if the caller is already determined.
@@ -106,7 +112,7 @@ abstract class StepFindCallerByContactMethod extends Step {
 
 		$sCallerEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
 
-		/** @var \Person|null $oCaller The related person. */
+		/** @var Person|null $oCaller The related person. */
 		$oPerson = StepFindCallerByContactMethod::FindContactByEmail($sCallerEmail);
 
 		if($oPerson === null) {
@@ -157,13 +163,13 @@ abstract class StepFindAdditionalContactsByContactMethod extends Step {
 				return;
 			}
 			
-			/** @var \EmailMessage $oEmail E-mail message. */
+			/** @var EmailMessage $oEmail E-mail message. */
 			$oEmail = static::GetMail();
 			
-			/** @var \RawEmailMessage $oRawEmail Raw e-mail message. */
+			/** @var RawEmailMessage $oRawEmail Raw e-mail message. */
 			$oRawEmail = static::GetRawMail();
 
-			/** @var \Ticket $oTicket The ticket. */
+			/** @var Ticket $oTicket The ticket. */
 			$oTicket = static::GetTicket();
 			
 			$sSenderEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
@@ -190,7 +196,7 @@ abstract class StepFindAdditionalContactsByContactMethod extends Step {
 			// For each recipient: Try to find the person object.
 			foreach($aRemainingContacts as $sCurrentEmail) {
 			
-				/** @var \Person|null $oCaller The related person. */	
+				/** @var Person|null $oCaller The related person. */	
 				$oPerson = StepFindCallerByContactMethod::FindContactByEmail($sCurrentEmail);
 				
 				// Only if there is a match.
