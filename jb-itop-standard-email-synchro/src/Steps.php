@@ -1162,9 +1162,14 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		$sClassList = implode(', ', CMDBSource::Quote($aClasses));
 		$oSet_TriggerMailUpdate = new DBObjectSet(DBObjectSearch::FromOQL_AllData("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
 
+		$aContext = [
+			'this->object()' => $oTicket,
+			'sender->object()' => static::GetMail()->GetSender(),
+        ];
+
 		/** @var Trigger $oTrigger iTop Trigger. */
 		while($oTrigger = $oSet_TriggerMailUpdate->Fetch()) {
-			$oTrigger->DoActivate($oTicket->ToArgs('this'));
+			$oTrigger->DoActivate($aContext);
 		}
 
 		// Apply a stimulus if needed, will write the ticket to the database, may launch triggers, etc...
@@ -1250,7 +1255,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 							}
 						}
 						else {
-							$aAllowedValues = MetaModel::GetAllowedValues_att(get_class($oTicket), $sAttCode, $aArgs);
+							$aAllowedValues = MetaModel::GetAllowedValues_att(get_class($oTicket), $sAttCode, $aArgs) ?? [];
 							if (count($aAllowedValues) == 1) {
 								$aValues = array_keys($aAllowedValues);
 								$oTicket->Set($sAttCode, $aValues[0]);

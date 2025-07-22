@@ -46,12 +46,12 @@ class EmailMessage {
 	protected $oDoc = null;
 	
 	/**
-	 * @var \Person[] $aInternal_Additional_Contacts Zero or more Person objects.
+	 * @var Person[] $aInternal_Additional_Contacts Zero or more Person objects.
 	 */
 	private $aInternal_Additional_Contacts = [];
 	
 	/**
-	 * @var \Person $oInternal_Contact An iTop person (the caller of the ticket).
+	 * @var Person $oInternal_Contact An iTop person (the caller of the ticket).
 	 */
 	public $oInternal_Contact = null;
 
@@ -458,7 +458,7 @@ class EmailMessage {
 	/**
 	 * Sets the sender of the e-mail.
 	 * 
-	 * @param \Person $oPerson Person object.
+	 * @param Person $oPerson Person object.
 	 *
 	 * @return void
 	 */
@@ -469,9 +469,10 @@ class EmailMessage {
 	}
 
 	/**
-	 * Returns the sender of the e-mail.
+	 * Returns the sender of the e-mail.  
+	 * Note: This can be different from the caller linked to the ticket.
 	 *
-	 * @return \Person|null The related person object (if found).
+	 * @return Person|null The related person object (if found).
 	 */
 	public function GetSender() {
 
@@ -482,7 +483,7 @@ class EmailMessage {
 	/**
 	 * Adds a related contact.
 	 *
-	 * @param \Person $oPerson The related person object.
+	 * @param Person $oPerson The related person object.
 	 *
 	 * @return void
 	 */
@@ -502,7 +503,7 @@ class EmailMessage {
 	/**
 	 * Gets related contacts. This includes (if identified, and eligible) the sender and recipients.
 	 * 
-	 * @return \Person[] Array of related person objects.
+	 * @return Person[] Array of related person objects.
 	 */
 	public function GetRelatedContacts() {
 

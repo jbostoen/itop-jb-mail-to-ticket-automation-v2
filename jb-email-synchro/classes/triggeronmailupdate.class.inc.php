@@ -46,7 +46,8 @@ class TriggerOnMailUpdate extends TriggerOnObject
 			'description',
 			'target_class',
 			'filter',
-			'action_list'
+			'action_list',
+			'subscription_policy',
 		)); 
 		
 		// Attributes to be displayed for the complete details
