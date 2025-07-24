@@ -97,6 +97,9 @@ user=shared@mailbox.org
 
 # Policies 
 
+Policies are mail processing steps that may enforce a rule.  
+For instance, a policy could reject messages with an empty subject.
+
 ## Basics about policies
 
 Common options are:
@@ -118,9 +121,20 @@ So in the bounce subject/message, it's possible to use `$mail->subject$` etc. (l
 
 ## Available placeholders
 
-The place holders can be used like this: `$mail->some_property_from_the_list_below$` , e.g. `$mail->subject$`
+Bounce messages are e-mails that can be sent to the sender when an e-mail message does not comply with a certain rule.  
+The bounce messages can make use of variables in their subject and in the body.  
 
-Available properties for the mail:
+The following variables are exposed:
+
+* `mail` object.
+* `sender` object (Only after the sender was successfully linked to an iTop person).
+
+The `sender` object exposes the attribute values of the person in iTop.  
+For example, you can use `$sender->first_name$ $sender->name$` .
+
+The `mail` object is custom.  
+You can view the list of available attributes below.  
+In the same way, you can use `mail->caller_email` etc.  
 
 ```
 body_format
@@ -135,6 +149,7 @@ recipient
 subject
 uidl
 ```
+
 
 ## Behavior on Incoming emails
 

@@ -364,7 +364,7 @@ abstract class Step implements iStep {
 	 *
 	 * @details Also exposes some properties which are not likely to be useful (body_format) at any time, but who knows?
 	 *
-	 * @return String String where the placeholders are filled in
+	 * @return String String where the placeholders are filled in.
 	 */
 	public static function ReplaceMailPlaceholders($sString, $aExtraPlaceholders = []) {
 		
@@ -390,7 +390,7 @@ abstract class Step implements iStep {
 		
 		$aParams = array_merge($aParams, $aExtraPlaceholders);
 		
-		// Extend
+		// Extend. This is to allow for both the original parameter and the HTML-encoded version of it.
 		$aParamsExtended = [];
 		foreach($aParams as $sParam => $sValue) {
 			$aParamsExtended[$sParam] = $sValue;
