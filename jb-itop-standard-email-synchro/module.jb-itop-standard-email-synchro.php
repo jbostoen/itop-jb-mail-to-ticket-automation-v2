@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'jb-itop-standard-email-synchro/3.2.241109',
+	'jb-itop-standard-email-synchro/3.2.250724',
 	array(
 		// Identification
 		//
@@ -15,6 +15,7 @@ SetupWebPage::AddModule(
 		// Setup
 		//
 		'dependencies' => array(
+			'itop-tickets/3.2.0',
 			'jb-framework/2.6.191216',
 			'jb-email-synchro/2.6.190110',
 			'jb-news/3.2.0',

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @copyright   Copyright (c) 2019-2024 Jeffrey Bostoen
+ * @copyright   Copyright (c) 2019-2025 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     3.2.241109
+ * @version     3.2.250724
  *
  * Policy interface definition and some classes implementing it.
  * 
@@ -55,6 +55,20 @@ const NEWLINE_REGEX = '/\r\n|\r|\n/';
  */
 interface iStep {
 	
+}
+
+
+enum PolicyBehavior : string {
+	// The behavior of the policy when it is violated.
+	case BOUNCE_DELETE = 'bounce_delete';
+	case BOUNCE_MARK_AS_UNDESIRED = 'bounce_mark_as_undesired';
+	case DELETE = 'delete';
+	case DO_NOTHING = 'do_nothing';
+	case MARK_AS_UNDESIRED = 'mark_as_undesired';
+	case MOVE = 'move';
+	case MARK_AS_ERROR = 'mark_as_error';
+	case SKIP_FOR_NOW = 'skip_for_now';
+	case ABORT_ALL_FURTHER_PROCESSING = 'abort_all_further_processing';
 }
 
 
@@ -461,7 +475,7 @@ abstract class Step implements iStep {
 		// - bounce_delete -> bounce and delete the message
 		// - bounce_mark_as_undesired -> bounce and marks the message as undesired
 		// - delete -> delete the message
-		// - do_nothing -> great, lazy. For testing purposes. To actually see if policies are processed or log additional info without doing anything in the end.
+		// - PolicyBehavior::DO_NOTHING -> great, lazy. For testing purposes. To actually see if policies are processed or log additional info without doing anything in the end.
 		// - mark_as_undesired -> stays in the mailbox for a few days
 		// - some sort of fallback -> doesn't matter here
 		
@@ -474,8 +488,8 @@ abstract class Step implements iStep {
 		switch($sBehavior) {
 		
 			// Generic cases
-			case 'bounce_delete':
-			case 'bounce_mark_as_undesired':
+			case PolicyBehavior::BOUNCE_DELETE:
+			case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
 			
 				static::Trace('Bounce message: '.$sSettingsPrefix);
 				
@@ -508,16 +522,16 @@ abstract class Step implements iStep {
 		}
 		
 		$iNextAction = match($sBehavior) {
-			'bounce_delete' => EmailProcessor::DELETE_MESSAGE,
-			'delete' => EmailProcessor::DELETE_MESSAGE,
-			'move' => EmailProcessor::MOVE_MESSAGE,
-			'mark_as_error' => EmailProcessor::MARK_MESSAGE_AS_ERROR,
-			'bounce_mark_as_undesired' => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
-			'mark_as_undesired' => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
-			'skip_for_now' => EmailProcessor::SKIP_FOR_NOW,
-			'abort_all_further_processing' => EmailProcessor::ABORT_ALL_FURTHER_PROCESSING,
-			'do_nothing' =>  EmailProcessor::NO_ACTION,
-			default =>  EmailProcessor::NO_ACTION
+			PolicyBehavior::BOUNCE_DELETE => EmailProcessor::DELETE_MESSAGE,
+			PolicyBehavior::DELETE => EmailProcessor::DELETE_MESSAGE,
+			PolicyBehavior::MOVE => EmailProcessor::MOVE_MESSAGE,
+			PolicyBehavior::MARK_AS_ERROR => EmailProcessor::MARK_MESSAGE_AS_ERROR,
+			PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
+			PolicyBehavior::MARK_AS_UNDESIRED => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
+			PolicyBehavior::SKIP_FOR_NOW => EmailProcessor::SKIP_FOR_NOW,
+			PolicyBehavior::ABORT_ALL_FURTHER_PROCESSING => EmailProcessor::ABORT_ALL_FURTHER_PROCESSING,
+			PolicyBehavior::DO_NOTHING => EmailProcessor::NO_ACTION,
+			default => EmailProcessor::NO_ACTION
 		};
 		
 		static::Trace('.. Set next action for EmailProcessor to '.EmailProcessor::GetActionFromCode($iNextAction));
@@ -641,7 +655,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	
 	/**
-	 * Function inspired by Combodo's MailInboxStandard::CreateTicketFromEmail()
 	 * Creates a new Ticket from an email.
 	 *
 	 * @return void
@@ -657,13 +670,13 @@ abstract class StepCreateOrUpdateTicket extends Step {
 
 		// In case of error (exception...) set the behavior
 		// Upon success, this will be overruled again.
-		if($oMailBox->Get('error_behavior') == 'delete') {
+		if($oMailBox->Get('error_behavior') == PolicyBehavior::DELETE) {
 			
 			 // Remove the message from the mailbox
 			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);
 			
 		}
-		elseif($oMailBox->Get('error_behavior') == 'mark_as_error') {
+		elseif($oMailBox->Get('error_behavior') == PolicyBehavior::MARK_AS_ERROR) {
 			
 			 // Keep the message in the mailbox, but marked as error
 			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR);
@@ -790,7 +803,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	
 	/**
-	 * Function inspired by Combodo's MailInboxStandard::UpdateTicketFromEmail()
 	 * Updates an existing Ticket from an email
 	 *
 	 * @return void
@@ -806,10 +818,10 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		
 		// In case of error (exception...) set the behavior
 		// Upon success, this will be overruled again.
-		if($oMailBox->Get('error_behavior') == 'delete') {
+		if($oMailBox->Get('error_behavior') == PolicyBehavior::DELETE) {
 			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
 		}
-		elseif($oMailBox->Get('error_behavior') == 'mark_as_error') {
+		elseif($oMailBox->Get('error_behavior') == PolicyBehavior::MARK_AS_ERROR) {
 			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 		}
 		
@@ -932,7 +944,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	
 	/**
-	 * Function inspired by Combodo's MailInboxStandard::BeforeInsertTicket().
 	 * Called right before a Ticket is created.
 	 *
 	 * @return void
@@ -944,7 +955,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	
 	/**
-	 * Function inspired by Combodo's MailInboxStandard::AfterInsertTicket().
 	 * Called right after a Ticket is created.
 	 *
 	 * @return void
@@ -957,7 +967,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	 
 	/**
-	 * Function inspired by Combodo's MailInboxStandard::BuildDescription().
 	 * Returns a description for a new Ticket.
 	 *
 	 * @param Boolean $bForPlainText True if the desired output format is plain text, false if HTML
@@ -996,7 +1005,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	
 	/**
-	 * Function inspired by Combodo's MailInboxStandard::ManageInlineImages().
 	 *
 	 * @param String $sBodyText Body text
 	 * @param Boolean $bForPlainText Plain text (true) or HTML (false)
@@ -1082,7 +1090,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	 
 	/**
-	 * Function inspired by Combodo's MailInboxStandard::AddAdditionalContacts()
 	 * Adds additional contacts in the email as related contacts in the Ticket.
 	 *
 	 * @return void
@@ -1135,7 +1142,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	
 	/**
-	 * Function inspired by Combodo's MailInboxStandard::BeforeUpdateTicket()
 	 *
 	 * @return void
 	 */
@@ -1146,7 +1152,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	
 	/**
-	 * Function inspired by Combodo's MailInboxStandard::AfterUpdateTicket()
 	 * Hook to run function after a Tickt has been updated.
 	 * In this case, it activates the trigger "TriggerOnMailUpdate"
 	 *
@@ -1182,8 +1187,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	
 	/**
-	 * Function inspired by Combodo's MailInboxStandard::ApplyConfiguredStimulus()
-	 *
 	 * Read the configuration in the 'stimuli' field (format: <state_code>:<stimulus_code>, one per line)
 	 * and apply the corresponding stimulus according to the current state of the ticket
 	 *
@@ -1291,7 +1294,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	
 	/**
-	 * Function inspired by Combodo's MailInboxStandard::BuildCaseLogEntry()
 	 * Build the text/html to be inserted in the case log when the ticket is updated
 	 * Starting with iTop 2.3.0, the format is always HTML
 	 *
@@ -1326,7 +1328,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	 }
 	 
 	/**
-	 * Function inspired by Combodo's MailInboxBase::AddAttachments()
 	 * @param Boolean $bNoDuplicates If true, don't add attachment that seem already attached to the ticket (same type, same name, same size, same md5 checksum).
 	 * @param Person $oCaller The caller.
 	 * @param User $oUser The user (account).
@@ -1474,7 +1475,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	 }
 	 
 	/**
-	 * Function inspired by Combodo's MailInboxBase::UpdateAttachments()
 	 * Links a collection of attachments to a newly created ticket.
 	 *
 	 * @uses PolicyCreateOrUpdateTicket::$aAddedAttachments
@@ -1497,7 +1497,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	 
 	/**
-	 * Function inspired by Combodo's MailInboxBase::IsImage()
 	 * Checks whether a MimeType is an image which can be processed by iTop (PHP GD)
 	 *
 	 * @param String $sMimeType
@@ -1532,7 +1531,6 @@ abstract class StepCreateOrUpdateTicket extends Step {
 	}
 	
 	/**
-	 * Function inspired by Combodo's MailInboxBase::FitTextIn()
 	 * Truncates the text, if needed, to fit into the given the maximum length and:
 	 * 1) Takes care of replacing line endings by \r\n since the browser produces this kind of line endings inside a TEXTAREA
 	 * 2) Trims the result to emulate the behavior of iTop's inputs
@@ -1799,13 +1797,13 @@ abstract class StepFinalAction extends Step {
 		$iNextAction = EmailProcessor::PROCESS_MESSAGE;
 		
 		// Delete the source email immediately?
-		if($oMailBox->Get('email_storage') == 'delete') {
+		if($oMailBox->Get('email_storage') == PolicyBehavior::DELETE) {
 			
 			// Remove the processed message from the mailbox.
 			$iNextAction = EmailProcessor::DELETE_MESSAGE;
 			
 		}
-		elseif($oMailBox->Get('email_storage') == 'move' && $oMailBox->Get('target_folder') != '') {
+		elseif($oMailBox->Get('email_storage') == PolicyBehavior::MOVE && $oMailBox->Get('target_folder') != '') {
 			
 			// Move the processed message to another folder.
 			$iNextAction = EmailProcessor::MOVE_MESSAGE;
@@ -1849,11 +1847,11 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Step {
 			// Checking if attachments are in line with configured policies.
 			switch(static::GetStepSetting('behavior')) {
 			
-				case 'bounce_delete':
-				case 'bounce_mark_as_undesired':
-				case 'delete':
-				case 'mark_as_undesired':
-				case 'do_nothing':
+				case PolicyBehavior::BOUNCE_DELETE:
+				case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
+				case PolicyBehavior::DELETE:
+				case PolicyBehavior::MARK_AS_UNDESIRED:
+				case PolicyBehavior::DO_NOTHING:
 					
 					// Other caller?
 					$sTicketCallerEmail = $oTicket->Get('caller_id->email');
@@ -1917,11 +1915,11 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Step {
 				
 				switch(static::GetStepSetting('behavior')) {
 					
-					case 'bounce_delete':
-					case 'bounce_mark_as_undesired':
-					case 'delete':
-					case 'mark_as_undesired':
-					case 'do_nothing':
+					case PolicyBehavior::BOUNCE_DELETE:
+					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
+					case PolicyBehavior::DELETE:
+					case PolicyBehavior::MARK_AS_UNDESIRED:
+					case PolicyBehavior::DO_NOTHING:
 						
 						// Forbidden attachments? 
 						foreach($oEmail->aAttachments as $iIndex => $aAttachment) { 
@@ -2049,11 +2047,11 @@ abstract class PolicyBounceNoSubject extends Step {
 				
 				switch($sPolicyBehavior) {
 					 // Will use default subject.
-					 case 'bounce_delete':
-					 case 'bounce_mark_as_undesired':
-					 case 'delete':
-					 case 'do_nothing':
-					 case 'mark_as_undesired':
+					 case PolicyBehavior::BOUNCE_DELETE:
+					 case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
+					 case PolicyBehavior::DELETE:
+					 case PolicyBehavior::DO_NOTHING:
+					 case PolicyBehavior::MARK_AS_UNDESIRED:
 
 						// No subject (and no fallback)
 						static::Trace('.. Undesired: Empty subject.');
@@ -2143,10 +2141,10 @@ abstract class PolicyBounceOtherRecipients extends Step {
 			switch($sPolicyBehavior) {
 
 				// Perform action if:
-				case 'bounce_delete':
-				case 'bounce_mark_as_undesired':
-				case 'delete':
-				case 'mark_as_undesired':
+				case PolicyBehavior::BOUNCE_DELETE:
+				case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
+				case PolicyBehavior::DELETE:
+				case PolicyBehavior::MARK_AS_UNDESIRED:
 				
 					foreach($aAllContacts as $oRecipient) {
 						
@@ -2185,7 +2183,7 @@ abstract class PolicyBounceOtherRecipients extends Step {
 					break; // Defensive programming
 				
 				// These behaviors will be handled in PolicyFindAdditionalContacts:
-				case 'do_nothing':
+				case PolicyBehavior::DO_NOTHING:
 				case 'fallback_ignore_other_contacts':
 				case 'fallback_add_other_contacts':
 				case 'fallback_add_existing_other_contacts':
@@ -2222,7 +2220,6 @@ abstract class PolicyBounceAutoReply extends Step {
 	 */
 	public static function Execute() {
 		
-		$oMailBox = static::GetMailBox();
 		$oRawEmail = static::GetRawMail();
 		
 		// Checking if subject is not empty.
@@ -2242,9 +2239,9 @@ abstract class PolicyBounceAutoReply extends Step {
 				
 					switch($sPolicyBehavior) {
 						
-						 case 'delete':
-						 case 'do_nothing':
-						 case 'mark_as_undesired':
+						 case PolicyBehavior::DELETE:
+						 case PolicyBehavior::DO_NOTHING:
+						 case PolicyBehavior::MARK_AS_UNDESIRED:
 
 							static::Trace('.. The message is an auto-reply.');
 							static::HandleViolation();
@@ -2392,11 +2389,11 @@ abstract class PolicyTicketResolved extends Step {
 				static::Trace(".. Ticket was marked as resolved before.");
 						
 				switch(static::GetStepSetting('behavior')) { 
-					case 'bounce_delete': 
-					case 'bounce_mark_as_undesired':
-					case 'delete':
-					case 'do_nothing':
-					case 'mark_as_undesired':
+					case PolicyBehavior::BOUNCE_DELETE: 
+					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
+					case PolicyBehavior::DELETE:
+					case PolicyBehavior::DO_NOTHING:
+					case PolicyBehavior::MARK_AS_UNDESIRED:
 					
 						static::HandleViolation();
 						
@@ -2459,11 +2456,11 @@ abstract class PolicyTicketClosed extends Step {
 			if($oTicket !== null && $oTicket->Get('status') == 'closed') {
 						
 				switch(static::GetStepSetting('behavior')) { 
-					case 'bounce_delete': 
-					case 'bounce_mark_as_undesired':
-					case 'delete':
-					case 'do_nothing':
-					case 'mark_as_undesired':
+					case PolicyBehavior::BOUNCE_DELETE: 
+					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
+					case PolicyBehavior::DELETE:
+					case PolicyBehavior::DO_NOTHING:
+					case PolicyBehavior::MARK_AS_UNDESIRED:
 					
 						static::Trace(".. Undesired: ticket was marked as closed before.");
 						static::HandleViolation();
@@ -2540,11 +2537,11 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Step {
 						elseif(preg_match($sPattern, $sMailSubject)) {
 							
 							switch(static::GetStepSetting('behavior')) { 
-								case 'bounce_delete': 
-								case 'bounce_mark_as_undesired':
-								case 'delete':
-								case 'do_nothing':
-								case 'mark_as_undesired':
+								case PolicyBehavior::BOUNCE_DELETE: 
+								case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
+								case PolicyBehavior::DELETE:
+								case PolicyBehavior::DO_NOTHING:
+								case PolicyBehavior::MARK_AS_UNDESIRED:
 								
 									static::Trace(".. The message '{$sMailSubject}' is considered as undesired, since it matches {$sPattern}.");
 									static::HandleViolation();
@@ -2626,10 +2623,10 @@ abstract class PolicyFindCaller extends Step {
 						// Caller was not found.
 						switch(static::GetStepSetting('behavior')) {
 							
-							case 'bounce_delete':
-							case 'bounce_mark_as_undesired':
-							case 'delete':
-							case 'mark_as_undesired':
+							case PolicyBehavior::BOUNCE_DELETE:
+							case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
+							case PolicyBehavior::DELETE:
+							case PolicyBehavior::MARK_AS_UNDESIRED:
 							
 								static::Trace("... The message '{$oEmail->sSubject}' is considered as undesired, the caller was not found.");
 								static::HandleViolation();
@@ -2771,7 +2768,7 @@ abstract class PolicyRemoveTitlePatterns extends Step {
 									
 									break; // Defensive programming
 									
-								case 'do_nothing':
+								case PolicyBehavior::DO_NOTHING:
 									// Should not happen.
 									static::Trace("... Found pattern to remove: {$sPattern}. Doing nothing.");
 									break; 
@@ -2842,7 +2839,7 @@ abstract class PolicyFindAdditionalContacts extends Step {
 			$aExcludedAddresses[] = $sCallerEmail;
 		}
 		
-		$aExcludedAddresses = array_map('strtolower', $aExcludedAddresses);
+		$aExcludedAddresses = array_map('mb_strtolower', $aExcludedAddresses);
 		$aExcludedAddresses = array_unique($aExcludedAddresses);
 		
 		static::Trace(".. E-mail addresses to exclude: ".implode(', ', $aExcludedAddresses));
@@ -2862,7 +2859,7 @@ abstract class PolicyFindAdditionalContacts extends Step {
 					$sRecipientName = $oRecipient->GetName();
 					
 					// Is this an e-mail address that should be ignored?
-					if(in_array(strtolower($sRecipientEmail), $aExcludedAddresses) == true) {
+					if(in_array(mb_strtolower($sRecipientEmail), $aExcludedAddresses) == true) {
 						static::Trace('.. Ignore '.$sRecipientEmail.' ('.$sRecipientName.')');
 						continue;
 					}
@@ -2944,11 +2941,11 @@ abstract class PolicyFindAdditionalContacts extends Step {
 				}
 				break;
 				
-			case 'bounce_delete':
-			case 'bounce_mark_as_undesired':
-			case 'delete':
-			case 'do_nothing':
-			case 'mark_as_undesired':
+			case PolicyBehavior::BOUNCE_DELETE:
+			case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
+			case PolicyBehavior::DELETE:
+			case PolicyBehavior::DO_NOTHING:
+			case PolicyBehavior::MARK_AS_UNDESIRED:
 			
 				// Will be added automatically later
 				break;
@@ -2996,7 +2993,6 @@ abstract class StepAttachmentCriteria extends Step {
 	 * @inheritDoc
 	 *
 	 * @details
-	 * Function inspired by Combodo's MailInboxBase::Execute()
 	 * Removes image attachments which are too small and also resizes images which are too large using php-gd
 	 */
 	public static function Execute() {
@@ -3103,7 +3099,6 @@ abstract class StepAttachmentCriteria extends Step {
 	}
 	
 	/**
-	 * Function inspired by Combodo's MailInboxBase::IsImage()
 	 * Checks whether a MimeType is an image which can be processed by iTop (PHP GD)
 	 *
 	 * @param String $sMimeType
@@ -3138,7 +3133,6 @@ abstract class StepAttachmentCriteria extends Step {
 	}
 	
 	/*
-	 * Function inspired by Combodo's MailInboxBase::ResizeImageToFit()
 	 * Resize an image attachment so that it fits in the given dimensions.
 	 *
 	 * @param Array $aAttachment The original image stored as an attached array (content / mimetype / filename)
@@ -3172,8 +3166,8 @@ abstract class StepAttachmentCriteria extends Step {
 			// Let's scale the image, preserving the transparency for GIFs and PNGs
 			$fScale = min($iMaxImageWidth / $iWidth, $iMaxImageHeight / $iHeight);
 
-			$iNewWidth = $iWidth * $fScale;
-			$iNewHeight = $iHeight * $fScale;
+			$iNewWidth = round($iWidth * $fScale);
+			$iNewHeight = round($iHeight * $fScale);
 			
 			static::Trace("... Resizing image from ($iWidth x $iHeight) to ($iNewWidth x $iNewHeight) px");
 			$new = imagecreatetruecolor($iNewWidth, $iNewHeight);
@@ -3217,7 +3211,6 @@ abstract class StepAttachmentCriteria extends Step {
 		
 	
 	/*
-	 * Function inspired by Combodo's MailInboxBase::GetImageSize()
 	 * Resize an image attachment so that it fits in the given dimensions.
 	 *
 	 * @param String $sImageData Image data
@@ -3336,7 +3329,7 @@ abstract class PolicyNonDeliveryReport extends Step {
 								/** @var Person $oPerson Person(s) in iTop with email set to that of the recipient. */
 								while($oPerson = $oSetPerson->Fetch()) {
 									
-									if($sBehavior == 'do_nothing') {
+									if($sBehavior == PolicyBehavior::DO_NOTHING) {
 									
 										static::Trace('.. Simulation (Do nothing). Would mark Person::'.$oPerson->GetKey().' as "inactive" based on attribute value.');
 										

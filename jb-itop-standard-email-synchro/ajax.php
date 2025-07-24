@@ -18,7 +18,7 @@
 /**
  * Processing of AJAX calls
  *
- * @copyright   Copyright (c) 2013-2024 Combodo SARL
+ * @copyright   Copyright (c) 2013-2025 Combodo SARL
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 

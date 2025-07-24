@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   Copyright (c) 2010-2024 Combodo SARL
+ * @copyright   Copyright (c) 2010-2025 Combodo SARL
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 

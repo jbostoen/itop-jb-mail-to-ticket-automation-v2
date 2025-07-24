@@ -1,16 +1,16 @@
 <?php
 
 /**
- * @copyright   Copyright (c) 2020-2024 Jeffrey Bostoen
+ * @copyright   Copyright (c) 2020-2025 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     3.2.241109
+ * @version     3.2.250724
  *
  * iTop module definition file
  */
 
 SetupWebPage::AddModule(
         __FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-        'jb-mail-to-ticket-automation-v2-contactmethod/3.2.241109',
+        'jb-mail-to-ticket-automation-v2-contactmethod/3.2.250724',
         array(
                 // Identification
                 //
@@ -20,7 +20,7 @@ SetupWebPage::AddModule(
                 // Setup
                 //
                 'dependencies' => array( 
-		        'jb-itop-standard-email-synchro/2.7.231201',
+                        'jb-itop-standard-email-synchro/3.2.0',
                 ),
                 'mandatory' => false,
                 'visible' => false,

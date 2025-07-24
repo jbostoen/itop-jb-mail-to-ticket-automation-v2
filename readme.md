@@ -1,6 +1,6 @@
 # Mail to Ticket Automation
 
-Copyright (c) 2019-2024 Jeffrey Bostoen
+Copyright (c) 2019-2025 Jeffrey Bostoen
 
 [![License](https://img.shields.io/github/license/jbostoen/iTop-custom-extensions)](https://github.com/jbostoen/iTop-custom-extensions/blob/master/license.md)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/jbostoen)
@@ -29,14 +29,14 @@ This extension works in steps. Those steps are called **policies** and they **ca
   * Examples: determining and linking additional contacts, saving emails to a folder, ...
   * Ticket fields should only be filled by one policy. That's why some of the default policies check whether some information (such as related contacts) hasn't been set yet.  
 
-Furthermore, it includes some fixes which were also provided back to Combodo where it was implemented at a later point or not at all.
+Furthermore, this version includes some fixes that were also provided back to Combodo.  
+Some were implemented at a later point, others not at all.
 
 
 
 ## Requirements
 
-* iTop 2.7: iTop 2.7.7 or higher
-* iTop 3.0: iTop 3.0.2 or higher.
+* Minimum iTop 3.2.
 
 * iTop extensions
   * [jb-framework](https://github.com/jbostoen/itop-jb-framework) - a generic framework shared among some of my extensions
