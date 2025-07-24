@@ -53,7 +53,7 @@ class EmailMessage {
 	/**
 	 * @var Person $oInternal_Contact An iTop person (the caller of the ticket).
 	 */
-	public $oInternal_Contact = null;
+	private $oInternal_Contact = null;
 
 	const NEW_LINE_MARKER = '__NEWLINE__'; // unlikely to be found in the body of an email message
 	

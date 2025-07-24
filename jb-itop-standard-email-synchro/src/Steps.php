@@ -383,6 +383,10 @@ abstract class Step implements iStep {
 			'mail->body_text'  => $oEmail->sBodyText,
 			'mail->body_format' => $oEmail->sBodyFormat
 		];
+
+		if($oEmail->GetSender() !== null) {
+			$aParams['sender->object()'] = $oEmail->GetSender();
+		}
 		
 		$aParams = array_merge($aParams, $aExtraPlaceholders);
 		
