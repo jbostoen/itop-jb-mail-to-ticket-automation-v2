@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (c) 2019-2025 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     3.2.250724
+ * @version     3.2.250812
  *
  * Policy interface definition and some classes implementing it.
  * 
@@ -58,8 +58,12 @@ interface iStep {
 }
 
 
+/**
+ * Enum PolicyBehavior defines the behavior of a policy when it is violated.  
+ * Note: Fallbacks are NOT listed here, as they're usually very specific; and are unlikely to be handled in the regular handling.
+ */
 enum PolicyBehavior : string {
-	// The behavior of the policy when it is violated.
+	
 	case BOUNCE_DELETE = 'bounce_delete';
 	case BOUNCE_MARK_AS_UNDESIRED = 'bounce_mark_as_undesired';
 	case DELETE = 'delete';
@@ -69,6 +73,7 @@ enum PolicyBehavior : string {
 	case MARK_AS_ERROR = 'mark_as_error';
 	case SKIP_FOR_NOW = 'skip_for_now';
 	case ABORT_ALL_FURTHER_PROCESSING = 'abort_all_further_processing';
+
 }
 
 
@@ -479,7 +484,7 @@ abstract class Step implements iStep {
 		// - bounce_delete -> bounce and delete the message
 		// - bounce_mark_as_undesired -> bounce and marks the message as undesired
 		// - delete -> delete the message
-		// - PolicyBehavior::DO_NOTHING -> great, lazy. For testing purposes. To actually see if policies are processed or log additional info without doing anything in the end.
+		// - PolicyBehavior::DO_NOTHING->value -> great, lazy. For testing purposes. To actually see if policies are processed or log additional info without doing anything in the end.
 		// - mark_as_undesired -> stays in the mailbox for a few days
 		// - some sort of fallback -> doesn't matter here
 		
@@ -492,8 +497,8 @@ abstract class Step implements iStep {
 		switch($sBehavior) {
 		
 			// Generic cases
-			case PolicyBehavior::BOUNCE_DELETE:
-			case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
+			case PolicyBehavior::BOUNCE_DELETE->value:
+			case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
 			
 				static::Trace('Bounce message: '.$sSettingsPrefix);
 				
@@ -526,15 +531,15 @@ abstract class Step implements iStep {
 		}
 		
 		$iNextAction = match($sBehavior) {
-			PolicyBehavior::BOUNCE_DELETE => EmailProcessor::DELETE_MESSAGE,
-			PolicyBehavior::DELETE => EmailProcessor::DELETE_MESSAGE,
-			PolicyBehavior::MOVE => EmailProcessor::MOVE_MESSAGE,
-			PolicyBehavior::MARK_AS_ERROR => EmailProcessor::MARK_MESSAGE_AS_ERROR,
-			PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
-			PolicyBehavior::MARK_AS_UNDESIRED => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
-			PolicyBehavior::SKIP_FOR_NOW => EmailProcessor::SKIP_FOR_NOW,
-			PolicyBehavior::ABORT_ALL_FURTHER_PROCESSING => EmailProcessor::ABORT_ALL_FURTHER_PROCESSING,
-			PolicyBehavior::DO_NOTHING => EmailProcessor::NO_ACTION,
+			PolicyBehavior::BOUNCE_DELETE->value => EmailProcessor::DELETE_MESSAGE,
+			PolicyBehavior::DELETE->value => EmailProcessor::DELETE_MESSAGE,
+			PolicyBehavior::MOVE->value => EmailProcessor::MOVE_MESSAGE,
+			PolicyBehavior::MARK_AS_ERROR->value => EmailProcessor::MARK_MESSAGE_AS_ERROR,
+			PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
+			PolicyBehavior::MARK_AS_UNDESIRED->value => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
+			PolicyBehavior::SKIP_FOR_NOW->value => EmailProcessor::SKIP_FOR_NOW,
+			PolicyBehavior::ABORT_ALL_FURTHER_PROCESSING->value => EmailProcessor::ABORT_ALL_FURTHER_PROCESSING,
+			PolicyBehavior::DO_NOTHING->value => EmailProcessor::NO_ACTION,
 			default => EmailProcessor::NO_ACTION
 		};
 		
@@ -674,13 +679,13 @@ abstract class StepCreateOrUpdateTicket extends Step {
 
 		// In case of error (exception...) set the behavior
 		// Upon success, this will be overruled again.
-		if($oMailBox->Get('error_behavior') == PolicyBehavior::DELETE) {
+		if($oMailBox->Get('error_behavior') == PolicyBehavior::DELETE->value) {
 			
 			 // Remove the message from the mailbox
 			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);
 			
 		}
-		elseif($oMailBox->Get('error_behavior') == PolicyBehavior::MARK_AS_ERROR) {
+		elseif($oMailBox->Get('error_behavior') == PolicyBehavior::MARK_AS_ERROR->value) {
 			
 			 // Keep the message in the mailbox, but marked as error
 			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR);
@@ -692,7 +697,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 			
 		if(MetaModel::IsValidClass($sTargetClass) == false) {
 			
-			$sErrorMessage = "... Invalid 'ticket_class' configured: {$sTargetClass} is not a valid class. Cannot create such an object.";
+			$sErrorMessage = "... Invalid 'target_class' configured: {$sTargetClass} is not a valid class. Cannot create such an object.";
 			static::Trace($sErrorMessage);
 			throw new Exception($sErrorMessage);
 			
@@ -822,10 +827,10 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		
 		// In case of error (exception...) set the behavior
 		// Upon success, this will be overruled again.
-		if($oMailBox->Get('error_behavior') == PolicyBehavior::DELETE) {
+		if($oMailBox->Get('error_behavior') == PolicyBehavior::DELETE->value) {
 			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
 		}
-		elseif($oMailBox->Get('error_behavior') == PolicyBehavior::MARK_AS_ERROR) {
+		elseif($oMailBox->Get('error_behavior') == PolicyBehavior::MARK_AS_ERROR->value) {
 			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 		}
 		
@@ -1801,13 +1806,13 @@ abstract class StepFinalAction extends Step {
 		$iNextAction = EmailProcessor::PROCESS_MESSAGE;
 		
 		// Delete the source email immediately?
-		if($oMailBox->Get('email_storage') == PolicyBehavior::DELETE) {
+		if($oMailBox->Get('email_storage') == PolicyBehavior::DELETE->value) {
 			
 			// Remove the processed message from the mailbox.
 			$iNextAction = EmailProcessor::DELETE_MESSAGE;
 			
 		}
-		elseif($oMailBox->Get('email_storage') == PolicyBehavior::MOVE && $oMailBox->Get('target_folder') != '') {
+		elseif($oMailBox->Get('email_storage') == PolicyBehavior::MOVE->value && $oMailBox->Get('target_folder') != '') {
 			
 			// Move the processed message to another folder.
 			$iNextAction = EmailProcessor::MOVE_MESSAGE;
@@ -1851,11 +1856,11 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Step {
 			// Checking if attachments are in line with configured policies.
 			switch(static::GetStepSetting('behavior')) {
 			
-				case PolicyBehavior::BOUNCE_DELETE:
-				case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
-				case PolicyBehavior::DELETE:
-				case PolicyBehavior::MARK_AS_UNDESIRED:
-				case PolicyBehavior::DO_NOTHING:
+				case PolicyBehavior::BOUNCE_DELETE->value:
+				case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
+				case PolicyBehavior::DELETE->value:
+				case PolicyBehavior::MARK_AS_UNDESIRED->value:
+				case PolicyBehavior::DO_NOTHING->value:
 					
 					// Other caller?
 					$sTicketCallerEmail = $oTicket->Get('caller_id->email');
@@ -1919,11 +1924,11 @@ abstract class PolicyBounceAttachmentForbiddenMimeType extends Step {
 				
 				switch(static::GetStepSetting('behavior')) {
 					
-					case PolicyBehavior::BOUNCE_DELETE:
-					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
-					case PolicyBehavior::DELETE:
-					case PolicyBehavior::MARK_AS_UNDESIRED:
-					case PolicyBehavior::DO_NOTHING:
+					case PolicyBehavior::BOUNCE_DELETE->value:
+					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
+					case PolicyBehavior::DELETE->value:
+					case PolicyBehavior::MARK_AS_UNDESIRED->value:
+					case PolicyBehavior::DO_NOTHING->value:
 						
 						// Forbidden attachments? 
 						foreach($oEmail->aAttachments as $iIndex => $aAttachment) { 
@@ -2051,11 +2056,11 @@ abstract class PolicyBounceNoSubject extends Step {
 				
 				switch($sPolicyBehavior) {
 					 // Will use default subject.
-					 case PolicyBehavior::BOUNCE_DELETE:
-					 case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
-					 case PolicyBehavior::DELETE:
-					 case PolicyBehavior::DO_NOTHING:
-					 case PolicyBehavior::MARK_AS_UNDESIRED:
+					 case PolicyBehavior::BOUNCE_DELETE->value:
+					 case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
+					 case PolicyBehavior::DELETE->value:
+					 case PolicyBehavior::DO_NOTHING->value:
+					 case PolicyBehavior::MARK_AS_UNDESIRED->value:
 
 						// No subject (and no fallback)
 						static::Trace('.. Undesired: Empty subject.');
@@ -2145,10 +2150,10 @@ abstract class PolicyBounceOtherRecipients extends Step {
 			switch($sPolicyBehavior) {
 
 				// Perform action if:
-				case PolicyBehavior::BOUNCE_DELETE:
-				case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
-				case PolicyBehavior::DELETE:
-				case PolicyBehavior::MARK_AS_UNDESIRED:
+				case PolicyBehavior::BOUNCE_DELETE->value:
+				case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
+				case PolicyBehavior::DELETE->value:
+				case PolicyBehavior::MARK_AS_UNDESIRED->value:
 				
 					foreach($aAllContacts as $oRecipient) {
 						
@@ -2187,7 +2192,7 @@ abstract class PolicyBounceOtherRecipients extends Step {
 					break; // Defensive programming
 				
 				// These behaviors will be handled in PolicyFindAdditionalContacts:
-				case PolicyBehavior::DO_NOTHING:
+				case PolicyBehavior::DO_NOTHING->value:
 				case 'fallback_ignore_other_contacts':
 				case 'fallback_add_other_contacts':
 				case 'fallback_add_existing_other_contacts':
@@ -2243,9 +2248,9 @@ abstract class PolicyBounceAutoReply extends Step {
 				
 					switch($sPolicyBehavior) {
 						
-						 case PolicyBehavior::DELETE:
-						 case PolicyBehavior::DO_NOTHING:
-						 case PolicyBehavior::MARK_AS_UNDESIRED:
+						 case PolicyBehavior::DELETE->value:
+						 case PolicyBehavior::DO_NOTHING->value:
+						 case PolicyBehavior::MARK_AS_UNDESIRED->value:
 
 							static::Trace('.. The message is an auto-reply.');
 							static::HandleViolation();
@@ -2393,11 +2398,11 @@ abstract class PolicyTicketResolved extends Step {
 				static::Trace(".. Ticket was marked as resolved before.");
 						
 				switch(static::GetStepSetting('behavior')) { 
-					case PolicyBehavior::BOUNCE_DELETE: 
-					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
-					case PolicyBehavior::DELETE:
-					case PolicyBehavior::DO_NOTHING:
-					case PolicyBehavior::MARK_AS_UNDESIRED:
+					case PolicyBehavior::BOUNCE_DELETE->value: 
+					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
+					case PolicyBehavior::DELETE->value:
+					case PolicyBehavior::DO_NOTHING->value:
+					case PolicyBehavior::MARK_AS_UNDESIRED->value:
 					
 						static::HandleViolation();
 						
@@ -2460,11 +2465,11 @@ abstract class PolicyTicketClosed extends Step {
 			if($oTicket !== null && $oTicket->Get('status') == 'closed') {
 						
 				switch(static::GetStepSetting('behavior')) { 
-					case PolicyBehavior::BOUNCE_DELETE: 
-					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
-					case PolicyBehavior::DELETE:
-					case PolicyBehavior::DO_NOTHING:
-					case PolicyBehavior::MARK_AS_UNDESIRED:
+					case PolicyBehavior::BOUNCE_DELETE->value: 
+					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
+					case PolicyBehavior::DELETE->value:
+					case PolicyBehavior::DO_NOTHING->value:
+					case PolicyBehavior::MARK_AS_UNDESIRED->value:
 					
 						static::Trace(".. Undesired: ticket was marked as closed before.");
 						static::HandleViolation();
@@ -2488,7 +2493,7 @@ abstract class PolicyTicketClosed extends Step {
 						
 					default:
 						// Should not happen.
-						static::Trace("... Unknown action for closed tickets.");
+						static::Trace("... Unknown action for closed tickets: ".$oMailBox->Get('behavior'));
 						break; 
 					
 					
@@ -2541,11 +2546,11 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Step {
 						elseif(preg_match($sPattern, $sMailSubject)) {
 							
 							switch(static::GetStepSetting('behavior')) { 
-								case PolicyBehavior::BOUNCE_DELETE: 
-								case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
-								case PolicyBehavior::DELETE:
-								case PolicyBehavior::DO_NOTHING:
-								case PolicyBehavior::MARK_AS_UNDESIRED:
+								case PolicyBehavior::BOUNCE_DELETE->value: 
+								case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
+								case PolicyBehavior::DELETE->value:
+								case PolicyBehavior::DO_NOTHING->value:
+								case PolicyBehavior::MARK_AS_UNDESIRED->value:
 								
 									static::Trace(".. The message '{$sMailSubject}' is considered as undesired, since it matches {$sPattern}.");
 									static::HandleViolation();
@@ -2627,10 +2632,10 @@ abstract class PolicyFindCaller extends Step {
 						// Caller was not found.
 						switch(static::GetStepSetting('behavior')) {
 							
-							case PolicyBehavior::BOUNCE_DELETE:
-							case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
-							case PolicyBehavior::DELETE:
-							case PolicyBehavior::MARK_AS_UNDESIRED:
+							case PolicyBehavior::BOUNCE_DELETE->value:
+							case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
+							case PolicyBehavior::DELETE->value:
+							case PolicyBehavior::MARK_AS_UNDESIRED->value:
 							
 								static::Trace("... The message '{$oEmail->sSubject}' is considered as undesired, the caller was not found.");
 								static::HandleViolation();
@@ -2772,7 +2777,7 @@ abstract class PolicyRemoveTitlePatterns extends Step {
 									
 									break; // Defensive programming
 									
-								case PolicyBehavior::DO_NOTHING:
+								case PolicyBehavior::DO_NOTHING->value:
 									// Should not happen.
 									static::Trace("... Found pattern to remove: {$sPattern}. Doing nothing.");
 									break; 
@@ -2945,11 +2950,11 @@ abstract class PolicyFindAdditionalContacts extends Step {
 				}
 				break;
 				
-			case PolicyBehavior::BOUNCE_DELETE:
-			case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED:
-			case PolicyBehavior::DELETE:
-			case PolicyBehavior::DO_NOTHING:
-			case PolicyBehavior::MARK_AS_UNDESIRED:
+			case PolicyBehavior::BOUNCE_DELETE->value:
+			case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
+			case PolicyBehavior::DELETE->value:
+			case PolicyBehavior::DO_NOTHING->value:
+			case PolicyBehavior::MARK_AS_UNDESIRED->value:
 			
 				// Will be added automatically later
 				break;
@@ -3333,7 +3338,7 @@ abstract class PolicyNonDeliveryReport extends Step {
 								/** @var Person $oPerson Person(s) in iTop with email set to that of the recipient. */
 								while($oPerson = $oSetPerson->Fetch()) {
 									
-									if($sBehavior == PolicyBehavior::DO_NOTHING) {
+									if($sBehavior == PolicyBehavior::DO_NOTHING->value) {
 									
 										static::Trace('.. Simulation (Do nothing). Would mark Person::'.$oPerson->GetKey().' as "inactive" based on attribute value.');
 										

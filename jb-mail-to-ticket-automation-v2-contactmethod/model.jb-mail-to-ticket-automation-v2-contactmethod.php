@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (c) 2020-2025 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     3.2.250724
+ * @version     3.2.250812
  *
  * PHP Data Model definition file
  */
