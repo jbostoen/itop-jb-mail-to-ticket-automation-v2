@@ -110,9 +110,9 @@ class RawEmailMessage {
 	 * See RFC 822, RFC 2822, RFC 5322 which allows this.
 	 * In the real world, it's rather rare though.
 	 *
-	 * @return \EmailRecipient[] one per sender.
+	 * @return EmailContact[] One per sender.
 	 */
-	public function GetSender() : Array {
+	public function GetSender() : array {
 		$sSender = $this->GetHeader('from');
 		if(empty($sSender)) {
 			$sSender = $this->GetHeader('sender');
@@ -126,7 +126,7 @@ class RawEmailMessage {
 	/**
 	 * Retrieves the address(es) from the recipient of the message... "To".
 	 *
-	 * @return EmailRecipient[] An array of recipients.
+	 * @return EmailContact[] An array of recipients.
 	 */
 	public function GetTo() {
 
@@ -138,7 +138,7 @@ class RawEmailMessage {
 	 * Retrieves the address(es) from the recipient in copy of the message.
 	 * So the recipients in "CC".
 	 *
-	 * @return EmailRecipient[] An array of recipients.
+	 * @return EmailContact[] An array of recipients.
 	 */
 	public function GetCc() {
 
@@ -772,7 +772,7 @@ class RawEmailMessage {
 	 *
 	 * @param string $sAddresses The whole list of addresses as read from the email header
 	 *
-	 * @return EmailRecipient[] An array of e-mail recipients.
+	 * @return EmailContact[] An array of e-mail recipients.
 	 */
 	protected static function ParseAddresses($sAddresses) {
 
@@ -820,7 +820,7 @@ class RawEmailMessage {
 	 *
 	 * @param string $sAddress The address to split
 	 *
-	 * @return \EmailRecipient An e-mail recipient.
+	 * @return EmailContact An e-mail recipient.
 	 */
 	protected static function ExtractAddressPieces($sAddress) {
 		$sAddress = trim($sAddress);
@@ -856,7 +856,7 @@ class RawEmailMessage {
 				}
 			}
 		}
-		return new EmailRecipient($sEmail, $sName);
+		return new EmailContact($sEmail, $sName);
 	}
 
 	/**
@@ -869,9 +869,9 @@ class RawEmailMessage {
 }
 
 /**
- * Class EmailRecipient. An e-mail recipient. 
+ * Class EmailContact. An e-mail contact (sender or recipient). 
  */
-class EmailRecipient {
+class EmailContact {
 
  	/** @var string $sEmailAddress The e-mail address of the recipient. Important note: in some cases there is no e-mail address (e.g. "undisclosed recipients"). */
 	private $sEmailAddress;
@@ -895,7 +895,7 @@ class EmailRecipient {
 	/**
 	 * Returns the e-mail address of the recipient.
 	 *
-	 * @return \String
+	 * @return string
 	 */
 	public function GetEmailAddress() {
 		return $this->sEmailAddress;

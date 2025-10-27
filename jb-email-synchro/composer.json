@@ -11,6 +11,7 @@
   "type": "itop-extension",
   "description": "OAuth email syncro",
   "require": {
-    "composer-runtime-api": "^2.0"
+    "composer-runtime-api": "^2.0",
+    "directorytree/imapengine": "^1.15"
   }
 }

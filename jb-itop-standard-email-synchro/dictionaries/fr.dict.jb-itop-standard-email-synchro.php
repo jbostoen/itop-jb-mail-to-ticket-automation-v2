@@ -221,17 +221,30 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
 	
 	// Policy: Non Delivery Report
-	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior' => 'Behavior~~',
-	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:delete' => 'Delete~~',
-	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:do_nothing' => 'Do nothing~~',
-	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:inactive' => 'Inactive~~',
-	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:mark_as_undesired' => 'Mark as undesired~~',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior' => 'Comportement en cas d\'infraction',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:delete' => 'Supprimer',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:do_nothing' => 'Ne rien faire',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:inactive' => 'Inactif',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:mark_as_undesired' => 'Marquer comme indésirable',
+
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive' => 'Marquer l\'appelant comme inactif',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive+' => 'L\'appelant sera marqué comme inactif si l\'échec de livraison du mail semble permanent et qu\'il y a une forte probabilité que le destinataire ne soit plus joignable via cette adresse e-mail.',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:yes' => 'Oui',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:no' => 'Non',
 	
-	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive' => 'Mark caller as inactive~~',
-	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive+' => 'The caller will be marked as inactive, if the mail delivery failure seems to be permanent and there is high confidence the recipient is no longer reachable through this e-mail address.~~',
-	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:yes' => 'Yes~~',
-	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:no' => 'No~~',
-	
+	// Policy: Sender Email Address
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Comportement en cas d\'infraction',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_mark_as_undesired' => 'Renvoyer à l\'expéditeur et marquer comme indésirable',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:delete' => 'Supprimer',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:do_nothing' => 'Ne rien faire',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:inactive' => 'Inactif',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:mark_as_undesired' => 'Marquer comme indésirable',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_subject' => 'Rejeter l\'objet',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_notification' => 'Rejeter le message',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns' => 'Motifs',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Tout e-mail dont l\'adresse de l\'expéditeur correspond à l\'un des motifs regex définis (un par ligne) sera considéré comme une violation. Ignorer les motifs dans l\'objet.',
+
 	// Headers
 	'MailInbox:Server' => 'Configuration de la boîte mail',
 	'MailInbox:Behavior' => 'Comportement pour les nouveaux emails',
@@ -253,7 +266,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:PolicyUnknownCaller' => 'Bénéficiaire inconnu',
 	'MailInbox:PolicyOtherRecipients' => 'Autres destinataires',
 	'MailInbox:PolicyAutoReply' => 'Auto réponse',
-	'MailInbox:PolicyNonDeliveryReport' => 'Non Delivery Reports~~',
+	'MailInbox:PolicyNonDeliveryReport' => 'Non Delivery Reports',
+	'MailInbox:PolicySenderEmailAddress' => 'Bloquer les expéditeurs à l\'aide de motifs d\'adresses e-mail',
 	
 	'Menu:MailInboxes' => 'Boîtes emails de réception',
 	'Menu:MailInboxes+' => 'Configuration des boîtes emails à scanner pour de nouveaux messages',
@@ -264,10 +278,10 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailPolicy:CreateOrUpdateTicket:NoDescriptionProvided' => 'Aucune description',
 	
 	// lnkEmailUidToTicket
-	'Class:lnkEmailUidToTicket' => 'Link Email UID / Ticket~~',
-	'Class:lnkEmailUidToTicket/Attribute:message_uid' => 'Message UID~~',
-	'Class:lnkEmailUidToTicket/Attribute:ticket_id' => 'Ticket ID~~',
-	'Class:lnkEmailUidToTicket/Attribute:mailbox_id' => 'Mailbox ID~~',
-	'Class:lnkEmailUidToTicket/UniquenessRule:unique_message_uid_and_mailbox_id_and_ticket_id' => 'The combination of mailbox ID, message UID and ticket ID must be unique.~~',
+	'Class:lnkEmailUidToTicket' => 'Link Email UID / Ticket',
+	'Class:lnkEmailUidToTicket/Attribute:message_uid' => 'Message UID',
+	'Class:lnkEmailUidToTicket/Attribute:ticket_id' => 'Ticket ID',
+	'Class:lnkEmailUidToTicket/Attribute:mailbox_id' => 'Mailbox ID',
+	'Class:lnkEmailUidToTicket/UniquenessRule:unique_message_uid_and_mailbox_id_and_ticket_id' => 'La combinaison de l\'ID de boîte aux lettres, de l\'UID du message et de l\'ID du ticket doit être unique.',
 	
 ));

@@ -37,13 +37,14 @@ use SetupUtils;
 use utils;
 use UserRights;
 
-// iTop email processing
+// iTop email processing.
 use EmailMessage;
 use EmailProcessor;
 use EmailSource;
 use MailInboxStandard;
+use RawEmailMessage;
 
-// iTop classes
+// iTop classes.
 use lnkContactToTicket;
 use Person;
 use Ticket;
@@ -428,7 +429,7 @@ abstract class Step implements iStep {
 		/** @var RawEmailMessage $oRawEmail Raw e-mail message. */
 		$oRawEmail = static::GetRawMail();
 
-		/** @var EmailRecipient[] $aRecipients An array of recipients. */
+		/** @var EmailContact[] $aRecipients An array of recipients. */
 		$aRecipients = array_merge($oRawEmail->GetTo(), $oRawEmail->GetCc());
 
 		/** @var String[] $aAddresses An array of e-mail addresses. */
@@ -469,41 +470,41 @@ abstract class Step implements iStep {
 	 */
 	public static function HandleViolation() {
 		
-		$oEmail = static::GetMail();
-		$oMailBox = static::GetMailBox();
-		
-		$oRawEmail = $oEmail->oRawEmail;
-	
-		// Inform the caller who doesn't follow guidelines.		
-		// User education and communicating the guideliens is great; but sometimes policies need to be enforced.
-		$sTo = $oEmail->sCallerEmail;
-		$sFrom = $oMailBox->Get('notify_from'); 
-	
+			
 		// Policy violations have a typical way of handling.
-		// The behavior is - besides some fallbacks - usually one of the following:
+		// The behavior is - besides some feature-specific fallbacks - usually one of the following:
 		// - bounce_delete -> bounce and delete the message
 		// - bounce_mark_as_undesired -> bounce and marks the message as undesired
 		// - delete -> delete the message
 		// - PolicyBehavior::DO_NOTHING->value -> great, lazy. For testing purposes. To actually see if policies are processed or log additional info without doing anything in the end.
 		// - mark_as_undesired -> stays in the mailbox for a few days
 		// - some sort of fallback -> doesn't matter here
-		
-		$sBehavior = static::GetStepSetting('behavior');
-		static::Trace('.. Policy violated. Behavior: '.$sBehavior);
 
-		$sSettingsPrefix = static::GetXMLSettingsPrefix();
+		$oEmail = static::GetMail();
+		$oMailBox = static::GetMailBox();
+		$sBehavior = static::GetStepSetting('behavior');
+		
+		static::Trace('.. Policy violated. Behavior: '.$sBehavior);
 		
 		// First check if email notification must be sent to caller (bounce message)
 		switch($sBehavior) {
 		
-			// Generic cases
+			// Generic cases.
 			case PolicyBehavior::BOUNCE_DELETE->value:
 			case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
 			
-				static::Trace('Bounce message: '.$sSettingsPrefix);
 				
-				$sSubject = $oMailBox->Get($sSettingsPrefix.'_subject');
-				$sBody = $oMailBox->Get($sSettingsPrefix.'_notification'); 
+				$oRawEmail = $oEmail->oRawEmail;
+			
+				// Inform the caller who doesn't follow guidelines.		
+				// User education and communicating the guideliens is great; but sometimes policies need to be enforced.
+				$sTo = $oEmail->sCallerEmail;
+				$sFrom = $oMailBox->Get('notify_from'); 
+
+				static::Trace('Send bounce message.');
+				
+				$sSubject = static::GetStepSetting('subject');
+				$sBody = static::GetStepSetting('notification'); 
 				
 				// Return to sender
 				if($sTo == '') { 
@@ -524,28 +525,33 @@ abstract class Step implements iStep {
 
 					static::Trace('Sending bounce message "'.$sSubject.'" to "'.$sTo.'"');
 					$oRawEmail->SendAsAttachment($sTo, $sFrom, $sSubject, $sBody);
+
 				}
 				
 				break;
+
 				
 		}
 		
-		$iNextAction = match($sBehavior) {
-			PolicyBehavior::BOUNCE_DELETE->value => EmailProcessor::DELETE_MESSAGE,
-			PolicyBehavior::DELETE->value => EmailProcessor::DELETE_MESSAGE,
-			PolicyBehavior::MOVE->value => EmailProcessor::MOVE_MESSAGE,
-			PolicyBehavior::MARK_AS_ERROR->value => EmailProcessor::MARK_MESSAGE_AS_ERROR,
-			PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
-			PolicyBehavior::MARK_AS_UNDESIRED->value => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
-			PolicyBehavior::SKIP_FOR_NOW->value => EmailProcessor::SKIP_FOR_NOW,
-			PolicyBehavior::ABORT_ALL_FURTHER_PROCESSING->value => EmailProcessor::ABORT_ALL_FURTHER_PROCESSING,
-			PolicyBehavior::DO_NOTHING->value => EmailProcessor::NO_ACTION,
-			default => EmailProcessor::NO_ACTION
-		};
-		
-		static::Trace('.. Set next action for EmailProcessor to '.EmailProcessor::GetActionFromCode($iNextAction));
-		$oMailBox->SetNextAction($iNextAction);
-		
+		// - Set the next action for the mail processor.
+
+			$iNextAction = match($sBehavior) {
+				PolicyBehavior::BOUNCE_DELETE->value => EmailProcessor::DELETE_MESSAGE,
+				PolicyBehavior::DELETE->value => EmailProcessor::DELETE_MESSAGE,
+				PolicyBehavior::MOVE->value => EmailProcessor::MOVE_MESSAGE,
+				PolicyBehavior::MARK_AS_ERROR->value => EmailProcessor::MARK_MESSAGE_AS_ERROR,
+				PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
+				PolicyBehavior::MARK_AS_UNDESIRED->value => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
+				PolicyBehavior::SKIP_FOR_NOW->value => EmailProcessor::SKIP_FOR_NOW,
+				PolicyBehavior::ABORT_ALL_FURTHER_PROCESSING->value => EmailProcessor::ABORT_ALL_FURTHER_PROCESSING,
+				PolicyBehavior::DO_NOTHING->value => EmailProcessor::NO_ACTION,
+				default => EmailProcessor::NO_ACTION
+			};
+			
+			static::Trace('.. Set next action for EmailProcessor to '.EmailProcessor::GetActionFromCode($iNextAction));
+			$oMailBox->SetNextAction($iNextAction);
+
+			
 	}
 
 	/**
@@ -776,7 +782,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 		// Keep some room just in case... (in case of what?)
 		$oTicket->Set('description', static::FitTextIn($sTicketDescription, $iDescriptionMaxSize));
 		
-		// Default values
+		// Default values.
 		$sDefaultValues = $oMailBox->Get('ticket_default_values');
 		$aDefaults = preg_split(NEWLINE_REGEX, $sDefaultValues);
 		$aDefaultValues = [];
@@ -1852,31 +1858,15 @@ abstract class PolicyBounceOtherEmailCallerThanTicketCaller extends Step {
 		$oEmail = static::GetMail();
 		
 		if($oTicket !== null) {
-				
-			// Checking if attachments are in line with configured policies.
-			switch(static::GetStepSetting('behavior')) {
 			
-				case PolicyBehavior::BOUNCE_DELETE->value:
-				case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
-				case PolicyBehavior::DELETE->value:
-				case PolicyBehavior::MARK_AS_UNDESIRED->value:
-				case PolicyBehavior::DO_NOTHING->value:
-					
-					// Other caller?
-					$sTicketCallerEmail = $oTicket->Get('caller_id->email');
-					if($sTicketCallerEmail != $oEmail->sCallerEmail) {
-						
-						static::Trace('.. Ticket caller\'s email address is different from the sender\'s email address.');
-						static::HandleViolation();
-						return;
-					
-					}
+			// Other caller?
+			$sTicketCallerEmail = $oTicket->Get('caller_id->email');
+			if($sTicketCallerEmail != $oEmail->sCallerEmail) {
 				
-					break;
-					
-				default:
-					static::Trace('.. Unexpected "behavior"');
-					break;
+				static::Trace('.. Ticket caller\'s email address is different from the sender\'s email address.');
+				static::HandleViolation();
+				return;
+			
 			}
 		
 		}
@@ -1995,7 +1985,6 @@ abstract class PolicyBounceLimitMailSize extends Step {
 	 */
 	public static function Execute() {
 		
-		$oMailBox = static::GetMailBox();
 		$oRawEmail = static::GetRawMail();
 		
 		// Checking if mail size is not too big
@@ -2024,6 +2013,7 @@ abstract class PolicyBounceLimitMailSize extends Step {
 	}
 	
 }
+
 
 /**
  * Class PolicyBounceNoSubject. A policy to enforce non-empty subjects.
@@ -2104,6 +2094,70 @@ abstract class PolicyBounceNoSubject extends Step {
 	
 }
 
+
+
+/**
+ * Class PolicyBounceSenderEmailAddress. A policy that allows or forbids certain email addresses for senders.
+ */
+abstract class PolicyBounceSenderEmailAddress extends Step {
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $iPrecedence = 10;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $sXMLSettingsPrefix = 'policy_sender_email_address';
+		
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() {
+		
+		$oRawEmail = static::GetRawMail();
+		$oEmail = static::GetMail();
+
+		/** @var EmailContact $oSender */
+		$sSenderEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
+
+		
+		// Checking if the e-mail address does NOT match the configured pattern.
+
+		$sPatterns = static::GetStepSetting('patterns');
+
+		if(trim($sPatterns) == '') {
+			// No patterns specified.
+			static::Trace('.. No patterns specified.');
+			return;
+		}
+
+		$aPatterns = preg_split(NEWLINE_REGEX, $sPatterns);
+		
+		foreach($aPatterns as $sPattern) {
+
+			$oPregMatched = @preg_match($sPattern, $sSenderEmail);
+						
+			if($oPregMatched === false) {
+				static::Trace(".. Invalid pattern: '{$sPattern}'");
+			}
+			elseif(preg_match($sPattern, $sSenderEmail)) {
+
+				static::Trace('.. Undesired: Sender\'s e-mail address.');
+				static::HandleViolation();
+				return;
+
+			}
+			
+		}
+		
+	}
+	
+}
+
+
+
 /**
  * Class PolicyBounceOtherRecipients. A policy to ensure that the service desk mailbox is the sole recipient (no other recipients in To:, CC:).
  * 
@@ -2135,7 +2189,7 @@ abstract class PolicyBounceOtherRecipients extends Step {
 		// Checking if there are no other recipients mentioned.
 		
 			// Take both the To: and CC:
-			/** @var EmailRecipient[] $aAllContacts All contacts (except BCC). */
+			/** @var EmailContact[] $aAllContacts All contacts (except BCC). */
 			$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
 			
 			// Mailbox aliases
@@ -2246,28 +2300,8 @@ abstract class PolicyBounceAutoReply extends Step {
 				// Values for auto-submitted: no, auto-generated, auto-replied, auto-notified
 				case (preg_match('/^auto/', strtolower($oRawEmail->GetHeader('auto-submitted')))):
 				
-					switch($sPolicyBehavior) {
-						
-						 case PolicyBehavior::DELETE->value:
-						 case PolicyBehavior::DO_NOTHING->value:
-						 case PolicyBehavior::MARK_AS_UNDESIRED->value:
-
-							static::Trace('.. The message is an auto-reply.');
-							static::HandleViolation();
-							
-							// No fallback
-							
-							// Stop processing any further!
-							return;
-							
-							break; // Defensive programming
-						
-						default:
-						
-							static::Trace('.. Unexpected "behavior"');
-							break;
-						
-					}
+					static::Trace('.. The message is an auto-reply.');
+					static::HandleViolation();					
 					break;
 				
 				default:
@@ -2405,13 +2439,7 @@ abstract class PolicyTicketResolved extends Step {
 					case PolicyBehavior::MARK_AS_UNDESIRED->value:
 					
 						static::HandleViolation();
-						
-						// No fallback
-						
-						// Stop processing any further!
-						return;
-
-						break; // Defensive programming
+						break;
 						 
 					case 'fallback_reopen': 
 					
@@ -2473,10 +2501,6 @@ abstract class PolicyTicketClosed extends Step {
 					
 						static::Trace(".. Undesired: ticket was marked as closed before.");
 						static::HandleViolation();
-						
-						// No fallback
-						
-						// Stop processing any further!
 						return;
 
 						break; // Defensive programming
@@ -2554,13 +2578,9 @@ abstract class PolicyBounceUndesiredTitlePatterns extends Step {
 								
 									static::Trace(".. The message '{$sMailSubject}' is considered as undesired, since it matches {$sPattern}.");
 									static::HandleViolation();
-									
-									// No fallback
-									
-									// Stop processing any further!
 									return;
 
-									break; // Defensive programming
+									break;
 									
 								default:
 									// Should not happen.
@@ -2639,11 +2659,8 @@ abstract class PolicyFindCaller extends Step {
 							
 								static::Trace("... The message '{$oEmail->sSubject}' is considered as undesired, the caller was not found.");
 								static::HandleViolation();
-								
-								// No fallback
 								return;
-
-								break; // Defensive programming
+								break;
 
 							case 'fallback_create_person':
 								
@@ -2830,7 +2847,7 @@ abstract class PolicyFindAdditionalContacts extends Step {
 		$sCallerEmail = $oEmail->sCallerEmail;
 							
 		// Take both the To: and CC:
-		/** @var EmailRecipient[] All e-mail recipients in To: and CC: */
+		/** @var EmailContact[] All e-mail recipients in To: and CC: */
 		$aAllContacts = array_merge($oEmail->aTos, $oEmail->aCCs);
 		
 		// Mailbox aliases

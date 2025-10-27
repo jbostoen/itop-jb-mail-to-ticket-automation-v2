@@ -242,16 +242,29 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
 	
 	// Policy: Non Delivery Report
-	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior' => 'Behavior',
-	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:delete' => 'Delete',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior' => 'Behavior on violation',
+	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:delete' => 'Delete the message from the mailbox',
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:do_nothing' => 'Do nothing',
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:inactive' => 'Inactive',
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior/Value:mark_as_undesired' => 'Mark as undesired',
-	
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive' => 'Mark caller as inactive',
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive+' => 'The caller will be marked as inactive, if the mail delivery failure seems to be permanent and there is high confidence the recipient is no longer reachable through this e-mail address.',
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:yes' => 'Yes',
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:no' => 'No',
+
+	// Policy: Sender Email Address
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Behavior on violation',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'Bounce to sender and delete',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_mark_as_undesired' => 'Bounce to sender and mark as undesired',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:delete' => 'Delete the message from the mailbox',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:do_nothing' => 'Do nothing',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:inactive' => 'Inactive',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:mark_as_undesired' => 'Mark as undesired',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior_subject' => 'Bounce subject',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior_notification' => 'Bounce message', 
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns' => 'Patterns',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Any e-mail where the sender\'s e-mail address matches one of the defined regex patterns (one per line), will be considered a violation. Ignore patterns in subject.',
+
 	
 	
 	// Headers
@@ -277,6 +290,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Limit accepted e-mail replies to original ticket caller\'s e-mail address',
 	'MailInbox:PolicyAutoReply' => 'Auto reply',
 	'MailInbox:PolicyNonDeliveryReport' => 'Non Delivery Reports',
+	'MailInbox:PolicySenderEmailAddress' => 'Block senders using e-mail address patterns',
 	
 	'Menu:MailInboxes' => 'Incoming E-mail Inboxes',
 	'Menu:MailInboxes+' => 'Configuration of Inboxes to scan for incoming e-mails',

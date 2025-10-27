@@ -57,6 +57,7 @@ function GetMailboxContent($oPage, $oInbox) {
 			/** @var int $iTotalMsgCount The number of available messages. */
 			$iTotalMsgCount = $oSource->GetMessagesCount();
 			$aMessages = $oSource->GetListing(); // Note: this may differ from $oSource->GetMessagesCount(); as messages with errors could be skipped.
+
 			$iTotalMsgOkCount = count(array_filter($aMessages, function($aMsg) {
 				return (is_null($aMsg['uidl']) == false);
 			}));
@@ -77,8 +78,8 @@ function GetMailboxContent($oPage, $oInbox) {
 		}
 		catch(Exception $e) {
 			$aContext = array(
-				'file'            => $e->getFile(),
-				'line'            => $e->getLine(),
+				'file' => $e->getFile(),
+				'line' => $e->getLine(),
 				'exception.class' => get_class($e),
 				'exception.stack' => $e->getTraceAsString(),
 			);
@@ -92,19 +93,10 @@ function GetMailboxContent($oPage, $oInbox) {
 		
 		if($iTotalMsgCount > 0) {
 			
-			// Sort but keep original index (to request right message)
-			if($oInbox->Get('protocol') == 'imap') {
-				
-				// Sort but keep original index
-				uasort($aMessages, function($a, $b) {
-					return $a['udate'] <=> $b['udate'];
-				});
-				
-			}
-			else {
-				// In case of POP3 (no longer supported) or other protocols
-				// No sorting
-			}
+			// Sort the items, but keep the original index.
+			uasort($aMessages, function($a, $b) {
+				return $a['udate'] <=> $b['udate'];
+			});
 			
 			// Get the corresponding EmailReplica object for each message
 			$aUIDLs = [];
