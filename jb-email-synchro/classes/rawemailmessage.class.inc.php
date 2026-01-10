@@ -14,7 +14,7 @@
 //   along with this program; if not, write to the Free Software
 //   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 /**
- * @copyright   Copyright (c) 2012-2025 Combodo SARL
+ * @copyright   Copyright (c) 2012-2026 Combodo SARL
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
@@ -470,6 +470,11 @@ class RawEmailMessage {
 				$aSubPart = $this->ExtractHeadersAndRawBody($aLines);
 				if(count($aSubPart['headers']) > 0) {
 					$aParsedParts['parts'][] = $this->ExtractParts($aSubPart['headers'], $aSubPart['body']);
+				}
+				else {
+					if (count($aHeaders) > 0) {
+						$aParsedParts['parts'][] = $this->ExtractParts($aHeaders, $aSubPart['body']);
+					}
 				}
 			}
 		}

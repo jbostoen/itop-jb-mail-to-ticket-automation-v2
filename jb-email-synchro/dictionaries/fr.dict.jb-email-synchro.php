@@ -2,7 +2,7 @@
 /**
  * Localized data
  *
- * @copyright Copyright (c) 2010-2025 Combodo SARL
+ * @copyright Copyright (c) 2010-2026 Combodo SARL
  * @license	http://opensource.org/licenses/AGPL-3.0
  *
  * This file is part of iTop.
@@ -41,16 +41,18 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxBase/Attribute:active+' => 'Si renseigné à "Oui", la boite mail est interrogée, sinon elle ne l\'est pas',
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Oui',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Non',
-	'Class:MailInboxBase/Attribute:imap_options' => 'IMAP options~~',
+	'Class:MailInboxBase/Attribute:imap_options' => 'IMAP options',
 	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP options can be specified, line by line. They are processed in that order.~~',
-	'Class:MailInboxBase/Attribute:disable_authenticator' => 'Disable authenticator~~',
+	'Class:MailInboxBase/Attribute:disable_authenticator' => 'Disable authenticator',
 	'Class:MailInboxBase/Attribute:disable_authenticator+' => 'In the legacy implementation, it is possible to disable certain authentication mechanisms. In most cases, leave this empty.~~',
-	'Class:MailInboxBase/Attribute:disable_authenticator/Value:GSSAPI' => 'GSSAPI~~',
-	'Class:MailInboxBase/Attribute:disable_authenticator/Value:GSSAPI+' => 'GSSAPI (Kerberos)~~',
-	'Class:MailInboxBase/Attribute:disable_authenticator/Value:NTLM' => 'NTLM~~',
-	'Class:MailInboxBase/Attribute:disable_authenticator/Value:NTLM+' => 'NTLM~~',
-	'Class:MailInboxBase/Attribute:disable_authenticator/Value:PLAIN' => 'PLAIN~~',
-	'Class:MailInboxBase/Attribute:disable_authenticator/Value:PLAIN+' => 'PLAIN~~',
+	'Class:MailInboxBase/Attribute:disable_authenticator/Value:GSSAPI' => 'GSSAPI',
+	'Class:MailInboxBase/Attribute:disable_authenticator/Value:GSSAPI+' => 'GSSAPI (Kerberos)',
+	'Class:MailInboxBase/Attribute:disable_authenticator/Value:NTLM' => 'NTLM',
+	'Class:MailInboxBase/Attribute:disable_authenticator/Value:NTLM+' => 'NTLM',
+	'Class:MailInboxBase/Attribute:disable_authenticator/Value:PLAIN' => 'PLAIN',
+	'Class:MailInboxBase/Attribute:disable_authenticator/Value:PLAIN+' => 'PLAIN',
+	'Class:MailInboxBase/Attribute:folder_delimiter' => 'Délimiteur de dossier',
+	'Class:MailInboxBase/Attribute:folder_delimiter+' => 'Le caractère utilisé par le fournisseur de messagerie pour indiquer les sous-dossiers. Habituellement "/" (Google, Microsoft) ou "." (Hetzner).',
 
 	'MailInbox:MailboxContent' => 'Contenu de la boîte mail',
 	'MailInbox:MailboxContent:ConfirmMessage' => 'Etes-vous sûr(e)?',

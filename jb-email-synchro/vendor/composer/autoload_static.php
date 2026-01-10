@@ -4,16 +4,16 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit82ad08a0b24b9adbdd37dd9305173144
+class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
-        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
-        'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
+        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
         '662a729f963d39afe703c9d9b7ab4a8c' => __DIR__ . '/..' . '/symfony/polyfill-php83/bootstrap.php',
+        'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         'b33e3d135e5d9e47d845c576147bda89' => __DIR__ . '/..' . '/php-di/php-di/src/functions.php',
         '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
         '9d2b9fc6db0f153a0a149fefb182415e' => __DIR__ . '/..' . '/symfony/polyfill-php84/bootstrap.php',
@@ -455,6 +455,7 @@ class ComposerStaticInit82ad08a0b24b9adbdd37dd9305173144
         'DirectoryTree\\ImapEngine\\MessageQuery' => __DIR__ . '/..' . '/directorytree/imapengine/src/MessageQuery.php',
         'DirectoryTree\\ImapEngine\\MessageQueryInterface' => __DIR__ . '/..' . '/directorytree/imapengine/src/MessageQueryInterface.php',
         'DirectoryTree\\ImapEngine\\Pagination\\LengthAwarePaginator' => __DIR__ . '/..' . '/directorytree/imapengine/src/Pagination/LengthAwarePaginator.php',
+        'DirectoryTree\\ImapEngine\\Poll' => __DIR__ . '/..' . '/directorytree/imapengine/src/Poll.php',
         'DirectoryTree\\ImapEngine\\QueriesMessages' => __DIR__ . '/..' . '/directorytree/imapengine/src/QueriesMessages.php',
         'DirectoryTree\\ImapEngine\\Support\\ForwardsCalls' => __DIR__ . '/..' . '/directorytree/imapengine/src/Support/ForwardsCalls.php',
         'DirectoryTree\\ImapEngine\\Support\\Str' => __DIR__ . '/..' . '/directorytree/imapengine/src/Support/Str.php',
@@ -661,6 +662,7 @@ class ComposerStaticInit82ad08a0b24b9adbdd37dd9305173144
         'Illuminate\\Contracts\\Foundation\\MaintenanceMode' => __DIR__ . '/..' . '/illuminate/contracts/Foundation/MaintenanceMode.php',
         'Illuminate\\Contracts\\Hashing\\Hasher' => __DIR__ . '/..' . '/illuminate/contracts/Hashing/Hasher.php',
         'Illuminate\\Contracts\\Http\\Kernel' => __DIR__ . '/..' . '/illuminate/contracts/Http/Kernel.php',
+        'Illuminate\\Contracts\\JsonSchema\\JsonSchema' => __DIR__ . '/..' . '/illuminate/contracts/JsonSchema/JsonSchema.php',
         'Illuminate\\Contracts\\Log\\ContextLogProcessor' => __DIR__ . '/..' . '/illuminate/contracts/Log/ContextLogProcessor.php',
         'Illuminate\\Contracts\\Mail\\Attachable' => __DIR__ . '/..' . '/illuminate/contracts/Mail/Attachable.php',
         'Illuminate\\Contracts\\Mail\\Factory' => __DIR__ . '/..' . '/illuminate/contracts/Mail/Factory.php',
@@ -968,6 +970,7 @@ class ComposerStaticInit82ad08a0b24b9adbdd37dd9305173144
         'Symfony\\Component\\Translation\\PseudoLocalizationTranslator' => __DIR__ . '/..' . '/symfony/translation/PseudoLocalizationTranslator.php',
         'Symfony\\Component\\Translation\\Reader\\TranslationReader' => __DIR__ . '/..' . '/symfony/translation/Reader/TranslationReader.php',
         'Symfony\\Component\\Translation\\Reader\\TranslationReaderInterface' => __DIR__ . '/..' . '/symfony/translation/Reader/TranslationReaderInterface.php',
+        'Symfony\\Component\\Translation\\StaticMessage' => __DIR__ . '/..' . '/symfony/translation/StaticMessage.php',
         'Symfony\\Component\\Translation\\Test\\AbstractProviderFactoryTestCase' => __DIR__ . '/..' . '/symfony/translation/Test/AbstractProviderFactoryTestCase.php',
         'Symfony\\Component\\Translation\\Test\\IncompleteDsnTestTrait' => __DIR__ . '/..' . '/symfony/translation/Test/IncompleteDsnTestTrait.php',
         'Symfony\\Component\\Translation\\Test\\ProviderFactoryTestCase' => __DIR__ . '/..' . '/symfony/translation/Test/ProviderFactoryTestCase.php',
@@ -1125,9 +1128,9 @@ class ComposerStaticInit82ad08a0b24b9adbdd37dd9305173144
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit82ad08a0b24b9adbdd37dd9305173144::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit82ad08a0b24b9adbdd37dd9305173144::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit82ad08a0b24b9adbdd37dd9305173144::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8::$classMap;
 
         }, null, ClassLoader::class);
     }

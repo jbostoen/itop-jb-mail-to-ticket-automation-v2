@@ -2,7 +2,7 @@
 /**
  * Localized data
  *
- * @copyright Copyright (c) 2010-2025 Combodo SARL
+ * @copyright Copyright (c) 2010-2026 Combodo SARL
  * @license	http://opensource.org/licenses/AGPL-3.0
  *
  * This file is part of iTop.
@@ -51,12 +51,14 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxBase/Attribute:disable_authenticator/Value:NTLM+' => 'NTLM',
 	'Class:MailInboxBase/Attribute:disable_authenticator/Value:PLAIN' => 'PLAIN',
 	'Class:MailInboxBase/Attribute:disable_authenticator/Value:PLAIN+' => 'PLAIN',
+	'Class:MailInboxBase/Attribute:folder_delimiter' => 'Folder delimiter',
+	'Class:MailInboxBase/Attribute:folder_delimiter+' => 'The character used by the mail provider to indicate subfolders. Usually "/" (Google, Microsoft) or "." (Hetzner).',
 	
 	'MailInbox:MailboxContent' => 'Mailbox Content',
 	'MailInbox:MailboxContent:ConfirmMessage' => 'Are you sure?',
 	'MailInbox:NoValidEmailsFound' => 'No valid e-mails found in this mailbox.',
 	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail(s) displayed. There are %2$d e-mail(s) in the mailbox (%3$d unprocessed and %4$d unreadable/corrupt).',
-	'MailInbox:UnprocessableMessages' => 'There are %1$s e-mail(s) which can not be listed due to a technical issue.',
+	'MailInbox:UnprocessableMessages' => 'There are %1$s e-mail(s) that can not be listed due to a technical issue.',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'MySQL parameter max_allowed_packet in "my.ini" is too small: %1$s. The recommended value is at least: %2$s',
 	'MailInbox:Status' => 'Status',
 	'MailInbox:Subject' => 'Subject',

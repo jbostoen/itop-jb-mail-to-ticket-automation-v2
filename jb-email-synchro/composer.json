@@ -1,6 +1,9 @@
 {
   "config": {
-    "classmap-authoritative": true
+    "classmap-authoritative": true,
+    "allow-plugins": {
+      "phpstan/extension-installer": true
+    }
   },
   "autoload": {
     "psr-4": {
@@ -9,9 +12,8 @@
   },
   "name": "jbostoen/jb-email-synchro",
   "type": "itop-extension",
-  "description": "OAuth email syncro",
+  "description": "IAMP e-mail synchronization (with support for OAuth 2.0) for iTop.",
   "require": {
-    "composer-runtime-api": "^2.0",
-    "directorytree/imapengine": "^1.15"
+    "directorytree/imapengine": "^1.18"
   }
 }
