@@ -1,5 +1,6 @@
 # jb-mail-to-ticket-automation-v2-contactmethod
-Copyright (c) 2020-2025 Jeffrey Bostoe
+
+Copyright (c) 2020-2026 Jeffrey Bostoen
 
 [![License](https://img.shields.io/github/license/jbostoen/iTop-custom-extensions)](https://github.com/jbostoen/iTop-custom-extensions/blob/master/license.md)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/jbostoen)
@@ -16,6 +17,7 @@ Uses alternative known e-mail addresses to find callers and additional contacts.
 This has the benefit that a caller can send e-mails from multiple e-mail addresses, but is still identified as the same individual person.
 
 ## Requirements
+
 * iTop extensions
   * [jb-contactmethod](https://github.com/jbostoen/itop-jb-contactmethod) (free) or  
     [combodo-email-alias](https://store.itophub.io/en_US/products/combodo-email-alias) (purchase from Combodo)

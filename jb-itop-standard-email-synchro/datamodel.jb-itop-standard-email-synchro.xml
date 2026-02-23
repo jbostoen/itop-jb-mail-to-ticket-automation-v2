@@ -1120,6 +1120,9 @@ EOF
 								<item id="disable_authenticator">
 									<rank>120</rank>
 								</item>
+								<item id="folder_delimiter">
+									<rank>121</rank>
+								</item>
 							</items>
 						</item>
 						<!-- Default behavior and class -->

@@ -1,14 +1,12 @@
 <?php
 
 /**
- * @copyright   Copyright (c) 2019-2025 Jeffrey Bostoen
+ * @copyright   Copyright (c) 2019-2026 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     3.2.250812
- *
- * Policy interface definition and some classes implementing it.
+ * @version     3.2.260110
  * 
  * Additional notes:
- * - do not alter ticket contents here, such as subject. That's done at a later phase. For this particular case: change EmailMessage's subject.
+ * - Do not alter ticket contents here, such as subject. That's done at a later phase. For this particular case: change EmailMessage's subject.
  */
  
 
@@ -409,15 +407,21 @@ abstract class Step implements iStep {
 	
 	
 	/**
-	 * For logging information about the processing of emails.
+	 * Trace function used to log information about the e-mail processing.
 	 *
-	 * @param String $sString Input string
+	 * @param string $sMessage The message.
+	 * @param mixed ...$args
 	 *
 	 * @return void
 	 */
-	public static function Trace($sString) {
-		static::$oMailBox->Trace($sString);
+	public static function Trace($sMessage, ...$args) : void {
+
+		$sMessage = call_user_func_array('sprintf', func_get_args());
+		static::$oMailBox->Trace($sMessage);
+				
+		
 	}
+	
 	
 	/**
 	 * Returns the e-mail addresses of all recipients in the original e-mail.
@@ -497,7 +501,7 @@ abstract class Step implements iStep {
 				$oRawEmail = $oEmail->oRawEmail;
 			
 				// Inform the caller who doesn't follow guidelines.		
-				// User education and communicating the guideliens is great; but sometimes policies need to be enforced.
+				// User education and communicating the guidelines is great; but sometimes policies need to be enforced.
 				$sTo = $oEmail->sCallerEmail;
 				$sFrom = $oMailBox->Get('notify_from'); 
 
@@ -1440,7 +1444,7 @@ abstract class StepCreateOrUpdateTicket extends Step {
 					if(static::IsImage($aAttachment['mimeType']) && class_exists('InlineImage') && $aAttachment['inline']) {
 						$oAttachment = new InlineImage();
 						static::Trace("... Attachment {$aAttachment['filename']} will be stored as an InlineImage.");
-						$oAttachment->Set('secret', sprintf ('%06x', mt_rand(0, 0xFFFFFF))); // something not easy to guess
+						$oAttachment->Set('secret', bin2hex(random_bytes(16))); // 128 bits of entropy, cryptographically secure
 					}
 					else {
 						static::Trace("... Attachment {$aAttachment['filename']} will be stored as an Attachment.");
