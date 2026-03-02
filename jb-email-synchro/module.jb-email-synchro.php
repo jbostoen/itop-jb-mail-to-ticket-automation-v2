@@ -19,9 +19,9 @@ SetupWebPage::AddModule(
 		'installer' => 'EmailSynchroInstaller',
 		// Components
 		'datamodel' => array(
+			'vendor/autoload.php',
 			'classes/autoload.php',
 			'model.jb-email-synchro.php',
-			'vendor/autoload.php',
 		),
 		'dictionary' => array(
 		),

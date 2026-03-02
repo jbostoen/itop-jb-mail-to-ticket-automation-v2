@@ -777,54 +777,22 @@ EOF
 					<code>
 						<![CDATA[	public function GetEmailSource() {
 						
-		$sProtocol = $this->Get('protocol');
-		$sServer = $this->Get('server');
-		$sPwd = $this->Get('password');
-		$sLogin = $this->Get('login');
-		$sMailbox = $this->Get('mailbox');
-		$iPort = $this->Get('port');
-		
-		$aImapOptions = preg_split('/\\r\\n|\\r|\\n/', $this->Get('imap_options'));
-					
-		switch($sProtocol) {
-		
-			case 'imap':
+						
 				
 				if((Int)$this->Get('oauth_client_id') > 0) {
 
 					// OAuth implementation
-					self::Trace("Protocol: $sProtocol (OAuth) Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", mailbox: $sMailbox, options: /".implode('/', $aImapOptions));
-					$oSource = new \Combodo\iTop\Extension\Service\IMAPOAuthEmailSource($this);
+					$oSource = new \Combodo\iTop\Extension\EmailSynchro\Service\IMAPOAuthEmailSource($this);
 				
 				}
 				else {
 				
-					// Legacy implementation
-					$sTargetFolder = $this->Get('target_folder');
-					self::Trace("Protocol: $sProtocol Mail server: $sServer, port: $iPort, login: $sLogin, password: ".str_repeat("*", strlen($sPwd)).", mailbox: $sMailbox, options: /".implode('/', $aImapOptions));
-					
-					// To be on the safe side: only add this option when really defined
-					$aDisabledAuthenticators = $this->Get('disable_authenticator')->GetValues();
-					$aImapOpenOptions = [];
-					
-					if(count($aDisabledAuthenticators) > 0) {
-						$aImapOpenOptions = [
-							'disable_authenticator' => $aDisabledAuthenticators
-						];
-					}
-					
-					$oSource = new IMAPEmailSource($sServer, $iPort, $sLogin, $sPwd, $sMailbox, $aImapOptions, $sTargetFolder, $aImapOpenOptions);
+					$oSource = new \Combodo\iTop\Extension\EmailSynchro\Service\IMAPEmailSource($this);
 					
 				}
 				
-				break;
-			
-			default:
-				// This can happen if customers come from Combodo's extension.
-				self::Trace("Error: unsupported protocol: $sProtocol - please use: imap.");	
-				throw new Exception('Unsupported protocol: '.$sProtocol.' - Only IMAP is supported.');
-		}
 		return $oSource;
+		
 	}]]></code>
 				</method>
 				<method id="GetInitialStateAttributeFlags">

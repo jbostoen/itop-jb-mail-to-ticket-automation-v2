@@ -1,5 +1,5 @@
 <?php
-namespace Combodo\iTop\Extension\Helper;
+namespace Combodo\iTop\Extension\EmailSynchro\Helper;
 
 use Combodo\iTop\Core\Authentication\Client\OAuth\OAuthClientProviderFactory;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
