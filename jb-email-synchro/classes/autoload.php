@@ -38,7 +38,6 @@ if(class_exists('DBObject')) {
 	require_once(__DIR__.'/triggeronmailupdate.class.inc.php');
 }
 require_once(__DIR__.'/emailsource.class.inc.php');
-require_once(__DIR__.'/imapemailsource.class.inc.php');
 if (file_exists(__DIR__.'/testemailsource.class.inc.php')) {
 	require_once(__DIR__.'/testemailsource.class.inc.php');
 }
