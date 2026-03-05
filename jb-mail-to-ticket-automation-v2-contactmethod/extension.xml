@@ -5,8 +5,8 @@
 	<author><![CDATA[Jeffrey Bostoen]]></author>
 	<label><![CDATA[Feature: Mail to Ticket Automation - Find contacts by contact method / e-mail alias]]></label>
 	<description><![CDATA[Additional attempts to find a contacts by their contact methods and/or e-mail aliases.]]></description>
-	<version>3.2.260110</version>
-	<release_date>2026-01-10</release_date>
+	<version>3.2.260305</version>
+	<release_date>2026-03-05</release_date>
 	<version_description><![CDATA[]]></version_description>
 	<itop_version_min>3.2.0</itop_version_min>
 	<status>stable</status>
