@@ -103,7 +103,7 @@ class IMAPEmailSource extends EmailSource {
 	 */
 	public function InitMessage($index) {
 		
-		// Preventive measure. For restored emails, sometimes there's still an IMAP flag indicating it was 'marked for removal'.
+		// Pre-emptive measure. For restored emails, sometimes there's still an IMAP flag indicating it was 'marked for removal'.
 		$this->UndeleteMessage($index);
 		
 		return;
@@ -153,17 +153,28 @@ class IMAPEmailSource extends EmailSource {
 		return $oNewMail;
 	}
 
-	public function DeleteMessage($index)
-	{
-		$iOffsetIndex = 1 + $index;
+	/**
+	 * @param int $index
+	 * @return true|null
+	 */
+	public function DeleteMessage($index) {
 
-		IssueLog::Debug(__METHOD__." Start: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
 		try {
+
+			if(static::UseMessageIdAsUid()) {
+				$iOffsetIndex = $index;
+				$identifier = ImapFetchIdentifier::Uid;
+			} else {
+				$iOffsetIndex = 1 + $index;
+				$identifier = ImapFetchIdentifier::MessageNumber;
+			}
+
+			IssueLog::Debug(__METHOD__." Start: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
 
 			/** @var Message $oMessage */
 			$oMessage = $this->GetFolder()
 				->messages()
-				->find($iOffsetIndex, ImapFetchIdentifier::MessageNumber);
+				->find($iOffsetIndex, $identifier);
 
 			if(!$oMessage) {
 				return null;
@@ -188,19 +199,28 @@ class IMAPEmailSource extends EmailSource {
 	
 	/**
 	 * Unmarks the message for deletion(IMAP-flag) of the given index [0..Count] from the mailbox.
-	 * @param $index integer The index between zero and count
+	 * 
+	 * @param int $index The index between zero and count
+	 * @return true|null
 	 */
 	public function UndeleteMessage($index) {
-		
-		$iOffsetIndex = 1 + $index;
 
-		IssueLog::Debug(__METHOD__." Start: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
 		try {
+
+			if(static::UseMessageIdAsUid()) {
+				$iOffsetIndex = $index;
+				$identifier = ImapFetchIdentifier::Uid;
+			} else {
+				$iOffsetIndex = 1 + $index;
+				$identifier = ImapFetchIdentifier::MessageNumber;
+			}
+			
+			IssueLog::Debug(__METHOD__." Start: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
 
 			/** @var Message $oMessage */
 			$oMessage = $this->GetFolder()
 				->messages()
-				->find($iOffsetIndex, ImapFetchIdentifier::MessageNumber);
+				->find($iOffsetIndex, $identifier);
 
 			if(!$oMessage) {
 				return null;
@@ -273,20 +293,28 @@ class IMAPEmailSource extends EmailSource {
 	/**
 	 * Move the message of the given index [0..Count] from the mailbox to another folder
 	 *
-	 * @param $index integer The index between zero and count
+	 * @param int|string $index The index between zero and count
 	 *
 	 * @throws \DirectoryTree\ImapEngine\Exceptions\ImapCapabilityException
 	 */
 	public function MoveMessage($index) {
 
-		$iOffsetIndex = 1 + $index;
-		IssueLog::Debug(__METHOD__." Start: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
 		try {
+			
+			if(static::UseMessageIdAsUid()) {
+				$iOffsetIndex = $index;
+				$identifier = ImapFetchIdentifier::Uid;
+			} else {
+				$iOffsetIndex = 1 + $index;
+				$identifier = ImapFetchIdentifier::MessageNumber;
+			}
+
+			IssueLog::Debug(__METHOD__." Start: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
 
 			/** @var Message $oMessage */
 			$oMessage = $this->GetFolder()
 				->messages()
-				->find($iOffsetIndex, ImapFetchIdentifier::MessageNumber);
+				->find($iOffsetIndex, $identifier);
 
 			if(!$oMessage) {
 				return false;

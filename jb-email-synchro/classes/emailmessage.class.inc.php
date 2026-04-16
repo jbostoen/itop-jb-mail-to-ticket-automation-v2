@@ -286,12 +286,10 @@ class EmailMessage {
 	/**
 	 * Clean the given node according to the list of tags / classes to remove
 	 * @param DOMNode $oElement
-	 * @param unknown $aTagsToRemove
+	 * @param array $aTagsToRemove
 	 */
 	protected function CleanNode(DOMNode $oElement, $aTagsToRemove) {
 
-		$aAttrToRemove = array();
-		
 		if($oElement->hasChildNodes()) {
 			$aChildElementsToRemove = array();
 			// Gather the child nodes to remove

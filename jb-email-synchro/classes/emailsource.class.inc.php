@@ -58,6 +58,7 @@ abstract class EmailSource
 	 * @param $index integer The index between zero and count
 	 */
 	abstract public function DeleteMessage($index);
+	
 	/**
 	 * Name of the eMail source
 	 */

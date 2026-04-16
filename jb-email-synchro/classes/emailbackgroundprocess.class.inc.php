@@ -266,7 +266,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					}
 					
 					// Get the corresponding EmailReplica object for each message
-					$aUIDLs = array();
+					$aUIDLs = [];
 					
 					// Gets all UIDLs to identify EmailReplicas in iTop.
 					foreach(array_keys($aMessages) as $iMessage) {
@@ -336,7 +336,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								$oEmailReplica->Set('message_id', $iMessage); // This will be set to the actual Message-ID/UIDL in ProcessMessage().
 								$oEmailReplica->Set('last_seen', date('Y-m-d H:i:s'));
 								
-								// Initialize e-mail which is being processed for the first time
+								// Initialize e-mail which is being processed for the first time.
 								$oSource->InitMessage($iMessage);
 								
 							}
@@ -600,7 +600,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					$oUnusedReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 					$oUnusedReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl']]);
 					while($oReplica = $oUnusedReplicaSet->Fetch()) {
-						// Replica not used for at least 7 days
+						// Replica not used for at least N days
 						$this->Trace("Deleting unused EmailReplica since ".$iRetentionPeriod." hours (#".$oReplica->GetKey()."), UIDL: ".$oReplica->Get('uidl'));
 						$oReplica->DBDelete();
 						

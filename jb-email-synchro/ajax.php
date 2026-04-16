@@ -280,22 +280,26 @@ function GetMailboxContent($oPage, $oInbox) {
 }
 
 /**
- * Finds the index of the message with the given UIDL identifier
- * 
- * @param \Array $aMessages The array returned by $oSource->GetListing()
- * @param \String $sUIDL The UIDL to find
- * @return \Integer The index of the message or false if not found
+ * Finds the message with the given UIDL identifier
+ * @param array $aMessages The array returned by $oSource->GetListing()
+ * @param string $sUIDL The UIDL to find
+ * @param EmailSource $oSource
+ * @return array|false The message data if found, false otherwise
  */
-function FindMessageIDFromUIDL($aMessages, $sUIDL) {
-
+function FindMessageDataFromUIDL($aMessages, $sUIDL, EmailSource $oSource)
+{
 	$sKey = $sUIDL;
-	foreach($aMessages as $aData) {
-		if(strcmp($sKey, $aData['uidl']) == 0) {
-			return $aData['msg_id'] - 1; // return a zero based index
+	$sMultiSourceKey = substr($sUIDL, 1 + strlen($oSource->GetName())); // in Multisource mode the name of the source plus _ are prepended to the UIDL
+	foreach ($aMessages as $aData) {
+		if ((strcmp($sKey, $aData['uidl']) == 0) || (strcmp($sMultiSourceKey, $aData['uidl']) == 0)) {
+			return $aData;
+
+
 		}
 	}
 	return false;
 }
+
 
 try {
 	
@@ -321,93 +325,75 @@ try {
 			GetMailboxContent($oPage, $oInbox);
 			break;
 
+
 		case 'mailbox_reset_status':
-
+		case 'mailbox_delete_messages':
+		
+			// As for the replicas, consider this:
+			// - There could be multiple mailboxes that received the same message (and UIDL).
+			// - There could be a copy of the same message (same UIDL) in a different folder on the same mailbox (different "Mailbox" config in iTop).
+		
 			$aUIDLs = utils::ReadParam('aUIDLs', [], false, 'raw_data');
-
 			if(count($aUIDLs) > 0) {
-				
-				// As for the replicas, consider this:
-				// - There could be multiple mailboxes with the same message (and UIDL).
-				// - There could be a copy of the same message (same UIDL) in a different folder on the same mailbox.
-
-				// Therefore, the email replica must consider the MailInboxBase!
-				
 				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_id = '.$oInbox->GetKey(); 
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 				$oReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl']]);
 				$aReplicas = [];
 				while($oReplica = $oReplicaSet->Fetch()) {
-					$oReplica->DBDelete();
+					$aReplicas[$oReplica->Get('uidl')] = $oReplica;
 				}
-				
-			}
-			GetMailboxContent($oPage, $oInbox);
-			break;
-
-		case 'mailbox_delete_messages':
-		
-			$aUIDLs = utils::ReadParam('aUIDLs', [], false, 'raw_data');
-
-			if(count($aUIDLs) > 0) {
-				
-				// The message will be deleted on the e-mail server. 
-				// It will be removed only from the folder that is configured for this MailInboxBase.
-
-				// As for the replicas, consider this:
-				// - There could be multiple mailboxes with the same message (and UIDL).
-				// - There could be a copy of the same message (same UIDL) in a different folder on the same mailbox.
-				// Therefore, the behavior here changed: email replicas are no longer removed at this point!
-				// Instead, they will be cleaned up automatically anyway due to various jobs.
-
-				// Delete the actual email from the mailbox
-				$oSource = $oInbox->GetEmailSource();
-				$aMessages = $oSource->GetListing();
-				
+				if($sOperation == 'mailbox_delete_messages') {
+					// Delete the actual email from the mailbox.
+					$oSource = $oInbox->GetEmailSource();
+					$aMessages = $oSource->GetListing();
+				}
 				foreach($aUIDLs as $sUIDL) {
-					
-					$idx = FindMessageIDFromUIDL($aMessages, $sUIDL);
-					if ($idx !== false) {
-						// Delete the actual email from the mailbox
-						$oSource->DeleteMessage($idx);
+					if($sOperation == 'mailbox_delete_messages') {
+						$aMessageData = FindMessageDataFromUIDL($aMessages, $sUIDL, $oSource);
+						if($aMessageData !== false) {
+							// Delete the actual email from the mailbox.
+							if(is_int($aMessageData['msg_id'])) {
+								$oSource->DeleteMessage($aMessageData['msg_id']);
+							} else {
+								$oSource->DeleteMessage($aMessageData['uidl']);
+							}
+						}
 					}
-					
+					if(array_key_exists($sUIDL, $aReplicas)) {
+						// A replica exists for the given email, let's remove it.
+						$aReplicas[$sUIDL]->DBDelete();
+					}
 				}
-				
-				$oSource->Disconnect();
-				
+				if ($sOperation == 'mailbox_delete_messages') {
+					$oSource->Disconnect();
+				}
 			}
 			GetMailboxContent($oPage, $oInbox);
 			break;
 
 		case 'mailbox_ignore_messages':
-		
+
 			$aUIDLs = utils::ReadParam('aUIDLs', [], false, 'raw_data');
 
 			if(count($aUIDLs) > 0) {
-				
-				// In case the same mailbox happens to be configured multiple times in iTop:
-				// Contrary to deletion, the intention may be to ignore the message for some specific reason only for this particular configuration.
-				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_id = '.$oInbox->GetKey();
+				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_id = '.$oInbox->GetKey(); 
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 				$aReplicas = [];
-				/** @var DBObject $oReplica */
-				while($oReplica = $oReplicaSet->Fetch()) {
+				/** @var \DBObject $oReplica */
+				while ($oReplica = $oReplicaSet->Fetch()) {
 					$oReplica->Set('status', 'ignored');
 					$oReplica->DBUpdate();
 					$aReplicas[$oReplica->Get('uidl')] = true;
 				}
-				
 			}
-			
+
 			if(count($aReplicas) < count($aUIDLs)) {
-				
-				// Some "New" messages are marked as ignore
-				// Add them to the database
+				// Some "New" messages will be marked as "ignore".
+				// Add them to the database.
 				$oSource = $oInbox->GetEmailSource();
 				$aMessages = $oSource->GetListing();
-				foreach ($aUIDLs as $sUIDL) {
-					if(isset($aReplicas[$sUIDL])) {
+				foreach($aUIDLs as $sUIDL) {
+					if (isset($aReplicas[$sUIDL])) {
 						// Already processed
 						continue;
 					}
@@ -425,9 +411,9 @@ try {
 					}
 				}
 			}
-			
 			GetMailboxContent($oPage, $oInbox);
 			break;
+			
 	}
 	$oPage->output();
 }
