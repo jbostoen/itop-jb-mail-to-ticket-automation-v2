@@ -22,6 +22,9 @@ SetupWebPage::AddModule(
 			'vendor/autoload.php',
 			'classes/autoload.php',
 			'model.jb-email-synchro.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Helper.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/MessageHandler.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/ProcessingHelper.php',
 		),
 		'dictionary' => array(
 		),

@@ -27,6 +27,7 @@ require_once(APPROOT.'/application/application.inc.php');
 require_once(APPROOT.'/application/ajaxwebpage.class.inc.php');
 
 use Combodo\iTop\Application\WebPage\AjaxPage;
+use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
 
 /**
  * @param AjaxPage $oPage
@@ -58,9 +59,9 @@ function GetMailboxContent($oPage, $oInbox) {
 			$iTotalMsgCount = $oSource->GetMessagesCount();
 			$aMessages = $oSource->GetListing(); // Note: this may differ from $oSource->GetMessagesCount(); as messages with errors could be skipped.
 
-			$iTotalMsgOkCount = count(array_filter($aMessages, function($aMsg) {
-				return (is_null($aMsg['uidl']) == false);
-			}));
+			// - In a previous iteration with a different IMAP engine, corruption could occur.
+			//   Extra filtering was applied at this step.
+			$iTotalMsgOkCount = count($aMessages);
 			
 			if($iStartIndex < 0 || $iMaxCount <= 0) {
 				// Don't process, invalid indexes
@@ -99,18 +100,10 @@ function GetMailboxContent($oPage, $oInbox) {
 			});
 			
 			// Get the corresponding EmailReplica object for each message
-			$aUIDLs = [];
+			$aUIDLs = array_map(function(MessageHandler $oMsgHandler) {
+				return $oMsgHandler->GetUIDL();
+			}, $aMessages);
 			
-			foreach(array_keys($aMessages) as $iMessage) {
-				
-				// Real index does not matter here. Just collecting ALL UIDLs
-				$sMessageUidl = $aMessages[$iMessage]['uidl'];
-				if (is_null($sMessageUidl)) {
-					continue;
-				}
-				$aUIDLs[] = $sMessageUidl;
-				
-			}
 			
 			/** @var int $iMsgOkCount The number of readable emails between start and end index. */
 			$iMsgOkCount = 0;
@@ -167,10 +160,12 @@ function GetMailboxContent($oPage, $oInbox) {
 					
 					// Obtain the actual index for the message (take Nth index)
 					$iMessage = $aMessageIndexes[$iCurrentIndex];
-									
-					$oRawEmail = $oSource->GetMessage($iMessage);
+					$oRawEmail = $oSource->GetMessageFromMailbox($iMessage);
+
+					/** @var MessageHandler $oMsgHandler */
+					$oMsgHandler = $aMessages[$iMessage];
 					
-					if(is_null($oRawEmail) == true) {
+					if(is_null($oRawEmail)) {
 						
 						// Just ignore.
 						// Adding a dummy record in the table could lead to actions being performed which should not be available for this corrupted message.
@@ -181,14 +176,14 @@ function GetMailboxContent($oPage, $oInbox) {
 						$iMsgOkCount =+ 1;
 						$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
 
-						$sUIDLs = $aMessages[$iMessage]['uidl'];
+						$sUIDL = $oMsgHandler->GetUIDL();
 						$sStatus = Dict::S('MailInbox:Status/New');
 						$sLink = '';
 						$sErrorMsg = '';
 						$sDetailsLink = '';
-						if(array_key_exists($sUIDLs, $aProcessed)) {
+						if(array_key_exists($sUIDL, $aProcessed)) {
 							
-							switch($aProcessed[$sUIDLs]['status']) {
+							switch($aProcessed[$sUIDL]['status']) {
 								case 'ok':
 									$sStatus = Dict::S('MailInbox:Status/Processed');
 									break;
@@ -204,17 +199,17 @@ function GetMailboxContent($oPage, $oInbox) {
 								case 'ignored':
 									$sStatus = Dict::S('MailInbox:Status/Ignored');
 							}
-							$sErrorMsg = $aProcessed[$sUIDLs]['error_message'];
-							if($aProcessed[$sUIDLs]['ticket_id'] != '') {
-								$sTicketUrl = ApplicationContext::MakeObjectUrl($oInbox->Get('target_class'), $aProcessed[$sUIDLs]['ticket_id']);
-								$sLink = '<a href="'.$sTicketUrl.'">'.$oInbox->Get('target_class').'::'.$aProcessed[$sUIDLs]['ticket_id'].'</a>';
+							$sErrorMsg = $aProcessed[$sUIDL]['error_message'];
+							if($aProcessed[$sUIDL]['ticket_id'] != '') {
+								$sTicketUrl = ApplicationContext::MakeObjectUrl($oInbox->Get('target_class'), $aProcessed[$sUIDL]['ticket_id']);
+								$sLink = '<a href="'.$sTicketUrl.'">'.$oInbox->Get('target_class').'::'.$aProcessed[$sUIDL]['ticket_id'].'</a>';
 							}
-							$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDLs];
+							$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDL];
 							$sDetailsURL = utils::GetAbsoluteUrlModulePage(basename(dirname(__FILE__)), 'details.php', $aArgs);
 							$sDetailsLink = '<a href="'.$sDetailsURL.'">'.Dict::S('MailInbox:MessageDetails').'</a>';
 						}
 						$aData[] = [
-							'checkbox' => '<input type="checkbox" class="mailbox_item" value="'.htmlentities($sUIDLs, ENT_QUOTES, 'UTF-8').'"/>',
+							'checkbox' => '<input type="checkbox" class="mailbox_item" value="'.htmlentities($sUIDL, ENT_QUOTES, 'UTF-8').'"/>',
 							'status' => $sStatus,
 							'date' => $oEmail->sDate,
 							'from' => $oEmail->sCallerEmail,
@@ -286,8 +281,7 @@ function GetMailboxContent($oPage, $oInbox) {
  * @param EmailSource $oSource
  * @return array|false The message data if found, false otherwise
  */
-function FindMessageDataFromUIDL($aMessages, $sUIDL, EmailSource $oSource)
-{
+function FindMessageDataFromUIDL($aMessages, $sUIDL, EmailSource $oSource) {
 	$sKey = $sUIDL;
 	$sMultiSourceKey = substr($sUIDL, 1 + strlen($oSource->GetName())); // in Multisource mode the name of the source plus _ are prepended to the UIDL
 	foreach ($aMessages as $aData) {
@@ -349,14 +343,14 @@ try {
 				}
 				foreach($aUIDLs as $sUIDL) {
 					if($sOperation == 'mailbox_delete_messages') {
-						$aMessageData = FindMessageDataFromUIDL($aMessages, $sUIDL, $oSource);
-						if($aMessageData !== false) {
+
+						$oMsgHandler = array_filter($aMessages, function(MessageHandler $oMsgHandler) use ($sUIDL) {
+							return $oMsgHandler->GetUIDL() == $sUIDL;
+						})[0] ?? null;
+
+						if($oMsgHandler) {
 							// Delete the actual email from the mailbox.
-							if(is_int($aMessageData['msg_id'])) {
-								$oSource->DeleteMessage($aMessageData['msg_id']);
-							} else {
-								$oSource->DeleteMessage($aMessageData['uidl']);
-							}
+							$oMsgHandler->DeleteMessage();
 						}
 					}
 					if(array_key_exists($sUIDL, $aReplicas)) {

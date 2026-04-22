@@ -214,6 +214,16 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'A' => 
+        array (
+            'AppName' => 
+            array (
+                0 => __DIR__ . '/../..' . '/src',
+            ),
+        ),
+    );
+
     public static $classMap = array (
         'Carbon\\AbstractTranslator' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/AbstractTranslator.php',
         'Carbon\\Callback' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Callback.php',
@@ -384,6 +394,7 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         'DateMalformedStringException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateMalformedStringException.php',
         'DateObjectError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateObjectError.php',
         'DateRangeError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateRangeError.php',
+        'DelayedTargetValidation' => __DIR__ . '/..' . '/symfony/polyfill-php85/Resources/stubs/DelayedTargetValidation.php',
         'Deprecated' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Deprecated.php',
         'DirectoryTree\\ImapEngine\\Address' => __DIR__ . '/..' . '/directorytree/imapengine/src/Address.php',
         'DirectoryTree\\ImapEngine\\Attachment' => __DIR__ . '/..' . '/directorytree/imapengine/src/Attachment.php',
@@ -456,6 +467,7 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         'DirectoryTree\\ImapEngine\\FolderRepository' => __DIR__ . '/..' . '/directorytree/imapengine/src/FolderRepository.php',
         'DirectoryTree\\ImapEngine\\FolderRepositoryInterface' => __DIR__ . '/..' . '/directorytree/imapengine/src/FolderRepositoryInterface.php',
         'DirectoryTree\\ImapEngine\\HasFlags' => __DIR__ . '/..' . '/directorytree/imapengine/src/HasFlags.php',
+        'DirectoryTree\\ImapEngine\\HasMessageAccessors' => __DIR__ . '/..' . '/directorytree/imapengine/src/HasMessageAccessors.php',
         'DirectoryTree\\ImapEngine\\HasParsedMessage' => __DIR__ . '/..' . '/directorytree/imapengine/src/HasParsedMessage.php',
         'DirectoryTree\\ImapEngine\\Idle' => __DIR__ . '/..' . '/directorytree/imapengine/src/Idle.php',
         'DirectoryTree\\ImapEngine\\Mailbox' => __DIR__ . '/..' . '/directorytree/imapengine/src/Mailbox.php',
@@ -469,7 +481,10 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         'DirectoryTree\\ImapEngine\\Pagination\\LengthAwarePaginator' => __DIR__ . '/..' . '/directorytree/imapengine/src/Pagination/LengthAwarePaginator.php',
         'DirectoryTree\\ImapEngine\\Poll' => __DIR__ . '/..' . '/directorytree/imapengine/src/Poll.php',
         'DirectoryTree\\ImapEngine\\QueriesMessages' => __DIR__ . '/..' . '/directorytree/imapengine/src/QueriesMessages.php',
+        'DirectoryTree\\ImapEngine\\Support\\BodyPartDecoder' => __DIR__ . '/..' . '/directorytree/imapengine/src/Support/BodyPartDecoder.php',
         'DirectoryTree\\ImapEngine\\Support\\ForwardsCalls' => __DIR__ . '/..' . '/directorytree/imapengine/src/Support/ForwardsCalls.php',
+        'DirectoryTree\\ImapEngine\\Support\\LazyBodyPartStream' => __DIR__ . '/..' . '/directorytree/imapengine/src/Support/LazyBodyPartStream.php',
+        'DirectoryTree\\ImapEngine\\Support\\MimeMessage' => __DIR__ . '/..' . '/directorytree/imapengine/src/Support/MimeMessage.php',
         'DirectoryTree\\ImapEngine\\Support\\Str' => __DIR__ . '/..' . '/directorytree/imapengine/src/Support/Str.php',
         'DirectoryTree\\ImapEngine\\Testing\\FakeFolder' => __DIR__ . '/..' . '/directorytree/imapengine/src/Testing/FakeFolder.php',
         'DirectoryTree\\ImapEngine\\Testing\\FakeFolderRepository' => __DIR__ . '/..' . '/directorytree/imapengine/src/Testing/FakeFolderRepository.php',
@@ -565,6 +580,8 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         'Egulias\\EmailValidator\\Warning\\QuotedString' => __DIR__ . '/..' . '/egulias/email-validator/src/Warning/QuotedString.php',
         'Egulias\\EmailValidator\\Warning\\TLD' => __DIR__ . '/..' . '/egulias/email-validator/src/Warning/TLD.php',
         'Egulias\\EmailValidator\\Warning\\Warning' => __DIR__ . '/..' . '/egulias/email-validator/src/Warning/Warning.php',
+        'Filter\\FilterException' => __DIR__ . '/..' . '/symfony/polyfill-php85/Resources/stubs/Filter/FilterException.php',
+        'Filter\\FilterFailedException' => __DIR__ . '/..' . '/symfony/polyfill-php85/Resources/stubs/Filter/FilterFailedException.php',
         'GuzzleHttp\\Psr7\\AppendStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/AppendStream.php',
         'GuzzleHttp\\Psr7\\BufferStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/BufferStream.php',
         'GuzzleHttp\\Psr7\\CachingStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/CachingStream.php',
@@ -772,11 +789,13 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         'Invoker\\ParameterResolver\\ResolverChain' => __DIR__ . '/..' . '/php-di/invoker/src/ParameterResolver/ResolverChain.php',
         'Invoker\\ParameterResolver\\TypeHintResolver' => __DIR__ . '/..' . '/php-di/invoker/src/ParameterResolver/TypeHintResolver.php',
         'Invoker\\Reflection\\CallableReflection' => __DIR__ . '/..' . '/php-di/invoker/src/Reflection/CallableReflection.php',
+        'JeffreyBostoenExtensions\\MailToTicket\\Helper' => __DIR__ . '/../..' . '/src/JeffreyBostoenExtensions/MailToTicket/Helper.php',
+        'JeffreyBostoenExtensions\\MailToTicket\\MessageHandler' => __DIR__ . '/../..' . '/src/JeffreyBostoenExtensions/MailToTicket/MessageHandler.php',
+        'JeffreyBostoenExtensions\\MailToTicket\\ProcessingHelper' => __DIR__ . '/../..' . '/src/JeffreyBostoenExtensions/MailToTicket/ProcessingHelper.php',
         'Laravel\\SerializableClosure\\Contracts\\Serializable' => __DIR__ . '/..' . '/laravel/serializable-closure/src/Contracts/Serializable.php',
         'Laravel\\SerializableClosure\\Contracts\\Signer' => __DIR__ . '/..' . '/laravel/serializable-closure/src/Contracts/Signer.php',
         'Laravel\\SerializableClosure\\Exceptions\\InvalidSignatureException' => __DIR__ . '/..' . '/laravel/serializable-closure/src/Exceptions/InvalidSignatureException.php',
         'Laravel\\SerializableClosure\\Exceptions\\MissingSecretKeyException' => __DIR__ . '/..' . '/laravel/serializable-closure/src/Exceptions/MissingSecretKeyException.php',
-        'Laravel\\SerializableClosure\\Exceptions\\PhpVersionNotSupportedException' => __DIR__ . '/..' . '/laravel/serializable-closure/src/Exceptions/PhpVersionNotSupportedException.php',
         'Laravel\\SerializableClosure\\SerializableClosure' => __DIR__ . '/..' . '/laravel/serializable-closure/src/SerializableClosure.php',
         'Laravel\\SerializableClosure\\Serializers\\Native' => __DIR__ . '/..' . '/laravel/serializable-closure/src/Serializers/Native.php',
         'Laravel\\SerializableClosure\\Serializers\\Signed' => __DIR__ . '/..' . '/laravel/serializable-closure/src/Serializers/Signed.php',
@@ -789,6 +808,12 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         'NoDiscard' => __DIR__ . '/..' . '/symfony/polyfill-php85/Resources/stubs/NoDiscard.php',
         'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
         'Override' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/Override.php',
+        'Pdo\\Dblib' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Dblib.php',
+        'Pdo\\Firebird' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Firebird.php',
+        'Pdo\\Mysql' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Mysql.php',
+        'Pdo\\Odbc' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Odbc.php',
+        'Pdo\\Pgsql' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Pgsql.php',
+        'Pdo\\Sqlite' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Sqlite.php',
         'Psr\\Clock\\ClockInterface' => __DIR__ . '/..' . '/psr/clock/src/ClockInterface.php',
         'Psr\\Container\\ContainerExceptionInterface' => __DIR__ . '/..' . '/psr/container/src/ContainerExceptionInterface.php',
         'Psr\\Container\\ContainerInterface' => __DIR__ . '/..' . '/psr/container/src/ContainerInterface.php',
@@ -818,6 +843,7 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         'Psr\\SimpleCache\\CacheInterface' => __DIR__ . '/..' . '/psr/simple-cache/src/CacheInterface.php',
         'Psr\\SimpleCache\\InvalidArgumentException' => __DIR__ . '/..' . '/psr/simple-cache/src/InvalidArgumentException.php',
         'ReflectionConstant' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/ReflectionConstant.php',
+        'RoundingMode' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/RoundingMode.php',
         'SQLite3Exception' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/SQLite3Exception.php',
         'Symfony\\Component\\Clock\\Clock' => __DIR__ . '/..' . '/symfony/clock/Clock.php',
         'Symfony\\Component\\Clock\\ClockAwareTrait' => __DIR__ . '/..' . '/symfony/clock/ClockAwareTrait.php',
@@ -1142,6 +1168,7 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8::$prefixesPsr0;
             $loader->classMap = ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8::$classMap;
 
         }, null, ClassLoader::class);

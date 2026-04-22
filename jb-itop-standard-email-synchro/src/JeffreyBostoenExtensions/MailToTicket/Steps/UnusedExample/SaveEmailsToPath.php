@@ -8,14 +8,18 @@
  * A demo of a class which could store e-mails automatically.
  */
  
-namespace jb_itop_extensions\mail_to_ticket;
+namespace JeffreyBostoenExtensions\MailToTicket\Steps\UnusedExample;
+
+use JeffreyBostoenExtensions\MailToTicket\Steps\Base;
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 
 /**
- * Class StepSaveEmailsToPath. Step to save incoming emails as .EML file to a (hardcoded) directory.
+ * Class SaveEmailsToPath.  
+ * Saves incoming emails as .EML file to a (hardcoded) directory.
  *
  * Note: this is NOT in use by default.
  */
-abstract class StepSaveEmailsToPath extends Step {
+abstract class SaveEmailsToPath extends Base {
 	
 	/**
 	 * @inheritDoc
@@ -32,10 +36,10 @@ abstract class StepSaveEmailsToPath extends Step {
 	/**
 	 * @inheritDoc
 	 */
-	public static function Execute() {
+	public static function Execute() : void {
 		
 		/** @var \RawEmailMessage $oEmail */
-		$oRawEmail = static::GetRawMail();
+		$oRawEmail = ProcessingHelper::GetRawMail();
 		
 		// Add some logic for file name. Mind time zones!
 		$sDateTime = strtotime($oRawEmail->GetHeader('date'));
@@ -68,17 +72,4 @@ abstract class StepSaveEmailsToPath extends Step {
 	}
 
 }
-
-
-/*
-
-abstract class PolicyAttachmentVirusCheck extends Step {
-	// could be an example implementing ClamAv, similar to what's mentioned in MailInboxBase
-}
-
-abstract class PolicyStatistics extends Step {
-	// could be an example of keeping track of statistics. Number of processed e-mails per inbox etc.
-}
-
-*/
 

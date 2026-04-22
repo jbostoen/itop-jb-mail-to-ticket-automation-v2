@@ -6,6 +6,9 @@
     }
   },
   "autoload": {
+    "psr-0": {
+        "AppName": "src/"
+    },
     "psr-4": {
       "Combodo\\iTop\\Extension\\": "src"
     }

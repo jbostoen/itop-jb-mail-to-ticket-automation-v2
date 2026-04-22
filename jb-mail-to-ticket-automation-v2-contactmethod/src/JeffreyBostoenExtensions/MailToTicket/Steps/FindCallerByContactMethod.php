@@ -8,21 +8,20 @@
  * 
  */
  
-namespace jb_itop_extensions\mail_to_ticket;
+namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
-// iTop internals
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
+
+// iTop internals.
 use DBObjectSet;
 use DBObjectSearch;
 use MetaModel;
 use Person;
 use Ticket;
 
-// Mail
+// Mail.
 use EmailMessage;
 use RawEmailMessage;
-
-// Generic
-use Exception;
  
 /**
  * Class StepFindCallerByContactMethod. Step to find the caller (Person) based on ContactMethod.
@@ -30,7 +29,7 @@ use Exception;
  * Keep in mind: e-mail address might be shared by multiple people. This is only a basic implementation.
  *
  */
-abstract class StepFindCallerByContactMethod extends Step {
+abstract class StepFindCallerByContactMethod extends Base {
 	
 	/**
 	 * @inheritDoc
@@ -87,14 +86,14 @@ abstract class StepFindCallerByContactMethod extends Step {
 	 * @inheritDoc 
 	 * @details Checks if all information within the e-mail is compliant with the steps defined for this mailbox
 	 */
-	public static function Execute() {
+	public static function Execute() : void {
 		
 
 		/** @var\EmailMessage $oEmail E-mail message. */
-		$oEmail = static::GetMail();
+		$oEmail = ProcessingHelper::GetMail();
 
 		/** @var RawEmailMessage $oRawEmail Raw e-mail message. */
-		$oRawEmail = static::GetRawMail();
+		$oRawEmail = ProcessingHelper::GetRawMail();
 	
 		// Don't even bother if jb-contactmethod is not enabled as an extension.
 		if(MetaModel::IsValidClass('ContactMethod') == false && MetaModel::IsValidClass('EmailAlias') == false) {
@@ -138,7 +137,7 @@ abstract class StepFindCallerByContactMethod extends Step {
  * Keep in mind: e-mail address might be shared by multiple people. This is only a basic implementation.
  *
  */
-abstract class StepFindAdditionalContactsByContactMethod extends Step {
+abstract class StepFindAdditionalContactsByContactMethod extends Base {
 	
 	/**
 	 * @inheritDoc
@@ -153,7 +152,7 @@ abstract class StepFindAdditionalContactsByContactMethod extends Step {
 	 * @details Checks if all information within the e-mail is compliant with the steps defined for this mailbox
 	 *
 	 */
-	public static function Execute() {
+	public static function Execute() : void {
 		
 		// Checking if there's an unknown caller
 		
@@ -164,13 +163,13 @@ abstract class StepFindAdditionalContactsByContactMethod extends Step {
 			}
 			
 			/** @var EmailMessage $oEmail E-mail message. */
-			$oEmail = static::GetMail();
+			$oEmail = ProcessingHelper::GetMail();
 			
 			/** @var RawEmailMessage $oRawEmail Raw e-mail message. */
-			$oRawEmail = static::GetRawMail();
+			$oRawEmail = ProcessingHelper::GetRawMail();
 
 			/** @var Ticket $oTicket The ticket. */
-			$oTicket = static::GetTicket();
+			$oTicket = ProcessingHelper::GetTicket();
 			
 			$sSenderEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
 			

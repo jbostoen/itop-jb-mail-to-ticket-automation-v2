@@ -8,7 +8,7 @@ use MetaModel;
 class ProviderHelper{
 
 
-	public static function getProviderForIMAP($oMailbox) {
+	public static function GetProviderForIMAP($oMailbox) {
 
 		$oOAuthClient = MetaModel::GetObject('OAuthClient', $oMailbox->Get('oauth_client_id'));
 		return OAuthClientProviderFactory::GetClientProvider($oOAuthClient);

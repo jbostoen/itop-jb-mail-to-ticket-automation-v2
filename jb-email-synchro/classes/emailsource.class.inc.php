@@ -18,11 +18,13 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
+use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
+
 /**
- * A source of messages either POP3, IMAP or File...
+ * A source of messages (IMAP or File...)
  */
-abstract class EmailSource
-{
+abstract class EmailSource {
+
 	protected $sLastErrorSubject;
 	protected $sLastErrorMessage;
 	protected $sPartsOrder;
@@ -37,91 +39,90 @@ abstract class EmailSource
 	 * Get the number of messages to process
 	 * @return integer The number of available messages
 	 */
-	abstract public function GetMessagesCount();
+	abstract public function GetMessagesCount() : int;
 	
 	/**
 	 * Retrieves the message of the given index [0..Count]
-	 * @param $index integer The index between zero and count
-	 * @return MessageFromMailbox
+	 * @param int $index The index between zero and count
+	 * @return null|MessageFromMailbox
 	 */
-	abstract public function GetMessage($index);
+	abstract public function GetMessageFromMailbox(int $index) : ?MessageFromMailbox;
 	
 	/**
 	 * Initializes the message when it is being processed.
-	 * @param $index integer The index between zero and count
+	 * @param MessageHandler $oMsgHandler
 	 * @return void
 	 */
-	abstract public function InitMessage($index);
+	abstract public function InitMessage(MessageHandler $oMsgHandler) : void;
 	
 	/**
 	 * Deletes the message of the given index [0..Count] from the mailbox
-	 * @param $index integer The index between zero and count
+	 * @param MessageHandler $oMsgHandler The message handler.
 	 */
-	abstract public function DeleteMessage($index);
+	abstract public function DeleteMessage(MessageHandler $oMsgHandler);
 	
 	/**
-	 * Name of the eMail source
+	 * Name of the e-mail source
 	 */
-	abstract public function GetName();
+	abstract public function GetName() : string;
 
 	
 	/**
-	 * Move the message of the given index [0..Count] from the mailbox to another folder
-	 * @param $index integer The index between zero and count
+	 * Moves the message to another folder.
+	 * 
+	 * @param MessageHandler $oMsgHandler The message handler.
+	 * @param string $sTargetFolder
+	 * @return bool
 	 */
-	public function MoveMessage($index) {
+	public function MoveMessage(MessageHandler $oMsgHandler, string $sTargetFolder) : bool {
 		// Do nothing
 		return false;
 	}
 	
 	/**
+	 * Copies the message to another folder.
+	 * 
+	 * @param MessageHandler $oMsgHandler The message handler.
+	 * @param string $sTargetFolder
+	 * @return bool
+	 */
+	public function CopyMessage(MessageHandler $oMsgHandler, string $sTargetFolder) : bool {
+		// Do nothing
+		return false;
+	}
+
+
+	/**
+	 * Marks a message as read / seen.
+	 */
+	public function MarkAsSeen(MessageHandler $oMsgHandler) : bool {
+		return false;
+	}
+
+	/**
 	 * Mailbox path of the eMail source
 	 */
-	public function GetMailbox() {
+	public function GetMailbox() : string {
 		return '';
 	}
 
 	/**
-	 * Get the list (with their IDs) of all the messages
-	 * @return array{msg_id: int, uidl: ?string} 'msg_id' => index, 'uidl' => message identifier (null if message cannot be decoded)
+	 * Gets the list (of message handlers) of all the messages
+	 * @return MessageHandler[]
 	 */
-	abstract public function GetListing();
+	abstract public function GetListing() : array;
 	
 	/**
 	 * Disconnect from the server
 	 */
-	abstract public function Disconnect();
+	abstract public function Disconnect() : void;
 
-	/**
-	 * Returns the value of the "use_message_id_as_uid" setting.
-	 * 
-	 * For some e-mail providers such as Microsoft Outlook 365 and GMail, it's recommended to set this setting to "true".  
-	 * With those e-mail providers, the UID may change between two sessions, which makes it an unreliable value.  
-	 * Instead, when enabled, the Message-Id can be used instead to uniquely identify a message.
-	 *
-	 * Notes:
-	 * - It's possible to receive multiple messages with the same Message-Id. 
-	 *   This could also simply occur because the message gets copied.
-	 *   Since the contents of the message will be the same, the behavior is to process such messages only once.
-	 * - When changing the "use_message_id_as_uid" setting in the configuration file, 
-	 *   all the messages present in the mailbox will be considered as "new" and thus processed again.  
-	 * - Some e-mail providers do not return a "Message-Id" property.
-	 *
-	 * @return boolean
-	 * @uses `use_message_id_as_uid` config parameter
-	 */
-	public static function UseMessageIdAsUid() {
-		
-		// Note: Contrary to Combodo's version: in most environments it seems better that this is enabled by default.
-		return (bool)MetaModel::GetModuleSetting('jb-email-synchro', 'use_message_id_as_uid', true);
-		
-	}
 	
-	public function GetLastErrorSubject() {
+	public function GetLastErrorSubject() : string {
 		return $this->sLastErrorSubject;
 	}
 	
-	public function GetLastErrorMessage() {
+	public function GetLastErrorMessage() : string {
 		return $this->sLastErrorMessage;
 	}
 	
@@ -132,7 +133,7 @@ abstract class EmailSource
 	 *                this is useful as for example EmailBackgroundProcess is working on this class and not persisted mailboxes ({@link \MailInboxBase})
 	 * @since 3.6.1 N°5633 method creation
 	 */
-	public function GetSourceId() {
+	public function GetSourceId() : string {
 		return $this->token;
 	}
 	
@@ -140,28 +141,28 @@ abstract class EmailSource
 	 * Preferred order for retrieving the mail "body" when scanning a multiparts emails
 	 * @param $sPartsOrder string A comma separated list of MIME types e.g. text/plain,text/html
 	 */
-	public function SetPartsOrder($sPartsOrder) {
+	public function SetPartsOrder($sPartsOrder) : void {
 		$this->sPartsOrder = $sPartsOrder;
 	}
 	/**
 	 * Preferred order for retrieving the mail "body" when scanning a multiparts emails
 	 * @return string A comma separated list of MIME types e.g. text/plain,text/html
 	 */
-	public function GetPartsOrder() {
+	public function GetPartsOrder() : string {
 		return $this->sPartsOrder;
 	}
 	/**
 	 * Set an opaque reference token for use by the caller...
 	 * @param mixed $token
 	 */
- 	public function SetToken($token) {
+ 	public function SetToken($token) : void {
  		$this->token = $token;
  	}
  	/**
  	 * Get the reference token set earlier....
  	 * @return mixed The token set by SetToken()
  	 */
- 	public function GetToken() {
+ 	public function GetToken() : mixed {
  		return $this->token;
  	}
 }

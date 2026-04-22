@@ -29,7 +29,29 @@ SetupWebPage::AddModule(
 		//
 		'datamodel' => array(
 			'model.jb-itop-standard-email-synchro.php',
-			'src/Steps.php',
+			// Core processing.
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Base.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/AttachmentCriteria.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/CreateOrUpdateTicket.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/FinalAction.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/FindCaller.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/FindAdditionalContacts.php',
+			// Extra.
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AttachmentForbiddenMimeType.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AutoReply.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Base.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/LimitMailSize.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/MatchByInReplyToOrReferences.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/NonDeliveryReport.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/NoSubject.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/OtherEmailCallerThanTicketCaller.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/OtherRecipients.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/RemoveTitlePatterns.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/SenderEmailAddress.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/TicketClosed.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/TicketResolved.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/UndesiredTitlePatterns.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/UnknownTicketReference.php',
 		),
 		'webservice' => array(
 			

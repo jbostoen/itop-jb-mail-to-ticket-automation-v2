@@ -18,17 +18,18 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
+use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
+
 /**
  * Reads messages from files stored in a given folder, ordered by their creation date
  */
-class TestEmailSource extends EmailSource
-{
+class TestEmailSource extends EmailSource {
+
 	protected $sSourceDir;
 	protected $aMessages;
 	protected $sName;
 	
-	public function __construct($sSourceDir, $sName)
-	{
+	public function __construct($sSourceDir, $sName) {
 		parent::__construct();
 		//$this->sPartsOrder = 'text/html,text/plain'; // Default value can be changed via SetPartsOrder
 		
@@ -62,42 +63,40 @@ class TestEmailSource extends EmailSource
 	 * Get the number of messages to process
 	 * @return integer The number of available messages
 	 */
-	public function GetMessagesCount()
-	{
+	public function GetMessagesCount() : int {
 		return count($this->aMessages);
 	}
 	
 	/**
 	 * Initializes the message when it is being processed.
-	 * @param $index integer The index between zero and count
+	 * @param MessageHandler $oMsgHandler
 	 * @return void
 	 */
-	public function InitMessage($index) {
+	public function InitMessage(MessageHandler $oMsgHandler) : void {
 	}
 	
 	/**
 	 * Retrieves the message of the given index [0..Count]
-	 * @param $index integer The index between zero and count
-	 * @return MessageFromMailbox
+	 * @param int $index The index between zero and count.
+	 * @return null|MessageFromMailbox
 	 */
-	public function GetMessage($index)
-	{
+	public function GetMessageFromMailbox(int $index) : ?MessageFromMailbox {
 		return MessageFromMailbox::FromFile($this->sSourceDir.'/'.$this->aMessages[$index]);
 	}
 
 	/**
 	 * Simulates the deletion of the message of the given index [0..Count] from the mailbox... does nothing
-	 * @param $index integer The index between zero and count
+	 * @inheritDoc
 	 */
-	public function DeleteMessage($index)
-	{
+	public function DeleteMessage(MessageHandler $oMsgHandler) : bool {
 		// Do nothing !
+		return true;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	 public function GetName() {
+	 public function GetName() : string {
 		 
 	 	if (!empty($this->sName)) {
 		 	return $this->sName;
@@ -109,7 +108,7 @@ class TestEmailSource extends EmailSource
 	/**
 	 * @inheritDoc
 	 */
-	public function GetSourceId() {
+	public function GetSourceId() : string {
 		return $this->sName.' ('.$this->sSourceDir.')';
 	}
 
@@ -117,7 +116,7 @@ class TestEmailSource extends EmailSource
 	/**
 	 * @inheritDoc
 	 */
-	 public function GetListing() {
+	 public function GetListing() : array {
 		 
 		$aListing = array();
 		foreach($this->aMessages as $index => $sName)
@@ -128,7 +127,8 @@ class TestEmailSource extends EmailSource
 		
 	 }
 	 
-	 public function Disconnect()
-	 {
+	 public function Disconnect() : void {
+		
 	 }
+
 }

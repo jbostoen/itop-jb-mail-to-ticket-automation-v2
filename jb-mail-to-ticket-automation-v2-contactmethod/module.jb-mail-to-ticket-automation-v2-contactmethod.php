@@ -30,7 +30,8 @@ SetupWebPage::AddModule(
                 //
                 'datamodel' => array(
 			'model.jb-mail-to-ticket-automation-v2-contactmethod.php',
-			'app/step.contactmethod.class.inc.php'
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/FindCallerByContactMethod.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/FindAdditionalContactsByContactMethod.php',
                 ),
                 'webservice' => array(
 

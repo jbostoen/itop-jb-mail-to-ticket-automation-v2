@@ -1013,7 +1013,6 @@ EOF
 			$this->Trace($sLog);
 			
 			// Always override each time this is used. Avoid leftovers from previous e-mails!
-			$sStep::Init($this, $oSource, $index, $oEmail, $oTicket, $aPreviouslyExecutedSteps);
 			$sStep::Execute();
 			$aPreviouslyExecutedSteps[] = $sStep;
 			

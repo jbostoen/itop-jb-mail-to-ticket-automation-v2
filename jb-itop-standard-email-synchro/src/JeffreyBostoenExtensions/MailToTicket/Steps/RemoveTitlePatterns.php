@@ -1,0 +1,98 @@
+<?php
+/**
+ * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
+ * @license     See license.md
+ * @version     3.2.260421
+ */
+ 
+
+namespace JeffreyBostoenExtensions\MailToTicket\Steps;
+
+use JeffreyBostoenExtensions\MailToTicket\{
+	ProcessingHelper
+};
+
+
+/**
+ * Class RemoveTitlePatterns. 
+ * A policy to remove patterns in titles (in message subject and later ticket title).
+ */
+abstract class RemoveTitlePatterns extends Base {
+	
+	/**
+	 * @inheritDoc
+	 * Must be executed before StepCreateOrUpdateTicket ( precedence = 200 ).
+	 */
+	public static $iPrecedence = 110;
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static $sXMLSettingsPrefix = 'policy_remove_pattern';
+	
+	/**
+	 * @inheritDoc
+	 */
+	public static function Execute() : void {
+		
+		// Checking if an undesired title pattern is found
+			$oEmail = ProcessingHelper::GetMail();
+			
+			$sPatterns = static::GetStepSetting('patterns');
+
+			if($sPatterns != '' ) { 
+			
+				// Go over each pattern and check.
+				$aPatterns = preg_split(static::NEWLINE_REGEX, $sPatterns); 
+				$sMailSubject = $oEmail->sSubject;
+				
+				foreach($aPatterns as $sPattern) {
+					if(trim($sPattern) != '') {
+							
+						$oPregMatched = @preg_match($sPattern, $sMailSubject);
+						
+						if($oPregMatched === false) {
+							static::Trace("... Invalid pattern: '{$sPattern}'");
+						}
+						elseif(preg_match($sPattern, $sMailSubject)) {
+							
+							switch(static::GetStepSetting('behavior')) {
+								
+								case 'fallback_remove':
+								
+									$sNewMailSubject = preg_replace($sPattern, '', $sMailSubject);
+									
+									if($sMailSubject == $sNewMailSubject) {
+										static::Trace("... Found pattern to remove: {$sPattern}. Nothing to remove.");
+									}
+									else {
+										static::Trace("... Found pattern to remove: {$sPattern}. Removing it.");
+									}
+									
+									$oEmail->sSubject = $sNewMailSubject;
+									
+									break; // Defensive programming
+									
+								case PolicyBehavior::DO_NOTHING->value:
+									// Should not happen.
+									static::Trace("... Found pattern to remove: {$sPattern}. Doing nothing.");
+									break; 
+									
+								default:
+									// Should not happen.
+									static::Trace("... Unknown action for closed tickets.");
+									break; 
+								
+							}
+							
+						}
+						else {
+							static::Trace(".. Pattern '{$sPattern}' not matched");
+						}
+					}
+				}
+			}
+		
+	}
+	
+}

@@ -2,13 +2,17 @@
 
 namespace Combodo\iTop\Extension\EmailSynchro\Service;
 
+use JeffreyBostoenExtensions\MailToTicket\Helper;
+
 use DirectoryTree\ImapEngine\Enums\ImapFetchIdentifier;
 use DirectoryTree\ImapEngine\FolderInterface;
 use DirectoryTree\ImapEngine\Mailbox;
 use DirectoryTree\ImapEngine\MailboxInterface;
+use DirectoryTree\ImapEngine\Message;
 use EmailSource;
 use Exception;
 use IssueLog;
+use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
 use MailInboxBase;
 use MessageFromMailbox;
 
@@ -98,19 +102,23 @@ class IMAPEmailSource extends EmailSource {
 
 	/**
 	 * Initializes the message when it is being processed.
-	 * @param $index integer The index between zero and count
+	 * @param MessageHandler $oMsgHandler
 	 * @return void
 	 */
-	public function InitMessage($index) {
+	public function InitMessage(MessageHandler $oMsgHandler) : void {
 		
 		// Pre-emptive measure. For restored emails, sometimes there's still an IMAP flag indicating it was 'marked for removal'.
-		$this->UndeleteMessage($index);
+		$this->UndeleteMessage($oMsgHandler);
 		
 		return;
 	}
 
-
-	public function GetMessagesCount() {
+	/**
+	 * Returns a message count based on the IMAP engine reseult.
+	 *
+	 * @return int
+	 */
+	public function GetMessagesCount() : int {
 
 		IssueLog::Debug(static::LOG_DEBUG_CLASS." Start GetMessagesCount for $this->sServer", static::LOG_CHANNEL);
 		$iCount = $this->GetFolder()->status()['MESSAGES'] ?? 0;
@@ -119,7 +127,10 @@ class IMAPEmailSource extends EmailSource {
 		return $iCount;
 	}
 
-	public function GetMessage($index) {
+	/**
+	 * @inheritDoc
+	 */
+	public function GetMessageFromMailbox(int $index) : ?MessageFromMailbox {
 
 		$iOffsetIndex = 1 + $index;
 
@@ -136,7 +147,7 @@ class IMAPEmailSource extends EmailSource {
 			if(!$oMessage) {
 				return null;
 			}
-			$sUIDL = static::UseMessageIdAsUid() ? $oMessage->messageId() : $oMessage->uid();
+			$sUIDL = Helper::UseMessageIdAsUid() ? $oMessage->messageId() : $oMessage->uid();
 
 		} catch(Exception $e) {
 
@@ -154,44 +165,32 @@ class IMAPEmailSource extends EmailSource {
 	}
 
 	/**
-	 * @param int $index
-	 * @return true|null
+	 * @param array $aMessage Message data
+	 * @return bool
 	 */
-	public function DeleteMessage($index) {
+	public function DeleteMessage(MessageHandler $oMsgHandler) : bool {
 
 		try {
 
-			if(static::UseMessageIdAsUid()) {
-				$iOffsetIndex = $index;
-				$identifier = ImapFetchIdentifier::Uid;
-			} else {
-				$iOffsetIndex = 1 + $index;
-				$identifier = ImapFetchIdentifier::MessageNumber;
-			}
-
-			IssueLog::Debug(__METHOD__." Start: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
-
-			/** @var Message $oMessage */
-			$oMessage = $this->GetFolder()
-				->messages()
-				->find($iOffsetIndex, $identifier);
+			$oMessage = $oMsgHandler->GetMessageObject();
 
 			if(!$oMessage) {
-				return null;
+				return false;
 			}
 
 			$oMessage->delete();
 			$this->bMessagesDeleted = true;
 
+
 		} catch(Exception $e) {
-			IssueLog::Error(__METHOD__." $iOffsetIndex for $this->sServer throws an exception", static::LOG_CHANNEL, [
+			IssueLog::Error(__METHOD__."  for $this->sServer throws an exception", static::LOG_CHANNEL, [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
 			]);
 
-			return null;
+			return false;
 		}
-		IssueLog::Debug(__METHOD__." End: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
+		
 
 		return true;
 	}
@@ -200,44 +199,31 @@ class IMAPEmailSource extends EmailSource {
 	/**
 	 * Unmarks the message for deletion(IMAP-flag) of the given index [0..Count] from the mailbox.
 	 * 
-	 * @param int $index The index between zero and count
-	 * @return true|null
+	 * @param MessageHandler $oMsgHandler
+	 * @return bool
 	 */
-	public function UndeleteMessage($index) {
+	public function UndeleteMessage(MessageHandler $oMsgHandler) : bool {
 
 		try {
-
-			if(static::UseMessageIdAsUid()) {
-				$iOffsetIndex = $index;
-				$identifier = ImapFetchIdentifier::Uid;
-			} else {
-				$iOffsetIndex = 1 + $index;
-				$identifier = ImapFetchIdentifier::MessageNumber;
-			}
 			
-			IssueLog::Debug(__METHOD__." Start: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
-
-			/** @var Message $oMessage */
-			$oMessage = $this->GetFolder()
-				->messages()
-				->find($iOffsetIndex, $identifier);
+			$oMessage = $oMsgHandler->GetMessageObject();
 
 			if(!$oMessage) {
-				return null;
+				return false;
 			}
 
 			$oMessage->restore();
 
 		}
 		catch(Exception $e) {
-			IssueLog::Error(__METHOD__." $iOffsetIndex for $this->sServer throws an exception", static::LOG_CHANNEL, [
+			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
 				'exception.message' => $e->getMessage(),
 				'exception.stack' => $e->getTraceAsString(),
 			]);
 
-			return null;
+			return false;
 		}
-		IssueLog::Debug(__METHOD__." End: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
+		
 
 		return true;
 		
@@ -246,14 +232,14 @@ class IMAPEmailSource extends EmailSource {
 	/**
 	 * @inheritDoc
 	 */
-	public function GetName() {
+	public function GetName() : string {
 		return $this->sLogin;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function GetSourceId() {
+	public function GetSourceId() : string {
 
 		return $this->sServer.'/'.$this->sLogin;
 
@@ -262,18 +248,19 @@ class IMAPEmailSource extends EmailSource {
 	/**
 	 * @inheritDoc
 	 */
-	public function GetListing() {
+	public function GetListing() : array{
 
 		$aReturn = [];
 		$oMessages = $this->GetFolder()
 			->messages()
 			->withHeaders()
 			->get();
-		foreach($oMessages as $oMessage) {
-			$aReturn[] = [
-				'msg_id' => $oMessage->messageId(),
-				'uidl' => static::UseMessageIdAsUid() ? $oMessage->messageId() : $oMessage->uid(),
-			];
+
+		/** @var Message $oMessage */
+		foreach($oMessages as $iIndex => $oMessage) {
+
+			$aReturn[] = MessageHandler::FromMessage($oMessage, $this, $iIndex);
+
 		}
 		return $aReturn;
 	}
@@ -281,7 +268,7 @@ class IMAPEmailSource extends EmailSource {
 	/**
 	 * @inheritDoc
 	 */
-	public function GetFolder() {
+	public function GetFolder() : ?FolderInterface {
 		
 		if($this->oFolder === null) {
 			$this->oFolder =  $this->oMailbox->folders()->find($this->sMailbox);
@@ -291,42 +278,25 @@ class IMAPEmailSource extends EmailSource {
 	}
 
 	/**
-	 * Move the message of the given index [0..Count] from the mailbox to another folder
-	 *
-	 * @param int|string $index The index between zero and count
-	 *
-	 * @throws \DirectoryTree\ImapEngine\Exceptions\ImapCapabilityException
+	 * @inheritDoc
 	 */
-	public function MoveMessage($index) {
+	public function MoveMessage(MessageHandler $oMsgHandler, string $sTargetFolder) : bool {
 
 		try {
-			
-			if(static::UseMessageIdAsUid()) {
-				$iOffsetIndex = $index;
-				$identifier = ImapFetchIdentifier::Uid;
-			} else {
-				$iOffsetIndex = 1 + $index;
-				$identifier = ImapFetchIdentifier::MessageNumber;
-			}
 
-			IssueLog::Debug(__METHOD__." Start: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
-
-			/** @var Message $oMessage */
-			$oMessage = $this->GetFolder()
-				->messages()
-				->find($iOffsetIndex, $identifier);
+			$oMessage = $oMsgHandler->GetMessageObject();
 
 			if(!$oMessage) {
 				return false;
 			}
 
 			// Use copy+delete instead of move as GMail won't expunge automatically and break our way of iterating over messages indexes
-			$oMessage->copy($this->sTargetFolder);
+			$oMessage->copy($sTargetFolder);
 			$oMessage->delete();
 			$this->bMessagesDeleted = true;
 
 		} catch(Exception $e) {
-			IssueLog::Error(__METHOD__." $iOffsetIndex for $this->sServer throws an exception", static::LOG_CHANNEL, [
+			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
 			]);
@@ -334,7 +304,6 @@ class IMAPEmailSource extends EmailSource {
 			return false;
 		}
 
-		IssueLog::Debug(__METHOD__." End: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
 		return true;
 	}
 
@@ -342,7 +311,63 @@ class IMAPEmailSource extends EmailSource {
 	/**
 	 * @inheritDoc
 	 */
-	public function Disconnect() {
+	public function CopyMessage(MessageHandler $oMsgHandler, string $sTargetFolder) : bool {
+
+		try {
+
+			$oMessage = $oMsgHandler->GetMessageObject();
+
+			if(!$oMessage) {
+				return false;
+			}
+
+			$oMessage->copy($sTargetFolder);
+
+		} catch(Exception $e) {
+			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
+				'exception.message' => $e->getMessage(),
+				'exception.stack'   => $e->getTraceAsString(),
+			]);
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function MarkAsSeen(MessageHandler $oMsgHandler) : bool {
+
+		try {
+
+			$oMessage = $oMsgHandler->GetMessageObject();
+
+			if(!$oMessage) {
+				return false;
+			}
+
+			$oMessage->markSeen();
+
+		} catch(Exception $e) {
+			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
+				'exception.message' => $e->getMessage(),
+				'exception.stack'   => $e->getTraceAsString(),
+			]);
+
+			return false;
+		}
+
+		return true;
+	}
+
+	
+
+	/**
+	 * @inheritDoc
+	 */
+	public function Disconnect() : void {
 
 		// Expunge deleted messages before disconnecting.
 		if($this->bMessagesDeleted) {
@@ -356,7 +381,7 @@ class IMAPEmailSource extends EmailSource {
 	/**
 	 * @inheritDoc
 	 */
-	public function GetMailbox() {
+	public function GetMailbox() : string {
 		return $this->sMailbox;
 	}
 	
@@ -371,5 +396,43 @@ class IMAPEmailSource extends EmailSource {
 		return $this->oMailbox;
 		
 	}
+
+
+	/**
+	 * Returns a Message (DirectoryTree\ImapEngine\Message) object based on the given message data.
+	 *
+	 * @param array $aMessage Message data
+	 * @return Message|null
+	 */
+	private function GetMessageFromData(array $aMessage) : ?Message {
+
+		if(Helper::UseMessageIdAsUid()) {
+
+			// - Current version of this extension 
+			//   will use the current uid (= the one that is currently returned from the mail server through the GetListing() method.).
+
+				$iIndex = $aMessage['uid'];
+				$identifier = ImapFetchIdentifier::Uid;
+
+
+				// Note: This might also work, but if a copy of the same message (same Message-ID) is present, it gets more tricky to process.
+				// $message = $inbox->messages()->whereHeader('Message-ID', '<unique-id@example.com>')->first();
+
+		} else {
+
+			$iIndex = $aMessage['original_number_in_listing'] + 1;
+			$identifier = ImapFetchIdentifier::MessageNumber;
+
+		}
+
+		/** @var Message $oMessage */
+		$oMessage = $this->GetFolder()
+			->messages()
+			->find($iIndex, $identifier);
+
+		return $oMessage;
+
+	}
+
 
 }
