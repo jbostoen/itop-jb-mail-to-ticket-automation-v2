@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'jb-itop-standard-email-synchro/3.2.260305',
+	'jb-itop-standard-email-synchro/3.2.260423',
 	array(
 		// Identification
 		//
@@ -36,6 +36,7 @@ SetupWebPage::AddModule(
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/FinalAction.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/FindCaller.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/FindAdditionalContacts.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/SaveReferences.php',
 			// Extra.
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AttachmentForbiddenMimeType.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AutoReply.php',

@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
@@ -52,7 +52,7 @@ abstract class RemoveTitlePatterns extends Base {
 						$oPregMatched = @preg_match($sPattern, $sMailSubject);
 						
 						if($oPregMatched === false) {
-							static::Trace("... Invalid pattern: '{$sPattern}'");
+							static::Trace("Invalid pattern: '{$sPattern}'");
 						}
 						elseif(preg_match($sPattern, $sMailSubject)) {
 							
@@ -63,10 +63,10 @@ abstract class RemoveTitlePatterns extends Base {
 									$sNewMailSubject = preg_replace($sPattern, '', $sMailSubject);
 									
 									if($sMailSubject == $sNewMailSubject) {
-										static::Trace("... Found pattern to remove: {$sPattern}. Nothing to remove.");
+										static::Trace("Found pattern to remove: {$sPattern}. Nothing to remove.");
 									}
 									else {
-										static::Trace("... Found pattern to remove: {$sPattern}. Removing it.");
+										static::Trace("Found pattern to remove: {$sPattern}. Removing it.");
 									}
 									
 									$oEmail->sSubject = $sNewMailSubject;
@@ -75,19 +75,19 @@ abstract class RemoveTitlePatterns extends Base {
 									
 								case PolicyBehavior::DO_NOTHING->value:
 									// Should not happen.
-									static::Trace("... Found pattern to remove: {$sPattern}. Doing nothing.");
+									static::Trace("Found pattern to remove: {$sPattern}. Doing nothing.");
 									break; 
 									
 								default:
 									// Should not happen.
-									static::Trace("... Unknown action for closed tickets.");
+									static::Trace("Unknown action for closed tickets.");
 									break; 
 								
 							}
 							
 						}
 						else {
-							static::Trace(".. Pattern '{$sPattern}' not matched");
+							static::Trace(". Pattern '{$sPattern}' not matched");
 						}
 					}
 				}

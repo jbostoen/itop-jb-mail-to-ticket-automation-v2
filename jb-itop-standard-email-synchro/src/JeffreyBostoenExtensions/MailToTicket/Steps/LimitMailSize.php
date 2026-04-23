@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
@@ -16,7 +16,8 @@ use utils;
 
 /**
  * Class LimitMailSize.  
- * A policy to prevent big email messages from being processed.
+ * A policy to prevent large e-mail messages from being processed.  
+ * It considers the size of the raw email message, which includes all attachments and is the actual size of the email as it was received by the mail server.
  */
 abstract class LimitMailSize extends Base {
 	
@@ -48,7 +49,7 @@ abstract class LimitMailSize extends Base {
 			if($iMailSize > $iLimitMailSize) {
 				
 				// Mail size too big
-				static::Trace('.. Undesired: mail size too big: '.$iMailSize.' bytes, limit is '.$iLimitMailSize.' bytes ('.$iMaxSizeMB.' M).');
+				static::Trace('Undesired: mail size too big (%1$s bytes), limit is %2$s MB.', $iMailSize, $iMaxSizeMB);
 				static::HandleViolation();
 				
 				// No fallback

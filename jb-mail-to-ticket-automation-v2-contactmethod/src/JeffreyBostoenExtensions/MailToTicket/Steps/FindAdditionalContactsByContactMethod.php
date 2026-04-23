@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (c) 2019-2026 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     3.2.260305
+ * @version     3.2.260423
  *
  * 
  */
@@ -48,7 +48,7 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 		
 			// Don't even bother if jb-contactmethod is not enabled as an extension.
 			if(MetaModel::IsValidClass('ContactMethod') == false && MetaModel::IsValidClass('EmailAlias') == false) {
-				static::Trace(".. Step not relevant: No relevant classes exist (ContactMethod, EmailAlias).");
+				static::Trace(". Step not relevant: No relevant classes exist (ContactMethod, EmailAlias).");
 				return;
 			}
 			
@@ -96,7 +96,7 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 					
 					// Don't update the primary e-mail address.
 					// Only do so if the e-mail is sent by the person!
-					// static::Trace(".. Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCurrentEmail}");
+					// static::Trace(". Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCurrentEmail}");
 					// $oPerson->Set('email', $sCurrentEmail);
 					$oPerson->DBUpdate();
 					

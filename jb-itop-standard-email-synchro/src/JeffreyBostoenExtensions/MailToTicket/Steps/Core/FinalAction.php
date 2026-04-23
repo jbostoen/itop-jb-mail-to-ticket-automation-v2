@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
@@ -13,11 +13,9 @@ use JeffreyBostoenExtensions\MailToTicket\Steps\{
 	PolicyBehavior
 };
 use JeffreyBostoenExtensions\MailToTicket\{
-	ProcessingHelper
+	eNextAction,
+	ProcessingHelper,
 };
-
-// iTop Mail.
-use EmailProcessor;
 
 
 /**
@@ -37,23 +35,23 @@ abstract class FinalAction extends Base {
 	public static function Execute() : void {
 		
 		$oMailBox = ProcessingHelper::GetMailBox();
-		$iNextAction = EmailProcessor::PROCESS_MESSAGE;
+		$iNextAction = eNextAction::PROCESS_MESSAGE;
 		
 		// Delete the source email immediately?
 		if($oMailBox->Get('email_storage') == PolicyBehavior::DELETE->value) {
 			
 			// Remove the processed message from the mailbox.
-			$iNextAction = EmailProcessor::DELETE_MESSAGE;
+			$iNextAction = eNextAction::DELETE_MESSAGE;
 			
 		}
 		elseif($oMailBox->Get('email_storage') == PolicyBehavior::MOVE->value && $oMailBox->Get('target_folder') != '') {
 			
 			// Move the processed message to another folder.
-			$iNextAction = EmailProcessor::MOVE_MESSAGE;
+			$iNextAction = eNextAction::MOVE_MESSAGE;
 			
 		}
 		
-		$oMailBox->SetNextAction($iNextAction);
+		ProcessingHelper::SetNextAction($iNextAction);
 		
 	}
 	

@@ -2,12 +2,13 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
 namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
+use Exception;
 use JeffreyBostoenExtensions\MailToTicket\{
 	ProcessingHelper
 };
@@ -37,8 +38,9 @@ abstract class TicketClosed extends Base {
 		$oTicket = ProcessingHelper::GetTicket();
 		$oMailBox = ProcessingHelper::GetMailBox();
 		
-		// Checking if a previous ticket was found
-			if($oTicket !== null && $oTicket->Get('status') == 'closed') {
+		// Checking if a previous ticket was found.
+		
+			if($oTicket !== null && $oTicket->Get('status') === 'closed') {
 						
 				switch(static::GetStepSetting('behavior')) { 
 					case PolicyBehavior::BOUNCE_DELETE->value: 
@@ -47,7 +49,7 @@ abstract class TicketClosed extends Base {
 					case PolicyBehavior::DO_NOTHING->value:
 					case PolicyBehavior::MARK_AS_UNDESIRED->value:
 					
-						static::Trace(".. Undesired: ticket was marked as closed before.");
+						static::Trace('Undesired: ticket was marked as closed before.');
 						static::HandleViolation();
 						return;
 
@@ -55,17 +57,22 @@ abstract class TicketClosed extends Base {
 						 
 					case 'fallback_reopen': 
 						// Reopen ticket
-						static::Trace("... Fallback: reopen closed ticket."); 
-						$bRet = $oTicket->ApplyStimulus('ev_reopen');
+						static::Trace('Fallback: reopen closed ticket.');
+						try {
+							$bRet = $oTicket->ApplyStimulus('ev_reopen');
+						}
+						catch(Exception $e) {
+							static::Trace('Unable to apply stimulus "ev_reopen".');
+						}
 						
 						if($bRet == false) {
-							static::Trace('... Stimulus ev_reopen is not possible for this ticket. Hint: the stimulus may not be defined or not allowed in the current ticket state: '.$oTicket->GetState());
+							static::Trace('Stimulus ev_reopen is not possible for this ticket. Hint: the stimulus may not be defined or not allowed in the current ticket state: %1$s', $oTicket->GetState());
 						}
 						break; 
 						
 					default:
 						// Should not happen.
-						static::Trace("... Unknown action for closed tickets: ".$oMailBox->Get('behavior'));
+						static::Trace('Unknown action for closed tickets: %1$s', $oMailBox->Get('behavior'));
 						break; 
 					
 					

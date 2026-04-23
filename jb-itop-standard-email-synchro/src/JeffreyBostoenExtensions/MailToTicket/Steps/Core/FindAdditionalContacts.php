@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
@@ -76,7 +76,7 @@ abstract class FindAdditionalContacts extends Base {
 		$aExcludedAddresses = array_map('mb_strtolower', $aExcludedAddresses);
 		$aExcludedAddresses = array_unique($aExcludedAddresses);
 		
-		static::Trace(".. E-mail addresses to exclude: ".implode(', ', $aExcludedAddresses));
+		static::Trace(". E-mail addresses to exclude: ".implode(', ', $aExcludedAddresses));
 
 		// While the mailbox may be configured NOT to *create* or *link* related contacts,
 		// It may still be good to match them to iTop objects if they do exist.
@@ -108,7 +108,7 @@ abstract class FindAdditionalContacts extends Base {
 						'email' => $sRecipientEmail
 					]);
 					
-					static::Trace(".. Results for Person with email address '{$sRecipientEmail}: {$oSet_Person->Count()}");
+					static::Trace(". Results for Person with email address '{$sRecipientEmail}: {$oSet_Person->Count()}");
 					
 					if($oSet_Person->Count() == 0) {
 						
@@ -120,7 +120,7 @@ abstract class FindAdditionalContacts extends Base {
 						elseif($sPolicyBehavior == 'fallback_add_other_contacts') {
 							
 							// Create
-							static::Trace(".. Creating a new Person with email address '{$sRecipientEmail}'");
+							static::Trace(". Creating a new Person with email address '{$sRecipientEmail}'");
 							$oContact = new Person();
 							$oContact->Set('email', $sRecipientEmail);
 							$sDefaultValues = static::GetStepSetting('default_values');
@@ -138,9 +138,9 @@ abstract class FindAdditionalContacts extends Base {
 								}
 							}
 							
-							$oMailBox->InitObjectFromDefaultValues($oContact, $aDefaultValues);
+							ProcessingHelper::InitObjectFromDefaultValues($oContact, $aDefaultValues);
 							try {
-								static::Trace("... Try to create user with default values");
+								static::Trace("Try to create user with default values");
 								$oContact->DBInsert();
 
 								// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
@@ -149,9 +149,9 @@ abstract class FindAdditionalContacts extends Base {
 							}
 							catch(Exception $e) {
 								// This is an actual error.
-								static::Trace("... Failed to create a Person for the email address '{$sCallerEmail}'.");
+								static::Trace("Failed to create a Person for the email address '{$sCallerEmail}'.");
 								static::Trace($e->getMessage());
-								$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oEmail->oRawEmail);
+								ProcessingHelper::HandleError('failed_to_create_contact');
 								return;
 							}
 
@@ -165,7 +165,7 @@ abstract class FindAdditionalContacts extends Base {
 					}
 					else {
 						// More than one Person returned. Inconclusive. Ignore?
-						static::Trace(".. Multiple Persons found. Returning the first one.");
+						static::Trace(". Multiple Persons found. Returning the first one.");
 						$oContact = $oSet_Person->Fetch();
 						$oEmail->AddRelatedContact($oContact);
 						
@@ -190,11 +190,11 @@ abstract class FindAdditionalContacts extends Base {
 				$oEmail->aTos = [];
 				$oEmail->aCCs = [];
 			
-				static::Trace(".. Ignoring other contacts");
+				static::Trace(". Ignoring other contacts");
 				break;
 			
 			default:
-				static::Trace(".. Unexpected 'behavior'");
+				static::Trace(". Unexpected 'behavior'");
 				break;
 			
 		}

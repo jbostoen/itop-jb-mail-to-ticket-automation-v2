@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
@@ -60,7 +60,7 @@ abstract class FindCaller extends Base {
 			if($oCaller === null) {
 				
 				$sCallerEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
-				static::Trace("... Determine caller: Person with email '{$sCallerEmail}'");
+				static::Trace("Determine caller: Person with email '{$sCallerEmail}'");
 				
 				$oCaller = null;
 				$sContactQuery = 'SELECT Person WHERE email = :email';
@@ -71,7 +71,7 @@ abstract class FindCaller extends Base {
 					
 					case 1:
 						// Ok, the caller was found in iTop
-						static::Trace("... Found person.");
+						static::Trace("Found person.");
 						$oCaller = $oSet_Person->Fetch();
 						break;
 						
@@ -85,14 +85,14 @@ abstract class FindCaller extends Base {
 							case PolicyBehavior::DELETE->value:
 							case PolicyBehavior::MARK_AS_UNDESIRED->value:
 							
-								static::Trace("... The message '{$oEmail->sSubject}' is considered as undesired, the caller was not found.");
+								static::Trace("The message '{$oEmail->sSubject}' is considered as undesired, the caller was not found.");
 								static::HandleViolation();
 								return;
 								break;
 
 							case 'fallback_create_person':
 								
-								static::Trace("... Creating a new Person for the email: {$sCallerEmail}");
+								static::Trace("Creating a new Person for the email: {$sCallerEmail}");
 								$oCaller = new Person();
 								$oCaller->Set('email', $oEmail->sCallerEmail);
 								$sDefaultValues = static::GetStepSetting('default_values');
@@ -114,23 +114,23 @@ abstract class FindCaller extends Base {
 										}
 										
 										static::Trace('... Default values: '.http_build_query($aDefaultValues));
-										$oMailBox->InitObjectFromDefaultValues($oCaller, $aDefaultValues);
+										ProcessingHelper::InitObjectFromDefaultValues($oCaller, $aDefaultValues);
 										
-										static::Trace("... Create user with default values");
+										static::Trace("Create user with default values");
 										$oCaller->DBInsert();					
 									}
 									catch(Exception $e) {
 										// This is an actual error.
-										static::Trace("... Failed to create a Person for the email address '{$sCallerEmail}'.");
+										static::Trace("Failed to create a Person for the email address '{$sCallerEmail}'.");
 										static::Trace($e->getMessage());
-										$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oRawEmail);
+										ProcessingHelper::HandleError('failed_to_create_contact');
 										return;
 									}
 
 								}
 								else {
 									static::Trace('... Default values are missing. Can not create contact.');
-									$oMailBox->HandleError($oEmail, 'failed_to_create_contact', $oRawEmail);
+									ProcessingHelper::HandleError('failed_to_create_contact');
 									return;
 								}
 								
@@ -143,7 +143,7 @@ abstract class FindCaller extends Base {
 						break;
 						
 					default:
-						static::Trace("... Found ".$oSet_Person->Count()." callers with the same email address '{$sCallerEmail}', the first one will be used...");
+						static::Trace("Found ".$oSet_Person->Count()." callers with the same email address '{$sCallerEmail}', the first one will be used...");
 						// Multiple callers with the same email address!
 						$oCaller = $oSet_Person->Fetch();
 						
@@ -154,7 +154,7 @@ abstract class FindCaller extends Base {
 				
 			}
 			else {
-				static::Trace("... Caller already determined by previous policy. Skip.");
+				static::Trace("Caller already determined by previous policy. Skip.");
 			}
 		
 	}

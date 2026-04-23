@@ -18,11 +18,11 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
-use Combodo\iTop\Application\WelcomePopup\Message;
-
 use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
-use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
-use JeffreyBostoenExtensions\MailToTicket\Steps\Base as BaseStep;
+use JeffreyBostoenExtensions\MailToTicket\{
+	eNextAction,
+	ProcessingHelper
+};
 
 /**
  * The interface between iBackgroundProcess (generic background tasks for iTop)
@@ -64,20 +64,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		self::$sNotifyErrorsFrom = MetaModel::GetModuleSetting('jb-email-synchro', 'notify_errors_from', '');
 		$sMaxEmailSize = MetaModel::GetModuleSetting('jb-email-synchro', 'maximum_email_size', '0');
 		self::$iMaxEmailSize = utils::ConvertToBytes($sMaxEmailSize);
-		
-		
-		// Build a filtered list of classes. Do so only once per process execution.
-		EmailProcessor::$aAvailableStepClasses = [];
-
-		foreach(get_declared_classes() as $sClassName) {
-		
-			if(is_subclass_of($sClassName, BaseStep::class) == true) {
-				
-				EmailProcessor::$aAvailableStepClasses[] = $sClassName;
-				
-			}
-			
-		}
 
 		
 	}
@@ -97,11 +83,11 @@ class EmailBackgroundProcess implements iBackgroundProcess {
      * @param string $sErrorCode
 	 * @param null|RawEmailMessage $oRawEmail
 	 *
-	 * @throws \CoreCannotSaveObjectException
-	 * @throws \CoreException
-	 * @throws \CoreUnexpectedValue
+	 * @throws CoreCannotSaveObjectException
+	 * @throws CoreException
+	 * @throws CoreUnexpectedValue
      */
-	protected function UpdateEmailReplica(&$oEmailReplica, $oProcessor, $sErrorCode = 'error', $oRawEmail = null) {
+	protected function UpdateEmailReplica($oEmailReplica, $oProcessor, $sErrorCode = 'error', $oRawEmail = null) {
 
 		try {
 			if(is_null($oRawEmail)) {
@@ -180,7 +166,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		$iTotalUnreadable = 0; // Can not be red by the mail library (N° 5633)
 		
 		$this->Trace("-----------------------------------------------------------------------------------------");
-		$this->Trace('. '.count(EmailProcessor::$aAvailableStepClasses).' steps to process.');
+		$this->Trace('. '.count(ProcessingHelper::GetAvailableSteps()).' steps to process.');
 		
 		foreach(self::$aEmailProcessors as $sProcessorClass) {
 			
@@ -229,39 +215,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 					ProcessingHelper::SetMailBox($oInbox);
 					
-					// Whether a step is active or inactive, is determined per mailbox.
-					EmailProcessor::$aActiveStepClasses = [];
-					
-					// Start from pre-filtered class names.
-					foreach(EmailProcessor::$aAvailableStepClasses as $sClassName) {
-
-						if($sClassName::IsApplicable()) {
-								
-							// Policies can easily be turned off.
-							// 'inactive' means it can be skipped altogether.
-							// 'do_nothing' means it should still be processed, but it shouldn't have any influence nor take any.
-							$sAttCode = $sClassName::GetXMLSettingsPrefix().'_behavior';
-
-							// - If a step has no behavior, it's a step that always will be executed.
-							if(!MetaModel::IsValidAttCode(get_class($oInbox), $sAttCode)) {
-
-								EmailProcessor::$aActiveStepClasses[] = $sClassName;
-								
-							}
-							// - If a step has a behavior and it's not set to "inactive", it means it's a policy that must be executed.
-							elseif($oInbox->Get($sAttCode) != 'inactive') {
-							
-								EmailProcessor::$aActiveStepClasses[] = $sClassName;
-								
-							}
-
-						}
-						
-					}
-					
-					
-				
-					
 					// Sort; but keep original index number.
 					uasort($aMessages, function(MessageHandler $a, MessageHandler $b) {
 						return $a->GetTimestamp() <=> $b->GetTimestamp();
@@ -296,6 +249,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					$this->Trace("Searching EmailReplicas: '$sOQL'");
 					$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 					$aReplicas = array();
+					/** @var EmailReplica $oReplica */
 					while($oReplica = $oReplicaSet->Fetch()) {
 						$aReplicas[$oReplica->Get('uidl')] = $oReplica;
 					}
@@ -332,6 +286,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							
 							$sUIDL = $sUIDL;
 
+							/** @var EmailReplica|null $oEmailReplica */
 							$oEmailReplica = array_key_exists($sUIDL, $aReplicas) ? $aReplicas[$sUIDL] : null;
 		
 							if($oEmailReplica == null) {
@@ -351,17 +306,17 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							}
 							else {
 								
-								if($oEmailReplica->Get('status') == 'error') {
+								if($oEmailReplica->Get('status') === 'error') {
 									$this->Trace("\nSkipping old (already processed) message: uidl=$sUIDL index=$iMessage marked as 'error'");
 									$iTotalSkippedError++;
 									continue;
 								}
-								elseif($oEmailReplica->Get('status') == 'ignored') {
+								elseif($oEmailReplica->Get('status') === 'ignored') {
 									$this->Trace("\nSkipping old (already processed) message: uidl=$sUIDL index=$iMessage marked as 'ignored'");
 									$iTotalSkippedIgnored++;
 									continue;
 								}
-								elseif($oEmailReplica->Get('status') == 'undesired') {
+								elseif($oEmailReplica->Get('status') === 'undesired') {
 									$this->Trace("\nUndesired message: uidl=$sUIDL index=$iMessage");
 									$iDelay = MetaModel::GetModuleSetting('jb-email-synchro', 'undesired_purge_delay', 7) * 86400;
 									if($iDelay > 0) {
@@ -391,17 +346,17 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								}
 							}
 							
-							$iActionCode = $oProcessor->DispatchMessage($oSource, $iMessage, $sUIDL, $oEmailReplica);
+							$eAction = ProcessingHelper::DispatchEmail($oEmailReplica);
 					
-							switch($iActionCode) {
+							switch($eAction) {
 								
-								case EmailProcessor::MARK_MESSAGE_AS_ERROR:
+								case eNextAction::MARK_MESSAGE_AS_ERROR:
 									$iTotalMarkedAsError++;
 									$this->Trace("Marking the message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
 									$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
 									break;
 								
-								case EmailProcessor::DELETE_MESSAGE:
+								case eNextAction::DELETE_MESSAGE:
 									$iTotalDeleted++;
 									$this->Trace("Deleting message (AND replica): uidl={$sUIDL} index={$iMessage}");
 									$ret = $oMsgHandler->DeleteMessage();
@@ -411,7 +366,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									}
 									break;
 								
-								case EmailProcessor::PROCESS_MESSAGE:
+								case eNextAction::PROCESS_MESSAGE:
 								
 									$iTotalProcessed++;
 									if($oEmailReplica->IsNew()) {
@@ -432,21 +387,22 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 
 									$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
+									ProcessingHelper::SetMail($oEmail);
 									
 									// Checks for valid caller (name, email), UIDL and attachments
 									if(!$oEmail->IsValid()) {
 
-										$iNextActionCode = $oProcessor->OnDecodeError($oSource, $sUIDL, $oEmail, $oRawEmail);
+										$eNextAction = $oProcessor->OnDecodeError($oSource, $sUIDL, $oEmail, $oRawEmail);
 
-										switch($iNextActionCode) {
-											case EmailProcessor::MARK_MESSAGE_AS_ERROR:
+										switch($eNextAction) {
+											case eNextAction::MARK_MESSAGE_AS_ERROR:
 												$iTotalMarkedAsError++;
 												$this->Trace("Failed to decode the message, marking the message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
 												$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
 												$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
 												break;
 								
-											case EmailProcessor::DELETE_MESSAGE:
+											case eNextAction::DELETE_MESSAGE:
 												$iTotalDeleted++;
 												$this->Trace("Failed to decode the message, deleting it (and its replica): {$sUIDL}");
 												$oMsgHandler->DeleteMessage();
@@ -458,12 +414,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									 
 									else {
 
-										$iNextActionCode = $oProcessor->ProcessMessage($oSource, $iMessage, $oEmail, $oEmailReplica);									  
+										$eNextAction = $oProcessor->ProcessMessage($oSource, $iMessage, $oEmail, $oEmailReplica);									  
 										$this->Trace("EmailReplica ID after ProcessMessage(): ".$oEmailReplica->GetKey());
 						
-										switch($iNextActionCode) {
+										switch($eNextAction) {
 											
-											case EmailProcessor::MARK_MESSAGE_AS_ERROR:
+											case eNextAction::MARK_MESSAGE_AS_ERROR:
 
 												$iTotalMarkedAsError++;
 												$this->Trace("Marking the valid message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
@@ -471,7 +427,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
 												break;
 	 
-											case EmailProcessor::MARK_MESSAGE_AS_UNDESIRED:
+											case eNextAction::MARK_MESSAGE_AS_UNDESIRED:
 
 												$iTotalUndesired++;
 												$this->Trace("Marking the message (and replica): uidl={$sUIDL} index={$iMessage} as undesired.");
@@ -479,7 +435,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
 												break;
 	 
-											case EmailProcessor::DELETE_MESSAGE:
+											case eNextAction::DELETE_MESSAGE:
 
 												$iTotalDeleted++;
 												$this->Trace("Deleting message (marked as DELETE_MESSAGE) (but not replica): {$sUIDL}");
@@ -489,7 +445,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												}
 												break;
 											
-											case EmailProcessor::MOVE_MESSAGE:
+											case eNextAction::MOVE_MESSAGE:
 											
 												$iTotalMoved++;
 												$this->Trace("Move message (and replica): $sUIDL / index $iMessage");
@@ -503,7 +459,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												break;
 											
 											// @todo Seems to be unused in this fork. Clean up?
-											case EmailProcessor::PROCESS_ERROR:
+											case eNextAction::PROCESS_ERROR:
 											
 												$sSubject = $oProcessor->GetLastErrorSubject();
 												$sMessage = $oProcessor->GetLastErrorMessage();
@@ -518,7 +474,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 			
 											
 												
-											case EmailProcessor::SKIP_FOR_NOW:
+											case eNextAction::SKIP_FOR_NOW:
 											
 												$this->Trace('Skip for now.');
 												if($oEmailReplica->IsNew() == false) {
@@ -526,7 +482,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												}
 												break 2;
 												
-											case EmailProcessor::ABORT_ALL_FURTHER_PROCESSING:
+											case eNextAction::ABORT_ALL_FURTHER_PROCESSING:
 
 												$this->Trace('Abort all further processing.');
 												if($oEmailReplica->IsNew() == false) {
@@ -535,7 +491,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												break 3;
 												
 											default:
-											case EmailProcessor::NO_ACTION:
+											case eNextAction::NO_ACTION:
 											
 												$this->Trace("No more action for EmailReplica ID: ".$oEmailReplica->GetKey());
 												$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'ok', $oRawEmail);
@@ -549,7 +505,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 									break;
 					
-								case EmailProcessor::NO_ACTION:
+								case eNextAction::NO_ACTION:
 								default:
 									$this->Trace("No action for message (and replica): {$sUIDL}");
 									$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
@@ -650,7 +606,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		$sSimpleErrorMessage = __CLASS__.': an exception occurred when reading content for mailbox: '.$e->getMessage();
 
 		// MailInboxStandard
-		$sMailboxId = $oSource->GetToken(); // see init in \MailInboxesEmailProcessor::ListEmailSources
+		$sMailboxId = $oSource->GetToken(); // see init in \MailInboxeseEmailProcessor::ListEmailSources
 		/** @var MailInboxStandard $oMailbox */
 		try {
 			$oMailbox = MetaModel::GetObject(MailInboxStandard::class, $sMailboxId, false);

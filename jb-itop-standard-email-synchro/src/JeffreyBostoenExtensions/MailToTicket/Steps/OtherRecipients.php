@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
@@ -81,7 +81,7 @@ abstract class OtherRecipients extends Base {
 							if($oPregMatch === false) {
 								
 								// Pattern mistake
-								static::Trace(".. Invalid pattern: '{$sPattern}'");
+								static::Trace(". Invalid pattern: '{$sPattern}'");
 								continue 2;
 							}
 							elseif(preg_match($sPattern, $sCurrentEmail)) {
@@ -94,7 +94,7 @@ abstract class OtherRecipients extends Base {
 						}
 						
 						// Did not match caller e-mail or any alias of this helpdesk mailbox
-						static::Trace(".. Undesired: at least one other recipient (missing alias or unwanted other recipient): {$oRecipient->GetEmailAddress()}");
+						static::Trace(". Undesired: at least one other recipient (missing alias or unwanted other recipient): {$oRecipient->GetEmailAddress()}");
 						static::HandleViolation();
 						return;
 						
@@ -111,7 +111,7 @@ abstract class OtherRecipients extends Base {
 					break;
 				
 				default:
-					static::Trace(".. Unexpected 'behavior'");
+					static::Trace(". Unexpected 'behavior'");
 					break;
 				
 			}

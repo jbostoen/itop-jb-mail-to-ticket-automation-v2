@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
@@ -50,7 +50,7 @@ abstract class UndesiredTitlePatterns extends Base {
 						$oPregMatched = @preg_match($sPattern, $sMailSubject);
 						
 						if($oPregMatched === false) {
-							static::Trace(".. Invalid pattern: '{$sPattern}'");
+							static::Trace(". Invalid pattern: '{$sPattern}'");
 						}
 						elseif(preg_match($sPattern, $sMailSubject)) {
 							
@@ -61,7 +61,7 @@ abstract class UndesiredTitlePatterns extends Base {
 								case PolicyBehavior::DO_NOTHING->value:
 								case PolicyBehavior::MARK_AS_UNDESIRED->value:
 								
-									static::Trace(".. The message '{$sMailSubject}' is considered as undesired, since it matches {$sPattern}.");
+									static::Trace(". The message '{$sMailSubject}' is considered as undesired, since it matches {$sPattern}.");
 									static::HandleViolation();
 									return;
 
@@ -69,14 +69,14 @@ abstract class UndesiredTitlePatterns extends Base {
 									
 								default:
 									// Should not happen.
-									static::Trace(".. Unknown action for closed tickets.");
+									static::Trace(". Unknown action for closed tickets.");
 									break; 
 								
 							}
 							
 						}
 						else {
-							static::Trace(".. Pattern '{$sPattern}' not matched");
+							static::Trace(". Pattern '{$sPattern}' not matched");
 						}
 					}
 				}

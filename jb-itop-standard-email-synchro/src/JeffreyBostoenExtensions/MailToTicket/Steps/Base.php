@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  * 
  * Additional notes:
  * - Do not alter ticket contents here, such as subject. That's done at a later phase. For this particular case: change EmailMessage's subject.
@@ -11,7 +11,10 @@
 
 namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
-use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
+use JeffreyBostoenExtensions\MailToTicket\{
+	eNextAction,
+	ProcessingHelper
+};
 
 // iTop internals.
 use MetaModel;
@@ -183,7 +186,7 @@ abstract class Base implements iStep {
 	 */
 	public static function Trace($sMessage, ...$args) : void {
 
-		$sMessage = call_user_func_array('sprintf', func_get_args());
+		$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
         $oMailBox = ProcessingHelper::GetMailBox();
 		$oMailBox->Trace($sMessage);
 				
@@ -308,20 +311,20 @@ abstract class Base implements iStep {
 		// - Set the next action for the mail processor.
 
 			$iNextAction = match($sBehavior) {
-				PolicyBehavior::BOUNCE_DELETE->value => EmailProcessor::DELETE_MESSAGE,
-				PolicyBehavior::DELETE->value => EmailProcessor::DELETE_MESSAGE,
-				PolicyBehavior::MOVE->value => EmailProcessor::MOVE_MESSAGE,
-				PolicyBehavior::MARK_AS_ERROR->value => EmailProcessor::MARK_MESSAGE_AS_ERROR,
-				PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
-				PolicyBehavior::MARK_AS_UNDESIRED->value => EmailProcessor::MARK_MESSAGE_AS_UNDESIRED,
-				PolicyBehavior::SKIP_FOR_NOW->value => EmailProcessor::SKIP_FOR_NOW,
-				PolicyBehavior::ABORT_ALL_FURTHER_PROCESSING->value => EmailProcessor::ABORT_ALL_FURTHER_PROCESSING,
-				PolicyBehavior::DO_NOTHING->value => EmailProcessor::NO_ACTION,
-				default => EmailProcessor::NO_ACTION
+				PolicyBehavior::BOUNCE_DELETE->value => eNextAction::DELETE_MESSAGE,
+				PolicyBehavior::DELETE->value => eNextAction::DELETE_MESSAGE,
+				PolicyBehavior::MOVE->value => eNextAction::MOVE_MESSAGE,
+				PolicyBehavior::MARK_AS_ERROR->value => eNextAction::MARK_MESSAGE_AS_ERROR,
+				PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value => eNextAction::MARK_MESSAGE_AS_UNDESIRED,
+				PolicyBehavior::MARK_AS_UNDESIRED->value => eNextAction::MARK_MESSAGE_AS_UNDESIRED,
+				PolicyBehavior::SKIP_FOR_NOW->value => eNextAction::SKIP_FOR_NOW,
+				PolicyBehavior::ABORT_ALL_FURTHER_PROCESSING->value => eNextAction::ABORT_ALL_FURTHER_PROCESSING,
+				PolicyBehavior::DO_NOTHING->value => eNextAction::NO_ACTION,
+				default => eNextAction::NO_ACTION
 			};
 			
-			static::Trace('.. Set next action for EmailProcessor to '.EmailProcessor::GetActionFromCode($iNextAction));
-			$oMailBox->SetNextAction($iNextAction);
+			static::Trace('Set next action for EmailProcessor to %1$s', $iNextAction->name);
+			ProcessingHelper::SetNextAction($iNextAction);
 
 			
 	}

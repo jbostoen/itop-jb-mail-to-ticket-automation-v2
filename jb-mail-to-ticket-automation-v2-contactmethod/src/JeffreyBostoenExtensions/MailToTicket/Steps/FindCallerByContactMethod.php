@@ -3,7 +3,7 @@
 /**
  * @copyright   Copyright (c) 2019-2026 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     3.2.260305
+ * @version     3.2.260423
  *
  * 
  */
@@ -97,7 +97,7 @@ abstract class StepFindCallerByContactMethod extends Base {
 	
 		// Don't even bother if jb-contactmethod is not enabled as an extension.
 		if(MetaModel::IsValidClass('ContactMethod') == false && MetaModel::IsValidClass('EmailAlias') == false) {
-			static::Trace(".. Step not relevant: No relevant classes exist (ContactMethod, EmailAlias).");
+			static::Trace(". Step not relevant: No relevant classes exist (ContactMethod, EmailAlias).");
 			return;
 		}
 
@@ -106,7 +106,7 @@ abstract class StepFindCallerByContactMethod extends Base {
 		
 		// Don't bother if the caller is already determined.
 		if($oCaller !== null) {
-			static::Trace("... Caller already determined by previous step. Skip.");
+			static::Trace("Caller already determined by previous step. Skip.");
 		}
 
 		$sCallerEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
@@ -119,7 +119,7 @@ abstract class StepFindCallerByContactMethod extends Base {
 		}
 
 		// Update the e-mail address (on the person object) to the one which was used last by the caller.
-		static::Trace(".. Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCallerEmail}");
+		static::Trace(". Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCallerEmail}");
 		$oPerson->Set('email', $sCallerEmail);
 		$oPerson->DBUpdate();
 		
@@ -158,7 +158,7 @@ abstract class StepFindAdditionalContactsByContactMethod extends Base {
 		
 			// Don't even bother if jb-contactmethod is not enabled as an extension.
 			if(MetaModel::IsValidClass('ContactMethod') == false && MetaModel::IsValidClass('EmailAlias') == false) {
-				static::Trace(".. Step not relevant: No relevant classes exist (ContactMethod, EmailAlias).");
+				static::Trace(". Step not relevant: No relevant classes exist (ContactMethod, EmailAlias).");
 				return;
 			}
 			
@@ -206,7 +206,7 @@ abstract class StepFindAdditionalContactsByContactMethod extends Base {
 					
 					// Don't update the primary e-mail address.
 					// Only do so if the e-mail is sent by the person!
-					// static::Trace(".. Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCurrentEmail}");
+					// static::Trace(". Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCurrentEmail}");
 					// $oPerson->Set('email', $sCurrentEmail);
 					$oPerson->DBUpdate();
 					

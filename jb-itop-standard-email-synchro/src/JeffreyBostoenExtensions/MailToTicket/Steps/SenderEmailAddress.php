@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
@@ -57,7 +57,7 @@ abstract class SenderEmailAddress extends Base {
 			$oPregMatched = @preg_match($sPattern, $sSenderEmail);
 						
 			if($oPregMatched === false) {
-				static::Trace(".. Invalid pattern: '{$sPattern}'");
+				static::Trace(". Invalid pattern: '{$sPattern}'");
 			}
 			elseif(preg_match($sPattern, $sSenderEmail)) {
 

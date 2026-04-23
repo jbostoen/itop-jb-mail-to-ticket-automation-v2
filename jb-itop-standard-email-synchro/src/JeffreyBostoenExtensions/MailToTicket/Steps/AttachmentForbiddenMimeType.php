@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
@@ -79,12 +79,12 @@ abstract class AttachmentForbiddenMimeType extends Base {
 						// Ticket will be processed. Forbidden attachments will be removed here.
 						foreach($oEmail->aAttachments as $index => $aAttachment) { 
 							if(in_array($aAttachment['mimeType'], $aForbiddenMimeTypes) == true) {
-								static::Trace("... Attachment Content-Id ". $aAttachment['content-id'] . " - Mime Type: {$aAttachment['mimeType']} = forbidden.");
+								static::Trace("Attachment Content-Id ". $aAttachment['content-id'] . " - Mime Type: {$aAttachment['mimeType']} = forbidden.");
 								// Removing attachment
 								unset($oEmail->aAttachments[$index]);
 							}
 							else {
-								static::Trace("... Attachment Content-Id ". $aAttachment['content-id'] . " - Mime Type: {$aAttachment['mimeType']} = allowed.");
+								static::Trace("Attachment Content-Id ". $aAttachment['content-id'] . " - Mime Type: {$aAttachment['mimeType']} = allowed.");
 							}
 						}
 						break;

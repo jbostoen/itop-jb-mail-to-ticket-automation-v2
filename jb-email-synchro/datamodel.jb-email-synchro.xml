@@ -116,9 +116,7 @@ novalidate-cert]]></default_value>
 					<code>
 						<![CDATA[	public function __construct($aRow = null, $sClassAlias = '', $aAttToLoad = null, $aExtendedDataSpec = null) {
 		parent::__construct($aRow, $sClassAlias, $aAttToLoad, $aExtendedDataSpec);
-		$aData = CMDBSource::QueryToArray('SELECT @@global.max_allowed_packet');
-		$this->iMaxAttachmentSize = (int)$aData[0]['@@global.max_allowed_packet'] - 500; // Keep some room for the rest of the SQL query
-		$this->sBigFilesDir = MetaModel::GetModuleSetting('jb-email-synchro', 'big_files_dir', '');
+		
 		$this->sLastError = '';
 	}]]></code>
 				</method>
@@ -134,7 +132,6 @@ novalidate-cert]]></default_value>
 						<![CDATA[	function DisplayBareRelations(WebPage $oPage, $bEditMode = false) {
 						
 		parent::DisplayBareRelations($oPage, $bEditMode);
-		$bUseLegacy = static::UseLegacy();
 		if(!$bEditMode) {
 		
 			$oPage->SetCurrentTab(Dict::S('MailInbox:MailboxContent'));
@@ -164,7 +161,6 @@ novalidate-cert]]></default_value>
 			$sAjaxUrl = addslashes(utils::GetAbsoluteUrlModulesRoot().basename(dirname(__FILE__)).'/ajax.php');
 			$iId = $this->GetKey();
 			$sConfirmMessage = Dict::S('MailInbox:MailboxContent:ConfirmMessage');
-			$sUseLegacy = ($bUseLegacy === true ? 'true' : 'false');
 			$oPage->add_script(
 <<<EOF
 function MailboxUpdateActionButtons() {
@@ -179,9 +175,8 @@ function MailboxUpdateActionButtons() {
 function MailboxRefresh(data) {
 	$('#mailbox_content_output').html(data);
 	$('#mailbox_content_refresh').prop('disabled', false);
-	if($sUseLegacy) {
-		$("#mailbox_content_output .listResults").tablesorter( { headers: { 0: {sorter: false}}, widgets: ['myZebra']} ); // sortable and zebra tables
-	}
+
+
 	$("#mailbox_checkall").click(function() {
 		var bChecked = $(this).prop('checked');
 		$(".mailbox_item").each(function() {
@@ -300,6 +295,7 @@ EOF
 		// Note: This MUST be factorized later: declare unique keys (set of columns) in the data model
 		$aChanges = $this->ListChanges();
 		if(array_key_exists('login', $aChanges) || array_key_exists('server', $aChanges) || array_key_exists('mailbox', $aChanges) || array_key_exists('protocol', $aChanges)) {
+
 			$sNewLogin = $this->Get('login');
 			$sNewServer = $this->Get('server');
 			$sNewMailbox = $this->Get('mailbox');
@@ -319,451 +315,6 @@ EOF
 		
 		
 	}	]]></code>
-				</method>
-				<method id="SetNextAction">
-					<static>false</static>
-					<access>public</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	public function SetNextAction($iNextAction) {
-		return $this->iNextAction = $iNextAction;
-	}]]></code>
-				</method>
-				<method id="GetNextAction">
-					<static>false</static>
-					<access>public</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	public function GetNextAction() {
-		return $this->iNextAction;
-	}]]></code>
-				</method>
-				<method id="DispatchEmail">
-					<comment>/**
-	 * Initial dispatching of an incoming email: determines what to do with the email
-	 * @param EmailReplica $oEmailReplica The EmailReplica associated with the email. A new replica (i.e. not yet in DB) one for new emails
-	 * @return int An action code from EmailProcessor
-	 */</comment>
-					<static>false</static>
-					<access>public</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	public function DispatchEmail(EmailReplica $oEmailReplica) {
-						
-		$this->SetNextAction(EmailProcessor::NO_ACTION);
-		
-		// New messages will be processed.
-		// Already processed messages:
-		// - if related ticket is closed, the e-mail will be deleted.
-		// - if no ticket was created before or if it has been deleted, the message will also be deleted (if previously 'ok' or 'undesired').
-		
-		if($oEmailReplica->IsNew()) {
-		
-			// New (unread) message, let's process it
-			$this->Trace('. EmailReplica is new. Process message.');
-			$this->SetNextAction(EmailProcessor::PROCESS_MESSAGE);
-			
-		}
-		else {
-		
-			$iTicketId = $oEmailReplica->Get('ticket_id');
-			$oTicket = MetaModel::GetObject('Ticket', $iTicketId, false /* => may not exist anymore */);
-			
-			if(is_object($oTicket)) { 
-			
-				if($oTicket->Get('status') == 'closed') {
-					// The corresponding ticket was closed, delete the email (and the replica)
-					$this->Trace('. EmailReplica is not new. Ticket '.$oTicket->Get('ref').' closed. Delete message.');
-					$this->SetNextAction(EmailProcessor::DELETE_MESSAGE);
-				}
-				
-			}
-			else {
-			
-				// The corresponding ticket was deleted (or never created!), delete the email (and the replica)
-				$sReplicaStatus = $oEmailReplica->Get('status');
-				
-				if(in_array($sReplicaStatus, ['ok', 'undesired']) == true) {
-				
-					$this->Trace('. EmailReplica is not new. No ticket found. Status: '.$sReplicaStatus.'. Delete message.');
-					$this->SetNextAction(EmailProcessor::DELETE_MESSAGE);
-					
-				}
-				else {
-				
-					$this->Trace('. EmailReplica is not new. No ticket found. Status: '.$sReplicaStatus.'. Do nothing - requires manual intervention.');
-					$this->SetNextAction(EmailProcessor::NO_ACTION);
-					
-				}
-				
-			}
-			
-		}
-		
-		return $this->GetNextAction();
-		
-	}]]></code>
-				</method>
-				<method id="ProcessNewEmail">
-					<comment>/**
-	 * Process an new (unread) incoming email
-	 * @param EmailSource $oSource The source from which this email was read
-	 * @param int $index The index of the message in the source
-	 * @param EmailMessage $oEmail The decoded email
-	 * @return Ticket|null The ticket created or updated in response to the email. Null on error.
-	 */</comment>
-					<static>false</static>
-					<access>public</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	public function ProcessNewEmail(EmailSource $oSource, $index, EmailMessage $oEmail) {
-						
-		$oTicket = null;
-		$this->SetNextAction(EmailProcessor::NO_ACTION);
-		$this->sLastError = null;
-		
-		// Search if the caller email is an existing contact in iTop
-		$oCaller = $this->FindCaller($oEmail);
-		if($oCaller === null) {
-			// Cannot create/update a ticket if the caller is unknown
-			return null;
-		}
-
-
-		// Check whether we need to create a new ticket or to update an existing one
-		// First check if there are any iTop object mentioned in the headers of the eMail
-		$oTicket = $this->GetRelatedTicket($oEmail);
-
-		if($this->bCreateOnly || !is_object($oTicket)) {
-			// No ticket associated with the incoming email, let's create a new ticket
-			MailInboxesEmailProcessor::Trace("jb-email-synchro: exec CreateTicketFromEmail");
-			$oTicket = $this->CreateTicketFromEmail($oEmail, $oCaller);
-		}
-		else {
-			// Update the ticket with the incoming eMail
-			MailInboxesEmailProcessor::Trace("jb-email-synchro: exec UpdateTicketFromEmail");
-			$this->UpdateTicketFromEmail($oTicket, $oEmail, $oCaller);
-		}
-		
-		return $oTicket;
-	}]]></code>
-				</method>
-				<method id="FindCaller">
-					<comment>/**
-	 * Search if the caller email is an existing contact in iTop
-	 * @param EmailMessage $oEmail
-	 * @return Contact | null
-	 */</comment>
-					<static>false</static>
-					<access>protected</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	protected function FindCaller(EmailMessage $oEmail) {
-		$oCaller = null;
-		$sContactQuery = 'SELECT Person WHERE email = :email';
-		$oSet = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), array(), array('email' => $oEmail->sCallerEmail));
-		$sAdditionalDescription = '';
-		switch($oSet->Count())
-		{
-			case 1:
-				// Ok, the caller was found in iTop
-				$oCaller = $oSet->Fetch();
-				break;
-			
-			case 0:
-				// Here decide what to do ? Create a new user, assign the ticket to a 'fixed' Unknown Caller, reject the ticket...
-				// For now: let's do nothing, just ignore the ticket, it will be processed again later... in case the caller gets created
-				$this->Trace('No contact found for the email address ('.$oEmail->sCallerEmail.'), the email will not be processed');
-				$this->sLastError = 'No contact found for the email address ('.$oEmail->sCallerEmail.')';
-				break;
-			
-			default:
-				$this->Trace('Found '.$oSet->Count().' callers with the same email address ('.$oEmail->sCallerEmail.'), the first one will be used...');
-				// Multiple callers with the same email address !!!
-				$sAdditionalDescription = "Warning:\nThere are ".$oSet->Count()." callers with the same email address (".$oEmail->sCallerEmail.") ";
-				$sAdditionalDescription = ".\nThe ticket was assigned to the first one found (at random).\n\n";
-				$oCaller = $oSet->Fetch();
-		}
-		return $oCaller;
-	}]]></code>
-				</method>
-				<method id="ReprocessOldEmail">
-					<comment>/**
-	 * If DispatchMessage tells to reprocess an email, this method is called
-	 * @param EmailSource $oSource The source from which this email was read
-	 * @param int $index The index of the message in the source
-	 * @param EmailMessage $oEmail The decoded email
-	 * @param EmailReplica $oEmailReplica The replica associated with this email
-	 * @return void
-	 */</comment>
-					<static>false</static>
-					<access>public</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	public function ReprocessOldEmail(EmailSource $oSource, $index, EmailMessage $oEmail, EmailReplica $oEmailReplica) {
-		// Should not be called in this implementation, does nothing
-		$this->SetNextAction(EmailProcessor::NO_ACTION);
-	}]]></code>
-				</method>
-				<method id="GetRelatedTicket">
-					<comment>
-						<![CDATA[/**
-	 * Get the iTop object related to this email, if any.
-	 * The default implementation is based on the patterns in the headers
-	 * 'in-reply-to' or 'references' automatically set in iTop notifications
-	 * @param EmailMessage $oEmail
-	 * @return DBObject | null
-	 */]]></comment>
-					<static>false</static>
-					<access>protected</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	protected function GetRelatedTicket(EmailMessage $oEmail) {
-						
-		$oTicket = $oEmail->oRelatedObject;
-		
-		// There is a related object, but it's not a ticket.
-		if(($oTicket != null) && !($oTicket instanceof Ticket)) {
-			// The object referenced by the email is not a ticket !!
-			// => Forward the message and delete the ticket ??
-			$sObjClass = get_class($oTicket);
-			$sObjId = $oTicket->GetKey();
-			$this->Trace(". iTop Simple Email Synchro: WARNING the message ({$oEmail->sUIDL}) contains a reference to a valid iTop object that is NOT a ticket! ({$sObjClass}::{$sObjId})");
-			$oTicket = null;
-		}
-		
-		return $oTicket;
-	}]]></code>
-				</method>
-				<method id="CreateTicketFromEmail">
-					<comment>
-						<![CDATA[/**
-	 * Actual creation of the ticket from the incoming email. Overload this method
-	 * to implement your own behavior, if needed
-	 * @param EmailMessage $oEmail The decoded incoming email
-	 * @param Contact $oCaller The contact corresponding to the "From" email address
-	 * @return Ticket the created ticket or null in case of failure
-	 */]]></comment>
-					<static>false</static>
-					<access>public</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[ public function CreateTicketFromEmail(EmailMessage $oEmail, Contact $oCaller) {
-		$oTicket = null;
-		return $oTicket;
-	}]]></code>
-				</method>
-				<method id="UpdateTicketFromEmail">
-					<comment>
-						<![CDATA[/**
-	 * Actual update of a ticket from the incoming email. Overload this method
-	 * to implement your own behavior, if needed
-	 * @param Ticket $oTicket The ticket to update
-	 * @param EmailMessage $oEmail The decoded incoming email
-	 * @param Contact $oCaller The contact corresponding to the "From" email address
-	 * @return void
-	 */]]></comment>
-					<static>false</static>
-					<access>public</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[ public function UpdateTicketFromEmail(Ticket $oTicket, EmailMessage $oEmail, Contact $oCaller) {
-
-	}]]></code>
-				</method>
-				<method id="HandleError">
-					<comment>/**
-	 * Error handler... what to do in case of error ??
-	 * @param EmailMessage $oEmail can be null in case of decoding error (like message too big)
-	 * @param string $sErrorCode
-	 * @param RawEmailMessage $oRawEmail In case decoding failed or null
-	 * @param string $sAdditionalErrorMessage More information about the error (optional)
-	 * @return int Next action: action code of the next action to execute
-	 */</comment>
-					<static>false</static>
-					<access>public</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	public function HandleError($oEmail, $sErrorCode, $oRawEmail = null, $sAdditionalErrorMessage = '') {
-		$this->SetNextAction(EmailProcessor::NO_ACTION); // Ignore faulty emails
-	}]]></code>
-				</method>
-				<method id="Trace">
-					<comment>/**
-	 * Debug trace: activated/disabled by the configuration flag set for the base module...
-	 * @param string $sText
-	 */</comment>
-					<static>false</static>
-					<access>public</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	public function Trace($sText) {
-		MailInboxesEmailProcessor::Trace($sText);
-	}]]></code>
-				</method>
-				<method id="FitTextIn">
-					<comment>
-						<![CDATA[/**
-	 * Truncates the text, if needed, to fit into the given the maximum length and:
-	 * 1) Takes care of replacing line endings by \r\n since the browser produces this kind of line endings inside a TEXTAREA
-	 * 2) Trims the result to emulate the behavior of iTop's inputs
-	 * @param string $sInputText
-	 * @param int $iMaxLength
-	 * @return string The fitted text
-	 */]]></comment>
-					<static>false</static>
-					<access>protected</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	protected function FitTextIn($sInputText, $iMaxLength) {
-		$sInputText = trim($sInputText);
-		$sInputText = str_replace("\r\n", "\r", $sInputText);
-		$sInputText = str_replace("\n", "\r", $sInputText);
-		$sInputText = str_replace("\r", "\r\n", $sInputText);
-		if(mb_strlen($sInputText) > $iMaxLength) {
-			$sInputText = trim(mb_substr($sInputText, 0, $iMaxLength-3)).'...';
-		}
-		return $sInputText;
-	}]]></code>
-				</method>
-				<method id="RejectBigAttachment">
-					<static>false</static>
-					<access>protected</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	protected function RejectBigAttachment($aAttachment, $oObj) {
-		$sMessage = "The attachment {$aAttachment['filename']} (".strlen($aAttachment['content'])." bytes) is bigger than the maximum possible size ({$this->iMaxAttachmentSize}).\r\n";
-		if ($this->sBigFilesDir == '')
-		{
-			$sMessage .= "The attachment was deleted. In order to keep such attachments in the future, contact your administrator to:\r\n";
-			$sMessage .= "- either increase the 'max_allowed_packet' size in the configuration of the MySQL server to be able to store them in iTop\r\n";
-			$sMessage .= "- or configure the parameter 'big_files_dir' in the iTop configuration file, so that such attachments can be kept on the web server.\r\n";
-		}
-		else if (!is_writable($this->sBigFilesDir))
-		{
-			$sMessage .= "The attachment was deleted, since the directory where to save such files on the web server ({$this->sBigFilesDir}) is NOT writable to iTop.\r\n";
-		}
-		else
-		{
-			$sExtension = '.'.pathinfo($aAttachment['filename'], PATHINFO_EXTENSION);
-			$idx = 1;
-			$sFileName = 'attachment_'.(get_class($oObj)).'_'.($oObj->GetKey()).'_';
-			$hFile = false;
-			while(($hFile = fopen($this->sBigFilesDir.'/'.$sFileName.$idx.$sExtension, 'x')) === false)
-			{
-				$idx++;
-			}
-			fwrite($hFile, $aAttachment['content']);
-			fclose($hFile);
-			$sMessage .= "The attachment was saved as '{$sFileName}{$idx}{$sExtension}' on the web server in the directory '{$this->sBigFilesDir}'.\r\n";
-			$sMessage .= "In order to get such attachments into iTop, increase the 'max_allowed_packet' size in the configuration of the MySQL server.\r\n";
-		}
-		$aReplacement = array('content' => $sMessage, 'mimeType' => 'text/plain', 'filename' => 'warning.txt');
-		return $aReplacement;
-	}]]></code>
-				</method>
-				<method id="InitObjectFromDefaultValues">
-					<comment>
-						<![CDATA[/**
-	 * Initializes an object from default values
-	 * Each default value must be a valid value for the given field
-	 * @param DBObject $oObj The object to update
-	 * @param hash $aValues The values to set attcode => value
-	 */]]></comment>
-					<static>false</static>
-					<access>public</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	public function InitObjectFromDefaultValues($oObj, $aValues) {
-		foreach($aValues as $sAttCode => $value) {
-			if (!MetaModel::IsValidAttCode(get_class($oObj), $sAttCode)) {
-	 			$this->Trace(".. Warning: cannot set default value '$value'; '$sAttCode' is not a valid attribute of the class ".get_class($oObj).".");		 		
-		 	}
-		 	else {
-			 	$oAttDef = MetaModel::GetAttributeDef(get_class($oObj), $sAttCode);
-			 	if(!$oAttDef->IsWritable()) 	{
-			 		$this->Trace(".. Warning: cannot set default value '$value' for the non-writable attribute: '$sAttCode'.");		 		
-			 	}
-			 	else {
-					$aArgs = array('this' => $oObj->ToArgs());
-			 		$aValues = $oAttDef->GetAllowedValues($aArgs);
-			 		if($aValues == null) {
-			 			// No special constraint for this attribute
-				 		if($oAttDef->IsExternalKey()) {
-				 			$oTarget = MetaModel::GetObjectByName($oAttDef->GetTargetClass(), $value, false);
-				 			if(is_object($oTarget)) {
-				 				$oObj->Set($sAttCode, $oTarget->GetKey());
-				 			}
-				 			else {
-					 			$this->Trace(".. Warning: cannot set default value '$value' for the external key: '$sAttCode'. Unable to find an object of class ".$oAttDef->GetTargetClass()." named '$value'.");
-				 			}
-				 		}
-				 		else if($oAttDef->IsScalar()) {
-				 			$oObj->Set($sAttCode, $value);
-				 		}
-				 		else {
-				 			$this->Trace(".. Warning: cannot set default value '$value' for the non-scalar attribute: '$sAttCode'.");
-				 		}
-			 		}
-			 		else {
-			 			// Check that the specified value is a possible/allowed value
-				 		if($oAttDef->IsExternalKey()) {
-				 			$bFound = false;
-				 			$iIntVal = (int)$value;
-				 			$bByKey = false;
-				 			if(is_numeric($value) && ($iIntVal == $value)) {
-				 				// A numeric value is supposed to be the object's key
-				 				$bByKey = true;
-				 			}
-				 			foreach($aValues as $id => $sName) {
-								if($bByKey) {
-									if($id === $iIntVal) {
-					 					$bFound = true;
-					 					$oObj->Set($sAttCode, $id);
-					 					break;										
-									}
-								}
-				 				else {
-					 				if(strcasecmp($sName,$value) == 0) {
-					 					$bFound = true;
-					 					$oObj->Set($sAttCode, $id);
-					 					break;
-					 				}
-				 				}
-				 			}
-				 		}
-				 		elseif($oAttDef instanceof AttributeEnum) {
-				 			// For enums the allowed values are value => label
-				 			foreach($aValues as $allowedValue => $sLocalizedLabel) {
-				 				if(($allowedValue == $value) || ($sLocalizedLabel == $value)) {
-				 					$bFound = true;
-				 					$oObj->Set($sAttCode, $allowedValue);
-				 					break;
-				 				}
-				 			}
-				 		}
-				 		elseif($oAttDef->IsScalar()) {
-				 			foreach($aValues as $allowedValue) {
-				 				if($allowedValue == $value) {
-				 					$bFound = true;
-				 					$oObj->Set($sAttCode, $value);
-				 					break;
-				 				}
-				 			}
-				 		}
-				 		else {
-				 			$bFound = true;
-				 			$this->Trace(".. Warning: cannot set default value '$value' for the non-scalar attribute: '$sAttCode'.");
-				 		}
-				 		
-				 		if(!$bFound) {
-				 			$this->Trace(".. Warning: cannot set the value '$value' for the field $sAttCode of the ticket. '$value' is not a valid value for $sAttCode.");		
-				 		}
-			 		}
-				}
-			}
-		}
-	}]]></code>
 				</method>
 				<method id="GetEmailSource">
 					<comment>/**
@@ -828,6 +379,31 @@ EOF
 					
 				}
 ]]></code>
+				</method>
+				<method id="Trace">
+					<comment>/**
+	 * Trace function used to log information about the e-mail processing.
+	 *
+	 * @param string $sMessage The message.
+	 * @param mixed ...$args
+	 *
+	 * @return void
+	 */</comment>
+					<static>false</static>
+					<access>public</access>
+					<type>Overload-DBObject</type>
+					<code>
+						<![CDATA[
+
+							public function Trace($sMessage, ...$args) : void {
+
+								$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
+								MailInboxesEmailProcessor::Trace($sMessage);
+										
+								
+							}
+	
+					]]></code>
 				</method>
 			</methods>
 			<presentation>

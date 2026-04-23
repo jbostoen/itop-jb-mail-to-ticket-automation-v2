@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
@@ -12,7 +12,10 @@ use JeffreyBostoenExtensions\MailToTicket\Steps\{
 	PolicyBehavior,
 	Base
 };
-use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
+use JeffreyBostoenExtensions\MailToTicket\{
+	eNextAction,
+	ProcessingHelper
+};
 use jb_itop_extensions\components\ormCustomCaseLog;
 
 // iTop internals.
@@ -94,7 +97,7 @@ abstract class CreateOrUpdateTicket extends Base {
 				
 					if(is_object($oTicket) == false) {
 						// No ticket associated with the incoming email, nothing to update, reject the email
-						$oMailBox->HandleError($oEmail, 'nothing_to_update', $oEmail->oRawEmail);
+						ProcessingHelper::HandleError('nothing_to_update');
 					}
 					else {
 						// Update the ticket with the incoming email
@@ -133,7 +136,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		// No error occurred. Revert to default (continue processing).
 		$oMailBox = ProcessingHelper::GetMailBox();
-		$oMailBox->SetNextAction(EmailProcessor::PROCESS_MESSAGE);
+		ProcessingHelper::SetNextAction(eNextAction::PROCESS_MESSAGE);
 		
 		
 	}
@@ -157,17 +160,17 @@ abstract class CreateOrUpdateTicket extends Base {
 		if($oMailBox->Get('error_behavior') == PolicyBehavior::DELETE->value) {
 			
 			 // Remove the message from the mailbox
-			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE);
+			ProcessingHelper::SetNextAction(eNextAction::DELETE_MESSAGE);
 			
 		}
 		elseif($oMailBox->Get('error_behavior') == PolicyBehavior::MARK_AS_ERROR->value) {
 			
 			 // Keep the message in the mailbox, but marked as error
-			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR);
+			ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
 			
 		}
 		
-		static::Trace(".. Creating a new Ticket from email '{$oEmail->sSubject}'");
+		static::Trace(". Creating a new Ticket from email '{$oEmail->sSubject}'");
 		$sTargetClass = $oMailBox->Get('target_class');
 			
 		if(MetaModel::IsValidClass($sTargetClass) == false) {
@@ -186,6 +189,7 @@ abstract class CreateOrUpdateTicket extends Base {
 			
 		}
 		
+		/** @var Ticket $oTicket */
 		$oTicket = MetaModel::NewObject($sTargetClass);
 		ProcessingHelper::SetTicket($oTicket);
 		
@@ -224,8 +228,8 @@ abstract class CreateOrUpdateTicket extends Base {
 			}
 		}
 		
-		static::Trace("... Email body format: ".$oEmail->sBodyFormat);
-		static::Trace("... Target format for 'description': ".($bForPlainText ? 'text/plain' : 'text/html'));
+		static::Trace("Email body format: ".$oEmail->sBodyFormat);
+		static::Trace("Target format for 'description': ".($bForPlainText ? 'text/plain' : 'text/html'));
 		
 		$sTicketDescription = static::BuildDescription($bForPlainText);
 
@@ -263,7 +267,8 @@ abstract class CreateOrUpdateTicket extends Base {
 				$aDefaultValues[$sAttCode] = $sValue;
 			}
 		}
-		$oMailBox->InitObjectFromDefaultValues($oTicket, $aDefaultValues);
+		
+		ProcessingHelper::InitObjectFromDefaultValues($oTicket, $aDefaultValues);
 		
 		static::AddAdditionalContacts();
 		
@@ -271,13 +276,13 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		try {
 			$oTicket->DBInsert();
-			static::Trace(".. Ticket ".$oTicket->GetName()." created.");
+			static::Trace(". Ticket ".$oTicket->GetName()." created.");
 		}
 		catch(Exception $e) {
 			// Known issues:
 			// - Incorrect related contacts
 			// - E-mail notifications (?)
-			static::Trace("... Ticket {$oTicket->GetName()} could not be created.");
+			static::Trace("Ticket {$oTicket->GetName()} could not be created.");
 			static::Trace($e->GetMessage()); // Add actual error message (if available)
 			throw new Exception('Ticket creation failed');
 		}
@@ -303,10 +308,10 @@ abstract class CreateOrUpdateTicket extends Base {
 		// In case of error (exception...) set the behavior
 		// Upon success, this will be overruled again.
 		if($oMailBox->Get('error_behavior') == PolicyBehavior::DELETE->value) {
-			$oMailBox->SetNextAction(EmailProcessor::DELETE_MESSAGE); // Remove the message from the mailbox
+			ProcessingHelper::SetNextAction(eNextAction::DELETE_MESSAGE); // Remove the message from the mailbox
 		}
 		elseif($oMailBox->Get('error_behavior') == PolicyBehavior::MARK_AS_ERROR->value) {
-			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
+			ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 		}
 		
 		// Check that the ticket is of the expected class
@@ -314,14 +319,14 @@ abstract class CreateOrUpdateTicket extends Base {
 		if(is_a($oTicket, $sTargetClass) == false) {
 			
 			$sClass = get_class($oTicket);
-			static::Trace("... Error: the incoming email refers to the ticket '{$oTicket->GetName()}' of class '{$sClass}', but this mailbox is configured to process only tickets of class '{$sTargetClass}'");
-			$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
+			static::Trace("Error: the incoming email refers to the ticket '{$oTicket->GetName()}' of class '{$sClass}', but this mailbox is configured to process only tickets of class '{$sTargetClass}'");
+			ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 			return;
 			
 		}
 		
 		// Try to extract what's new from the message's body
-		static::Trace("... Updating Ticket '{$oTicket->GetName()}' from email '{$oEmail->sSubject}'");
+		static::Trace("Updating Ticket '{$oTicket->GetName()}' from email '{$oEmail->sSubject}'");
 		
 		$iCurrentUserId = UserRights::GetUserId();
 		$bInsertChangeUserId = false;
@@ -343,10 +348,10 @@ abstract class CreateOrUpdateTicket extends Base {
 		$sCaseLogEntry = static::BuildCaseLogEntry();
 		
 		if($oEmail->sTrace == '') {
-			static::Trace("... No email trace available.");
+			static::Trace("No email trace available.");
 		}
 		else {
-			static::Trace("... Email trace: ".$oEmail->sTrace);
+			static::Trace("Email trace: ".$oEmail->sTrace);
 		}
 		
 		// Write the log on behalf of the caller.
@@ -409,10 +414,10 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		try {
 			$oTicket->DBUpdate();			
-			static::Trace("... Ticket '{$oTicket->GetName()}' has been updated.");
+			static::Trace("Ticket '{$oTicket->GetName()}' has been updated.");
 		}
 		catch(Exception $e) {
-			static::Trace("... Ticket {$oTicket->GetName()} might not be properly updated or something else went wrong (for instance: notifications).");
+			static::Trace("Ticket {$oTicket->GetName()} might not be properly updated or something else went wrong (for instance: notifications).");
 			static::Trace($e->GetMessage()); // Add actual error message (if available)
 			throw new Exception('Ticket update failed');
 		}
@@ -463,10 +468,10 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		if($oEmail->sBodyFormat == 'text/html') {
 			// Original message is in HTML
-			static::Trace("... Managing inline images...");
+			static::Trace("Managing inline images...");
 			$sTicketDescription = static::ManageInlineImages($oEmail->sBodyText, $bForPlainText);
 			if($bForPlainText == true) {
-				static::Trace("... Converting HTML to text using utils::HtmlToText...");
+				static::Trace("Converting HTML to text using utils::HtmlToText...");
 				$sTicketDescription = utils::HtmlToText($oEmail->sBodyText);
 			}
 		}
@@ -474,7 +479,7 @@ abstract class CreateOrUpdateTicket extends Base {
 			// Original message is in plain text
 			$sTicketDescription = utils::TextToHtml($oEmail->sBodyText);
 			if($bForPlainText == false) {
-				static::Trace("... Converting text to HTML using utils::TextToHtml...");
+				static::Trace("Converting text to HTML using utils::TextToHtml...");
 				$sTicketDescription = utils::TextToHtml($oEmail->sBodyText);
 			}
 		}
@@ -509,11 +514,11 @@ abstract class CreateOrUpdateTicket extends Base {
 			foreach ($aMatches[1] as $idx => $aInfo) {
 				$sCID = $aInfo[0];
 				if(array_key_exists($sCID, static::$aAddedAttachments) == false) {
-					static::Trace(".... Info: inline image: {$sCID} not found as an attachment. Ignored.");
+					static::Trace("... Info: inline image: {$sCID} not found as an attachment. Ignored.");
 				}
 				elseif(array_key_exists($sCID, static::$aAddedAttachments)) {
 					$aInlineImages[$idx]['cid'] = $sCID;
-					static::Trace(".... Inline image cid:$sCID stored as ".get_class(static::$aAddedAttachments[$sCID])."::".static::$aAddedAttachments[$sCID]->GetKey());
+					static::Trace("... Inline image cid:$sCID stored as ".get_class(static::$aAddedAttachments[$sCID])."::".static::$aAddedAttachments[$sCID]->GetKey());
 				}
 			}
 			if(defined('ATTACHMENT_DOWNLOAD_URL') == false) {
@@ -567,7 +572,7 @@ abstract class CreateOrUpdateTicket extends Base {
 			$sBodyText = $sWholeText;
 		}
 		else {
-			static::Trace("... Inline Images: no inline-image found in the message");
+			static::Trace("Inline Images: no inline-image found in the message");
 		}
 		return $sBodyText;
 		
@@ -604,12 +609,12 @@ abstract class CreateOrUpdateTicket extends Base {
 				
 			if(MetaModel::IsValidAttCode($sTargetClass, 'caller_id') == true && $oContact->GetKey() == $oTicket->Get('caller_id')) {
 
-				static::Trace(".... Skipping '{$sContactName}' (ID {$oContact->GetKey()}) as additional contact since it is the caller.");
+				static::Trace("... Skipping '{$sContactName}' (ID {$oContact->GetKey()}) as additional contact since it is the caller.");
 
 			}
 			elseif(in_array($oContact->GetKey(), $aExistingContacts) == true) {
 				
-				static::Trace(".... Skipping '{$sContactName}' (ID {$oContact->GetKey()}) as additional contact since the person is already linked to the ticket.");
+				static::Trace("... Skipping '{$sContactName}' (ID {$oContact->GetKey()}) as additional contact since the person is already linked to the ticket.");
 				
 			}
 			else {
@@ -665,7 +670,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		static::ApplyConfiguredStimulus($oTicket);
 		
 		// No error occurred
-		$oMailBox->SetNextAction(EmailProcessor::PROCESS_MESSAGE);
+		ProcessingHelper::SetNextAction(eNextAction::PROCESS_MESSAGE);
 		
 	}
 	
@@ -699,20 +704,20 @@ abstract class CreateOrUpdateTicket extends Base {
 				$aStateToStimulus[$sState] = $sStimulus;
 			}
 			elseif(empty($sLine) == false) {
-				static::Trace("... Invalid line in the 'stimuli' configuration: '{$sLine}'. The expected format for each line is <state_code>:<stimulus_code>");
+				static::Trace("Invalid line in the 'stimuli' configuration: '{$sLine}'. The expected format for each line is <state_code>:<stimulus_code>");
 			}
 		}
 		if (array_key_exists($oTicket->GetState(), $aStateToStimulus))
 		{
 			$sStimulusCode = $aStateToStimulus[$oTicket->GetState()];
-			static::Trace("... About to apply the stimulus: ".$sStimulusCode." for the ticket in state: ".$oTicket->GetState());
+			static::Trace("About to apply the stimulus: ".$sStimulusCode." for the ticket in state: ".$oTicket->GetState());
 			
 			// Check that applying the stimulus will not break the data integrity constaints (mandatory, must change)
 			$aTransitions = $oTicket->EnumTransitions();
 			$bCanApplyStimulus = true;
 			if (!isset($aTransitions[$sStimulusCode])) {
 				$bCanApplyStimulus = false;
-				static::Trace("... The Stimulus {$sStimulusCode} for ".get_class($oTicket)." in state {$oTicket->GetState()} has no effect (no transition). Ignored.");
+				static::Trace("The Stimulus {$sStimulusCode} for ".get_class($oTicket)." in state {$oTicket->GetState()} has no effect (no transition). Ignored.");
 			}
 			else {
 				
@@ -733,10 +738,10 @@ abstract class CreateOrUpdateTicket extends Base {
 							if ($oAllowedValues->Count() == 1) 	{
 								$oRemoteObj = $oAllowedValues->Fetch();
 								$oTicket->Set($sAttCode, $oRemoteObj->GetKey());
-								static::Trace("... Setting the mandatory External Key {$sAttCode} to the only allowed value: {$oRemoteObj->GetKey()}");
+								static::Trace("Setting the mandatory External Key {$sAttCode} to the only allowed value: {$oRemoteObj->GetKey()}");
 							}
 							else {
-								static::Trace("... Cannot apply the stimulus since the attribute {$sAttCode} is mandatory in the target state {$sTargetState} and is neither currently set nor has just one allowed value.");
+								static::Trace("Cannot apply the stimulus since the attribute {$sAttCode} is mandatory in the target state {$sTargetState} and is neither currently set nor has just one allowed value.");
 								$bCanApplyStimulus = false;
 							}
 						}
@@ -745,16 +750,16 @@ abstract class CreateOrUpdateTicket extends Base {
 							if (count($aAllowedValues) == 1) {
 								$aValues = array_keys($aAllowedValues);
 								$oTicket->Set($sAttCode, $aValues[0]);
-								static::Trace("... Setting the mandatory attribute {$sAttCode} to the only allowed value: ".(string)$aValues[0]);
+								static::Trace("Setting the mandatory attribute {$sAttCode} to the only allowed value: ".(string)$aValues[0]);
 							}
 							else {
-								static::Trace("... Cannot apply the stimulus since the attribute {$sAttCode} is mandatory in the target state {$sTargetState} and is neither currently set nor has just one allowed value.");
+								static::Trace("Cannot apply the stimulus since the attribute {$sAttCode} is mandatory in the target state {$sTargetState} and is neither currently set nor has just one allowed value.");
 								$bCanApplyStimulus = false;
 							}
 						}
 					}
 					if ($iExpectCode & OPT_ATT_MUSTCHANGE) {
-						static::Trace("... Cannot apply the stimulus since the value of the attribute {$sAttCode} must be modified (manually) during the transition to the target state {$sTargetState}.");
+						static::Trace("Cannot apply the stimulus since the value of the attribute {$sAttCode} must be modified (manually) during the transition to the target state {$sTargetState}.");
 						$bCanApplyStimulus = false;
 					}
 				}
@@ -762,15 +767,15 @@ abstract class CreateOrUpdateTicket extends Base {
 			
 			if($bCanApplyStimulus == true) {
 				try {
-					static::Trace("... Actually applying the stimulus: {$sStimulusCode} for the ticket in state: {$oTicket->GetState()}");
+					static::Trace("Actually applying the stimulus: {$sStimulusCode} for the ticket in state: {$oTicket->GetState()}");
 					$oTicket->ApplyStimulus($sStimulusCode);
 				}
 				catch(Exception $e) {
-					static::Trace("... ApplyStimulus failed: {$e->getMessage()}");
+					static::Trace("ApplyStimulus failed: {$e->getMessage()}");
 				}
 			}
 			else {
-				static::Trace("... ApplyStimulus ignored.");
+				static::Trace("ApplyStimulus ignored.");
 			}
 		}
 		
@@ -787,9 +792,9 @@ abstract class CreateOrUpdateTicket extends Base {
 		$oEmail = ProcessingHelper::GetMail();
 		$sCaseLogEntry = '';
 		
-		static::Trace("... Email body format: ".$oEmail->sBodyFormat);
+		static::Trace("Email body format: ".$oEmail->sBodyFormat);
 		if ($oEmail->sBodyFormat == 'text/html') {
-			static::Trace("... Extracting the new part using GetNewPartHTML()...");
+			static::Trace("Extracting the new part using GetNewPartHTML()...");
 			$sCaseLogEntry = $oEmail->GetNewPartHTML($oEmail->sBodyText);
 			if (strip_tags($sCaseLogEntry) == '')
 			{
@@ -797,11 +802,11 @@ abstract class CreateOrUpdateTicket extends Base {
 				// It's better use the whole text of the message
 				$sCaseLogEntry = $oEmail->sBodyText;
 			}
-			static::Trace("... Managing inline images...");
+			static::Trace("Managing inline images...");
 			$sCaseLogEntry = static::ManageInlineImages($sCaseLogEntry, false /* $bForPlainText */);
 		}
 		else {
-			static::Trace("... Extracting the new part using GetNewPart()...");
+			static::Trace("Extracting the new part using GetNewPart()...");
 			$sCaseLogEntry = $oEmail->GetNewPart($oEmail->sBodyText, $oEmail->sBodyFormat); // GetNewPart always returns a plain text version of the message
 			$sCaseLogEntry = utils::TextToHtml($sCaseLogEntry);
 		}
@@ -835,7 +840,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		// Build a list of Attachments already present in this ticket.
 		// This includes both Attachment and InlineImage classes.
-		if($bNoDuplicates == true) {
+		if($bNoDuplicates ) {
 			
 			$sOQL = 'SELECT Attachment WHERE item_class = :class AND item_id = :id';
 			$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
@@ -883,20 +888,20 @@ abstract class CreateOrUpdateTicket extends Base {
 			
 			$bIgnoreAttachment = false;
 			
-			if($bIgnoreAttachment == false && $bNoDuplicates == true) {
+			if($bIgnoreAttachment == false && $bNoDuplicates) {
 				
 				// Check if an attachment with the same name/type/size/md5 already exists
 				$iSize = strlen($aAttachment['content']);
 				$sMd5 = md5($aAttachment['content']);
 				foreach($aPreviousAttachments as $aPrevious) {
 					if (
-						($aAttachment['filename'] == $aPrevious['filename']) &&
-						($aAttachment['mimeType'] == $aPrevious['mimeType']) &&
+						($aAttachment['filename'] === $aPrevious['filename']) &&
+						($aAttachment['mimeType'] === $aPrevious['mimeType']) &&
 						($iSize == $aPrevious['size']) &&
 						($sMd5 == $aPrevious['md5']) )
 					{
 						// Skip this attachment
-						static::Trace("... Attachment {$aAttachment['filename']} skipped, already attached to the ticket.");
+						static::Trace("Attachment {$aAttachment['filename']} skipped, already attached to the ticket.");
 						static::$aAddedAttachments[$aAttachment['content-id']] = $aPrevious['object']; // Still remember it for processing inline images
 						$bIgnoreAttachment = true;
 						break;
@@ -907,11 +912,11 @@ abstract class CreateOrUpdateTicket extends Base {
 					
 					if(static::IsImage($aAttachment['mimeType']) && class_exists('InlineImage') && $aAttachment['inline']) {
 						$oAttachment = new InlineImage();
-						static::Trace("... Attachment {$aAttachment['filename']} will be stored as an InlineImage.");
+						static::Trace("Attachment {$aAttachment['filename']} will be stored as an InlineImage.");
 						$oAttachment->Set('secret', bin2hex(random_bytes(16))); // 128 bits of entropy, cryptographically secure
 					}
 					else {
-						static::Trace("... Attachment {$aAttachment['filename']} will be stored as an Attachment.");
+						static::Trace("Attachment {$aAttachment['filename']} will be stored as an Attachment.");
 						$oAttachment = new Attachment();
 						
 						$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
@@ -943,32 +948,30 @@ abstract class CreateOrUpdateTicket extends Base {
 					$oMyChangeOp->Set('objkey', $oTicket->GetKey());
 					$oMyChangeOp->Set('description', Dict::Format('Attachments:History_File_Added', $aAttachment['filename']));
 					$iId = $oMyChangeOp->DBInsertNoReload();
-					static::Trace("... Attachment {$aAttachment['filename']} added to the ticket.");
+					static::Trace("Attachment {$aAttachment['filename']} added to the ticket.");
 					static::$aAddedAttachments[$aAttachment['content-id']] = $oAttachment;
 				}
 			}
 			else {
-				static::Trace("... The attachment #{$iIndex} {$aAttachment['filename']} was NOT added to the ticket because its type '{$aAttachment['mimeType']}' is excluded according to the configuration");
+				static::Trace("The attachment #{$iIndex} {$aAttachment['filename']} was NOT added to the ticket because its type '{$aAttachment['mimeType']}' is excluded according to the configuration");
 			}
 		}
 		
 		$iCount = count(static::$aAddedAttachments);
-		static::Trace(".. Added {$iCount} attachments".($iCount > 0 ? " ".implode(', ', array_keys(static::$aAddedAttachments)) : ""));
+		static::Trace(". Added {$iCount} attachments".($iCount > 0 ? " ".implode(', ', array_keys(static::$aAddedAttachments)) : ""));
 		
 	 }
 	 
 	/**
 	 * Links a collection of attachments to a newly created ticket.
 	 *
-	 * @uses PolicyCreateOrUpdateTicket::$aAddedAttachments
-	 *
 	 * @return void
 	 */
-	public static function UpdateAttachments() {
+	public static function UpdateAttachments() : void {
 		
 		$iNumAttachments = count(static::$aAddedAttachments);
 		if($iNumAttachments > 0) {
-			static::Trace("... Linking {$iNumAttachments} attachments...");
+			static::Trace("Linking {$iNumAttachments} attachments...");
 		}
 			
 		foreach(static::$aAddedAttachments as $oAttachment) {
@@ -978,40 +981,32 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 		
 	}
-	 
+
+	
 	/**
 	 * Checks whether a MimeType is an image which can be processed by iTop (PHP GD)
 	 *
-	 * @param String $sMimeType
+	 * @param string $sMimeType
 	 *
-	 * @return Boolean
+	 * @return array|bool
 	 */
-	public static function IsImage($sMimeType) {
+	public static function IsImage(string $sMimeType) : array|bool {
 				
 		if(function_exists('gd_info') == false) {
 			return false; // no image processing capability on this system
 		}
 		
-		$bRet = false;
 		$aInfo = gd_info(); // What are the capabilities
-		switch($sMimeType)
-		{
-			case 'image/gif':
-				return $aInfo['GIF Read Support'];
-				break;
-			
-			case 'image/jpeg':
-				return $aInfo['JPEG Support'];
-				break;
-			
-			case 'image/png':
-				return $aInfo['PNG Support'];
-				break;
 
-		}
-		
-		return $bRet;
+		return match($sMimeType) {
+			'image/gif' => $aInfo['GIF Read Support'],
+			'image/jpeg' => $aInfo['JPEG Support'],
+			'image/png' => $aInfo['PNG Support'],
+			default => false,
+		};
+
 	}
+
 	
 	/**
 	 * Truncates the text, if needed, to fit into the given the maximum length and:

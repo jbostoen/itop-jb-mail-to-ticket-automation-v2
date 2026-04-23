@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
@@ -40,7 +40,7 @@ abstract class TicketResolved extends Base {
 		// Checking if a previous ticket was found
 			if($oTicket !== null && $oTicket->Get('status') == 'resolved') {
 					
-				static::Trace(".. Ticket was marked as resolved before.");
+				static::Trace(". Ticket was marked as resolved before.");
 						
 				switch(static::GetStepSetting('behavior')) { 
 					case PolicyBehavior::BOUNCE_DELETE->value: 
@@ -55,7 +55,7 @@ abstract class TicketResolved extends Base {
 					case 'fallback_reopen': 
 					
 						// Reopen ticket
-						static::Trace("... Fallback: reopen resolved ticket.");
+						static::Trace("Fallback: reopen resolved ticket.");
 						
 						$bRet = $oTicket->ApplyStimulus('ev_reopen');
 						
@@ -66,7 +66,7 @@ abstract class TicketResolved extends Base {
 						
 					default:
 						// Should not happen.
-						static::Trace("... Unknown action for resolved tickets.");
+						static::Trace("Unknown action for resolved tickets.");
 						break; 
 					
 				}

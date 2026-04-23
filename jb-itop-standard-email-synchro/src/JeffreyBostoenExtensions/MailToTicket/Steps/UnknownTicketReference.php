@@ -2,26 +2,23 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260421
+ * @version     3.2.260423
  */
  
 
 namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
 use JeffreyBostoenExtensions\MailToTicket\{
+	eNextAction,
 	ProcessingHelper
 };
-
-
-// iTop Mail.
-use EmailProcessor;
 
 // iTop classes.
 use Ticket;
 
 /**
  * Class UnknownTicketReference.  
- * A policy to handle unknown ticket references. Also see MailInboxStandard::GetRelatedTicket().
+ * A policy to handle unknown ticket references. Also see GetRelatedTicket().
  */
 abstract class UnknownTicketReference extends Base {
 	
@@ -67,17 +64,17 @@ abstract class UnknownTicketReference extends Base {
 					
 					$aPatterns = preg_split(static::NEWLINE_REGEX, $sPatterns);
 					
-					static::Trace(".. Ignoring patterns (defined in {$sAttCode}): {$sPatterns}");
+					static::Trace("Ignoring patterns (defined in {$sAttCode}): {$sPatterns}");
 					
 					foreach($aPatterns as $sPattern) {
 						if(trim($sPattern) != '') {
 							$oPregMatch = @preg_match($sPattern, $sSubject);
 							
 							if($oPregMatch === false) {
-								static::Trace("... Invalid pattern: '{$sPattern}'");
+								static::Trace("Invalid pattern: '{$sPattern}'");
 							}
 							elseif(preg_match($sPattern, $sSubject)) {
-								static::Trace("... Removing: '{$sPattern}'");
+								static::Trace("Removing: '{$sPattern}'");
 								$sSubject = preg_replace($sPattern, '', $sSubject);
 							}
 							else {
@@ -88,22 +85,22 @@ abstract class UnknownTicketReference extends Base {
 				}
 			}
 			
-			$sPattern = $oMailBox->FixPattern($oMailBox->Get('title_pattern'));
+			$sPattern = $oMailBox->Get('title_pattern');
 			if(($sPattern != '') && (preg_match($sPattern, $sSubject, $aMatches))) {
-				static::Trace(".. Undesired: unable to find any prior ticket despite a matching ticket reference pattern in the subject ('{$sPattern}'). ".http_build_query($aMatches));
-				$oMailBox->SetNextAction(EmailProcessor::MARK_MESSAGE_AS_UNDESIRED);
+				static::Trace("ndesired: unable to find any prior ticket despite a matching ticket reference pattern in the subject ('{$sPattern}'). ".http_build_query($aMatches));
+				ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_UNDESIRED);
 				return;
 			}
 			elseif($oEmail->oRelatedObject !== null && !($oTicket instanceof Ticket)) {
-				static::Trace(".. Warning: email header references a (valid) non-ticket object ({$oEmail->oRelatedObject}).");
+				static::Trace("Warning: email header references a (valid) non-ticket object ({$oEmail->oRelatedObject}).");
 			}
 			else {
-				static::Trace(".. Not undesired? Pattern = ".$sPattern." - subject: ".$sSubject);
+				static::Trace("Not undesired? Pattern = ".$sPattern." - subject: ".$sSubject);
 			}
 		
 		}
 		else {
-			static::Trace(".. Already linked to a Ticket");
+			static::Trace("Already linked to a Ticket");
 		}
 		
 	}

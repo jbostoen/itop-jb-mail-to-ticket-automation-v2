@@ -18,6 +18,11 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
+use JeffreyBostoenExtensions\MailToTicket\{
+	eNextAction,
+	ProcessingHelper,
+};
+
 /**
  * Processes messages coming from email sources corresponding to instances
  * of MailInbox (and derived) classes. 1 instance = 1 email source
@@ -58,12 +63,12 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	/**
 	 * Initializes the email sources: one source is created and associated with each MailInboxBase instance
 	 *
-	 * @return array An array of EmailSource objects
-	 * @throws \CoreException
-	 * @throws \CoreUnexpectedValue
-	 * @throws \MySQLException
+	 * @return EmailSource[] An array of EmailSource objects
+	 * @throws CoreException
+	 * @throws CoreUnexpectedValue
+	 * @throws MySQLException
 	 */
-	public function ListEmailSources() {
+	public function ListEmailSources() : array {
 
 		static::Trace('-----------------------------------------------------------------------------------------');
 		static::Trace('Listing sources:');
@@ -75,7 +80,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 		
 		static::Trace('Number of sources found: '.$oSet->Count());
 		
-		/** @var \MailInboxBase $oInbox */
+		/** @var MailInboxBase $oInbox */
 		while($oInbox = $oSet->Fetch()) {
 			
 			static::Trace('Add: '.$oInbox->GetKey());
@@ -103,33 +108,18 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	 * @return MailInboxBase The instance associated with the source
 	 * @throws Exception
 	 */
-	public function GetInboxFromSource(EmailSource $oSource) {
+	public function GetInboxFromSource(EmailSource $oSource) : MailInboxBase {
+
 		$iId = $oSource->GetToken();
+
 		if(!array_key_exists($iId, $this->aInboxes)) {
 			self::Trace("Unknown MailInbox (id=$iId) for EmailSource '".$oSource->GetName()."'");
 			throw new Exception("Unknown MailInbox (id=$iId) for EmailSource '".$oSource->GetName()."'");
 		}
 		return $this->aInboxes[$iId];
+
 	}
 	
-	/**
-	 * Decides whether a message should be downloaded and processed, deleted, or simply ignored
-	 * (i.e left as-is in the mailbox)
-	 *
-	 * @throws \Exception
-	 */
-	public function DispatchMessage(EmailSource $oSource, $index, $sUIDL, $oEmailReplica = null) {
-		
-		self::Trace("Combodo Email Synchro: MailInboxesEmailProcessor: dispatch of the message $index ($sUIDL)");
-
-		$oInbox = $this->GetInboxFromSource($oSource);
-		$iRetCode = $oInbox->DispatchEmail($oEmailReplica);
-		$sRetCode = EmailProcessor::GetActionFromCode($iRetCode);
-
-		self::Trace("Combodo Email Synchro: MailInboxesEmailProcessor: dispatch of the message $index ($sUIDL) returned $iRetCode ($sRetCode)");
-		return $iRetCode;
-		
-	}
 
 	/**
 	 * Process the email downloaded from the mailbox.
@@ -141,9 +131,9 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	 * @param EmailReplica $oEmailReplica The information associating a ticket to the email. This replica is new (i.e. not yet in DB for new messages)
 	 * @param array $aErrors
 	 *
-	 * @return int
+	 * @return eNextAction
 	 */
-	public function ProcessMessage(EmailSource $oSource, $index, EmailMessage $oEmail, EmailReplica $oEmailReplica, &$aErrors = array()) {
+	public function ProcessMessage(EmailSource $oSource, $index, EmailMessage $oEmail, EmailReplica $oEmailReplica, &$aErrors = array()) : eNextAction {
 				
 		// Reset error messages before processing.
 		// If not, they may be (incorrectly) transferred to the next email replicas too.
@@ -153,10 +143,10 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 		try {			
 		
 			$oInbox = $this->GetInboxFromSource($oSource);
-			self::Trace("Combodo Email Synchro: MailInboxesEmailProcessor: Processing message $index ({$oEmail->sUIDL})");
+			self::Trace("MailInboxesEmailProcessor: Processing message $index ({$oEmail->sUIDL})");
 			if($oEmailReplica->IsNew()) {
 				self::Trace('Ticket creation: ProcessNewEmail');
-				$oResult = $oInbox->ProcessNewEmail($oSource, $index, $oEmail);
+				$oResult = ProcessingHelper::ProcessNewEmail();
 				
 				if(is_object($oResult) && $oResult instanceof Ticket) {
 					self::Trace('Linked mail to ticket. Handle email replica.');
@@ -178,7 +168,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 					$sUIDL = htmlentities($oEmail->sUIDL, ENT_QUOTES, 'UTF-8');
 					$this->sLastErrorSubject = "Failed to create a ticket for the incoming email ({$sUIDL}) (" . __METHOD__ . "). No Ticket object. ".(is_object($oResult) ? 'Class: '.get_class($oResult): 'No object.');
 					$this->sLastErrorMessage = $oInbox->sLastError;
-					$sMessage = "Email Synchro: MailInboxesEmailProcessor: Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL})";
+					$sMessage = "Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL})";
 					$aErrors[] = $sMessage;
 					$aErrors[] = $oInbox->sLastError;
 					self::Trace($sMessage);
@@ -186,45 +176,47 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 			}
 			else {
 
-					$oInbox->ReprocessOldEmail($oSource, $index, $oEmail, $oEmailReplica);		
+				// - An old mail is being reprocessed.
+				ProcessingHelper::SetNextAction(eNextAction::NO_ACTION);
+				
 			}
-			$iRetCode = $oInbox->GetNextAction();
-			$sRetCode = EmailProcessor::GetActionFromCode($iRetCode);
-			self::Trace("Email Synchro: MailInboxesEmailProcessor: End of processing of the new message $index ({$oEmail->sUIDL}) retCode: ($iRetCode) $sRetCode");
+			$eNextAction = ProcessingHelper::GetNextAction();
+			$sAction = $eNextAction->name;
+			self::Trace("End of processing of the new message $index ({$oEmail->sUIDL}) retCode: $sAction");
 		}
 		catch(Exception $e) {
-			$iRetCode = $oInbox->GetNextAction();
+			$eNextAction = ProcessingHelper::GetNextAction();
 			$this->sLastErrorSubject = "Failed to process email $index ({$oEmail->sUIDL})";
-			$this->sLastErrorMessage = "Email Synchro: Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage();
+			$this->sLastErrorMessage = "Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage();
 			$aErrors[] = $this->sLastErrorMessage;
-			self::Trace("Email Synchro: MailInboxesEmailProcessor: Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage()."\n".$e->getTraceAsString());
+			self::Trace("Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage()."\n".$e->getTraceAsString());
 		}
 
-		return $iRetCode;
+		return $eNextAction;
 	}
 	
 	/**
-	 * Called, before deleting the message from the source when the decoding fails
+	 * Called when the decoding fails.
 	 * $oEmail can be null
 	 *
-	 * @param \EmailSource $oSource
+	 * @param EmailSource $oSource
 	 * @param string $sUIDL
-	 * @param \EmailMessage $oEmail
-	 * @param \RawEmailMessage $oRawEmail
+	 * @param EmailMessage $oEmail
+	 * @param RawEmailMessage $oRawEmail
 	 * @param array $aErrors
 	 *
-	 * @return integer Next action code
-	 * @throws \Exception
+	 * @return eNextAction Next action code
+	 * @throws Exception
 	 */
-	public function OnDecodeError(EmailSource $oSource, $sUIDL, $oEmail, RawEmailMessage $oRawEmail, &$aErrors = array()) {
+	public function OnDecodeError(EmailSource $oSource, $sUIDL, $oEmail, RawEmailMessage $oRawEmail, &$aErrors = array()) : eNextAction {
+
 		$oInbox = $this->GetInboxFromSource($oSource);
-		$aErrors[] = "Combodo Email Synchro: MailInboxesEmailProcessor: failed to decode the message ({$sUIDL})";
+		$aErrors[] = "Failed to decode the message ({$sUIDL})";
 		if(isset($oEmail)) {
 			$aErrors = array_merge($aErrors, $oEmail->GetInvalidReasons());
 		}
-		$oInbox->HandleError($oEmail, 'decode_failed', $oRawEmail);
-		// message will be deleted from the source or marked as error...
-		return $oInbox->GetNextAction();
+		ProcessingHelper::HandleError('decode_failed');
+		return ProcessingHelper::GetNextAction();
 	}
 	
 }

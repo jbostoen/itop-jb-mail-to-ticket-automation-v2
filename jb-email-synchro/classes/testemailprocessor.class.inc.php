@@ -1,15 +1,23 @@
 <?php
 
+use JeffreyBostoenExtensions\MailToTicket\{
+	eNextAction,
+	ProcessingHelper,
+};
+
 /**
  * Used for the unit test of the EmailMessage class
  * Simulates incoming messages by reading from a directory './log) containing .eml files
  * and processes them to check the decoding of the messages
  *
  */
-class TestEmailProcessor extends EmailProcessor
-{
-	public function ListEmailSources()
-	{
+class TestEmailProcessor extends EmailProcessor {
+
+	/**
+	 * @inheritDoc
+	 */
+	public function ListEmailSources() : array {
+		
 		if(file_exists(dirname(__FILE__).'/../log') == true) {
 			return array( 0 => new TestEmailSource(dirname(__FILE__).'/../log', 'test'));
 		}
@@ -18,10 +26,6 @@ class TestEmailProcessor extends EmailProcessor
 		
 	}
 	
-	public function DispatchMessage(EmailSource $oSource, $index, $sUIDL, $oEmailReplica = null)
-	{
-		return EmailProcessor::PROCESS_MESSAGE;
-	}
 	
 	/**
 	 * Process the email downloaded from the mailbox.
@@ -84,7 +88,7 @@ class TestEmailProcessor extends EmailProcessor
 			$sMessage = '<p>'.htmlentities($sMessage, ENT_QUOTES, 'UTF-8').'</p>';
 		}
 		echo $sMessage."\n";
-		return EmailProcessor::NO_ACTION;	
+		return eNextAction::NO_ACTION;	
 	}
 
 	/**
@@ -98,10 +102,9 @@ class TestEmailProcessor extends EmailProcessor
 	 * @param EmailReplica $oEmailReplica The information associating a ticket to the email. This replica is new (i.e. not yet in DB for new messages)
 	 * @param array $aErrors
 	 *
-	 * @return int
+	 * @return eNextAction
 	 */
-	public function ProcessMessage(EmailSource $oSource, $index, EmailMessage $oEmail, EmailReplica $oEmailReplica, &$aErrors = array())
-	{
+	public function ProcessMessage(EmailSource $oSource, $index, EmailMessage $oEmail, EmailReplica $oEmailReplica, &$aErrors = array()) : eNextAction {
 		try
 		{
 
@@ -110,8 +113,8 @@ class TestEmailProcessor extends EmailProcessor
 			self::Trace("Test Email Synchro: MailInboxesEmailProcessor: Processing message $index ({$oEmail->sUIDL})");
 			if ($oEmailReplica->IsNew()) {
 
-				$oTicket = $oInbox->ProcessNewEmail($oSource, $index, $oEmail);
-
+				$oTicket = ProcessingHelper::ProcessNewEmail();
+				
 				if (is_object($oTicket)) {
 					
 					$oEmailReplica->Set('uidl',$oEmail->sUIDL);
@@ -138,18 +141,17 @@ class TestEmailProcessor extends EmailProcessor
 					self::Trace("Test Email Synchro: MailInboxesEmailProcessor: Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL})");
 				}
 			}
-			else
-			{
-
-				$oInbox->ReprocessOldEmail($oSource, $index, $oEmail, $oEmailReplica);
+			else {
+				// - An old mail is being reprocessed.
+				ProcessingHelper::SetNextAction(eNextAction::NO_ACTION);
 			}
-			$iRetCode = $oInbox->GetNextAction();
-			$sRetCode = EmailProcessor::GetActionFromCode($iRetCode);
-			self::Trace("Test Email Synchro: MailInboxesEmailProcessor: End of processing of the new message $index ({$oEmail->sUIDL}) retCode: ($iRetCode) $sRetCode");
+			$eAction = ProcessingHelper::GetNextAction();
+			$sRetCode = $eAction->name;
+			self::Trace("Test Email Synchro: MailInboxesEmailProcessor: End of processing of the new message $index ({$oEmail->sUIDL}) retCode: $sRetCode");
 		}
 		catch(Exception $e)
 		{
-			$iRetCode = $oInbox->GetNextAction();
+			$iRetCode = ProcessingHelper::GetNextAction();
 			$this->sLastErrorSubject = "Failed to process email $index ({$oEmail->sUIDL})";
 			$this->sLastErrorMessage = "Email Synchro: Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage();
 			self::Trace("Test Email Synchro: MailInboxesEmailProcessor: Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage()."\n".$e->getTraceAsString());
@@ -158,8 +160,7 @@ class TestEmailProcessor extends EmailProcessor
 		return $iRetCode;
 	}
 
-	private function GetInboxFromSource($oSource)
-	{
+	private function GetInboxFromSource($oSource) : MailInboxStandard {
 		return MetaModel::NewObject('MailInboxStandard');
 	}
 
