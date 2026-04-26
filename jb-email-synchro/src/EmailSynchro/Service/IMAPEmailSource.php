@@ -349,6 +349,7 @@ class IMAPEmailSource extends EmailSource {
 			}
 
 			$oMessage->markSeen();
+			
 
 		} catch(Exception $e) {
 			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
