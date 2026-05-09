@@ -130,7 +130,7 @@ class IMAPEmailSource extends EmailSource {
 	/**
 	 * @inheritDoc
 	 */
-	public function GetMessageFromMailbox(int $index) : ?MessageFromMailbox {
+	public function GetMessage(int $index) : ?MessageFromMailbox {
 
 		$iOffsetIndex = 1 + $index;
 
@@ -165,7 +165,7 @@ class IMAPEmailSource extends EmailSource {
 	}
 
 	/**
-	 * @param array $aMessage Message data
+	 * @param MessageHandler $oMsgHandler Message data
 	 * @return bool
 	 */
 	public function DeleteMessage(MessageHandler $oMsgHandler) : bool {
@@ -270,9 +270,18 @@ class IMAPEmailSource extends EmailSource {
 	 */
 	public function GetFolder() : ?FolderInterface {
 		
-		if($this->oFolder === null) {
-			$this->oFolder =  $this->oMailbox->folders()->find($this->sMailbox);
+		// Set the folder if not already done
+		if ($this->oFolder === null && $this->sMailbox === '') {
+			$this->oFolder = $this->oMailbox->inbox();
+		} elseif ($this->oFolder === null) {
+			$this->oFolder = $this->oMailbox->folders()->find($this->sMailbox);
 		}
+
+		// If there is no real folder yet, throw an error.
+		if ($this->oFolder === null) {
+			throw new Exception("IMAP folder '{$this->sMailbox}' not found on server {$this->sServer}. Please check the 'Mailbox (for IMAP)' field and make sure it follows RFC 3501 (https://www.rfc-editor.org/rfc/rfc3501.html#section-5.1)");
+		}
+
 		return $this->oFolder;
 
 	}

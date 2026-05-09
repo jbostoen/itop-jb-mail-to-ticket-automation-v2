@@ -18,29 +18,30 @@ use JeffreyBostoenExtensions\MailToTicket\{
 };
 use jb_itop_extensions\components\ormCustomCaseLog;
 
-// iTop internals.
+// iTop.
+use Attachment;
 use AttributeExternalKey;
 use AttributeHTML;
 use AttributeText;
+use CMDBChange;
 use CMDBObject;
 use CMDBSource;
 use DBObjectSearch;
 use DBObjectSet;
 use Dict;
+use InlineImage;
 use IssueLog;
+use lnkContactToTicket;
 use MetaModel;
 use ormDocument;
+use Person;
+use Ticket;
+use Trigger;
+use User;
 use UserRights;
 use utils;
 
-use EmailProcessor;
-
-// iTop classes.
-use Attachment;
-use InlineImage;
-use lnkContactToTicket;
-use Ticket;
-
+// Generic.
 use Exception;
 
 /**
@@ -121,7 +122,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 		catch(Exception $e) {
 		
-			switch($e->GetMessage()) {
+			switch($e->getMessage()) {
 				// Match descriptions in CreateTicketFromEmail(), UpdateTicketFromEmail()
 				case 'Ticket creation failed':
 				case 'Ticket update failed':
@@ -283,7 +284,7 @@ abstract class CreateOrUpdateTicket extends Base {
 			// - Incorrect related contacts
 			// - E-mail notifications (?)
 			static::Trace("Ticket {$oTicket->GetName()} could not be created.");
-			static::Trace($e->GetMessage()); // Add actual error message (if available)
+			static::Trace($e->getMessage()); // Add actual error message (if available)
 			throw new Exception('Ticket creation failed');
 		}
 			
@@ -391,7 +392,8 @@ abstract class CreateOrUpdateTicket extends Base {
 		$oAttributeValue->AddLogEntriesFromCaseLog($oCaseLog);
 		
 		// New entry from current email
-		if($bInsertChangeUserId === true){
+		if($bInsertChangeUserId){
+			/** @var User $oUser */
 			$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $oUser->GetKey());
 		}
 		else{
@@ -418,16 +420,17 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 		catch(Exception $e) {
 			static::Trace("Ticket {$oTicket->GetName()} might not be properly updated or something else went wrong (for instance: notifications).");
-			static::Trace($e->GetMessage()); // Add actual error message (if available)
+			static::Trace($e->getMessage()); // Add actual error message (if available)
 			throw new Exception('Ticket update failed');
 		}
 		
 		static::AfterUpdateTicket();
 
 		// Restore previous change as current change
-		if($bInsertChangeUserId === true){
-		  CMDBObject::SetTrackUserId($iCurrentUserId);
-		  CMDBObject::SetCurrentChange($oCMDBChange);
+		if($bInsertChangeUserId){
+			CMDBObject::SetTrackUserId($iCurrentUserId);
+			/** @var CMDBChange $oCMDBChange */
+			CMDBObject::SetCurrentChange($oCMDBChange);
 		}
 		
 	}
@@ -648,7 +651,6 @@ abstract class CreateOrUpdateTicket extends Base {
 	 */
 	public static function AfterUpdateTicket() {
 		
-		$oMailBox = ProcessingHelper::GetMailBox();
 		$oTicket = ProcessingHelper::GetTicket();
 		
 		// If there are any TriggerOnMailUpdate defined, let's activate them
@@ -667,7 +669,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 
 		// Apply a stimulus if needed, will write the ticket to the database, may launch triggers, etc...
-		static::ApplyConfiguredStimulus($oTicket);
+		static::ApplyConfiguredStimulus();
 		
 		// No error occurred
 		ProcessingHelper::SetNextAction(eNextAction::PROCESS_MESSAGE);
@@ -678,7 +680,6 @@ abstract class CreateOrUpdateTicket extends Base {
 	 * Read the configuration in the 'stimuli' field (format: <state_code>:<stimulus_code>, one per line)
 	 * and apply the corresponding stimulus according to the current state of the ticket
 	 *
-	 * @param ticket $oTicket
 	 *
 	 * @return void
 	 */
@@ -817,8 +818,6 @@ abstract class CreateOrUpdateTicket extends Base {
 	 
 	/**
 	 * @param Boolean $bNoDuplicates If true, don't add attachment that seem already attached to the ticket (same type, same name, same size, same md5 checksum).
-	 * @param Person $oCaller The caller.
-	 * @param User $oUser The user (account).
 	 *
 	 * @return array array of cid => attachment_id
 	 * @throws \CoreException

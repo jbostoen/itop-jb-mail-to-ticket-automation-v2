@@ -46,7 +46,7 @@ abstract class EmailSource {
 	 * @param int $index The index between zero and count
 	 * @return null|MessageFromMailbox
 	 */
-	abstract public function GetMessageFromMailbox(int $index) : ?MessageFromMailbox;
+	abstract public function GetMessage(int $index) : ?MessageFromMailbox;
 	
 	/**
 	 * Initializes the message when it is being processed.

@@ -80,7 +80,7 @@ class TestEmailSource extends EmailSource {
 	 * @param int $index The index between zero and count.
 	 * @return null|MessageFromMailbox
 	 */
-	public function GetMessageFromMailbox(int $index) : ?MessageFromMailbox {
+	public function GetMessage(int $index) : ?MessageFromMailbox {
 		return MessageFromMailbox::FromFile($this->sSourceDir.'/'.$this->aMessages[$index]);
 	}
 

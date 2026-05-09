@@ -57,7 +57,12 @@ function GetMailboxContent($oPage, $oInbox) {
 
 			/** @var int $iTotalMsgCount The number of available messages. */
 			$iTotalMsgCount = $oSource->GetMessagesCount();
-			$aMessages = $oSource->GetListing(); // Note: this may differ from $oSource->GetMessagesCount(); as messages with errors could be skipped.
+
+			 // Note: This may differ from $oSource->GetMessagesCount(); as messages with errors could be skipped 
+			 // (At least with the Laminas PHP library used in previous versions of this extension).
+			
+			/** @var MessageHandler[] $aMessages */
+			$aMessages = $oSource->GetListing();
 
 			// - In a previous iteration with a different IMAP engine, corruption could occur.
 			//   Extra filtering was applied at this step.
@@ -160,7 +165,7 @@ function GetMailboxContent($oPage, $oInbox) {
 					
 					// Obtain the actual index for the message (take Nth index)
 					$iMessage = $aMessageIndexes[$iCurrentIndex];
-					$oRawEmail = $oSource->GetMessageFromMailbox($iMessage);
+					$oRawEmail = $oSource->GetMessage($iMessage);
 
 					/** @var MessageHandler $oMsgHandler */
 					$oMsgHandler = $aMessages[$iMessage];
@@ -242,6 +247,8 @@ function GetMailboxContent($oPage, $oInbox) {
 			
 			if($iMsgOkCount > 0) {
 				
+				/** @var array $aTableConfig Associative array with config for the table. */
+				/** @var array $aData Associative array with data for the table. */
 				$oPage->table($aTableConfig, $aData);
 				$oPage->add('<div><img alt="" src="../images/tv-item-last.gif" style="vertical-align:bottom;margin-left:10px;"/>&nbsp;'.Dict::S('MailInbox:WithSelectedDo').'&nbsp;&nbsp<button class="mailbox_button ibo-button ibo-is-regular ibo-is-neutral" id="mailbox_reset_status">'.Dict::S('MailInbox:ResetStatus').'</button>&nbsp;&nbsp;<button class="mailbox_button ibo-button ibo-is-regular ibo-is-danger" id="mailbox_delete_messages">'.Dict::S('MailInbox:DeleteMessage').'</button>&nbsp;&nbsp;<button class="mailbox_button ibo-button ibo-is-regular ibo-is-neutral" id="mailbox_ignore_messages">'.Dict::S('MailInbox:IgnoreMessage').'</button></div>');
 			
@@ -274,25 +281,6 @@ function GetMailboxContent($oPage, $oInbox) {
 	}
 }
 
-/**
- * Finds the message with the given UIDL identifier
- * @param array $aMessages The array returned by $oSource->GetListing()
- * @param string $sUIDL The UIDL to find
- * @param EmailSource $oSource
- * @return array|false The message data if found, false otherwise
- */
-function FindMessageDataFromUIDL($aMessages, $sUIDL, EmailSource $oSource) {
-	$sKey = $sUIDL;
-	$sMultiSourceKey = substr($sUIDL, 1 + strlen($oSource->GetName())); // in Multisource mode the name of the source plus _ are prepended to the UIDL
-	foreach ($aMessages as $aData) {
-		if ((strcmp($sKey, $aData['uidl']) == 0) || (strcmp($sMultiSourceKey, $aData['uidl']) == 0)) {
-			return $aData;
-
-
-		}
-	}
-	return false;
-}
 
 
 try {
@@ -341,9 +329,11 @@ try {
 					$oSource = $oInbox->GetEmailSource();
 					$aMessages = $oSource->GetListing();
 				}
+				
 				foreach($aUIDLs as $sUIDL) {
 					if($sOperation == 'mailbox_delete_messages') {
 
+						/** @var MessageHandler[] $aMessages */
 						$oMsgHandler = array_filter($aMessages, function(MessageHandler $oMsgHandler) use ($sUIDL) {
 							return $oMsgHandler->GetUIDL() == $sUIDL;
 						})[0] ?? null;
@@ -359,6 +349,7 @@ try {
 					}
 				}
 				if ($sOperation == 'mailbox_delete_messages') {
+					/** @var EmailSource $oSource */
 					$oSource->Disconnect();
 				}
 			}
@@ -368,12 +359,12 @@ try {
 		case 'mailbox_ignore_messages':
 
 			$aUIDLs = utils::ReadParam('aUIDLs', [], false, 'raw_data');
+			$aReplicas = [];
 
 			if(count($aUIDLs) > 0) {
 				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_id = '.$oInbox->GetKey(); 
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
-				$aReplicas = [];
-				/** @var \DBObject $oReplica */
+				/** @var DBObject $oReplica */
 				while ($oReplica = $oReplicaSet->Fetch()) {
 					$oReplica->Set('status', 'ignored');
 					$oReplica->DBUpdate();

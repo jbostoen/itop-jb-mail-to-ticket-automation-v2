@@ -24,7 +24,7 @@ class MessageHandler {
 	/**
 	 * @var int $iOriginalListingIndex The **original** index of this message when listing the messages in the folder.
 	 */
-	private int $iOriginalListingIndex = 20;
+	private int $iOriginalListingIndex;
 	
 	/**
 	 * @var int $iUid The UID of the message.
@@ -87,7 +87,7 @@ class MessageHandler {
 
 	/**
 	 * Returns the UID of the message.
-	 * @return void
+	 * @return int
 	 */
 	public function GetUid() : int {
 		return $this->iUid;
