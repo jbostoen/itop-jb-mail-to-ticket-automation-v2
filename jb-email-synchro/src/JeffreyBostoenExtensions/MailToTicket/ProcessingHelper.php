@@ -44,7 +44,7 @@ enum eNextAction {
 	case ABORT_ALL_FURTHER_PROCESSING;
 	case SKIP_FOR_NOW;
 
-	/** @var PROCESS_ERROR Currently unused! */
+	/** Currently unused! */
 	case PROCESS_ERROR;
 
 }
@@ -132,7 +132,7 @@ abstract class ProcessingHelper {
 	/**
 	 * Sets the e-mail that's being processed.
 	 *
-	 * @param EmailMessage $oMessage E-mail message.
+	 * @param EmailMessage $oEmail E-mail message.
 	 *
 	 * @return void
 	 */
@@ -396,7 +396,7 @@ abstract class ProcessingHelper {
 	/**
 	 * Initial dispatching of an e-mail. (Determination on what to do).
 	 *
-	 * @param EmailReplica $oReplica
+	 * @param EmailReplica $oEmailReplica
 	 * @return eNextAction
 	 */
 	public static function DispatchEmail(EmailReplica $oEmailReplica) : eNextAction {
@@ -459,9 +459,9 @@ abstract class ProcessingHelper {
 	/**
 	 * Process a new e-mail.
 	 *
-	 * @return Ticket
+	 * @return ?Ticket
 	 */
-	public static function ProcessNewEmail() : Ticket {
+	public static function ProcessNewEmail() : ?Ticket {
 
 		static::SetNextAction(eNextAction::PROCESS_MESSAGE);
 
@@ -477,14 +477,16 @@ abstract class ProcessingHelper {
 			$oMsgHandler->GetUIDL(),
 		);
 		
-		// Check whether a new ticket must be initiated or an existing one updated.
-		$oTicket = static::GetRelatedTicket();
-		static::SetTicket($oTicket);
+		// - Check whether a new ticket must be initiated or an existing one updated.
+
+			$oTicket = static::GetRelatedTicket();
+			static::SetTicket($oTicket);
 		
-		// If there was no related ticket above, a new one may be created while processing the steps.
-		static::ProcessSteps();
+		// - If there was no related ticket above, a new one may be created while processing the steps.
+
+			static::ProcessSteps();
 	
-		return static::GetTicket();
+			return static::GetTicket();
 
 
 	}

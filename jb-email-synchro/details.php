@@ -16,8 +16,6 @@
 //   You should have received a copy of the GNU Affero General Public License
 //   along with iTop. If not, see <http://www.gnu.org/licenses/>
 /**
- * Processing of AJAX calls for the CalendarView
- *
  * @copyright   Copyright (c) 2013-2026 Combodo SARL
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
@@ -31,14 +29,14 @@ require_once(APPROOT.'/application/application.inc.php');
 require_once(APPROOT.'/application/itopwebpage.class.inc.php');
 
 /**
- * @param \iTopWebPage $oPage
- * @param $sUIDL
+ * @param iTopWebPage $oPage
+ * @param string $sUIDL
  *
  * @throws \CoreException
  * @throws \CoreUnexpectedValue
  * @throws \MySQLException
  */
-function GetMessageDetails($oPage, $sUIDL) {
+function GetMessageDetails(iTopWebPage $oPage, string $sUIDL) : void {
 	
 	$oReplicaSearch = new DBObjectSearch('EmailReplica');
 	$oReplicaSearch->AddCondition('uidl', $sUIDL);

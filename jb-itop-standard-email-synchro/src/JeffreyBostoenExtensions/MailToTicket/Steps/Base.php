@@ -16,14 +16,12 @@ use JeffreyBostoenExtensions\MailToTicket\{
 	ProcessingHelper
 };
 
-// iTop internals.
+// iTop.
 use MetaModel;
-
-// iTop email processing.
+use EmailContact;
 use EmailMessage;
 use EmailProcessor;
 use EmailSource;
-use JeffreyBostoenExtensions\Diagnostics\Process;
 use MailInboxStandard;
 use RawEmailMessage;
 
@@ -133,8 +131,8 @@ abstract class Base implements iStep {
 	/**
 	 * Replace email placeholders in a string.
 	 * 
-	 * @param String $sString Input string.
-	 * @param Array $aExtraPlaceholders Optional: extra place holders.
+	 * @param string $sString Input string.
+	 * @param array $aExtraPlaceholders Optional: extra place holders.
 	 *
 	 * @details Also exposes some properties which are not likely to be useful (body_format) at any time, but who knows?
 	 *

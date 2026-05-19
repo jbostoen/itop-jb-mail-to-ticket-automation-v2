@@ -100,8 +100,8 @@ function GetMailboxContent($oPage, $oInbox) {
 		if($iTotalMsgCount > 0) {
 			
 			// Sort the items, but keep the original index.
-			uasort($aMessages, function($a, $b) {
-				return $a['udate'] <=> $b['udate'];
+			uasort($aMessages, function(MessageHandler $oHandlerA, MessageHandler $oHandlerB) {
+				return $oHandlerA->GetTimestamp() <=> $oHandlerB->GetTimestamp();
 			});
 			
 			// Get the corresponding EmailReplica object for each message

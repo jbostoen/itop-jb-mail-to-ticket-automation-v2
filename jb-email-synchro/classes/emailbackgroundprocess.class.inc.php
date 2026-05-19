@@ -34,9 +34,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	protected static $sNotifyErrorsTo = '';
 	protected static $sNotifyErrorsFrom = '';
 	public static $iMaxEmailSize = 0;
-	protected $bDebug;
+	protected bool $bDebug;
 	private $aMessageTrace = array();
-	private $iCurrentRequestMessage;
+	private int $iCurrentRequestMessage;
 	/**
 	 * @var EmailSource
 	 */
@@ -68,7 +68,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		
 	}
 
-	protected function Trace($sText) {
+	protected function Trace(string $sText) : void {
 		$this->aMessageTrace[] = $sText;
 		if ($this->bDebug) {
 			echo $sText."\n";
@@ -90,11 +90,11 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	protected function UpdateEmailReplica($oEmailReplica, $oProcessor, $sErrorCode = 'error', $oRawEmail = null) {
 
 		try {
+
 			if(is_null($oRawEmail)) {
 				$oCurrentSource = $this->oCurrentSource;
-				$iCurrentRequestMessage = $this->iCurrentRequestMessage;
 				if(isset($oCurrentSource)) {
-					$oRawEmail = $oCurrentSource->GetMessage($iCurrentRequestMessage);
+					$oRawEmail = $oCurrentSource->GetMessage($this->iCurrentRequestMessage);
 				}
 			}
 			
@@ -144,7 +144,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		return (int)MetaModel::GetModuleSetting('jb-email-synchro', 'periodicity', 30); // seconds
 	}
 
-	public function ReportError($sSubject, $sMessage, $oRawEmail) {
+	public function ReportError(string $sSubject, string $sMessage, MessageFromMailbox $oRawEmail) : void {
 		if((self::$sNotifyErrorsTo != '') && (self::$sNotifyErrorsFrom != '')) {
 			$oRawEmail->SendAsAttachment(self::$sNotifyErrorsTo, self::$sNotifyErrorsFrom, $sSubject, $sMessage);
 			//@mail(self::$sNotifyErrorsTo, $sSubject, $sMessage, 'From: '.self::$sNotifyErrorsFrom);
@@ -230,7 +230,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						
 						$sUIDL = $oMsgHandler->GetUIDL();
 						
-						if(is_null($sUIDL) == true) {
+						if(is_null($sUIDL) === true) {
 							$iTotalUnreadable++;
 							continue;
 						}
@@ -248,7 +248,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 					$this->Trace("Searching EmailReplicas: '$sOQL'");
 					$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
-					$aReplicas = array();
+					$aReplicas = [];
 					/** @var EmailReplica $oReplica */
 					while($oReplica = $oReplicaSet->Fetch()) {
 						$aReplicas[$oReplica->Get('uidl')] = $oReplica;
@@ -274,29 +274,30 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						CMDBObject::SetTrackOrigin('email-processing');
 						
 						try {
-									
+							
 							$this->InitMessageTrace($oSource, $iMessage);
 							
 							$iTotalMessages++;
 
 							$sUIDL = $oMsgHandler->GetUIDL();
 							if(is_null($sUIDL)) {
+								$this->Trace('Invalid UIDL.');
 								continue; // invalid email, see \EmailSource::GetListing and N°5633
 							}
 							
 							$sUIDL = $sUIDL;
 
 							/** @var EmailReplica|null $oEmailReplica */
-							$oEmailReplica = array_key_exists($sUIDL, $aReplicas) ? $aReplicas[$sUIDL] : null;
-		
-							if($oEmailReplica == null) {
+							$oEmailReplica = $aReplicas[$sUIDL] ?? null;
+							
+							if($oEmailReplica === null) {
 								
 								$this->Trace("\nDispatching new message: uidl=$sUIDL index=$iMessage");
 								// Create a replica to keep track that we've processed this email
 								$oEmailReplica = new EmailReplica();
 								$oEmailReplica->Set('mailbox_id', $oInbox->GetKey());
 								$oEmailReplica->Set('uidl', $sUIDL);
-								$oEmailReplica->Set('mailbox_path', ProcessingHelper::GetMailBox());
+								$oEmailReplica->Set('mailbox_path', $oInbox->Get('mailbox')); // This is *still* here, in case the folder setting got updated on the mailbox (same ID).
 								$oEmailReplica->Set('message_id', $iMessage); // This will be set to the actual Message-ID/UIDL in ProcessMessage().
 								$oEmailReplica->Set('last_seen', date('Y-m-d H:i:s'));
 								
@@ -647,7 +648,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		
 	}
 	
-	private function InitMessageTrace($oSource, $iMessage) {
+	private function InitMessageTrace(EmailSource $oSource, int $iMessage) {
 		$this->oCurrentSource = $oSource;
 		$this->iCurrentRequestMessage = $iMessage;
 		$this->aMessageTrace = array();
@@ -658,13 +659,13 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	}
 	
 	/**
-	 * @param \EmailReplica $oEmailReplica
-	 * @param $oRawEmail
+	 * @param EmailReplica $oEmailReplica
+	 * @param MessageFromMailbox $oRawEmail
 	 *
 	 * @throws \CoreException
 	 * @throws \CoreUnexpectedValue
 	 */
-	protected function SaveEml(&$oEmailReplica, $oRawEmail) {
+	protected function SaveEml(EmailReplica &$oEmailReplica, MessageFromMailbox $oRawEmail) : void {
 		$iContentSize = strlen($oRawEmail->GetRawContent());
 		$iMaxServerSize = CMDBSource::GetServerVariable('max_allowed_packet') - 128*1024;
 		if($iContentSize < $iMaxServerSize) {
