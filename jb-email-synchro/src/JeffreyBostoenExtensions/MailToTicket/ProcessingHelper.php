@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260426
+ * @version     3.2.260521
  */
 
 namespace JeffreyBostoenExtensions\MailToTicket;

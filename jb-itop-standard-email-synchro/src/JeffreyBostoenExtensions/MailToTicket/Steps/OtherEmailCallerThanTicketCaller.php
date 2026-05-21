@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260426
+ * @version     3.2.260521
  */
  
 
@@ -34,8 +34,7 @@ abstract class OtherEmailCallerThanTicketCaller extends Base {
 	 */
 	public static function Execute() : void {
 		
-		// @todo Accept known contacts (from same org)
-		
+		// @todo Accept known contacts (from same org).		
 		$oTicket = ProcessingHelper::GetTicket();
 		$oEmail = ProcessingHelper::GetMail();
 		

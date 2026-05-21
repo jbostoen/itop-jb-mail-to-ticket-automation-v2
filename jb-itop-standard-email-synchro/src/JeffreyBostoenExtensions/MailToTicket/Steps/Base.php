@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260426
+ * @version     3.2.260521
  * 
  * Additional notes:
  * - Do not alter ticket contents here, such as subject. That's done at a later phase. For this particular case: change EmailMessage's subject.

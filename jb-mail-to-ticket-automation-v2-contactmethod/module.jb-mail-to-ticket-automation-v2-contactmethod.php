@@ -3,14 +3,14 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     3.2.260426
+ * @version     3.2.260521
  *
  * iTop module definition file
  */
 
 SetupWebPage::AddModule(
         __FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-        'jb-mail-to-ticket-automation-v2-contactmethod/3.2.260426',
+        'jb-mail-to-ticket-automation-v2-contactmethod/3.2.260521',
         array(
                 // Identification
                 //
