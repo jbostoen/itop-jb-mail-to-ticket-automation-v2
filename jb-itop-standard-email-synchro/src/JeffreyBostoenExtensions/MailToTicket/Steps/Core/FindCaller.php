@@ -37,13 +37,13 @@ abstract class FindCaller extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 110;
+	public static int $iPrecedence = 110;
 	
 	/**
 	 * @inheritDoc
 	 * @details Note: different short name because of (legacy) attribute fields!
 	 */
-	public static $sXMLSettingsPrefix = 'policy_unknown_caller';
+	public static string $sXMLSettingsPrefix = 'policy_unknown_caller';
 	
 	/**
 	 * @inheritDoc

@@ -35,12 +35,12 @@ abstract class FindAdditionalContacts extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 115;
+	public static int $iPrecedence = 115;
 
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_other_recipients';
+	public static string $sXMLSettingsPrefix = 'policy_other_recipients';
 	
 	/**
 	 * @inheritDoc

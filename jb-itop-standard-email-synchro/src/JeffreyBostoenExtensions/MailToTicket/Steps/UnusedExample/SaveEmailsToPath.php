@@ -26,12 +26,12 @@ abstract class SaveEmailsToPath extends Base {
 	 *
 	 * @details Depending on the use case, set a low number (always export the email) or high number (export only if certain policies have been processed and email was compliant)
 	 */
-	public static $iPrecedence = 1;
+	public static int $iPrecedence = 1;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_example_save_emails_to_path';
+	public static string $sXMLSettingsPrefix = 'policy_example_save_emails_to_path';
 	
 	/**
 	 * @inheritDoc

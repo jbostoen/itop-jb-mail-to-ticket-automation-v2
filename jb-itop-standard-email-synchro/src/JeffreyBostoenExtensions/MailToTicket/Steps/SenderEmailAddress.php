@@ -22,12 +22,12 @@ abstract class SenderEmailAddress extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 10;
+	public static int $iPrecedence = 10;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_sender_email_address';
+	public static string $sXMLSettingsPrefix = 'policy_sender_email_address';
 		
 	/**
 	 * @inheritDoc

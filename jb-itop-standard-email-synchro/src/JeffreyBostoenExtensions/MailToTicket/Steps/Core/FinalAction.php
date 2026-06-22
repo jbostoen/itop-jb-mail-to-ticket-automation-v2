@@ -27,7 +27,7 @@ abstract class FinalAction extends Base {
 	 * @inheritDoc
 	 * @details This should really be the final step. After successful processing, take the final action (keep, move, delete, ...).
 	 */
-	public static $iPrecedence = 9999;
+	public static int $iPrecedence = 9999;
 	
 	/**
 	 * @inheritDoc

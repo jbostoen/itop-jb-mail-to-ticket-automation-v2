@@ -23,12 +23,12 @@ abstract class NoSubject extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 10;
+	public static int $iPrecedence = 10;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_no_subject';
+	public static string $sXMLSettingsPrefix = 'policy_no_subject';
 		
 	/**
 	 * @inheritDoc

@@ -71,12 +71,12 @@ abstract class Base implements iStep {
 	/**
 	 * @var int $iPrecedence It's not necessary that this number is unique; but when all steps are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
 	 */
-	public static $iPrecedence = 20;
+	public static int $iPrecedence = 20;
 	
 	/**
 	 * @var string $sXMLSettingsPrefix (XML) settings prefix for step.
 	 */
-	public static $sXMLSettingsPrefix = 'step_generic';
+	public static string $sXMLSettingsPrefix = 'step_generic';
 	
 	/**
 	 * @var string $sEmailIndex Index in the e-mail source. Note: name is experimental; use methods instead to set/get
@@ -108,7 +108,7 @@ abstract class Base implements iStep {
 	 *
 	 * @return string
 	 */
-	public static function GetStepSetting($sSetting) : string {
+	public static function GetStepSetting(string $sSetting) : string {
 	
 		$oMailBox = ProcessingHelper::GetMailBox();
 		return $oMailBox->Get(static::GetXMLSettingsPrefix().'_'.$sSetting);
@@ -138,7 +138,7 @@ abstract class Base implements iStep {
 	 *
 	 * @return String String where the placeholders are filled in.
 	 */
-	public static function ReplaceMailPlaceholders($sString, $aExtraPlaceholders = []) {
+	public static function ReplaceMailPlaceholders(string $sString, array $aExtraPlaceholders = []) {
 		
 		$oEmail = ProcessingHelper::GetMail();
 		
@@ -197,7 +197,7 @@ abstract class Base implements iStep {
 	 *
 	 * @return string[]
 	 */
-	public static function GetRecipientAddresses() {
+	public static function GetRecipientAddresses() : array {
 
 		/** @var RawEmailMessage $oRawEmail Raw e-mail message. */
 		$oRawEmail = ProcessingHelper::GetRawMail();
@@ -218,9 +218,9 @@ abstract class Base implements iStep {
 	/**
 	 * Returns an array containing the e-mail aliases of the mailbox, including the primary e-mail address.
 	 *
-	 * @return String[]
+	 * @return string[]
 	 */
-	public static function GetMailBoxAliases() {
+	public static function GetMailBoxAliases() : array {
 		
 		$oMailBox = ProcessingHelper::GetMailBox();
 		
@@ -241,7 +241,7 @@ abstract class Base implements iStep {
 	 *
 	 * @return void
 	 */
-	public static function HandleViolation() {
+	public static function HandleViolation() : void {
 		
 			
 		// Policy violations have a typical way of handling.

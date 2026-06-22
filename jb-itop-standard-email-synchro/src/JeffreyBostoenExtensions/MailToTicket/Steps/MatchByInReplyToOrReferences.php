@@ -31,12 +31,12 @@ abstract class MatchByInReplyToOrReferences extends Base {
 	 * @details This must run before policies such as PolicyBounceUnknownTicketReference, PolicyTicketResolved, PolicyTicketClosed
 	 * @todo Re-evaluate PolicyBounceUnknownTicketReference. Should this step be executed before or after?
 	 */
-	public static $iPrecedence = 9;
+	public static int $iPrecedence = 9;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'step_match_by_in_reply_to_or_references';
+	public static string $sXMLSettingsPrefix = 'step_match_by_in_reply_to_or_references';
 	
 	/**
 	 * @inheritDoc

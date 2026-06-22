@@ -28,12 +28,12 @@ abstract class NonDeliveryReport extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 0;
+	public static int $iPrecedence = 0;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_non_delivery_report';
+	public static string $sXMLSettingsPrefix = 'policy_non_delivery_report';
 	
 	/**
 	 * @inheritDoc

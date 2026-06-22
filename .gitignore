@@ -2,3 +2,4 @@ docs/
 private/
 vendor/
 composer.lock
+jb-email-synchro/vendor

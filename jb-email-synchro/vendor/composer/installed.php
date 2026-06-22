@@ -3,7 +3,7 @@
         'name' => 'jbostoen/jb-email-synchro',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '4cb4f22c0c57084f628d099db7cf513c3c2dd7eb',
+        'reference' => '21fbe13ddfeed805707cb3f6638e5fa3e245f0ad',
         'type' => 'itop-extension',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -94,7 +94,7 @@
         'jbostoen/jb-email-synchro' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '4cb4f22c0c57084f628d099db7cf513c3c2dd7eb',
+            'reference' => '21fbe13ddfeed805707cb3f6638e5fa3e245f0ad',
             'type' => 'itop-extension',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

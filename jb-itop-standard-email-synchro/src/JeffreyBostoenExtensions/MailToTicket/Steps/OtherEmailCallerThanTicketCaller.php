@@ -22,12 +22,12 @@ abstract class OtherEmailCallerThanTicketCaller extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 10;
+	public static int $iPrecedence = 10;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_other_email_caller_than_ticket_caller';
+	public static string $sXMLSettingsPrefix = 'policy_other_email_caller_than_ticket_caller';
 		
 	/**
 	 * @inheritDoc

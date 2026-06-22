@@ -21,12 +21,12 @@ abstract class AttachmentForbiddenMimeType extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 10;
+	public static int $iPrecedence = 10;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_attachment_forbidden_mimetype';
+	public static string $sXMLSettingsPrefix = 'policy_attachment_forbidden_mimetype';
 		
 	/**
 	 * @inheritDoc

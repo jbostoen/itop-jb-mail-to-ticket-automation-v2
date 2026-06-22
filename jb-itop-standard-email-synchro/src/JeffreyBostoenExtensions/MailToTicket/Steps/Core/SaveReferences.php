@@ -33,12 +33,12 @@ abstract class SaveReferences extends Base {
 	 *
 	 * @details This must run after StepCreateOrUpdateTicket.
 	 */
-	public static $iPrecedence = 201;
+	public static int $iPrecedence = 201;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'step_save_references';
+	public static string $sXMLSettingsPrefix = 'step_save_references';
 	
 	/*
 	 * @var string[] $aUIDLs Array of previously unknown references in the e-mail message.

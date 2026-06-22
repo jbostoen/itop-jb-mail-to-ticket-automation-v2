@@ -34,12 +34,12 @@ abstract class AttachmentCriteria extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 20;
+	public static int $iPrecedence = 20;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'step_attachment_criteria';
+	public static string $sXMLSettingsPrefix = 'step_attachment_criteria';
 	
 	/**
 	 * @inheritDoc

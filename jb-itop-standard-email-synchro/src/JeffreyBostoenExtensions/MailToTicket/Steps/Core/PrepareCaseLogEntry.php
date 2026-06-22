@@ -49,31 +49,25 @@ use utils;
 use Exception;
 
 /**
- * Class CreateOrUpdateTicket. Special step; at this point the Ticket is created or updated.
- * @details Replaces Combodo's MailInboxStandard way of handling incoming emails (creating or updating ticket).
- * This is a fork, a lot of code has been polished but is also still the same or heavily inspired by the original Mail to Ticket Automation.
- * Hence, this (sub)class contains methods with the same name to make it easy to keep retrofitting bug fixes etc.
+ * Class PrepareCaseLogEntry. 
+ * Special step; at this point the caselog content will be created.
  */
-abstract class CreateOrUpdateTicket extends Base {
+abstract class PrepareCaseLogEntry extends Base {
 	
 	/**
 	 * @inheritDoc
 	 *
-	 * @details This is a special policy which takes care of only basic Ticket creation or update. 
-	 * Any real checks that block Ticket creation or update, should have been run by now. 
-	 * Any policies following this one, should not be blocking!
+	 * @details Should be lower than but close to CreateOrUpdateTicket.
 	 */
-	public static int $iPrecedence = 200;
+	public static int $iPrecedence = 199;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static string $sXMLSettingsPrefix = 'step_create_or_update_ticket';
+	public static string $sXMLSettingsPrefix = 'step_create_or_update_ticket_prepare_case_log_entry';
 	
 	/*
-	 * @var array $aAddedAttachments Array containing info on any attachments in the email. 
-	 * - Key: cid
-	 * - Value: Attachment or InlineImage object.
+	 * @var array $aAddedAttachments Array containing info on any attachments in the email.
 	 */
 	public static array $aAddedAttachments = [];
 	
@@ -83,67 +77,11 @@ abstract class CreateOrUpdateTicket extends Base {
 	 */
 	public static function Execute() : void {
 		
-		// Reset before processing each mail.
-		static::$aAddedAttachments = [];
 		
 		$oMailBox = ProcessingHelper::GetMailBox();
 		$oTicket = ProcessingHelper::GetTicket();
 		
-		$sBehavior = $oMailBox->Get('behavior');
-		
-		try {
-				
-			switch($sBehavior)
-			{
-				case 'create_only':
-					static::CreateTicketFromEmail();
-					break;
-				
-				case 'update_only':
-				
-					if(is_object($oTicket) == false) {
-						// No ticket associated with the incoming email, nothing to update, reject the email
-						ProcessingHelper::HandleError('nothing_to_update');
-					}
-					else {
-						// Update the ticket with the incoming email
-						static::UpdateTicketFromEmail();
-					}
-					break;
-				
-				default: // both: update or create as needed
-				
-					if(is_object($oTicket) == false) {
-						// Create a new ticket
-						static::CreateTicketFromEmail();
-					}
-					else {
-						// Update the ticket with the incoming email
-						static::UpdateTicketFromEmail();
-					}
-					break;			
-			}
-			
-		}
-		catch(Exception $e) {
-		
-			switch($e->getMessage()) {
-				// Match descriptions in CreateTicketFromEmail(), UpdateTicketFromEmail()
-				case 'Ticket creation failed':
-				case 'Ticket update failed':
-					
-					// Stop further processing (will delete or mark as error, based on user's settings)
-					return;
-					
-			}
-			
-		}
-		
-		
-		// No error occurred. Revert to default (continue processing).
-		$oMailBox = ProcessingHelper::GetMailBox();
-		ProcessingHelper::SetNextAction(eNextAction::PROCESS_MESSAGE);
-		
+		// - The attachments & inline images must be created first.
 		
 	}
 	
@@ -214,7 +152,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		$sSubject = $oEmail->sSubject;
 		$oTicket->Set('title', substr($sSubject, 0, $iTitleMaxSize));
 		
-		// Insert the remaining attachments so that their ID is known, and the attachments can be referenced in the message's body.
+		// Insert the remaining attachments so that their ID is known and the attachments can be referenced in the message's body.
 		// Cannot insert them for real since the Ticket is not saved yet (so Ticket id is unknown).
 		// UpdateAttachments() will be called once the ticket is properly saved.
 		static::AddAttachments(true);
@@ -253,8 +191,8 @@ abstract class CreateOrUpdateTicket extends Base {
 			// Newer comment by Combodo notes: this has no effect, attachments have already been processed
 			$oEmail->aAttachments[] = [
 				'content' => $sTicketDescription, 
-				'filename' => ($bForPlainText ? 'original message.txt' : 'original message.html'), 
-				'mimeType' => ($bForPlainText ? 'text/plain' : 'text/html')
+				'filename' => ($bForPlainText == true ? 'original message.txt' : 'original message.html'), 
+				'mimeType' => ($bForPlainText == true ? 'text/plain' : 'text/html')
 			];
 		}
 		
@@ -298,9 +236,7 @@ abstract class CreateOrUpdateTicket extends Base {
 	}
 	
 	/**
-	 * Updates an existing Ticket from an email.
-	 * 
-	 * In this important step, the log entry will already be added; and any linked TriggerOnMailUpdate will be activated in the AfterUpdateTicket() method.
+	 * Updates an existing Ticket from an email
 	 *
 	 * @return void
 	 *
@@ -477,21 +413,21 @@ abstract class CreateOrUpdateTicket extends Base {
 		$oEmail = ProcessingHelper::GetMail();
 		
 		if($oEmail->sBodyFormat == 'text/html') {
-
-			// Original message is in HTML.
+			// Original message is in HTML
 			static::Trace("Managing inline images...");
 			$sTicketDescription = static::ManageInlineImages($oEmail->sBodyText, $bForPlainText);
 			if($bForPlainText) {
 				static::Trace("Converting HTML to text using utils::HtmlToText...");
 				$sTicketDescription = utils::HtmlToText($oEmail->sBodyText);
 			}
-
 		}
 		else {
-
-			// Original message is in plain text.
+			// Original message is in plain text
 			$sTicketDescription = utils::TextToHtml($oEmail->sBodyText);
-
+			if(!$bForPlainText) {
+				static::Trace("Converting text to HTML using utils::TextToHtml...");
+				$sTicketDescription = utils::TextToHtml($oEmail->sBodyText);
+			}
 		}
 
 		if(empty($sTicketDescription)) {
@@ -504,13 +440,17 @@ abstract class CreateOrUpdateTicket extends Base {
 	}
 	
 	/**
-	 *
+	 * This method will look for inline images in the message's body and 
+	 * will replace the "src" of the <img> tags with a URL to the attachment (instead of the "cid:..." which is not supported by iTop).
+	 * 
+	 * This method is called *after* the attachments have been added already.
+	 * 
 	 * @param string $sBodyText Body text
 	 * @param boolean $bForPlainText Plain text (true) or HTML (false)
 	 * 
 	 * @return string Body text
 	 */
-	public static function ManageInlineImages($sBodyText, $bForPlainText) : string {
+	public static function ManageInlineImages(string $sBodyText, bool $bForPlainText) : string {
 		 
 		// Search for inline images: i.e. <img tags containing an src="cid:...." or without double quotes e.g. src=cid:xyzxyzx
 		// Note: (?: ... ) is used for grouping the alternative without creating a "matching group"
@@ -534,8 +474,9 @@ abstract class CreateOrUpdateTicket extends Base {
 			if(defined('ATTACHMENT_DOWNLOAD_URL') == false) {
 				define('ATTACHMENT_DOWNLOAD_URL', 'pages/ajax.render.php?operation=download_document&class=Attachment&field=contents&id=');
 			}
-			if($bForPlainText == true) {
-				// The target form is text/plain, so the HTML tags will be stripped
+			if($bForPlainText) {
+
+				// The target form is text/plain, so the HTML tags will be stripped.
 				// Insert the URLs to the attachments, just before the <img tag so that the hyperlink remains (as plain text) at the right position
 				// when the HTML tags will be stripped
 				// Start from the end of the text to preserve the positions of the <img tags AFTER the insertion
@@ -543,24 +484,25 @@ abstract class CreateOrUpdateTicket extends Base {
 				$idx = count($aInlineImages);
 				while ($idx > 0) {
 					$idx --;
-					if (array_key_exists('cid', $aInlineImages[$idx]))
-					{
+					if (array_key_exists('cid', $aInlineImages[$idx])) {
+
 						$sBefore = substr($sWholeText, 0, $aInlineImages[$idx]['position']);
 						$sAfter = substr($sWholeText, $aInlineImages[$idx]['position']);
 						$oAttachment = static::$aAddedAttachments[$aInlineImages[$idx]['cid']];
 						$sUrl = utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey();
 						$sWholeText = $sBefore.' '.$sUrl.' '. $sAfter;
+
 					}
 				}
 			}
 			else {
-				// The target format is text/html, keep the formatting, but just change the URLs
+				// The target format is text/html. Keep the formatting, but change the URLs.
 				$aSearches = [];
 				$aReplacements = [];
 				foreach(static::$aAddedAttachments as $sCID => $oAttachment) {
 
 					$aSearches[] = 'src="cid:'.$sCID.'"';
-					if(class_exists('InlineImage') == true && $oAttachment instanceof InlineImage) {
+					if(class_exists('InlineImage') && $oAttachment instanceof InlineImage) {
 						// Inline images have a special download URL requiring the 'secret' token
 						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().INLINEIMAGE_DOWNLOAD_URL.$oAttachment->GetKey().'&s='.$oAttachment->Get('secret').'"';
 					}
@@ -569,13 +511,14 @@ abstract class CreateOrUpdateTicket extends Base {
 					}
 					
 					$aSearches[] = 'src=cid:'.$sCID; // Same without quotes
-					if (class_exists('InlineImage') == true && ($oAttachment instanceof InlineImage)) {
+					if(class_exists('InlineImage') && ($oAttachment instanceof InlineImage)) {
 						// Inline images have a special download URL requiring the 'secret' token
 						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().INLINEIMAGE_DOWNLOAD_URL.$oAttachment->GetKey().'&s='.$oAttachment->Get('secret').'" '; // Beware: add a space at the end
 					}
 					else {
 						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'" '; // Beware: add a space at the end
 					}
+
 				}
 				$sWholeText = str_replace($aSearches, $aReplacements, $sBodyText);
 			}
@@ -651,7 +594,7 @@ abstract class CreateOrUpdateTicket extends Base {
 	}
 	
 	/**
-	 * Hook to run function after a Ticket has been updated.
+	 * Hook to run function after a Tickt has been updated.
 	 * In this case, it activates the trigger "TriggerOnMailUpdate"
 	 *
 	 * @return void
@@ -790,7 +733,8 @@ abstract class CreateOrUpdateTicket extends Base {
 	}
 	
 	/**
-	 * Build the text/html to be inserted in the case log when the ticket is updated.
+	 * Build the text/html to be inserted in the case log when the ticket is updated
+	 * Starting with iTop 2.3.0, the format is always HTML
 	 *
 	 * @return string The HTML text to be inserted in the case log
 	 */
@@ -799,22 +743,21 @@ abstract class CreateOrUpdateTicket extends Base {
 		$oEmail = ProcessingHelper::GetMail();
 		$sCaseLogEntry = '';
 		
-		static::Trace("Email body format: ".$oEmail->sBodyFormat);
+		static::Trace('Email body format: %1$s', $oEmail->sBodyFormat);
+
 		if ($oEmail->sBodyFormat == 'text/html') {
 			static::Trace("Extracting the new part using GetNewPartHTML()...");
 			$sCaseLogEntry = $oEmail->GetNewPartHTML($oEmail->sBodyText);
-			if (strip_tags($sCaseLogEntry) == '') {
-
+			if(strip_tags($sCaseLogEntry) === '') {
 				// No new part (only blank tags)...
 				// It's better use the whole text of the message
 				$sCaseLogEntry = $oEmail->sBodyText;
-
 			}
-			static::Trace("Managing inline images...");
+			static::Trace('Managing inline images...');
 			$sCaseLogEntry = static::ManageInlineImages($sCaseLogEntry, false /* $bForPlainText */);
 		}
 		else {
-			static::Trace("Extracting the new part using GetNewPart()...");
+			static::Trace('Extracting the new part using GetNewPart()...');
 			$sCaseLogEntry = $oEmail->GetNewPart($oEmail->sBodyText, $oEmail->sBodyFormat); // GetNewPart always returns a plain text version of the message
 			$sCaseLogEntry = utils::TextToHtml($sCaseLogEntry);
 		}
@@ -824,12 +767,14 @@ abstract class CreateOrUpdateTicket extends Base {
 	 }
 	 
 	/**
-	 * This method will create or find Attachment and InlineImage objects.  
-	 * If this is a new ticket, the ticket ID is still unknown; and UpdateAttachments() will be called later on to set the final ticket ID.
+	 * Adds attachments.
+	 * 
+	 * It does so in memory, and it creates Attachment and InlineImage objects when needed.  
+	 * It assumes a ticket already exists.
+	 * 
 	 * 
 	 * @param boolean $bNoDuplicates If true, don't add attachment that seem already attached to the ticket (same type, same name, same size, same md5 checksum).
 	 *
-	 * 
 	 * @throws CoreException
 	 * @throws CoreUnexpectedValue
 	 * @throws CoreWarning
@@ -849,11 +794,16 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		// Build a list of Attachments already present in this ticket.
 		// This includes both Attachment and InlineImage classes.
-		if($bNoDuplicates ) {
+		if($bNoDuplicates) {
 			
 			$sOQL = 'SELECT Attachment WHERE item_class = :class AND item_id = :id';
-			$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
+			$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], [
+				'class' => get_class($oTicket), 
+				'id' => $oTicket->GetKey()
+			]);
+
 			while($oPrevAttachment = $oAttachments->Fetch()) {
+
 				$oDoc = $oPrevAttachment->Get('contents');
 				$data = $oDoc->GetData();
 				$aPreviousAttachments[] = [
@@ -866,10 +816,15 @@ abstract class CreateOrUpdateTicket extends Base {
 				];
 			}
 			
-			// same processing for InlineImages
-			if(class_exists('InlineImage') == true) {
+			// Same processing for InlineImages.
+			if(class_exists('InlineImage')) {
+
 				$sOQL = 'SELECT InlineImage WHERE item_class = :class AND item_id = :id';
-				$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
+				$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], [
+					'class' => get_class($oTicket),
+					'id' => $oTicket->GetKey()]
+				);
+
 				while($oPrevAttachment = $oAttachments->Fetch()) {
 					$oDoc = $oPrevAttachment->Get('contents');
 					$data = $oDoc->GetData();
@@ -897,7 +852,7 @@ abstract class CreateOrUpdateTicket extends Base {
 			
 			$bIgnoreAttachment = false;
 			
-			if($bIgnoreAttachment == false && $bNoDuplicates) {
+			if(!$bIgnoreAttachment && $bNoDuplicates) {
 				
 				// Check if an attachment with the same name/type/size/md5 already exists
 				$iSize = strlen($aAttachment['content']);
@@ -919,18 +874,13 @@ abstract class CreateOrUpdateTicket extends Base {
 				
 				if(!$bIgnoreAttachment) {
 					
-					// - Save inline images.
-
 					if(static::IsImage($aAttachment['mimeType']) && class_exists('InlineImage') && $aAttachment['inline']) {
-
 						$oAttachment = new InlineImage();
-						static::Trace('Attachment "%1$s" will be stored as an InlineImage.', $aAttachment['filename']);
+						static::Trace("Attachment {$aAttachment['filename']} will be stored as an InlineImage.");
 						$oAttachment->Set('secret', bin2hex(random_bytes(16))); // 128 bits of entropy, cryptographically secure
-
 					}
 					else {
-
-						static::Trace('Attachment "%1$s" will be stored as an Attachment.', $aAttachment['filename']);
+						static::Trace("Attachment {$aAttachment['filename']} will be stored as an Attachment.");
 						$oAttachment = new Attachment();
 						
 						$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
@@ -985,7 +935,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		$iNumAttachments = count(static::$aAddedAttachments);
 		if($iNumAttachments > 0) {
-			static::Trace('Linking %1$s attachments...', $iNumAttachments);
+			static::Trace("Linking {$iNumAttachments} attachments...");
 		}
 			
 		foreach(static::$aAddedAttachments as $oAttachment) {
@@ -998,7 +948,7 @@ abstract class CreateOrUpdateTicket extends Base {
 
 	
 	/**
-	 * Checks whether a MimeType is an image which can be processed by iTop (PHP GD).
+	 * Checks whether a MimeType is an image which can be processed by iTop (PHP GD)
 	 *
 	 * @param string $sMimeType
 	 *

@@ -22,12 +22,12 @@ abstract class UndesiredTitlePatterns extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 20;
+	public static int $iPrecedence = 20;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_undesired_pattern';
+	public static string $sXMLSettingsPrefix = 'policy_undesired_pattern';
 	
 	/**
 	 * @inheritDoc

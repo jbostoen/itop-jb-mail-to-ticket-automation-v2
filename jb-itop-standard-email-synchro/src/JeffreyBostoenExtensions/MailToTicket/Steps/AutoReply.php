@@ -22,12 +22,12 @@ abstract class AutoReply extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 10;
+	public static int $iPrecedence = 10;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_autoreply';
+	public static string $sXMLSettingsPrefix = 'policy_autoreply';
 		
 	/**
 	 * @inheritDoc

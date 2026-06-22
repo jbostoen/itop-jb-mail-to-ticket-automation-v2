@@ -25,12 +25,12 @@ abstract class UnknownTicketReference extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 10;
+	public static int $iPrecedence = 10;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_ticket_unknown';
+	public static string $sXMLSettingsPrefix = 'policy_ticket_unknown';
 	
 	/**
 	 * @inheritDoc

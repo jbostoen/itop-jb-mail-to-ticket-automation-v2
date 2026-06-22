@@ -24,12 +24,12 @@ abstract class LimitMailSize extends Base {
 	/**
 	 * @inheritDoc
 	 */
-	public static $iPrecedence = 10;
+	public static int $iPrecedence = 10;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_mail_size_too_big';
+	public static string $sXMLSettingsPrefix = 'policy_mail_size_too_big';
 		
 	/**
 	 * @inheritDoc

@@ -35,7 +35,7 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 	 */
 	// Should be executed before StepFindAdditionalContacts; 
 	// therefore $iPrecedence should be lower than that of StepFindAdditionalContacts (115).
-	public static $iPrecedence = 114;
+	public static int $iPrecedence = 114;
 	
 	/**
 	 * @inheritDoc

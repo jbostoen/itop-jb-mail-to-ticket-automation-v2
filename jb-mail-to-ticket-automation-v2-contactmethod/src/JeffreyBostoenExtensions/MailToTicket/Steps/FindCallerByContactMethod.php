@@ -37,7 +37,7 @@ abstract class StepFindCallerByContactMethod extends Base {
 	 */ 
 	// Should be executed before StepFindCaller;
 	// therefore $iPrecedence should be lower than that of StepFindCaller (110).
-	public static $iPrecedence = 109;
+	public static int $iPrecedence = 109;
 	
 	/**
 	 * Finds contacts by contact method (ContactMethod) or e-mail alias (Combodo's EmailAlias).
@@ -145,7 +145,7 @@ abstract class StepFindAdditionalContactsByContactMethod extends Base {
 	 */
 	// Should be executed before StepFindAdditionalContacts; 
 	// therefore $iPrecedence should be lower than that of StepFindAdditionalContacts (115).
-	public static $iPrecedence = 114;
+	public static int $iPrecedence = 114;
 	
 	/**
 	 * @inheritDoc

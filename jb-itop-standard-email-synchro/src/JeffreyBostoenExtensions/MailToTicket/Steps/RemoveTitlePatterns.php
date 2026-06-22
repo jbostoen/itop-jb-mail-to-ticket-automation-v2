@@ -23,12 +23,12 @@ abstract class RemoveTitlePatterns extends Base {
 	 * @inheritDoc
 	 * Must be executed before StepCreateOrUpdateTicket ( precedence = 200 ).
 	 */
-	public static $iPrecedence = 110;
+	public static int $iPrecedence = 110;
 	
 	/**
 	 * @inheritDoc
 	 */
-	public static $sXMLSettingsPrefix = 'policy_remove_pattern';
+	public static string $sXMLSettingsPrefix = 'policy_remove_pattern';
 	
 	/**
 	 * @inheritDoc
