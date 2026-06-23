@@ -37,6 +37,9 @@ SetupWebPage::AddModule(
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/FindCaller.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/FindAdditionalContacts.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/SaveReferences.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/EntryProcessor/Base.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/EntryProcessor/DefaultHTML.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/EntryProcessor/DefaultText.php',
 			// Extra.
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AttachmentForbiddenMimeType.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AutoReply.php',

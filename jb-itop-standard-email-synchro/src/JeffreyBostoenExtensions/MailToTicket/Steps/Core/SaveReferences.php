@@ -24,7 +24,8 @@ use Exception;
 
 /**
  * Class SaveReferences. 
- * Creates records to link "In-reply-to" or "References" e-mail headers to the current ticket.
+ * Creates records to link "In-reply-to" or "References" e-mail headers to the current ticket.  
+ * Note that the collecting of this info happens in the MatchByInReplyToOrReferences step, which runs before this one.
  */
 abstract class SaveReferences extends Base {
 	
@@ -41,17 +42,16 @@ abstract class SaveReferences extends Base {
 	public static string $sXMLSettingsPrefix = 'step_save_references';
 	
 	/*
-	 * @var string[] $aUIDLs Array of previously unknown references in the e-mail message.
+	 * @var string[] $aNewMessageIds Array of previously unknown references in the e-mail message.
 	 */
-	public static $aNewUIDLs = [];
+	public static $aNewMessageIds = [];
 
 	/**
 	 * @inheritDoc
 	 */
 	public static function IsApplicable() : bool{
 
-		// - This step is only applicable if references are being used as UIDs.
-		return Helper::UseMessageIdAsUid();
+		return true;
 		
 	}
 	
@@ -65,12 +65,12 @@ abstract class SaveReferences extends Base {
 		
 		if($oTicket !== null) {
 			
-			// Create a record for each reference, so it gets associated with the ticket that was just created/updated.
-			foreach(static::$aNewUIDLs as $sUIDL) {
+			// - Create a record for each reference, so it gets associated with the ticket that was just created/updated.
+			foreach(static::$aNewMessageIds as $sMessageId) {
 				
 				$oLink = MetaModel::NewObject('lnkEmailUidToTicket', [
 					'mailbox_id' => $oMailBox->GetKey(),
-					'message_uid' => $sUIDL,
+					'message_uid' => $sMessageId,
 					'ticket_id' => $oTicket->GetKey()
 				]);
 				
@@ -78,7 +78,7 @@ abstract class SaveReferences extends Base {
 					$oLink->DBInsert();
 				}
 				catch(Exception $e) {
-					static::Trace('.. Message ID "%1$s" is already linked to ticket ID %2$s', $sUIDL, $oTicket->GetKey());
+					static::Trace('.. Message ID "%1$s" is already linked to ticket ID %2$s', $sMessageId, $oTicket->GetKey());
 				}
 				
 			}

@@ -204,9 +204,9 @@ function MailboxRefresh(data) {
 }
 
 function MailboxResetStatus() {
-	var aUIDLs = [];
+	var aInternalIdentifiers = [];
 	$(".mailbox_item:checked").each(function() {
-		aUIDLs.push(this.value);
+		aInternalIdentifiers.push(this.value);
 	});
 					
 	$('#mailbox_content_output').html('<img src="../images/indicator.gif"/>');
@@ -214,16 +214,16 @@ function MailboxResetStatus() {
 	var iStart = $('#mailbox_start_index').val();
 	var iCount = $('#mailbox_count').val();
 					
-	$.post('$sAjaxUrl', {operation: 'mailbox_reset_status', id: $iId, start: iStart, count: iCount, aUIDLs: aUIDLs }, function(data) {
+	$.post('$sAjaxUrl', {operation: 'mailbox_reset_status', id: $iId, start: iStart, count: iCount, aInternalIdentifiers: aInternalIdentifiers }, function(data) {
 		 MailboxRefresh(data);
 	});
 	return false;
 }
 
 function MailboxDeleteMessages() {
-	var aUIDLs = [];
+	var aInternalIdentifiers = [];
 	$(".mailbox_item:checked").each(function() {
-		aUIDLs.push(this.value);
+		aInternalIdentifiers.push(this.value);
 	});
 					
 	$('#mailbox_content_output').html('<img src="../images/indicator.gif"/>');
@@ -231,16 +231,16 @@ function MailboxDeleteMessages() {
 	var iStart = $('#mailbox_start_index').val();
 	var iCount = $('#mailbox_count').val();
 					
-	$.post('$sAjaxUrl', {operation: 'mailbox_delete_messages', id: $iId, start: iStart, count: iCount, aUIDLs: aUIDLs }, function(data) {
+	$.post('$sAjaxUrl', {operation: 'mailbox_delete_messages', id: $iId, start: iStart, count: iCount, aInternalIdentifiers: aInternalIdentifiers }, function(data) {
 		 MailboxRefresh(data);
 	});
 	return false;	
 }
 
 function MailboxIgnoreMessages() {
-	var aUIDLs = [];
+	var aInternalIdentifiers = [];
 	$(".mailbox_item:checked").each(function() {
-		aUIDLs.push(this.value);
+		aInternalIdentifiers.push(this.value);
 	});
 
 	$('#mailbox_content_output').html('<img src="../images/indicator.gif"/>');
@@ -248,7 +248,7 @@ function MailboxIgnoreMessages() {
 	var iStart = $('#mailbox_start_index').val();
 	var iCount = $('#mailbox_count').val();
 
-	$.post('$sAjaxUrl', {operation: 'mailbox_ignore_messages', id: $iId, start: iStart, count: iCount, aUIDLs: aUIDLs }, function(data) {
+	$.post('$sAjaxUrl', {operation: 'mailbox_ignore_messages', id: $iId, start: iStart, count: iCount, aInternalIdentifiers: aInternalIdentifiers }, function(data) {
 		 MailboxRefresh(data);
 	});
 	return false;

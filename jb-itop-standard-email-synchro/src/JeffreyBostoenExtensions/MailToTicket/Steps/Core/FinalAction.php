@@ -38,13 +38,13 @@ abstract class FinalAction extends Base {
 		$iNextAction = eNextAction::PROCESS_MESSAGE;
 		
 		// Delete the source email immediately?
-		if($oMailBox->Get('email_storage') == PolicyBehavior::DELETE->value) {
+		if($oMailBox->Get('email_storage') === PolicyBehavior::DELETE->value) {
 			
 			// Remove the processed message from the mailbox.
 			$iNextAction = eNextAction::DELETE_MESSAGE;
 			
 		}
-		elseif($oMailBox->Get('email_storage') == PolicyBehavior::MOVE->value && $oMailBox->Get('target_folder') != '') {
+		elseif($oMailBox->Get('email_storage') === PolicyBehavior::MOVE->value && $oMailBox->Get('target_folder') != '') {
 			
 			// Move the processed message to another folder.
 			$iNextAction = eNextAction::MOVE_MESSAGE;

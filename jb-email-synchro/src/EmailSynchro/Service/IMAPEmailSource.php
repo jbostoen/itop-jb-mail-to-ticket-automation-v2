@@ -127,14 +127,13 @@ class IMAPEmailSource extends EmailSource {
 		return $iCount;
 	}
 
+	
 	/**
-	 * @inheritDoc
+	 * Gets a message by its UID.
 	 */
-	public function GetMessage(int $index) : ?MessageFromMailbox {
+	public function GetMessage(MessageHandler $oMsgHandler) : ?MessageFromMailbox {
 
-		$iOffsetIndex = 1 + $index;
-
-		IssueLog::Debug(__METHOD__." Start: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
+		IssueLog::Debug(__METHOD__." for $this->sServer", static::LOG_CHANNEL);
 		try {
 
 			/** @var Message $oMessage */
@@ -142,27 +141,26 @@ class IMAPEmailSource extends EmailSource {
 				->messages()
 				->withHeaders()
 				->withBody()
-				->findOrFail($iOffsetIndex, ImapFetchIdentifier::MessageNumber);
+				->findOrFail($oMsgHandler->GetUid(), ImapFetchIdentifier::Uid);
 
 			if(!$oMessage) {
 				return null;
 			}
-			$sUIDL = Helper::UseMessageIdAsUid() ? $oMessage->messageId() : $oMessage->uid();
 
 		} catch(Exception $e) {
 
-			IssueLog::Error(__METHOD__." $iOffsetIndex for $this->sServer throws an exception", static::LOG_CHANNEL, [
+			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
 			]);
 
 			return null;
 		}
-		$oNewMail = new MessageFromMailbox($sUIDL, $oMessage->head(), $oMessage->body());
-		IssueLog::Debug(__METHOD__." End: $iOffsetIndex for $this->sServer", static::LOG_CHANNEL);
+		$oNewMail = new MessageFromMailbox($oMsgHandler->GetInternalIdentifier(), $oMessage->head(), $oMessage->body());
 
 		return $oNewMail;
 	}
+
 
 	/**
 	 * @param MessageHandler $oMsgHandler Message data

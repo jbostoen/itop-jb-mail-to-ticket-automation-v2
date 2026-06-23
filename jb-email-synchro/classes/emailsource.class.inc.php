@@ -25,14 +25,14 @@ use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
  */
 abstract class EmailSource {
 
-	protected $sLastErrorSubject;
-	protected $sLastErrorMessage;
-	protected $sPartsOrder;
-	protected $token;
+	protected string $sLastErrorSubject;
+	protected string $sLastErrorMessage;
+	protected string $sPartsOrder;
+	protected ?string $token;
 	
 	public function __construct() {
 		$this->sPartsOrder = 'text/plain,text/html'; // Default value can be changed via SetPartsOrder
-		$this->token  =null;
+		$this->token = null;
 	}
 	
 	/**
@@ -42,11 +42,11 @@ abstract class EmailSource {
 	abstract public function GetMessagesCount() : int;
 	
 	/**
-	 * Retrieves the message of the given index [0..Count]
-	 * @param int $index The index between zero and count
+	 * Retrieves the message for the given MessageHandler.
+	 * @param MessageHandler $oMsgHandler
 	 * @return null|MessageFromMailbox
 	 */
-	abstract public function GetMessage(int $index) : ?MessageFromMailbox;
+	abstract public function GetMessage(MessageHandler $oMsgHandler) : ?MessageFromMailbox;
 	
 	/**
 	 * Initializes the message when it is being processed.
@@ -141,7 +141,7 @@ abstract class EmailSource {
 	 * Preferred order for retrieving the mail "body" when scanning a multiparts emails
 	 * @param $sPartsOrder string A comma separated list of MIME types e.g. text/plain,text/html
 	 */
-	public function SetPartsOrder($sPartsOrder) : void {
+	public function SetPartsOrder(string $sPartsOrder) : void {
 		$this->sPartsOrder = $sPartsOrder;
 	}
 	/**

@@ -13,6 +13,8 @@ namespace JeffreyBostoenExtensions\MailToTicket\Steps\UnusedExample;
 use JeffreyBostoenExtensions\MailToTicket\Steps\Base;
 use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 
+use RawEmailMessage;
+
 /**
  * Class SaveEmailsToPath.  
  * Saves incoming emails as .EML file to a (hardcoded) directory.
@@ -38,11 +40,12 @@ abstract class SaveEmailsToPath extends Base {
 	 */
 	public static function Execute() : void {
 		
-		/** @var \RawEmailMessage $oEmail */
+		/** @var RawEmailMessage $oEmail */
 		$oRawEmail = ProcessingHelper::GetRawMail();
 		
 		// Add some logic for file name. Mind time zones!
 		$sDateTime = strtotime($oRawEmail->GetHeader('date'));
+		// Better expose this for configuration somewhere.
 		$sFolder = 'C:/temp/'.date('Ymd', $sDateTime);
 		$sMessageId = $oRawEmail->GetMessageId();
 		

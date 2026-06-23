@@ -471,10 +471,10 @@ abstract class ProcessingHelper {
 		$oMsgHandler = static::GetMessageHandler();
 
 		$oInbox->sLastError = null;
-		$oInbox->Trace('Processing new e-mail ( index = %1$s , Message-ID = %2$s , UIDL = %3$s )',
+		$oInbox->Trace('Processing new e-mail ( index = %1$s , Message-ID = %2$s , UID = %3$s )',
 			$oMsgHandler->GetOriginalListingIndex(),
 			$oMsgHandler->GetMessageId(),
-			$oMsgHandler->GetUIDL(),
+			$oMsgHandler->GetUID(),
 		);
 		
 		// - Check whether a new ticket must be initiated or an existing one updated.
@@ -555,7 +555,7 @@ abstract class ProcessingHelper {
 		
 		}
 		
-		if($eNextAction == eNextAction::PROCESS_MESSAGE) {
+		if($eNextAction === eNextAction::PROCESS_MESSAGE) {
 		
 			// - Everything went smoothly, but it's done now.
 				ProcessingHelper::SetNextAction(eNextAction::NO_ACTION);
@@ -839,10 +839,11 @@ abstract class ProcessingHelper {
 			}
 			else {
 
+				$bFound = false;
+				
 				// Check that the specified value is a possible/allowed value.
 				if($oAttDef->IsExternalKey()) {
 
-					$bFound = false;
 					$iIntVal = (int)$value;
 					$bByKey = false;
 					if(is_numeric($value) && ($iIntVal == $value)) {

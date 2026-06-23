@@ -36,7 +36,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	public static $iMaxEmailSize = 0;
 	protected bool $bDebug;
 	private $aMessageTrace = array();
-	private int $iCurrentRequestMessage;
+	private MessageHandler $oCurrentMessageHandler;
 	/**
 	 * @var EmailSource
 	 */
@@ -94,7 +94,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 			if(is_null($oRawEmail)) {
 				$oCurrentSource = $this->oCurrentSource;
 				if(isset($oCurrentSource)) {
-					$oRawEmail = $oCurrentSource->GetMessage($this->iCurrentRequestMessage);
+					$oRawEmail = $oCurrentSource->GetMessage($this->oCurrentMessageHandler);
 				}
 			}
 			
@@ -215,40 +215,41 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 					ProcessingHelper::SetMailBox($oInbox);
 					
-					// Sort; but keep original index number.
+					// - Sort; but keep original index number.
 					uasort($aMessages, function(MessageHandler $a, MessageHandler $b) {
 						return $a->GetTimestamp() <=> $b->GetTimestamp();
 					});
 					
 					
 					// Get the corresponding EmailReplica object for each message
-					$aUIDLs = [];
+					$aInternalIdentifiers = [];
 					
 					// Gets all UIDLs to identify EmailReplicas in iTop.
 					/** @var MessageHandler $oMsgHandler */
 					foreach($aMessages as $oMsgHandler) {
 						
-						$sUIDL = $oMsgHandler->GetUIDL();
+						$sUIDL = $oMsgHandler->GetInternalIdentifier();
 						
-						if(is_null($sUIDL) === true) {
+						if(is_null($sUIDL)) {
 							$iTotalUnreadable++;
 							continue;
 						}
 						
-						$aUIDLs[] = $sUIDL;
+						$aInternalIdentifiers[] = $sUIDL;
 						
 					}
 					
 					$sOQL = '
 						SELECT EmailReplica 
 						WHERE
-							uidl IN (' . implode(',', CMDBSource::Quote($aUIDLs)) . ') 
+							uidl IN (' . implode(',', CMDBSource::Quote($aInternalIdentifiers)) . ') 
 							AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox')).'
 							AND mailbox_id = '.$oInbox->GetKey();
 
 					$this->Trace("Searching EmailReplicas: '$sOQL'");
 					$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 					$aReplicas = [];
+
 					/** @var EmailReplica $oReplica */
 					while($oReplica = $oReplicaSet->Fetch()) {
 						$aReplicas[$oReplica->Get('uidl')] = $oReplica;
@@ -275,11 +276,11 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						
 						try {
 							
-							$this->InitMessageTrace($oSource, $iMessage);
+							$this->InitMessageTrace($oSource, $oMsgHandler);
 							
 							$iTotalMessages++;
 
-							$sUIDL = $oMsgHandler->GetUIDL();
+							$sUIDL = $oMsgHandler->GetInternalIdentifier();
 							if(is_null($sUIDL)) {
 								$this->Trace('Invalid UIDL.');
 								continue; // invalid email, see \EmailSource::GetListing and N°5633
@@ -378,7 +379,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									}
 			
 			
-									$oRawEmail = $oSource->GetMessage($iMessage);
+									$oRawEmail = $oSource->GetMessage($oMsgHandler);
 									
 									// IMAP error occurred?
 									if(is_null($oRawEmail)) {
@@ -648,9 +649,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		
 	}
 	
-	private function InitMessageTrace(EmailSource $oSource, int $iMessage) {
+	private function InitMessageTrace(EmailSource $oSource, MessageHandler $oHandler) {
 		$this->oCurrentSource = $oSource;
-		$this->iCurrentRequestMessage = $iMessage;
+		$this->oCurrentMessageHandler = $oHandler;
 		$this->aMessageTrace = array();
 	}
 

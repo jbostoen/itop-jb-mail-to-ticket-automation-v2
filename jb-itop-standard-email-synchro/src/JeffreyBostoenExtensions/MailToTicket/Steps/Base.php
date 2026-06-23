@@ -3,9 +3,6 @@
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
  * @version     3.2.260521
- * 
- * Additional notes:
- * - Do not alter ticket contents here, such as subject. That's done at a later phase. For this particular case: change EmailMessage's subject.
  */
  
 
@@ -24,8 +21,6 @@ use EmailProcessor;
 use EmailSource;
 use MailInboxStandard;
 use RawEmailMessage;
-
-// iTop classes.
 use Ticket;
 
 
@@ -81,7 +76,7 @@ abstract class Base implements iStep {
 	/**
 	 * @var string $sEmailIndex Index in the e-mail source. Note: name is experimental; use methods instead to set/get
 	 */
-	public static $iEmailIndex = null;
+	public static ?string $iEmailIndex = null;
 	
 	/**
 	 * Execution of what needs to happen in this step. This is an individual method; so it can easily be overridden without doing common things defined in the Init() method.

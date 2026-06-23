@@ -22,24 +22,24 @@
  * A decoded email message
  */
 class EmailMessage {
-	public $sUIDL;
-	public $sMessageId;
-	public $sSubject;
-	public $sCallerEmail;
-	public $sCallerName;
-	public $sRecipient;
-	public $aReferences;
-	public $sBodyText;
-	public $sBodyFormat;
-	public $aAttachments;
-	public $oRelatedObject;
-	public $sDecodeStatus;
-	public $aHeaders;
-	public $sTrace;
-	public $sDate;
-	public $oRawEmail; // raw source email
-	public $aTos;
-	public $aCCs;
+	public string $sUIDL;
+	public string $sMessageId;
+	public string $sSubject;
+	public string $sCallerEmail;
+	public string $sCallerName;
+	public string $sRecipient;
+	public array $aReferences;
+	public string $sBodyText;
+	public string $sBodyFormat;
+	public array $aAttachments;
+	public ?DBObject $oRelatedObject;
+	public string $sDecodeStatus;
+	public array $aHeaders;
+	public string $sTrace;
+	public string $sDate;
+	public ?RawEmailMessage $oRawEmail; // raw source email
+	public array $aTos;
+	public array $aCCs;
 	
 
 	/** @var DOMDocument */
@@ -198,7 +198,7 @@ class EmailMessage {
 	
 	/**
 	 * Function used with preg_replace_callback to replace the anchors/hyperlinks tags <a ...>...</a>
-	 * @param hash $aMatches
+	 * @param array $aMatches
 	 * @return string
 	 */
 	protected function AnchorsReplaceCallback($aMatches) {
@@ -223,7 +223,7 @@ class EmailMessage {
 	
 	/**
 	 * Function used with preg_replace_callback to replace the newlines inside the <pre>...</pre> tags
-	 * @param hash $aMatches
+	 * @param array $aMatches
 	 * @return string
 	 */
 	protected function PregReplaceCallback($aMatches) {
@@ -236,12 +236,14 @@ class EmailMessage {
 	 * (tries to) extract the "new" part of the body in HTML, producing some HTML
 	 * as the output. The filtering is based on a list of tags/classes to remove (overrideable by 'html_tags_to_remove' in the config)
 	 */
-	public function GetNewPartHTML($sBodyText = null) {
+	public function GetNewPartHTML(?string $sBodyText = null) : string {
+
 		if($sBodyText === null) {
 			$sBodyText = $this->sBodyText;
 		}
 		
-		if($sBodyText == '') return ''; // No need for a sophisticated processing, an empty string is an empty string!
+		if($sBodyText === '') return ''; // No need for a sophisticated processing, an empty string is an empty string!
+
 		if(strpos($sBodyText, '<html') === false) {
 			// No enclosing <html></html> tag, let's add it
 			$sBodyText = '<html><body>'.$sBodyText.'</body></html>';
@@ -446,7 +448,7 @@ class EmailMessage {
 		return $sNewText;
 	}
 	
-	protected function IsNewPartLine($sLine, $aDelimiterPatterns) {
+	protected function IsNewPartLine(string $sLine, array $aDelimiterPatterns) {
 		foreach($aDelimiterPatterns as $sPattern => $bStopNow) {
 			if(preg_match($sPattern, $sLine)) return $bStopNow;
 		}

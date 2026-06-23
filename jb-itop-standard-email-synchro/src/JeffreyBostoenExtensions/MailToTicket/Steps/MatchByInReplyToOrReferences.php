@@ -58,7 +58,7 @@ abstract class MatchByInReplyToOrReferences extends Base {
 		$oMailBox = ProcessingHelper::GetMailBox();
 		
 		// Reset before processing each mail.
-		SaveReferences::$aNewUIDLs = [
+		SaveReferences::$aNewMessageIds = [
 			$oRawEmail->GetMessageId()
 		];
 		
@@ -68,7 +68,7 @@ abstract class MatchByInReplyToOrReferences extends Base {
 		
 		// Only if Ticket has not been matched yet.
 		// Just a safety measure.
-		if($sReferences == '' && $sInReplyTo == '') {
+		if($sReferences === '' && $sInReplyTo === '') {
 			
 			static::Trace('.. Empty headers: "References" and "In-Reply-To".');
 			return;
@@ -86,14 +86,6 @@ abstract class MatchByInReplyToOrReferences extends Base {
 		
 		// Just to prevent re-processing of an existing e-mail in this mailbox configuration:
 		$aReferences[] = $oRawEmail->GetMessageId();
-		
-		if(count($aReferences) == 0) {
-			
-			// Should not happen due to first check above.
-			static::Trace('.. No e-mail references found in headers.');
-			return;
-			
-			}
 
 		// In the wild, it was observed that In-Reply-To is sometimes set - but empty, e.g.:
 		// In-Reply-To: <>
@@ -126,7 +118,7 @@ abstract class MatchByInReplyToOrReferences extends Base {
 		
 		// Store the references that were NOT found, as new references;
 		// so they can be saved once the ticket is known.
-		SaveReferences::$aNewUIDLs = array_diff($aReferences, $aKnownReferences);
+		SaveReferences::$aNewMessageIds = array_diff($aReferences, $aKnownReferences);
 
 		if($oTicket === null) {
 			

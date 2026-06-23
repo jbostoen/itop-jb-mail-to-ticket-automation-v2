@@ -105,8 +105,8 @@ function GetMailboxContent($oPage, $oInbox) {
 			});
 			
 			// Get the corresponding EmailReplica object for each message
-			$aUIDLs = array_map(function(MessageHandler $oMsgHandler) {
-				return $oMsgHandler->GetUIDL();
+			$aInternalIdentifiers = array_map(function(MessageHandler $oMsgHandler) {
+				return $oMsgHandler->GetInternalIdentifier();
 			}, $aMessages);
 			
 			
@@ -121,7 +121,7 @@ function GetMailboxContent($oPage, $oInbox) {
 				$sOQL = '
 					SELECT EmailReplica 
 					WHERE 
-						uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') 
+						uidl IN ('.implode(',', CMDBSource::Quote($aInternalIdentifiers)).') 
 						AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox')).' 
 						AND mailbox_id = '.$oInbox->GetKey();
 					
@@ -165,10 +165,12 @@ function GetMailboxContent($oPage, $oInbox) {
 					
 					// Obtain the actual index for the message (take Nth index)
 					$iMessage = $aMessageIndexes[$iCurrentIndex];
-					$oRawEmail = $oSource->GetMessage($iMessage);
 
 					/** @var MessageHandler $oMsgHandler */
 					$oMsgHandler = $aMessages[$iMessage];
+					
+					$oRawEmail = $oSource->GetMessage($oMsgHandler);
+
 					
 					if(is_null($oRawEmail)) {
 						
@@ -181,7 +183,7 @@ function GetMailboxContent($oPage, $oInbox) {
 						$iMsgOkCount =+ 1;
 						$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
 
-						$sUIDL = $oMsgHandler->GetUIDL();
+						$sUIDL = $oMsgHandler->GetInternalIdentifier();
 						$sStatus = Dict::S('MailInbox:Status/New');
 						$sLink = '';
 						$sErrorMsg = '';
@@ -315,9 +317,9 @@ try {
 			// - There could be multiple mailboxes that received the same message (and UIDL).
 			// - There could be a copy of the same message (same UIDL) in a different folder on the same mailbox (different "Mailbox" config in iTop).
 		
-			$aUIDLs = utils::ReadParam('aUIDLs', [], false, 'raw_data');
-			if(count($aUIDLs) > 0) {
-				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_id = '.$oInbox->GetKey(); 
+			$aInternalIdentifiers = utils::ReadParam('aInternalIdentifiers', [], false, 'raw_data');
+			if(count($aInternalIdentifiers) > 0) {
+				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aInternalIdentifiers)).') AND mailbox_id = '.$oInbox->GetKey(); 
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 				$oReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl']]);
 				$aReplicas = [];
@@ -330,12 +332,12 @@ try {
 					$aMessages = $oSource->GetListing();
 				}
 				
-				foreach($aUIDLs as $sUIDL) {
+				foreach($aInternalIdentifiers as $sUIDL) {
 					if($sOperation == 'mailbox_delete_messages') {
 
 						/** @var MessageHandler[] $aMessages */
 						$oMsgHandler = array_filter($aMessages, function(MessageHandler $oMsgHandler) use ($sUIDL) {
-							return $oMsgHandler->GetUIDL() == $sUIDL;
+							return $oMsgHandler->GetInternalIdentifier() === $sUIDL;
 						})[0] ?? null;
 
 						if($oMsgHandler) {
@@ -358,11 +360,11 @@ try {
 
 		case 'mailbox_ignore_messages':
 
-			$aUIDLs = utils::ReadParam('aUIDLs', [], false, 'raw_data');
+			$aInternalIdentifiers = utils::ReadParam('aInternalIdentifiers', [], false, 'raw_data');
 			$aReplicas = [];
 
-			if(count($aUIDLs) > 0) {
-				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aUIDLs)).') AND mailbox_id = '.$oInbox->GetKey(); 
+			if(count($aInternalIdentifiers) > 0) {
+				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aInternalIdentifiers)).') AND mailbox_id = '.$oInbox->GetKey(); 
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 				/** @var DBObject $oReplica */
 				while ($oReplica = $oReplicaSet->Fetch()) {
@@ -372,12 +374,12 @@ try {
 				}
 			}
 
-			if(count($aReplicas) < count($aUIDLs)) {
+			if(count($aReplicas) < count($aInternalIdentifiers)) {
 				// Some "New" messages will be marked as "ignore".
 				// Add them to the database.
 				$oSource = $oInbox->GetEmailSource();
 				$aMessages = $oSource->GetListing();
-				foreach($aUIDLs as $sUIDL) {
+				foreach($aInternalIdentifiers as $sUIDL) {
 					if (isset($aReplicas[$sUIDL])) {
 						// Already processed
 						continue;

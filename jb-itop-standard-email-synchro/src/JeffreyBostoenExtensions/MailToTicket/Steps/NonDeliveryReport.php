@@ -105,7 +105,7 @@ abstract class NonDeliveryReport extends Base {
 								/** @var Person $oPerson Person(s) in iTop with email set to that of the recipient. */
 								while($oPerson = $oSetPerson->Fetch()) {
 									
-									if($sBehavior == PolicyBehavior::DO_NOTHING->value) {
+									if($sBehavior === PolicyBehavior::DO_NOTHING->value) {
 									
 										static::Trace('.. Simulation (Do nothing). Would mark Person::'.$oPerson->GetKey().' as "inactive" based on attribute value.');
 										

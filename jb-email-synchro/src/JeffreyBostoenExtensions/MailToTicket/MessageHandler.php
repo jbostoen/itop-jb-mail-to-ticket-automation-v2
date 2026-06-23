@@ -22,7 +22,7 @@ use Exception;
 class MessageHandler {
 	
 	/**
-	 * @var int $iOriginalListingIndex The **original** index of this message when listing the messages in the folder.
+	 * @var int $iOriginalListingIndex The **original** index (sequence number, starting at 1) of this message when listing the messages in the folder.
 	 */
 	private int $iOriginalListingIndex;
 	
@@ -32,10 +32,9 @@ class MessageHandler {
 	private int $iUid = -1;
 	
 	/**
-	 * @var string $sUidl A UIDL. This terminology comes from the original POP3 implementation.  
-	 * For the IMAP implementation, it still serves as a unique identifier.
+	 * @var string $sInternalIdentifier A (supposedly) unique identifier for e-mails within iTop.
 	 */
-	private string $sUidl;
+	private string $sInternalIdentifier;
 
 	/**
 	 * @var string $sMessageId.
@@ -77,7 +76,10 @@ class MessageHandler {
 
 	/**
 	 * Sets the UID of the message.
-	 *
+	 * 
+	 * The IMAP UID is strictly an unsigned 32-bit integer.  
+	 * Note that this is stored per mailbox folder, and for instance GMail will return a different UID for the same message if it's present in multiple "folders" (dynamic view based on labels).
+	 * 
 	 * @param integer $iUid
 	 * @return void
 	 */
@@ -94,21 +96,21 @@ class MessageHandler {
 	}
 
 	/**
-	 * Sets the UIDL.
+	 * Sets the internal identifier for iTop.
 	 *
-	 * @param string $sUidl
+	 * @param string $sInternalIdentifier
 	 * @return void
 	 */
-	public function SetUIDL(string $sUidl) : void {
-		$this->sUidl = $sUidl;
+	public function SetInternalIdentifier(string $sInternalIdentifier) : void {
+		$this->sInternalIdentifier = $sInternalIdentifier;
 	}
 
 	/**
-	 * Returns the UIDL.
+	 * Returns the internal identifier for iTop.
 	 * @return string
 	 */
-	public function GetUIDL() : string {
-		return $this->sUidl;
+	public function GetInternalIdentifier() : string {
+		return $this->sInternalIdentifier;
 	}
 
 	/**
@@ -218,9 +220,9 @@ class MessageHandler {
 			$oDate = $oMessage->date();
 			$oHandler->SetTimestamp($oDate->timestamp);
 
-		// - UIDL.
-			$sUidl = Helper::UseMessageIdAsUid() ? $oMessage->messageId() : $oMessage->uid();
-			$oHandler->SetUidl($sUidl);
+		// - Internal identifier.
+			$sInternalIdentifier = Helper::UseMessageIdAsUid() ? $oMessage->messageId() : $oMessage->uid();
+			$oHandler->SetInternalIdentifier($sInternalIdentifier);
 
 		return $oHandler;
 
