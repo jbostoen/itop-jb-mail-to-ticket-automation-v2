@@ -431,13 +431,16 @@ abstract class ProcessingHelper {
 			}
 			else {
 
-				// The corresponding ticket was deleted (or never created!), delete the email (and the replica)
+				// - The corresponding ticket was deleted (or never created!), 
+				//   delete the email (and the replica).
 				$sReplicaStatus = $oEmailReplica->Get('status');
 
-				if(in_array($sReplicaStatus, ['ok', 'undesired']) == true) {
+				if(in_array($sReplicaStatus, ['ok', 'undesired'])) {
 
-					$oInbox->Trace('EmailReplica is not new. No ticket found. Status: "%1$s". Delete message.', $sReplicaStatus);
-					static::SetNextAction(eNextAction::DELETE_MESSAGE);
+					// - An EmailReplica might still be present even if it's related ticket has been deleted.
+					//   This EmailReplica may contain a reference to the UID of the message.
+					$oInbox->Trace('EmailReplica is not new. No ticket found. Status: "%1$s". Delete message. It is labeled as OK or undesired; which means it was processed before.', $sReplicaStatus);
+					static::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
 					
 				}
 				else {
@@ -470,7 +473,6 @@ abstract class ProcessingHelper {
 
 		$oMsgHandler = static::GetMessageHandler();
 
-		$oInbox->sLastError = null;
 		$oInbox->Trace('Processing new e-mail ( index = %1$s , Message-ID = %2$s , UID = %3$s )',
 			$oMsgHandler->GetOriginalListingIndex(),
 			$oMsgHandler->GetMessageId(),

@@ -10,9 +10,6 @@ namespace JeffreyBostoenExtensions\MailToTicket\Steps\Core\EntryProcessor;
 use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 use JeffreyBostoenExtensions\MailToTicket\Steps\Core\CreateOrUpdateTicket;
 
-// iTop.
-use utils;
-
 /**
  * Class DefaultHTML.  
  * An abstract class that implements the iEntryProcessor interface. All entry processors should extend this class.  
@@ -30,7 +27,24 @@ class DefaultHTML extends Base {
     public static function IsApplicable() : bool {
 
         // This default processor will disable itself if there are other entry processors available.
-        return count(Base::GetEntryProcessors()) === 2 && (ProcessingHelper::GetMail()->sBodyFormat === 'text/html');
+        
+            foreach(Base::GetEntryProcessors() as $oProcessor) {
+
+                // - Especially avoid self (recursion).
+
+                    if(in_array($oProcessor::class, [DefaultHTML::class, DefaultText::class])) {
+                        continue;
+                    }
+
+                if($oProcessor::IsApplicable()) {
+
+                    return false;
+
+                }
+
+            }
+
+            return ProcessingHelper::GetMail()->sBodyFormat === 'text/html';
 
     }
 

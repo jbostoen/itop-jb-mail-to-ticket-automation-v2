@@ -134,6 +134,13 @@ function GetMailboxContent($oPage, $oInbox) {
 					'error_message'
 				]]);
 				$iProcessedCount = $oReplicaSet->Count();
+
+				/** @var array $aProcessed Array containing items with the following properties:
+				 * - status
+				 * - ticket ID
+				 * - error_message
+				 * - id (of the EmailReplica)
+				 */
 				$aProcessed = [];
 				
 				while($oReplica = $oReplicaSet->Fetch()) {
@@ -152,9 +159,12 @@ function GetMailboxContent($oPage, $oInbox) {
 					'date' => ['label' => Dict::S('MailInbox:Date'), 'description' => ''],
 					'from' => ['label' => Dict::S('MailInbox:From'), 'description' => ''],
 					'subject' => ['label' => Dict::S('MailInbox:Subject'), 'description' => ''],
-					'ticket' => ['label' =>  Dict::S('MailInbox:RelatedTicket'), 'description' => ''],
-					'error' => ['label' =>  Dict::S('MailInbox:ErrorMessage'), 'description' => ''],
-					'details' => ['label' =>  Dict::S('MailInbox:MessageDetails'), 'description' => ''],
+					'ticket' => ['label' => Dict::S('MailInbox:RelatedTicket'), 'description' => ''],
+					'error' => ['label' => Dict::S('MailInbox:ErrorMessage'), 'description' => ''],
+					'details' => ['label' => Dict::S('MailInbox:MessageDetails'), 'description' => ''],
+					'uid' => ['label' => Dict::S('MailInbox:UID'), 'description' => ''],
+					'internalId' => ['label' => Dict::S('MailInbox:InternalId'), 'description' => ''],
+					'replicaLink' => ['label' => Dict::S('MailInbox:ReplicaLink'), 'description' => ''],
 				];
 
 				$aData = [];
@@ -168,7 +178,7 @@ function GetMailboxContent($oPage, $oInbox) {
 
 					/** @var MessageHandler $oMsgHandler */
 					$oMsgHandler = $aMessages[$iMessage];
-					
+
 					$oRawEmail = $oSource->GetMessage($oMsgHandler);
 
 					
@@ -188,6 +198,7 @@ function GetMailboxContent($oPage, $oInbox) {
 						$sLink = '';
 						$sErrorMsg = '';
 						$sDetailsLink = '';
+						$sReplicaLink = '';
 						if(array_key_exists($sUIDL, $aProcessed)) {
 							
 							switch($aProcessed[$sUIDL]['status']) {
@@ -214,6 +225,12 @@ function GetMailboxContent($oPage, $oInbox) {
 							$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDL];
 							$sDetailsURL = utils::GetAbsoluteUrlModulePage(basename(dirname(__FILE__)), 'details.php', $aArgs);
 							$sDetailsLink = '<a href="'.$sDetailsURL.'">'.Dict::S('MailInbox:MessageDetails').'</a>';
+
+							$sReplicaLink = sprintf('<a href="%1$s">%2$s</a>',
+								ApplicationContext::MakeObjectUrl(EmailReplica::class, $aProcessed[$sUIDL]['id']),
+								$aProcessed[$sUIDL]['id']
+							);
+
 						}
 						$aData[] = [
 							'checkbox' => '<input type="checkbox" class="mailbox_item" value="'.htmlentities($sUIDL, ENT_QUOTES, 'UTF-8').'"/>',
@@ -224,6 +241,9 @@ function GetMailboxContent($oPage, $oInbox) {
 							'ticket' => $sLink,
 							'error' => $sErrorMsg,
 							'details' => $sDetailsLink,
+							'uid' => $oMsgHandler->GetUid(),
+							'internalId' => $oMsgHandler->GetInternalIdentifier(),
+							'replicaLink' => $sReplicaLink,
 						];
 						
 					}
@@ -252,7 +272,20 @@ function GetMailboxContent($oPage, $oInbox) {
 				/** @var array $aTableConfig Associative array with config for the table. */
 				/** @var array $aData Associative array with data for the table. */
 				$oPage->table($aTableConfig, $aData);
-				$oPage->add('<div><img alt="" src="../images/tv-item-last.gif" style="vertical-align:bottom;margin-left:10px;"/>&nbsp;'.Dict::S('MailInbox:WithSelectedDo').'&nbsp;&nbsp<button class="mailbox_button ibo-button ibo-is-regular ibo-is-neutral" id="mailbox_reset_status">'.Dict::S('MailInbox:ResetStatus').'</button>&nbsp;&nbsp;<button class="mailbox_button ibo-button ibo-is-regular ibo-is-danger" id="mailbox_delete_messages">'.Dict::S('MailInbox:DeleteMessage').'</button>&nbsp;&nbsp;<button class="mailbox_button ibo-button ibo-is-regular ibo-is-neutral" id="mailbox_ignore_messages">'.Dict::S('MailInbox:IgnoreMessage').'</button></div>');
+
+				$sLblWithSelected = Dict::S('MailInbox:WithSelectedDo');
+				$sLblReset = Dict::S('MailInbox:ResetStatus');
+				$sLblIgnore = Dict::S('MailInbox:IgnoreMessage');
+				$sLblDelete = Dict::S('MailInbox:DeleteMessage');
+
+				$oPage->add(<<<HTML
+					<div>
+						<img alt="" src="../images/tv-item-last.gif" style="vertical-align:bottom;margin-left:10px;"/>&nbsp;{$sLblWithSelected}&nbsp;&nbsp;
+						<button class="mailbox_button ibo-button ibo-is-regular ibo-is-neutral" id="mailbox_reset_status">{$sLblReset}</button>&nbsp;&nbsp;
+						<button class="mailbox_button ibo-button ibo-is-regular ibo-is-neutral" id="mailbox_ignore_messages">{$sLblIgnore}</button>&nbsp;&nbsp;
+						<button class="mailbox_button ibo-button ibo-is-regular ibo-is-danger" id="mailbox_delete_messages">{$sLblDelete}</button>
+					</div>
+				HTML);
 			
 			} 
 			else {
@@ -326,14 +359,14 @@ try {
 				while($oReplica = $oReplicaSet->Fetch()) {
 					$aReplicas[$oReplica->Get('uidl')] = $oReplica;
 				}
-				if($sOperation == 'mailbox_delete_messages') {
+				if($sOperation === 'mailbox_delete_messages') {
 					// Delete the actual email from the mailbox.
 					$oSource = $oInbox->GetEmailSource();
 					$aMessages = $oSource->GetListing();
 				}
 				
 				foreach($aInternalIdentifiers as $sUIDL) {
-					if($sOperation == 'mailbox_delete_messages') {
+					if($sOperation === 'mailbox_delete_messages') {
 
 						/** @var MessageHandler[] $aMessages */
 						$oMsgHandler = array_filter($aMessages, function(MessageHandler $oMsgHandler) use ($sUIDL) {
@@ -350,7 +383,7 @@ try {
 						$aReplicas[$sUIDL]->DBDelete();
 					}
 				}
-				if ($sOperation == 'mailbox_delete_messages') {
+				if ($sOperation === 'mailbox_delete_messages') {
 					/** @var EmailSource $oSource */
 					$oSource->Disconnect();
 				}

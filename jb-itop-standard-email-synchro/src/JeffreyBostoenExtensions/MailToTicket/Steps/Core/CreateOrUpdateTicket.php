@@ -83,6 +83,9 @@ abstract class CreateOrUpdateTicket extends Base {
 	 * - Value: Attachment or InlineImage object.
 	 */
 	public static array $aAddedAttachments = [];
+
+	/** @var string $sCaseLogEntry The case log entry that has been added (during execution). */
+	private static string $sCaseLogEntry = '';
 	
 	/**
 	 * @inheritDoc
@@ -91,6 +94,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		// Reset before processing each mail.
 		static::$aAddedAttachments = [];
+		static::$sCaseLogEntry = '';
 		
 		$oMailBox = ProcessingHelper::GetMailBox();
 		$oTicket = ProcessingHelper::GetTicket();
@@ -99,15 +103,14 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		try {
 				
-			switch($sBehavior)
-			{
+			switch($sBehavior) {
 				case 'create_only':
 					static::CreateTicketFromEmail();
 					break;
 				
 				case 'update_only':
 				
-					if(is_object($oTicket) == false) {
+					if(!is_object($oTicket)) {
 						// No ticket associated with the incoming email, nothing to update, reject the email
 						ProcessingHelper::HandleError('nothing_to_update');
 					}
@@ -127,28 +130,26 @@ abstract class CreateOrUpdateTicket extends Base {
 						// Update the ticket with the incoming email
 						static::UpdateTicketFromEmail();
 					}
-					break;			
+					break;	
+
 			}
+
+			// - No error occurred. Revert to default (continue processing).
+
+				ProcessingHelper::SetNextAction(eNextAction::PROCESS_MESSAGE);
 			
 		}
 		catch(Exception $e) {
 		
-			switch($e->getMessage()) {
-				// Match descriptions in CreateTicketFromEmail(), UpdateTicketFromEmail()
-				case 'Ticket creation failed':
-				case 'Ticket update failed':
+			$oMailBox->sLastError = $e->getMessage();
+
+			static::Trace($e->getMessage());
 					
-					// Stop further processing (will delete or mark as error, based on user's settings)
-					return;
-					
-			}
+			// - Stop further processing (will delete or mark as error, based on user's settings)
+				return;
+			
 			
 		}
-		
-		
-		// No error occurred. Revert to default (continue processing).
-		$oMailBox = ProcessingHelper::GetMailBox();
-		ProcessingHelper::SetNextAction(eNextAction::PROCESS_MESSAGE);
 		
 		
 	}
@@ -365,10 +366,8 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		$sCaseLogEntry = static::BuildCaseLogEntry();
 		
-		if($oEmail->sTrace === '') {
-			static::Trace('No email trace available.');
-		}
-		else {
+		// - Note: The trace is mainly set in GetNewPart().
+		if($oEmail->sTrace !== '') {
 			static::Trace('Email trace: %1$s', $oEmail->sTrace);
 		}
 		
@@ -438,7 +437,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		catch(Exception $e) {
 			static::Trace("Ticket {$oTicket->GetName()} might not be properly updated or something else went wrong (for instance: notifications).");
 			static::Trace($e->getMessage()); // Add actual error message (if available)
-			throw new Exception('Ticket update failed');
+			throw new Exception('Unable to update ticket.');
 		}
 		
 		static::AfterUpdateTicket();
@@ -807,6 +806,8 @@ abstract class CreateOrUpdateTicket extends Base {
 	
 	/**
 	 * Build the text/html to be inserted in the case log when the ticket is updated.
+	 * 
+	 * Note: extensions should NOT call this method. Instead, they should use GetCaselogEntry() and only *after* this step.
 	 *
 	 * @return string The HTML text to be inserted in the case log
 	 */
@@ -827,10 +828,27 @@ abstract class CreateOrUpdateTicket extends Base {
 				
 			}
 
+		// - Expose for other extensions.
+
+			static::$sCaseLogEntry = $sEntry;
+
 
 		return $sEntry;
 		
 	}
+
+	/**
+	 * Returns the case log entry.
+	 *
+	 * @return string
+	 */
+	public static function GetCaseLogEntry() : string {
+
+		return static::$sCaseLogEntry;
+
+	}
+
+
 	 
 	/**
 	 * This method will create or find Attachment and InlineImage objects.  

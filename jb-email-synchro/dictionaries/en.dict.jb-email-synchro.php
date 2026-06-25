@@ -71,6 +71,9 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:Status/Error' => 'Error',
     'MailInbox:Status/Undesired' => 'Undesired',
 	'MailInbox:Status/Ignored' => 'Ignored',
+	'MailInbox:ReplicaLink' => 'Replica',
+	'MailInbox:InternalId' => 'Internal ID',
+	'MailInbox:UID' => 'UID',
 		
 	'MailInbox:Login/ServerMustBeUnique' => 'The combination Login (%1$s) and Server (%2$s) is already configured for another Mail Inbox.',
 	'MailInbox:Login/Server/MailboxMustBeUnique' => 'The combination Login (%1$s), Server (%2$s) and Mailbox (%3$s) is already configured for another Mail Inbox',

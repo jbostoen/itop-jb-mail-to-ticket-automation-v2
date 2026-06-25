@@ -64,7 +64,6 @@ abstract class Base implements iBase {
      */
     private static float $fRank = 1;
 
-
     /**
      * @inheritDoc
      */
