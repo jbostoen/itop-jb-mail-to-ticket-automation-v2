@@ -5,7 +5,7 @@ use Combodo\iTop\Core\Authentication\Client\OAuth\OAuthClientProviderFactory;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use MetaModel;
 
-class ProviderHelper{
+class ProviderHelper {
 
 
 	public static function GetProviderForIMAP($oMailbox) {

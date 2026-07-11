@@ -471,10 +471,8 @@ class RawEmailMessage {
 				if(count($aSubPart['headers']) > 0) {
 					$aParsedParts['parts'][] = $this->ExtractParts($aSubPart['headers'], $aSubPart['body']);
 				}
-				else {
-					if (count($aHeaders) > 0) {
-						$aParsedParts['parts'][] = $this->ExtractParts($aHeaders, $aSubPart['body']);
-					}
+				elseif(count($aHeaders) > 0) {
+					$aParsedParts['parts'][] = $this->ExtractParts($aHeaders, $aSubPart['body']);
 				}
 			}
 		}

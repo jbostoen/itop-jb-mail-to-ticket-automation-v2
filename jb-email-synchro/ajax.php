@@ -162,9 +162,9 @@ function GetMailboxContent($oPage, $oInbox) {
 					'ticket' => ['label' => Dict::S('MailInbox:RelatedTicket'), 'description' => ''],
 					'error' => ['label' => Dict::S('MailInbox:ErrorMessage'), 'description' => ''],
 					'details' => ['label' => Dict::S('MailInbox:MessageDetails'), 'description' => ''],
+					'replicaLink' => ['label' => Dict::S('MailInbox:ReplicaLink'), 'description' => ''],
 					'uid' => ['label' => Dict::S('MailInbox:UID'), 'description' => ''],
 					'internalId' => ['label' => Dict::S('MailInbox:InternalId'), 'description' => ''],
-					'replicaLink' => ['label' => Dict::S('MailInbox:ReplicaLink'), 'description' => ''],
 				];
 
 				$aData = [];

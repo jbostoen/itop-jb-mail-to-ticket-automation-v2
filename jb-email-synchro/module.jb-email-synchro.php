@@ -5,7 +5,7 @@
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'jb-email-synchro/3.2.260521',
+	'jb-email-synchro/3.2.260711',
 	array(
 		// Identification
 		'label' => 'Mail to Ticket Automation (core)',
@@ -108,11 +108,11 @@ if (!class_exists('EmailSynchroInstaller')) {
 		/**
 		 * Handler called before the creation/update of the database schema
 		 *
-		 * @param \Config $oConfiguration The new configuration of the application
-		 * @param \String $sPreviousVersion Previous version number of the module (empty string in case of first install)
-		 * @param \String $sCurrentVersion Current version number of the module
+		 * @param Config $oConfiguration The new configuration of the application
+		 * @param string $sPreviousVersion Previous version number of the module (empty string in case of first install)
+		 * @param string $sCurrentVersion Current version number of the module
 		 *
-		 * @returns \Config
+		 * @returns Config
 		 */
 		public static function BeforeWritingConfig(Config $oConfiguration) {
 			
