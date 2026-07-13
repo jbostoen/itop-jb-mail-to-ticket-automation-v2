@@ -334,11 +334,14 @@ abstract class CreateOrUpdateTicket extends Base {
 		if(!is_a($oTicket, $sTargetClass)) {
 			
 			$sClass = get_class($oTicket);
-			static::Trace('Error: the incoming email refers to the ticket "%1$s" of class "%2$s", but this mailbox is configured to process only tickets of class "%3$s"',
+			$sError = 'Error: the incoming email refers to the ticket "%1$s" of class "%2$s", but this mailbox is configured to process only tickets of class "%3$s"';
+			static::Trace($sError,
 				$oTicket->GetName(),
 				$sClass,
 				$sTargetClass
 			);
+			$oMailBox->sLastError = $sError;
+			$oMailBox->Trace($sError);
 			ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
 			return;
 			

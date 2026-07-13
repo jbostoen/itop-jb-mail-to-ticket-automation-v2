@@ -260,8 +260,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:do_nothing' => 'Do nothing',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:inactive' => 'Inactive',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:mark_as_undesired' => 'Mark as undesired',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior_subject' => 'Bounce subject',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior_notification' => 'Bounce message', 
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_subject' => 'Bounce subject',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_notification' => 'Bounce message', 
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns' => 'Patterns',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Any e-mail where the sender\'s e-mail address matches one of the defined regex patterns (one per line), will be considered a violation. Ignore patterns in subject.',
 
