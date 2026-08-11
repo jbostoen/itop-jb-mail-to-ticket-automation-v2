@@ -59,7 +59,7 @@ class DefaultText extends Base {
         $sCaseLogEntry = $oEmail->GetNewPart($sEntry, $oEmail->sBodyFormat); // GetNewPart always returns a plain text version of the message.
         $sCaseLogEntry = utils::TextToHtml($sCaseLogEntry);
 
-        return $sEntry;
+        return $sCaseLogEntry;
 
     }
 
