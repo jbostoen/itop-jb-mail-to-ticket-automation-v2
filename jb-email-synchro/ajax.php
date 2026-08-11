@@ -190,7 +190,7 @@ function GetMailboxContent($oPage, $oInbox) {
 					}
 					else {
 						
-						$iMsgOkCount =+ 1;
+						$iMsgOkCount += 1;
 						$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
 
 						$sUIDL = $oMsgHandler->GetInternalIdentifier();
