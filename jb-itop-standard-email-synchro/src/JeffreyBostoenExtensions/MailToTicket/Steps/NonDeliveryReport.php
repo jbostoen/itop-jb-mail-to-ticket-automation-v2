@@ -52,9 +52,12 @@ abstract class NonDeliveryReport extends Base {
 				$sContent = $aAttachment['content'];
 				
 				// Status code: https://www.rfc-editor.org/rfc/rfc3463
-				preg_match('/Status: ([\d]{1,})\.([\d]{1,})\.([\d]{1,})/', $sContent, $aStatus);
+				if(preg_match('/Status: ([\d]{1,})\.([\d]{1,})\.([\d]{1,})/', $sContent, $aStatus) !== 1) {
+					// No (recognizable) status code in this delivery-status part; nothing more to do with it.
+					continue;
+				}
 				$sCode = $aStatus[1].'.'.$aStatus[2].'.'.$aStatus[3];
-			
+
 				// Check if this is a permanent failure.
 				if($aStatus[1] == '5') {
 					
@@ -82,44 +85,51 @@ abstract class NonDeliveryReport extends Base {
  
 						// Mark as inactive?
 						if($bMarkAsInactive == true) {
-						
+
 							// Build a list of e-mail addresses of recipients to whom delivery failed.
-							preg_match('/Final-recipient: RFC822; (.*?@.*)/', $sContent, $aRecipient);
-							$sRecipient = $aRecipient[1];
-							
-							static::Trace('.. Recipient: '.$sRecipient);
-							
-							// Lookup if there is a person whose e-mail is in the list.
-							
-								// email field of Person object
-								$oSetPerson = new DBObjectSet(DBObjectSearch::FromOQL('SELECT Person WHERE email LIKE :email'), [], [
-									'email' => $sRecipient
-								]);
-								
-								if($oSetPerson->Count() == 0) {
-									
-									static::Trace('.. No Person found.');
-									
-								}
-								
-								/** @var Person $oPerson Person(s) in iTop with email set to that of the recipient. */
-								while($oPerson = $oSetPerson->Fetch()) {
-									
-									if($sBehavior === PolicyBehavior::DO_NOTHING->value) {
-									
-										static::Trace('.. Simulation (Do nothing). Would mark Person::'.$oPerson->GetKey().' as "inactive" based on attribute value.');
-										
+							// Note: field name is matched case-insensitively; RFC 3464 examples capitalize it as "Final-Recipient".
+							if(preg_match('/Final-Recipient: RFC822; (.*?@.*)/i', $sContent, $aRecipient) === 1) {
+
+								$sRecipient = $aRecipient[1];
+
+								static::Trace('.. Recipient: '.$sRecipient);
+
+								// Lookup if there is a person whose e-mail is in the list.
+
+									// email field of Person object
+									$oSetPerson = new DBObjectSet(DBObjectSearch::FromOQL('SELECT Person WHERE email LIKE :email'), [], [
+										'email' => $sRecipient
+									]);
+
+									if($oSetPerson->Count() == 0) {
+
+										static::Trace('.. No Person found.');
+
 									}
-									else {
-											
-										static::Trace('.. Marking Person::'.$oPerson->GetKey().' as "inactive" based on attribute value.');
-										$oPerson->Set('status', 'inactive');
-										$oPerson->DBUpdate();
-										
+
+									/** @var Person $oPerson Person(s) in iTop with email set to that of the recipient. */
+									while($oPerson = $oSetPerson->Fetch()) {
+
+										if($sBehavior === PolicyBehavior::DO_NOTHING->value) {
+
+											static::Trace('.. Simulation (Do nothing). Would mark Person::'.$oPerson->GetKey().' as "inactive" based on attribute value.');
+
+										}
+										else {
+
+											static::Trace('.. Marking Person::'.$oPerson->GetKey().' as "inactive" based on attribute value.');
+											$oPerson->Set('status', 'inactive');
+											$oPerson->DBUpdate();
+
+										}
+
 									}
-									
-								}
-								
+
+							}
+							else {
+								static::Trace('.. Could not determine the "Final-Recipient" from the Non-Delivery Report.');
+							}
+
 						}
 								
 						// Handle behavior.
