@@ -163,7 +163,7 @@ class EmailMessage {
 		
 		// Completely remove the <style>...</style> tags, including their contents
 		$sStyleExpr = '|<style>(.*)</style>|iUs';
-		$sBodyText = preg_replace($sStyleExpr, '', $sText);
+		$sBodyText = preg_replace($sStyleExpr, '', $sBodyText);
 		
 		// Preserve hyperlinks <pre>...</pre> tags
 		$sBodyText = preg_replace_callback('|<a([^>]*)>(.*)</a>|isU', array($this, 'AnchorsReplaceCallback'), $sBodyText);
