@@ -201,8 +201,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					catch (Exception $e) {
 						$this->LogProcessException($e, $oSource);
 						$oSource->Disconnect();
+						continue;
 					}
-					
+
 					$iMsgCount = count($aMessages);
 
 					if($iMsgCount == 0) {
