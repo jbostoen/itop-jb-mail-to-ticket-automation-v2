@@ -615,7 +615,7 @@ abstract class ProcessingHelper {
 			
 			if(trim($sPatterns) != '') {
 				
-				$aPatterns = explode('/\\r\\n|\\r|\\n/', $sPatterns);
+				$aPatterns = preg_split('/\r\n|\r|\n/', $sPatterns);
 				
 				$oInbox->Trace("Ignoring patterns: {$sPatterns}");
 				
