@@ -12,6 +12,9 @@ use JeffreyBostoenExtensions\MailToTicket\{
 	ProcessingHelper
 };
 
+// Generic.
+use Exception;
+
 
 
 /**
@@ -52,13 +55,19 @@ abstract class TicketResolved extends Base {
 						static::HandleViolation();
 						break;
 						 
-					case 'fallback_reopen': 
-					
+					case 'fallback_reopen':
+
 						// Reopen ticket
 						static::Trace("Fallback: reopen resolved ticket.");
-						
-						$bRet = $oTicket->ApplyStimulus('ev_reopen');
-						
+
+						$bRet = false;
+						try {
+							$bRet = $oTicket->ApplyStimulus('ev_reopen');
+						}
+						catch(Exception $e) {
+							static::Trace('Unable to apply stimulus "ev_reopen": '.$e->getMessage());
+						}
+
 						if($bRet == false) {
 							static::Trace('... Stimulus ev_reopen is not possible for this ticket. Hint: the stimulus may not be defined or not allowed in the current ticket state: '.$oTicket->GetState());
 						}

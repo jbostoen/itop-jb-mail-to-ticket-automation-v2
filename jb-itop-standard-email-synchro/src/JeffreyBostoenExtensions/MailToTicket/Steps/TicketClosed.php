@@ -55,16 +55,17 @@ abstract class TicketClosed extends Base {
 
 						break; // Defensive programming
 						 
-					case 'fallback_reopen': 
+					case 'fallback_reopen':
 						// Reopen ticket
 						static::Trace('Fallback: reopen closed ticket.');
+						$bRet = false;
 						try {
 							$bRet = $oTicket->ApplyStimulus('ev_reopen');
 						}
 						catch(Exception $e) {
-							static::Trace('Unable to apply stimulus "ev_reopen".');
+							static::Trace('Unable to apply stimulus "ev_reopen": '.$e->getMessage());
 						}
-						
+
 						if($bRet == false) {
 							static::Trace('Stimulus ev_reopen is not possible for this ticket. Hint: the stimulus may not be defined or not allowed in the current ticket state: %1$s', $oTicket->GetState());
 						}
