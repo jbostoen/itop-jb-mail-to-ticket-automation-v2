@@ -110,7 +110,7 @@ abstract class Base implements iBase {
 				// - Sort the list.
 
 					usort(static::$aCachedEntryProcessors, function(Base $a, Base $b) {
-						return $b->GetRank() <=> $a->GetRank();
+						return $a->GetRank() <=> $b->GetRank();
 					});
 
 			}
