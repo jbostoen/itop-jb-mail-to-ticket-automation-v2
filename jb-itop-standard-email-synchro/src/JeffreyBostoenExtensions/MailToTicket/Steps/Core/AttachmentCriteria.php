@@ -66,7 +66,7 @@ abstract class AttachmentCriteria extends Base {
 			$bDoCheckIfImageDimensionTooLarge = true;
 			
 			// Remove images which are too small.
-			if($iMinWidth < 1 || $iMinWidth < 1) {
+			if($iMinWidth < 1 || $iMinHeight < 1) {
 				static::Trace('Min dimensions can not be negative and should be at least 1x1 px.');
 				$bDoCheckIfImageDimensionTooSmall = false;
 			}
