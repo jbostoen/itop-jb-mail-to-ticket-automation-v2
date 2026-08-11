@@ -495,7 +495,7 @@ abstract class CreateOrUpdateTicket extends Base {
 			$sTicketDescription = static::ManageInlineImages($oEmail->sBodyText, $bForPlainText);
 			if($bForPlainText) {
 				static::Trace("Converting HTML to text using utils::HtmlToText...");
-				$sTicketDescription = utils::HtmlToText($oEmail->sBodyText);
+				$sTicketDescription = utils::HtmlToText($sTicketDescription);
 			}
 
 		}
