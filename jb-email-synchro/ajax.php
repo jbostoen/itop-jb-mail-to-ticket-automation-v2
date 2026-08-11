@@ -369,9 +369,9 @@ try {
 					if($sOperation === 'mailbox_delete_messages') {
 
 						/** @var MessageHandler[] $aMessages */
-						$oMsgHandler = array_filter($aMessages, function(MessageHandler $oMsgHandler) use ($sUIDL) {
+						$oMsgHandler = array_values(array_filter($aMessages, function(MessageHandler $oMsgHandler) use ($sUIDL) {
 							return $oMsgHandler->GetInternalIdentifier() === $sUIDL;
-						})[0] ?? null;
+						}))[0] ?? null;
 
 						if($oMsgHandler) {
 							// Delete the actual email from the mailbox.
