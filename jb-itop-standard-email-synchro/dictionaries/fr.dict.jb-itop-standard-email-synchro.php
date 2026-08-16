@@ -55,6 +55,11 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:target_folder' => 'Target folder',
 	'Class:MailInboxStandard/Attribute:target_folder+' => 'Use to move an email with the IMAP protocol',
 
+	'Class:MailInboxStandard/Attribute:attcode_description' => 'Attribut de description',
+	'Class:MailInboxStandard/Attribute:attcode_description+' => 'Code de l\'attribut de la classe cible qui doit recevoir la description initiale du ticket. Par défaut : "description" si laissé vide.',
+	'Class:MailInboxStandard/Attribute:attcode_caselog' => 'Attribut du journal (case log)',
+	'Class:MailInboxStandard/Attribute:attcode_caselog+' => 'Code de l\'attribut de la classe cible (journal des échanges) qui doit recevoir les nouvelles entrées lors de la création et/ou de la mise à jour du ticket. Par défaut : "public_log" si laissé vide ou invalide.',
+
 	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Valeurs par défaut du Ticket',
 	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Titre par défaut (en cas de sujet vide)',
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Expression régulière à rechercher dans l\'objet de l\'eMail',
@@ -253,6 +258,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 
 	// Messages de validation
 	'MailInbox:Error:TargetFolderRequired' => 'Le dossier cible doit être renseigné pour une boîte mail active.',
+	'MailInbox:Error:CaseLogAttCodeRequired' => 'Le code de l\'attribut du journal des échanges (case log) doit être un attribut valide de la classe cible \'%1$s\'.',
+	'MailInbox:Error:DescriptionOrCaseLogAttCodeRequired' => 'Le code de l\'attribut de la description ou celui du journal des échanges (case log) doit être un attribut valide de la classe cible \'%1$s\'.',
 
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Pièce jointe - criteria',

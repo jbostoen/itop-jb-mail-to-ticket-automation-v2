@@ -227,7 +227,11 @@ abstract class CreateOrUpdateTicket extends Base {
 		static::AddAttachments(true);
 		
 		// Seems to be for backward compatibility / plain text.
-		$oTicketDescriptionAttDef = MetaModel::GetAttributeDef($sTargetClass, 'description');
+		$sDescriptionAttCode = trim($oMailBox->Get('attcode_description'));
+		if($sDescriptionAttCode === '' || !MetaModel::IsValidAttCode($sTargetClass, $sDescriptionAttCode)) {
+			$sDescriptionAttCode = 'description';
+		}
+		$oTicketDescriptionAttDef = MetaModel::GetAttributeDef($sTargetClass, $sDescriptionAttCode);
 		$bForPlainText = true; // Target format is plain text (by default)
 		if ($oTicketDescriptionAttDef instanceof AttributeHTML) {
 			// Target format is HTML
@@ -260,8 +264,11 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 
 		// Keep some room just in case... (in case of what?)
-		$oTicket->Set('description', static::FitTextIn($sTicketDescription, $iDescriptionMaxSize));
-		
+		$oTicket->Set($sDescriptionAttCode, static::FitTextIn($sTicketDescription, $iDescriptionMaxSize));
+
+		// Harmonize with UpdateTicketFromEmail(): also add the original message as a first case log entry.
+		static::AddInitialCaseLogEntry($oTicket, $oCaller);
+
 		// Default values.
 		$sDefaultValues = $oMailBox->Get('ticket_default_values');
 		$aDefaults = preg_split(static::NEWLINE_REGEX, $sDefaultValues);
@@ -390,16 +397,8 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 					
 		// Determine which field to update
-		$sAttCode = 'public_log';
-		$aAttCodes = MetaModel::GetModuleSetting('jb-itop-standard-email-synchro', 'ticket_log', [
-			'UserRequest' => 'public_log', 
-			'Incident' => 'public_log'
-		]);
-		
-		if(array_key_exists(get_class($oTicket), $aAttCodes) == true) {
-			$sAttCode = $aAttCodes[get_class($oTicket)];
-		}
-		
+		$sAttCode = static::GetCaseLogAttCode(get_class($oTicket));
+
 		$oCaseLog = $oTicket->Get($sAttCode);
 		$oAttributeValue = new ormCustomCaseLog();
 		$oAttributeValue->AddLogEntriesFromCaseLog($oCaseLog);
@@ -801,6 +800,74 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 	}
 	
+	/**
+	 * Returns the case log attribute code (e.g. 'public_log') that should be updated for a given Ticket class,
+	 * based on the mailbox's 'attcode_caselog' setting.
+	 *
+	 * @param String $sTargetClass Ticket (sub)class
+	 *
+	 * @return String Attribute code
+	 */
+	public static function GetCaseLogAttCode(string $sTargetClass) : string {
+
+		$oMailBox = ProcessingHelper::GetMailBox();
+		$sAttCode = trim($oMailBox->Get('attcode_caselog'));
+
+		if($sAttCode === '' || MetaModel::IsValidAttCode($sTargetClass, $sAttCode) == false) {
+			$sAttCode = 'public_log';
+		}
+
+		return $sAttCode;
+
+	}
+
+	/**
+	 * Adds an initial case log entry (e.g. 'public_log') to a newly created Ticket, based on the email body.
+	 *
+	 * @details Harmonizes the case log with the way Ticket updates (replies) are processed via UpdateTicketFromEmail():
+	 * both the ticket's description and its case log will contain the original message.
+	 *
+	 * @param Ticket $oTicket Newly created Ticket (not saved yet)
+	 * @param Person|null $oCaller Caller detected from the incoming email (if any)
+	 *
+	 * @return void
+	 */
+	public static function AddInitialCaseLogEntry(Ticket $oTicket, ?Person $oCaller) : void {
+
+		$sTargetClass = get_class($oTicket);
+		$sAttCode = static::GetCaseLogAttCode($sTargetClass);
+
+		if(MetaModel::IsValidAttCode($sTargetClass, $sAttCode) == false) {
+			return;
+		}
+
+		$oEmail = ProcessingHelper::GetMail();
+
+		// Fallback to e-mail address if name is unknown.
+		$sCallerName = $oEmail->sCallerName;
+		$iCallerUserId = null;
+		if($oCaller === null) {
+			$sCallerName = $oEmail->sCallerEmail;
+		}
+		else {
+			$sCallerName = $oCaller->GetName(); // Derive name from Person
+			// Only first user will be matched. Multiple accounts could theoretically be linked to 1 Person.
+			$oUser = UserRights::GetUserFromPerson($oCaller, false);
+			if($oUser !== null) {
+				$iCallerUserId = $oUser->GetKey();
+			}
+		}
+
+		$sCaseLogEntry = static::BuildCaseLogEntry();
+
+		$oAttributeValue = new ormCustomCaseLog();
+		$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $iCallerUserId, '');
+		$oAttributeValue = $oAttributeValue->ToSortedCaseLog(false);
+
+		$oTicket->Set($sAttCode, $oAttributeValue);
+
+	}
+
 	/**
 	 * Attaches the original raw e-mail (.eml) to the current Ticket.
 	 *
