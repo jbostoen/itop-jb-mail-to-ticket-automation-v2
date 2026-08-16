@@ -218,7 +218,7 @@ function GetMailboxContent($oPage, $oInbox) {
 									$sStatus = Dict::S('MailInbox:Status/Ignored');
 							}
 							$sErrorMsg = $aProcessed[$sUIDL]['error_message'];
-							if($aProcessed[$sUIDL]['ticket_id'] != '') {
+							if($aProcessed[$sUIDL]['ticket_id'] > 0) {
 								$sTicketUrl = ApplicationContext::MakeObjectUrl($oInbox->Get('target_class'), $aProcessed[$sUIDL]['ticket_id']);
 								$sLink = '<a href="'.$sTicketUrl.'">'.$oInbox->Get('target_class').'::'.$aProcessed[$sUIDL]['ticket_id'].'</a>';
 							}
