@@ -249,22 +249,16 @@ abstract class CreateOrUpdateTicket extends Base {
 		$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize(); // Keep some room just in case...
 		
 		if(mb_strlen($sTicketDescription) > $iDescriptionMaxSize) {
-			
+
 			$sMsg = "CreateTicketFromEmail: Truncated description for [{$oTicket->Get('title')}] actual length: ".mb_strlen($sTicketDescription)." maximum: $iDescriptionMaxSize";
 		    IssueLog::Error($sMsg);
 			static::Trace($sMsg);
-			
-			
-		 
-			// Add the original e-mail message as an attachment. 
-			// Newer comment by Combodo notes: this has no effect, attachments have already been processed
-			$oEmail->aAttachments[] = [
-				'content' => $sTicketDescription, 
-				'filename' => ($bForPlainText ? 'original message.txt' : 'original message.html'), 
-				'mimeType' => ($bForPlainText ? 'text/plain' : 'text/html')
-			];
+
+			// Attach the original e-mail so no information is lost due to the truncated description.
+			static::AddOriginalEmailAsAttachment();
+
 		}
-		
+
 		// Keep some room just in case... (in case of what?)
 		$oTicket->Set('description', static::FitTextIn($sTicketDescription, $iDescriptionMaxSize));
 		
@@ -808,8 +802,49 @@ abstract class CreateOrUpdateTicket extends Base {
 	}
 	
 	/**
+	 * Attaches the original raw e-mail (.eml) to the current Ticket.
+	 *
+	 * @details Used as a fallback when the description had to be truncated, so no information from the original message is lost.
+	 *
+	 * @return void
+	 */
+	public static function AddOriginalEmailAsAttachment() : void {
+
+		$oEmail = ProcessingHelper::GetMail();
+		$oRawEmail = ProcessingHelper::GetRawMail();
+		$oTicket = ProcessingHelper::GetTicket();
+		$oCaller = $oEmail->GetSender();
+
+		$sMimeType = MetaModel::GetModuleSetting('jb-email-synchro', 'eml_attachment_mime_type', 'application/octet-stream');
+		$oBlob = new ormDocument($oRawEmail->GetRawContent(), $sMimeType, 'original-message.eml');
+
+		$oAttachment = new Attachment();
+		$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
+		$oAttachment->SetIfNull('creation_date', time());
+
+		if($oCaller !== null && MetaModel::GetAttributeDef('Attachment', 'contact_id') instanceof AttributeExternalKey) {
+			$oAttachment->Set('contact_id', $oCaller);
+		}
+
+		if($oTicket->IsNew()) {
+			$oAttachment->Set('item_class', get_class($oTicket));
+		}
+		else {
+			$oAttachment->SetItem($oTicket);
+		}
+
+		$oAttachment->Set('contents', $oBlob);
+		$oAttachment->DBInsert();
+
+		static::Trace("... Attached the original e-mail as 'original-message.eml'.");
+
+		static::$aAddedAttachments['original-message-eml'] = $oAttachment;
+
+	}
+
+	/**
 	 * Build the text/html to be inserted in the case log when the ticket is updated.
-	 * 
+	 *
 	 * Note: extensions should NOT call this method. Instead, they should use GetCaselogEntry() and only *after* this step.
 	 *
 	 * @return string The HTML text to be inserted in the case log
