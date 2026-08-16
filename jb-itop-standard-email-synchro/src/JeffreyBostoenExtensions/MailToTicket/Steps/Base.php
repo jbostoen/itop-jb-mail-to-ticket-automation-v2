@@ -329,9 +329,22 @@ abstract class Base implements iStep {
 	 * @return bool
 	 */
 	public static function IsApplicable() : bool {
-		
+
 		return true;
 
 	}
-	
+
+
+	/**
+	 * A helper method to split by line.
+	 *
+	 * @param string $sContent
+	 * @return array
+	 */
+	public static function SplitByLine(string $sContent) : array {
+
+		return preg_split(static::NEWLINE_REGEX, $sContent);
+
+	}
+
 }
