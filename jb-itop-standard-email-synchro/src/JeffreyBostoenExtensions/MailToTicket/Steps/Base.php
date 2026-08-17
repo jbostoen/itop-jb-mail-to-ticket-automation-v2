@@ -15,13 +15,20 @@ use JeffreyBostoenExtensions\MailToTicket\{
 
 // iTop.
 use MetaModel;
+use DBObjectSearch;
+use DBObjectSet;
 use EmailContact;
 use EmailMessage;
 use EmailProcessor;
 use EmailSource;
 use MailInboxStandard;
+use ormDocument;
 use RawEmailMessage;
 use Ticket;
+use TriggerOnMailPolicy;
+
+// Generic.
+use Exception;
 
 
 /**
@@ -124,19 +131,19 @@ abstract class Base implements iStep {
     
 
 	/**
-	 * Replace email placeholders in a string.
-	 * 
-	 * @param string $sString Input string.
+	 * Builds the array of e-mail placeholders (params), usable both for string substitution (MetaModel::ApplyParams)
+	 * and as context arguments for a Trigger's DoActivate().
+	 *
 	 * @param array $aExtraPlaceholders Optional: extra place holders.
 	 *
 	 * @details Also exposes some properties which are not likely to be useful (body_format) at any time, but who knows?
 	 *
-	 * @return String String where the placeholders are filled in.
+	 * @return array Params. Each key is present twice: once as-is, once HTML-encoded.
 	 */
-	public static function ReplaceMailPlaceholders(string $sString, array $aExtraPlaceholders = []) {
-		
+	public static function GetMailPlaceholderParams(array $aExtraPlaceholders = []) : array {
+
 		$oEmail = ProcessingHelper::GetMail();
-		
+
 		$aParams = [
 			'mail->uidl' => $oEmail->sUIDL,
 			'mail->message_id' => $oEmail->sMessageId,
@@ -154,18 +161,33 @@ abstract class Base implements iStep {
 		if($oEmail->GetSender() !== null) {
 			$aParams['sender->object()'] = $oEmail->GetSender();
 		}
-		
+
 		$aParams = array_merge($aParams, $aExtraPlaceholders);
-		
+
 		// Extend. This is to allow for both the original parameter and the HTML-encoded version of it.
 		$aParamsExtended = [];
 		foreach($aParams as $sParam => $sValue) {
 			$aParamsExtended[$sParam] = $sValue;
 			$aParamsExtended[htmlentities($sParam)] = $sValue;
 		}
-		
-		return MetaModel::ApplyParams($sString, $aParamsExtended);
-		
+
+		return $aParamsExtended;
+
+	}
+
+
+	/**
+	 * Replace email placeholders in a string.
+	 *
+	 * @param string $sString Input string.
+	 * @param array $aExtraPlaceholders Optional: extra place holders.
+	 *
+	 * @return String String where the placeholders are filled in.
+	 */
+	public static function ReplaceMailPlaceholders(string $sString, array $aExtraPlaceholders = []) {
+
+		return MetaModel::ApplyParams($sString, static::GetMailPlaceholderParams($aExtraPlaceholders));
+
 	}
 	
 	
@@ -231,14 +253,67 @@ abstract class Base implements iStep {
 	}
 	
 	/**
+	 * Searches for any TriggerOnMailPolicy subscribed to this step, and activates it.
+	 * This allows for more dynamic notifications (any Action linked to the trigger, not just a plain bounce e-mail) upon a policy violation.
+	 * This is purely additive: the per-step bounce message (behavior/subject/notification settings) is unaffected and keeps working as before.
+	 *
+	 * @return void
+	 */
+	public static function FireMailPolicyTriggers() : void {
+
+		$oMailBox = ProcessingHelper::GetMailBox();
+		$sStepId = static::GetXMLSettingsPrefix();
+
+		$oSet_Triggers = new DBObjectSet(DBObjectSearch::FromOQL_AllData('SELECT TriggerOnMailPolicy'));
+
+		/** @var TriggerOnMailPolicy $oTrigger */
+		while($oTrigger = $oSet_Triggers->Fetch()) {
+
+			$aStepIds = array_map('trim', preg_split(static::NEWLINE_REGEX, (string)$oTrigger->Get('step_list')));
+
+			if(in_array($sStepId, $aStepIds, true) == false) {
+				continue;
+			}
+
+			static::Trace('.. Activating TriggerOnMailPolicy #%1$s ("%2$s") for step "%3$s".', $oTrigger->GetKey(), $oTrigger->Get('description'), $sStepId);
+
+			// 'this->object()' is required by ActionEmail (assumes a notification is linked to an object); the mailbox is the most relevant object here,
+			// since - unlike TriggerOnMailUpdate - there may not be a related Ticket yet at this point.
+			$aContextArgs = static::GetMailPlaceholderParams([
+				'this->object()' => $oMailBox,
+				'policy->step' => $sStepId,
+			]);
+
+			if($oTrigger->Get('include_original_message') == true) {
+
+				$oRawEmail = ProcessingHelper::GetRawMail();
+				$aContextArgs['attachments'] = [
+					new ormDocument($oRawEmail->GetRawContent(), 'message/rfc822', 'original-message.eml'),
+				];
+				$aContextArgs['mail->eml_base64'] = base64_encode($oRawEmail->GetRawContent());
+
+			}
+
+			try {
+				$oTrigger->DoActivate($aContextArgs);
+			}
+			catch(Exception $e) {
+				static::Trace('.. TriggerOnMailPolicy #%1$s execution error: %2$s', $oTrigger->GetKey(), $e->getMessage());
+			}
+
+		}
+
+	}
+
+	/**
 	 * Actions executed when the message does not comply with a policy.
 	 * The default method informs the caller that the email was rejected.
 	 *
 	 * @return void
 	 */
 	public static function HandleViolation() : void {
-		
-			
+
+
 		// Policy violations have a typical way of handling.
 		// The behavior is - besides some feature-specific fallbacks - usually one of the following:
 		// - bounce_delete -> bounce and delete the message
@@ -251,9 +326,12 @@ abstract class Base implements iStep {
 		$oEmail = ProcessingHelper::GetMail();
 		$oMailBox = ProcessingHelper::GetMailBox();
 		$sBehavior = static::GetStepSetting('behavior');
-		
+
 		static::Trace('.. Policy violated. Behavior: '.$sBehavior);
-		
+
+		// Activate any TriggerOnMailPolicy subscribed to this step, independently of the bounce-message behavior below.
+		static::FireMailPolicyTriggers();
+
 		// First check if email notification must be sent to caller (bounce message)
 		switch($sBehavior) {
 		

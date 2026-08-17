@@ -87,7 +87,14 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:DownloadEml' => 'Télécharger l\'eml',
 	'Class:TriggerOnMailUpdate' => 'Déclencheur sur mise à jour par mail',
 	'Class:TriggerOnMailUpdate+' => 'Déclencheur activé sur la mise à jour de tickets par mail',
-	
+
+	'Class:TriggerOnMailPolicy' => 'Déclencheur (violation d\'une politique de mail)',
+	'Class:TriggerOnMailPolicy+' => 'Déclencheur activé lorsqu\'un email entrant viole une politique de la boîte mail (étape)',
+	'Class:TriggerOnMailPolicy/Attribute:step_list' => 'Étapes de politique',
+	'Class:TriggerOnMailPolicy/Attribute:step_list+' => 'Un identifiant d\'étape de politique par ligne (ex. "policy_no_subject")',
+	'Class:TriggerOnMailPolicy/Attribute:include_original_message' => 'Inclure le message original',
+	'Class:TriggerOnMailPolicy/Attribute:include_original_message+' => 'Joindre l\'email original (.eml) aux actions liées, et l\'exposer via le paramètre "mail->eml_base64"',
+
 	'MailInbox:EmptyMailbox' => 'La boîte mail est vide.',
 	
 	'Class:EmailReplica' => 'Email Replica~~',

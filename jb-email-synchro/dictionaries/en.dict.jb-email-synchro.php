@@ -87,7 +87,14 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:DownloadEml' => 'Download .eml file',
 	'Class:TriggerOnMailUpdate' => 'Trigger (when updated by mail)',
 	'Class:TriggerOnMailUpdate+' => 'Trigger activated when a ticket is updated by processing an incoming email',
-	
+
+	'Class:TriggerOnMailPolicy' => 'Trigger (on mail policy violation)',
+	'Class:TriggerOnMailPolicy+' => 'Trigger activated when an incoming email violates a mailbox policy (step)',
+	'Class:TriggerOnMailPolicy/Attribute:step_list' => 'Policy steps',
+	'Class:TriggerOnMailPolicy/Attribute:step_list+' => 'One policy step identifier per line (e.g. "policy_no_subject"), see each step\'s documentation for its identifier',
+	'Class:TriggerOnMailPolicy/Attribute:include_original_message' => 'Include original message',
+	'Class:TriggerOnMailPolicy/Attribute:include_original_message+' => 'Attach the original email (.eml) to the linked actions, and expose it as the "mail->eml_base64" placeholder',
+
 	'MailInbox:EmptyMailbox' => 'Empty mailbox',
 	
 	'Class:EmailReplica' => 'Email Replica',
