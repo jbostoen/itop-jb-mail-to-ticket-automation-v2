@@ -449,7 +449,7 @@ class RawEmailMessage {
 		$aParsedParts = array();
 		$sContentType = isset($aHeaders['content-type']) ? $aHeaders['content-type'] : '';
 
-		if(($sContentType != '') && preg_match('/multipart(.*);.*?boundary="?([^"]+)"?/i', $sContentType, $aMatches)) {
+		if(($sContentType != '') && preg_match('/multipart(.*);.*?boundary="?([^";]+)"?/i', $sContentType, $aMatches)) {
 			$sBoundary = $aMatches[2];
 			if(empty($sBoundary)) {
 				// hmm, malformed message ??
