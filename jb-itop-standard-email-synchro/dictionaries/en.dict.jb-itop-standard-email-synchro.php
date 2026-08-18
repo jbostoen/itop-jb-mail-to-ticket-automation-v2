@@ -26,7 +26,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	// Dictionary entries go here
 	'Class:MailInboxStandard' => 'IMAP Mail Inbox',
 	'Class:MailInboxStandard+' => 'Source of incoming e-mails',
-	'Class:MailInboxStandard/Attribute:behavior' => 'Behavior',
+	'Class:MailInboxStandard/Attribute:behavior' => 'Behavior when processing an e-mail',
 	'Class:MailInboxStandard/Attribute:behavior/Value:create_only' => 'Create new Tickets',
 	'Class:MailInboxStandard/Attribute:behavior/Value:update_only' => 'Update existing Tickets',
 	'Class:MailInboxStandard/Attribute:behavior/Value:both' => 'Create or Update Tickets',
@@ -54,7 +54,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:debug_trace+' => '',
 	'Class:MailInboxStandard/Attribute:target_folder' => 'Target folder',
 	'Class:MailInboxStandard/Attribute:target_folder+' => 'The e-mail will be moved (IMAP protocol) to this target folder after being processed. Mind to update the setting for "After processing the e-mail" to "Move to another folder".',
-	
+
 	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Default values for new Ticket',
 	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Default title (if subject is empty)',
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Pattern to match in the subject',
@@ -75,7 +75,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	   
 	'Class:MailInboxStandard/Attribute:debug_log' => 'Debug Log',
 	
-	'Class:MailInboxStandard/Attribute:error_behavior' => 'Behavior',
+	'Class:MailInboxStandard/Attribute:error_behavior' => 'Behavior when error occurs during processing',
 	'Class:MailInboxStandard/Attribute:error_behavior/Value:delete' => 'Delete the message from the mailbox',
 	'Class:MailInboxStandard/Attribute:error_behavior/Value:mark_as_error' => 'Mark as Error', 
 	'Class:MailInboxStandard/Attribute:notify_errors_to' => 'Forward e-mails (in error) To Address',
@@ -270,9 +270,12 @@ Dict::Add('EN US', 'English', 'English', array(
 	// Headers
 	'MailInbox:Server' => 'Mailbox Configuration',
 	'MailInbox:Behavior' => 'Behavior on Incoming e-mails',
-	'MailInbox:Errors' => 'E-mails in error', 
-	'MailInbox:Settings' => 'Settings', 
-	
+	'MailInbox:Errors' => 'E-mails in error',
+	'MailInbox:Settings' => 'Settings',
+
+	// Validation messages
+	'MailInbox:Error:TargetFolderRequired' => 'The target folder must be specified for an active mailbox.',
+
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Embedded e-mail images',
 	'MailInbox:PolicyMailSize' => 'Mail Size',

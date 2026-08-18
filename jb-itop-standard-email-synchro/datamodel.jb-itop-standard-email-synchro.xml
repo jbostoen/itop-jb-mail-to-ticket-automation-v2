@@ -699,20 +699,20 @@ EOF
 								<item id="behavior">
 									<rank>10</rank>
 								</item>
-								<item id="target_folder">
-									<rank>11</rank>
+								<item id="title_pattern">
+									<rank>20</rank>
 								</item>
 								<item id="email_storage">
-									<rank>20</rank>
+									<rank>30</rank>
+								</item>
+								<item id="target_folder">
+									<rank>40</rank>
 								</item>
 								<item id="target_class">
 									<rank>50</rank>
 								</item>
 								<item id="ticket_default_values">
 									<rank>60</rank>
-								</item>
-								<item id="title_pattern">
-									<rank>70</rank>
 								</item>
 								<item id="stimuli">
 									<rank>80</rank>
