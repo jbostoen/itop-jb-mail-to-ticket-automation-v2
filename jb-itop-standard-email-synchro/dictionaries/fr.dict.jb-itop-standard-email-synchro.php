@@ -26,7 +26,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	// Dictionary entries go here
 	'Class:MailInboxStandard' => 'Boîte Mail Standard',
 	'Class:MailInboxStandard+' => 'Source d\'eMails',
-	'Class:MailInboxStandard/Attribute:behavior' => 'Comportement',
+	'Class:MailInboxStandard/Attribute:behavior' => 'Comportement lors du traitement d\'un e-mail',
 	'Class:MailInboxStandard/Attribute:behavior/Value:create_only' => 'Créer des Tickets',
 	'Class:MailInboxStandard/Attribute:behavior/Value:update_only' => 'Mettre à jour des Tickets existants',
 	'Class:MailInboxStandard/Attribute:behavior/Value:both' => 'Créer ou mettre à jour des Tickets',
@@ -74,7 +74,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	   
 	'Class:MailInboxStandard/Attribute:debug_log' => 'Traces de Debug',
 	
-	'Class:MailInboxStandard/Attribute:error_behavior' => 'Comportement en cas d\'erreur',
+	'Class:MailInboxStandard/Attribute:error_behavior' => 'Comportement en cas d\'erreur lors du traitement',
 	'Class:MailInboxStandard/Attribute:error_behavior/Value:delete' => 'Supprimer l\'eMail de la boîte mail',
 	'Class:MailInboxStandard/Attribute:error_behavior/Value:mark_as_error' => 'Garder l\'eMail dans la boîte mail',
 	'Class:MailInboxStandard/Attribute:notify_errors_to' => 'Faire suivre l\'eMail à',
@@ -249,8 +249,11 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:Server' => 'Configuration de la boîte mail',
 	'MailInbox:Behavior' => 'Comportement pour les nouveaux emails',
 	'MailInbox:Errors' => 'E-mails en erreur',
-	'MailInbox:Settings' => 'Configuration', 
-	
+	'MailInbox:Settings' => 'Configuration',
+
+	// Messages de validation
+	'MailInbox:Error:TargetFolderRequired' => 'Le dossier cible doit être renseigné pour une boîte mail active.',
+
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Pièce jointe - criteria',
 	'MailInbox:PolicyMailSize' => 'Taille de l\'email',
