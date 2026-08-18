@@ -714,9 +714,6 @@ EOF
 								<item id="title_pattern">
 									<rank>70</rank>
 								</item>
-								<item id="title_pattern_ignore_patterns">
-									<rank>71</rank>
-								</item>
 								<item id="stimuli">
 									<rank>80</rank>
 								</item>
@@ -967,6 +964,15 @@ EOF
 										</item>
 										<item id="policy_undesired_pattern_patterns">
 											<rank>30</rank>
+										</item>
+									</items>
+								</item>
+								<!-- Ignore unwanted title patterns -->
+								<item id="fieldset:MailInbox:PolicyIgnorePattern">
+									<rank>185</rank>
+									<items>
+										<item id="title_pattern_ignore_patterns">
+											<rank>10</rank>
 										</item>
 									</items>
 								</item>
