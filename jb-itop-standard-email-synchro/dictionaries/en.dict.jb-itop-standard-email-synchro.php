@@ -55,6 +55,11 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:target_folder' => 'Target folder',
 	'Class:MailInboxStandard/Attribute:target_folder+' => 'The e-mail will be moved (IMAP protocol) to this target folder after being processed. Mind to update the setting for "After processing the e-mail" to "Move to another folder".',
 
+	'Class:MailInboxStandard/Attribute:attcode_description' => 'Description attribute',
+	'Class:MailInboxStandard/Attribute:attcode_description+' => 'Attribute code of the target class that should receive the initial ticket description. Defaults to "description" when left empty.',
+	'Class:MailInboxStandard/Attribute:attcode_caselog' => 'Case log attribute',
+	'Class:MailInboxStandard/Attribute:attcode_caselog+' => 'Attribute code of the target class (case log) that should receive new entries when the ticket is created and/or updated. Defaults to "public_log" when left empty or invalid.',
+
 	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Default values for new Ticket',
 	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Default title (if subject is empty)',
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Pattern to match in the subject',
@@ -275,6 +280,8 @@ Dict::Add('EN US', 'English', 'English', array(
 
 	// Validation messages
 	'MailInbox:Error:TargetFolderRequired' => 'The target folder must be specified for an active mailbox.',
+	'MailInbox:Error:CaseLogAttCodeRequired' => 'The case log attribute code must be a valid attribute of the target class \'%1$s\'.',
+	'MailInbox:Error:DescriptionOrCaseLogAttCodeRequired' => 'Either the description attribute code or the case log attribute code must be a valid attribute of the target class \'%1$s\'.',
 
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Embedded e-mail images',

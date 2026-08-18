@@ -10,6 +10,7 @@ namespace JeffreyBostoenExtensions\MailToTicket;
 
 // iTop internals.
 use Dict;
+use MetaModel;
 
 // iTop events.
 use Combodo\iTop\Service\Events\EventData;
@@ -37,6 +38,12 @@ abstract class EventListener {
 			'MailInboxStandard'
 		);
 
+		EventService::RegisterListener(
+			\EVENT_DB_CHECK_TO_WRITE,
+			[static::class, 'OnMailInboxStandardAttCodesCheckToWrite'],
+			'MailInboxStandard'
+		);
+
 	}
 
 	/**
@@ -54,6 +61,51 @@ abstract class EventListener {
 		if($oMailInbox->Get('active') === 'yes' && trim($oMailInbox->Get('target_folder')) === '') {
 
 			$oMailInbox->AddCheckIssue(Dict::Format('MailInbox:Error:TargetFolderRequired'));
+
+		}
+
+	}
+
+	/**
+	 * Validates the description / case log attribute codes, according to the configured behavior.
+	 *
+	 * @param EventData $oEventData Event data. Contains the object ('object') being checked.
+	 *
+	 * @return void
+	 */
+	public static function OnMailInboxStandardAttCodesCheckToWrite(EventData $oEventData) : void {
+
+		/** @var MailInboxStandard $oMailInbox */
+		$oMailInbox = $oEventData->Get('object');
+		$sTargetClass = $oMailInbox->Get('target_class');
+
+		if(!MetaModel::IsValidClass($sTargetClass)) {
+			return;
+		}
+
+		$sBehavior = $oMailInbox->Get('behavior');
+		$sAttCodeDescription = trim($oMailInbox->Get('attcode_description'));
+		$sAttCodeCaseLog = trim($oMailInbox->Get('attcode_caselog'));
+
+		if($sBehavior === 'both' || $sBehavior === 'update_only') {
+
+			if($sAttCodeCaseLog === '' || !MetaModel::IsValidAttCode($sTargetClass, $sAttCodeCaseLog)) {
+
+				$oMailInbox->AddCheckIssue(Dict::Format('MailInbox:Error:CaseLogAttCodeRequired', $sTargetClass));
+
+			}
+
+		}
+		elseif($sBehavior === 'create_only') {
+
+			$bValidDescription = ($sAttCodeDescription !== '' && MetaModel::IsValidAttCode($sTargetClass, $sAttCodeDescription));
+			$bValidCaseLog = ($sAttCodeCaseLog !== '' && MetaModel::IsValidAttCode($sTargetClass, $sAttCodeCaseLog));
+
+			if(!$bValidDescription && !$bValidCaseLog) {
+
+				$oMailInbox->AddCheckIssue(Dict::Format('MailInbox:Error:DescriptionOrCaseLogAttCodeRequired', $sTargetClass));
+
+			}
 
 		}
 

@@ -29,6 +29,7 @@ SetupWebPage::AddModule(
 		//
 		'datamodel' => array(
 			'model.jb-itop-standard-email-synchro.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/EventListener.php',
 			// Core processing.
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Base.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/AttachmentCriteria.php',
@@ -77,7 +78,6 @@ SetupWebPage::AddModule(
 		'settings' => array(
 			// Module specific settings go here, if any
 			'inline_image_max_width' => 500, // Maximum width (in px) for displaying inline images
-			'ticket_log' => array('UserRequest' => 'public_log', 'Incident' => 'public_log'),
 		),
 	)
 );
