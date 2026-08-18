@@ -29,7 +29,6 @@ SetupWebPage::AddModule(
 		//
 		'datamodel' => array(
 			'model.jb-itop-standard-email-synchro.php',
-			'src/JeffreyBostoenExtensions/MailToTicket/EventListener.php',
 			// Core processing.
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Base.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/AttachmentCriteria.php',
