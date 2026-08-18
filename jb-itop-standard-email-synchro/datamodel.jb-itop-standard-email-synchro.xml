@@ -553,42 +553,6 @@ name:Unknown caller]]></default_value>
 				</field>
 			</fields>
 			<methods>
-				<method id="DoCheckToWrite">
-					<comment>/**
-			 * Overload the standard behavior to guarantee the unicity of either:
-			 * login / server / mailbox (imap)
-			 * @see cmdbAbstractObject::DoCheckToWrite()
-			 */</comment>
-					<static>false</static>
-					<access>public</access>
-					<type>Overload-DBObject</type>
-					<code>
-						<![CDATA[	public function DoCheckToWrite()
-			{
-			
-				parent::DoCheckToWrite();
-
-				// Note: This MUST be factorized later: declare unique keys (set of columns) in the data model
-				$aChanges = $this->ListChanges();
-				if(array_key_exists('login', $aChanges) || array_key_exists('server', $aChanges) || array_key_exists('mailbox', $aChanges) || array_key_exists('protocol', $aChanges)) {
-				
-					$sNewLogin = $this->Get('login');
-					$sNewServer = $this->Get('server');
-					$sNewMailbox = $this->Get('mailbox');
-					
-					$oSearch = DBObjectSearch::FromOQL_AllData("SELECT MailInboxBase WHERE login = :newlogin AND server = :newserver AND (protocol = 'imap' AND mailbox = :newmailbox) AND id != :id");
-					$oSet = new DBObjectSet($oSearch, [], ['id' => $this->GetKey(), 'newlogin' => $sNewLogin, 'newserver' => $sNewServer, 'newmailbox' => $sNewMailbox]);
-					if($oSet->Count() > 0) {
-						
-						$this->m_aCheckIssues[] = Dict::Format('MailInbox:Login/Server/MailboxMustBeUnique', $sNewLogin, $sNewServer, $sNewMailbox);
-						
-					}
-				}	
-				
-				
-				
-			}	]]></code>
-				</method>
 				<method id="DisplayBareRelations">
 					<comment>/**
 	 * Add an extra tab showing the debug trace
