@@ -83,7 +83,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:error_behavior' => 'Behavior when error occurs during processing',
 	'Class:MailInboxStandard/Attribute:error_behavior/Value:delete' => 'Delete the message from the mailbox',
 	'Class:MailInboxStandard/Attribute:error_behavior/Value:mark_as_error' => 'Mark as Error', 
-	'Class:MailInboxStandard/Attribute:notify_errors_to' => 'Forward e-mails (in error) To Address',
+	'Class:MailInboxStandard/Attribute:notify_errors_to' => 'Contacts to notify on error',
+	'Class:MailInboxStandard/Attribute:notify_errors_to+' => 'OQL query returning the Person(s) (e.g. "SELECT Person WHERE email = \'admin@example.com\'") to whom e-mails in error will be forwarded.',
 	'Class:MailInboxStandard/Attribute:notify_from' => 'Mail From Address',
 	
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Mail Aliases',
@@ -301,7 +302,10 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:PolicyAutoReply' => 'Auto reply',
 	'MailInbox:PolicyNonDeliveryReport' => 'Non Delivery Reports',
 	'MailInbox:PolicySenderEmailAddress' => 'Block senders using e-mail address patterns',
-	
+
+	// Validation messages
+	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'The query to select the %1$s must target the \'Contact\' class (or a subclass such as \'Person\' or \'Team\'), not \'%2$s\'.',
+
 	'Menu:MailInboxes' => 'Incoming E-mail Inboxes',
 	'Menu:MailInboxes+' => 'Configuration of Inboxes to scan for incoming e-mails',
 	 

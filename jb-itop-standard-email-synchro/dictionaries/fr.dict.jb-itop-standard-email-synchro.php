@@ -82,7 +82,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:error_behavior' => 'Comportement en cas d\'erreur lors du traitement',
 	'Class:MailInboxStandard/Attribute:error_behavior/Value:delete' => 'Supprimer l\'eMail de la boîte mail',
 	'Class:MailInboxStandard/Attribute:error_behavior/Value:mark_as_error' => 'Garder l\'eMail dans la boîte mail',
-	'Class:MailInboxStandard/Attribute:notify_errors_to' => 'Faire suivre l\'eMail à',
+	'Class:MailInboxStandard/Attribute:notify_errors_to' => 'Contacts à notifier en cas d\'erreur',
+	'Class:MailInboxStandard/Attribute:notify_errors_to+' => 'Requête OQL retournant la ou les Personne(s) (ex. "SELECT Person WHERE email = \'admin@example.com\'") à qui les eMails en erreur seront transférés.',
 	'Class:MailInboxStandard/Attribute:notify_errors_from' => '(De)',
 	
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Alias d\'email',
@@ -278,7 +279,10 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:PolicyAutoReply' => 'Auto réponse',
 	'MailInbox:PolicyNonDeliveryReport' => 'Non Delivery Reports',
 	'MailInbox:PolicySenderEmailAddress' => 'Bloquer les expéditeurs à l\'aide de motifs d\'adresses e-mail',
-	
+
+	// Messages de validation
+	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'La requête pour sélectionner les %1$s doit cibler la classe \'Contact\' (ou une sous-classe telle que \'Person\' ou \'Team\'), et non \'%2$s\'.',
+
 	'Menu:MailInboxes' => 'Boîtes emails de réception',
 	'Menu:MailInboxes+' => 'Configuration des boîtes emails à scanner pour de nouveaux messages',
 	 

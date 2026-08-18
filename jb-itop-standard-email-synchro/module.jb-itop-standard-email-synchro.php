@@ -31,6 +31,7 @@ SetupWebPage::AddModule(
 			'model.jb-itop-standard-email-synchro.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/EventListener.php',
 			// Core processing.
+			'src/JeffreyBostoenExtensions/MailToTicket/EventListener.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Base.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/AttachmentCriteria.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/CreateOrUpdateTicket.php',
@@ -140,15 +141,123 @@ if (!class_exists('StandardEmailSynchroInstaller')) {
 			
 			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.210219', '<')) {
 				CMDBSource::Query('
-					UPDATE mailinbox_standard 
-					SET policy_unknown_caller_behavior = "mark_as_undesired" 
+					UPDATE mailinbox_standard
+					SET policy_unknown_caller_behavior = "mark_as_undesired"
 					WHERE policy_unknown_caller_behavior = "do_nothing"
 				');
 			}
 
-			
+
 		}
-		
+
+		/**
+		 * Handler called after creating or upgrading the database schema
+		 * @param $oConfiguration Config The new configuration of the application
+		 * @param $sPreviousVersion string Previous version number of the module (empty string in case of first install)
+		 * @param $sCurrentVersion string Current version number of the module
+		 */
+		public static function AfterDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion) {
+
+			if($sPreviousVersion == '' || version_compare($sPreviousVersion, '3.2.260711', '>')) {
+
+				SetupLog::Info('Feature: Ticket Creation from E-mails: No database changes needed.');
+				return;
+
+			}
+
+			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '3.2.260711', '<=')) {
+
+				// 3.2.260711: notify_errors_to changed from an AttributeEmailAddress (free-text address) to an
+				// AttributeOQL (query returning Person objects). At this point, the schema was already migrated,
+				// so the raw (old) e-mail address value has to be read directly via SQL, not through the ORM.
+				SetupLog::Info('Feature: Ticket Creation from E-mails: Migrating notify_errors_to (e-mail address) to a Person-matching OQL query.');
+
+				$sTableName = 'mailinbox_standard';
+				$sMigrationOrgName = 'Mail to Ticket Migration';
+				$iMigrationOrgId = null; // Resolved lazily, only if a new Person actually needs to be created.
+
+				$aRows = CMDBSource::QueryToArray("SELECT id, notify_errors_to FROM $sTableName WHERE notify_errors_to != ''");
+
+				foreach($aRows as $aRow) {
+
+					$iMailboxId = $aRow['id'];
+					$sEmail = trim($aRow['notify_errors_to']);
+
+					if($sEmail === '') {
+						continue;
+					}
+
+					// Skip values which already look like an OQL query (in case this migration runs more than once).
+					if(preg_match('/^\s*SELECT\s/i', $sEmail) === 1) {
+						continue;
+					}
+
+					SetupLog::Info("Feature: Ticket Creation from E-mails: Migrating notify_errors_to for mailbox #$iMailboxId ('$sEmail').");
+
+					// Look for an existing Person with this e-mail address.
+					$oSearch = DBObjectSearch::FromOQL_AllData('SELECT Person WHERE email = :email');
+					$oSet = new DBObjectSet($oSearch, [], ['email' => $sEmail]);
+					$oPerson = $oSet->Fetch();
+
+					if($oPerson !== false) {
+
+						$iPersonId = $oPerson->GetKey();
+						SetupLog::Info("Feature: Ticket Creation from E-mails: Found existing Person #$iPersonId for '$sEmail'.");
+
+					}
+					else {
+
+						// No existing Person with this e-mail address: create one, under a dedicated
+						// Organization so migrated contacts are easy to find and re-assign afterwards.
+						if($iMigrationOrgId === null) {
+
+							$oOrgSearch = DBObjectSearch::FromOQL_AllData('SELECT Organization WHERE name = :name');
+							$oOrgSet = new DBObjectSet($oOrgSearch, [], ['name' => $sMigrationOrgName]);
+							$oOrg = $oOrgSet->Fetch();
+
+							if($oOrg !== false) {
+
+								$iMigrationOrgId = $oOrg->GetKey();
+								SetupLog::Info("Feature: Ticket Creation from E-mails: Using existing Organization #$iMigrationOrgId ('$sMigrationOrgName') for migrated Persons.");
+
+							}
+							else {
+
+								$oOrg = new Organization();
+								$oOrg->Set('name', $sMigrationOrgName);
+								$oOrg->DBInsert();
+
+								$iMigrationOrgId = $oOrg->GetKey();
+								SetupLog::Info("Feature: Ticket Creation from E-mails: Created Organization #$iMigrationOrgId ('$sMigrationOrgName') for migrated Persons.");
+
+							}
+
+						}
+
+						$oPerson = new Person();
+						$oPerson->Set('org_id', $iMigrationOrgId);
+						$oPerson->Set('first_name', '-');
+						$oPerson->Set('name', $sEmail);
+						$oPerson->Set('email', $sEmail);
+						$oPerson->DBInsert();
+
+						$iPersonId = $oPerson->GetKey();
+						SetupLog::Info("Feature: Ticket Creation from E-mails: Created new Person #$iPersonId for '$sEmail'.");
+
+					}
+
+					$sOQL = "SELECT Person WHERE id = $iPersonId";
+
+					$sUpdateQuery = "UPDATE $sTableName SET notify_errors_to = " . CMDBSource::Quote($sOQL) . " WHERE id = $iMailboxId";
+					SetupLog::Info($sUpdateQuery);
+					CMDBSource::Query($sUpdateQuery);
+
+				}
+
+			}
+
+		}
+
 	}
 
 }

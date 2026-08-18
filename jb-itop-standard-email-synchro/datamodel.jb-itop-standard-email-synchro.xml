@@ -92,7 +92,7 @@ status:assigned]]></default_value>
 					<default_value>mark_as_error</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="notify_errors_to" xsi:type="AttributeEmailAddress">
+				<field id="notify_errors_to" xsi:type="AttributeOQL">
 					<sql>notify_errors_to</sql>
 					<default_value/>
 					<is_null_allowed>true</is_null_allowed>

@@ -18,6 +18,7 @@ use DBObjectSet;
 use DBObjectSearch;
 use DBSearch;
 use Email;
+use Exception;
 
 // iTop email processing.
 use EmailMessage;
@@ -678,7 +679,33 @@ abstract class ProcessingHelper {
 		/** @var MessageFromMailbox $oRawEmail This raw e-mail will be the specific subclass that supports sending the e-mail as attachment. */
 		$oRawEmail = static::GetRawMail();
 
-		$sTo = $oInbox->Get('notify_errors_to');
+		// - notify_errors_to holds an OQL query returning Person objects. Resolve it into a comma-separated list of e-mail addresses.
+		$sTo = '';
+		$sNotifyErrorsToOQL = $oInbox->Get('notify_errors_to');
+		if($sNotifyErrorsToOQL !== '') {
+
+			try {
+
+				$oPersonSet = new DBObjectSet(DBObjectSearch::FromOQL($sNotifyErrorsToOQL));
+				$aRecipients = [];
+				while($oPerson = $oPersonSet->Fetch()) {
+
+					$sEmail = $oPerson->Get('email');
+					if($sEmail !== '') {
+						$aRecipients[] = $sEmail;
+					}
+
+				}
+				$sTo = implode(',', $aRecipients);
+
+			}
+			catch(Exception $e) {
+
+				$oInbox->Trace('HandleError: Invalid OQL in notify_errors_to (%1$s): %2$s', $sNotifyErrorsToOQL, $e->getMessage());
+
+			}
+
+		}
 		$sFrom = $oInbox->Get('notify_from');
 		
 		// The behavior is overriden in case of undesired_message
