@@ -25,7 +25,7 @@ use MailInboxStandard;
 use ormDocument;
 use RawEmailMessage;
 use Ticket;
-use TriggerOnMailPolicy;
+use TriggerOnMailProcessingEvent;
 
 // Generic.
 use Exception;
@@ -253,20 +253,20 @@ abstract class Base implements iStep {
 	}
 	
 	/**
-	 * Searches for any TriggerOnMailPolicy subscribed to this step, and activates it.
+	 * Searches for any TriggerOnMailProcessingEvent subscribed to this step, and activates it.
 	 * This allows for more dynamic notifications (any Action linked to the trigger, not just a plain bounce e-mail) upon a policy violation.
 	 * This is purely additive: the per-step bounce message (behavior/subject/notification settings) is unaffected and keeps working as before.
 	 *
 	 * @return void
 	 */
-	public static function FireMailPolicyTriggers() : void {
+	public static function FireMailProcessingEventTriggers() : void {
 
 		$oMailBox = ProcessingHelper::GetMailBox();
 		$sStepId = static::GetXMLSettingsPrefix();
 
-		$oSet_Triggers = new DBObjectSet(DBObjectSearch::FromOQL_AllData('SELECT TriggerOnMailPolicy'));
+		$oSet_Triggers = new DBObjectSet(DBObjectSearch::FromOQL_AllData('SELECT TriggerOnMailProcessingEvent'));
 
-		/** @var TriggerOnMailPolicy $oTrigger */
+		/** @var TriggerOnMailProcessingEvent $oTrigger */
 		while($oTrigger = $oSet_Triggers->Fetch()) {
 
 			$aStepIds = array_map('trim', preg_split(static::NEWLINE_REGEX, (string)$oTrigger->Get('step_list')));
@@ -275,7 +275,7 @@ abstract class Base implements iStep {
 				continue;
 			}
 
-			static::Trace('.. Activating TriggerOnMailPolicy #%1$s ("%2$s") for step "%3$s".', $oTrigger->GetKey(), $oTrigger->Get('description'), $sStepId);
+			static::Trace('.. Activating TriggerOnMailProcessingEvent #%1$s ("%2$s") for step "%3$s".', $oTrigger->GetKey(), $oTrigger->Get('description'), $sStepId);
 
 			// 'this->object()' is required by ActionEmail (assumes a notification is linked to an object); the mailbox is the most relevant object here,
 			// since - unlike TriggerOnMailUpdate - there may not be a related Ticket yet at this point.
@@ -298,7 +298,7 @@ abstract class Base implements iStep {
 				$oTrigger->DoActivate($aContextArgs);
 			}
 			catch(Exception $e) {
-				static::Trace('.. TriggerOnMailPolicy #%1$s execution error: %2$s', $oTrigger->GetKey(), $e->getMessage());
+				static::Trace('.. TriggerOnMailProcessingEvent #%1$s execution error: %2$s', $oTrigger->GetKey(), $e->getMessage());
 			}
 
 		}
@@ -329,8 +329,8 @@ abstract class Base implements iStep {
 
 		static::Trace('.. Policy violated. Behavior: '.$sBehavior);
 
-		// Activate any TriggerOnMailPolicy subscribed to this step, independently of the bounce-message behavior below.
-		static::FireMailPolicyTriggers();
+		// Activate any TriggerOnMailProcessingEvent subscribed to this step, independently of the bounce-message behavior below.
+		static::FireMailProcessingEventTriggers();
 
 		// First check if email notification must be sent to caller (bounce message)
 		switch($sBehavior) {

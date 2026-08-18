@@ -6,16 +6,16 @@
  */
 
 /**
- * Class TriggerOnMailPolicy.
+ * Class TriggerOnMailProcessingEvent.
  * A trigger that is activated when an incoming e-mail violates a mailbox policy ("step"),
  * e.g. an undesired title pattern, a forbidden attachment mime type, an unknown caller, ...
  *
- * @details Unlike TriggerOnMailUpdate, this does NOT extend TriggerOnObject: a policy violation does not necessarily
+ * @details Unlike TriggerOnMailUpdate, this does NOT extend TriggerOnObject: a mail processing event does not necessarily
  * relate to an existing Ticket (e.g. the message may be rejected before any Ticket is created or found).
  * This is purely additive to the existing per-step "bounce message" (behavior/subject/notification) settings on the
  * mailbox: those keep working as before, and are not migrated automatically.
  */
-class TriggerOnMailPolicy extends Trigger {
+class TriggerOnMailProcessingEvent extends Trigger {
 
 	/**
 	 * @throws CoreException
@@ -28,7 +28,7 @@ class TriggerOnMailPolicy extends Trigger {
 			'name_attcode' => 'description',
 			'state_attcode' => '',
 			'reconc_keys' => ['description'],
-			'db_table' => 'priv_trigger_onmailpolicy',
+			'db_table' => 'priv_trigger_onmailprocessingevent',
 			'db_key_field' => 'id',
 			'db_finalclass_field' => '',
 		];
