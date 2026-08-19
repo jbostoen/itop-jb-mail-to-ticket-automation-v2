@@ -224,7 +224,8 @@ class RawEmailMessage {
 							$sFileExtension = 'eml';
 							break;
 					}
-					$sFileName = sprintf('%s%03d.%s', $aTypes[0], $index, $sFileExtension); // i.e. image001.jpg 
+					$sFileName = sprintf('%s%03d.%s', $aTypes[0], $index, $sFileExtension); // i.e. image001.jpg
+					$index++;
 				}
 				$aAttachments['part_'.$aPart['part_id']] = array(
 					'filename' => $sFileName,
