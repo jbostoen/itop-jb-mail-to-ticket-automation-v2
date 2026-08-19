@@ -260,6 +260,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					/** @var MessageHandler $oMsgHandler */
 					foreach($aMessages as $iMessage => $oMsgHandler) {
 
+						$oEmailReplica = null;
+
 						ProcessingHelper::SetMessageHandler($oMsgHandler);
 
 						// - New e-mail; this no ticket object.
