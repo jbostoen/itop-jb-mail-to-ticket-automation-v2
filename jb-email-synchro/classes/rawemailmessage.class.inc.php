@@ -378,7 +378,7 @@ class RawEmailMessage {
 		else {
 			foreach ($aPart['parts'] as $aSubPart) {
 				$aPartFound = $this->GetPartById($sId, $aSubPart);
-				if($aPartFound === null) {
+				if($aPartFound !== null) {
 					return $aPartFound;
 				}
 			}
