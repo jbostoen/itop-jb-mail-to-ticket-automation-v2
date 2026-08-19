@@ -28,6 +28,26 @@ abstract class AttachmentForbiddenMimeType extends Base {
 	 */
 	public static string $sXMLSettingsPrefix = 'policy_attachment_forbidden_mimetype';
 		
+	private static function GetEffectiveMimeTypes(array $aAttachment) : array {
+
+		$aTypes = [$aAttachment['mimeType']];
+
+		if(!empty($aAttachment['content']) && function_exists('finfo_open')) {
+
+			$rFinfo = finfo_open(FILEINFO_MIME_TYPE);
+			$sSniffed = finfo_buffer($rFinfo, $aAttachment['content']);
+			finfo_close($rFinfo);
+
+			if($sSniffed !== false) {
+				$aTypes[] = $sSniffed;
+			}
+
+		}
+
+		return array_unique($aTypes);
+
+	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -61,8 +81,8 @@ abstract class AttachmentForbiddenMimeType extends Base {
 						foreach($oEmail->aAttachments as $iIndex => $aAttachment) { 
 							static::Trace('.. Attachment #'.$iIndex.' MimeType: '.$aAttachment['mimeType']);
 							
-							if(in_array($aAttachment['mimeType'], $aForbiddenMimeTypes) == true) {
-								
+							if(array_intersect(static::GetEffectiveMimeTypes($aAttachment), $aForbiddenMimeTypes) !== []) {
+
 								static::Trace('... Found attachment with forbidden MimeType "'.$aAttachment['mimeType'].'"');
 								static::HandleViolation();
 								
@@ -77,8 +97,8 @@ abstract class AttachmentForbiddenMimeType extends Base {
 					case 'fallback_ignore_forbidden_attachments':
 					
 						// Ticket will be processed. Forbidden attachments will be removed here.
-						foreach($oEmail->aAttachments as $index => $aAttachment) { 
-							if(in_array($aAttachment['mimeType'], $aForbiddenMimeTypes) == true) {
+						foreach($oEmail->aAttachments as $index => $aAttachment) {
+							if(array_intersect(static::GetEffectiveMimeTypes($aAttachment), $aForbiddenMimeTypes) !== []) {
 								static::Trace("Attachment Content-Id ". $aAttachment['content-id'] . " - Mime Type: {$aAttachment['mimeType']} = forbidden.");
 								// Removing attachment
 								unset($oEmail->aAttachments[$index]);
