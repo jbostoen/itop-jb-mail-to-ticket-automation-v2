@@ -8,10 +8,7 @@
 
 namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
-use JeffreyBostoenExtensions\MailToTicket\{
-	eNextAction,
-	ProcessingHelper
-};
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 
 // iTop classes.
 use Ticket;
@@ -87,8 +84,8 @@ abstract class UnknownTicketReference extends Base {
 			
 			$sPattern = $oMailBox->Get('title_pattern');
 			if(($sPattern != '') && (preg_match($sPattern, $sSubject, $aMatches))) {
-				static::Trace("ndesired: unable to find any prior ticket despite a matching ticket reference pattern in the subject ('{$sPattern}'). ".http_build_query($aMatches));
-				ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_UNDESIRED);
+				static::Trace("Unable to find any prior ticket despite a matching ticket reference pattern in the subject ('{$sPattern}'). ".http_build_query($aMatches));
+				static::HandleViolation();
 				return;
 			}
 			elseif($oEmail->oRelatedObject !== null && !($oTicket instanceof Ticket)) {
