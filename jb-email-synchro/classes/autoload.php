@@ -18,7 +18,6 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
-require_once(__DIR__.'/mail_mimedecode.class.inc.php');
 require_once(__DIR__.'/rawemailmessage.class.inc.php');
 require_once(__DIR__.'/messagefrommailbox.class.inc.php');
 require_once(__DIR__.'/emailmessage.class.inc.php');
