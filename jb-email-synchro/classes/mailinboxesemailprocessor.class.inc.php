@@ -173,7 +173,9 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 					$aErrors[] = $sMessage;
 					$aErrors[] = $oInbox->sLastError;
 					self::Trace($sMessage);
-				}	
+
+					ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
+				}
 			}
 			else {
 
@@ -186,6 +188,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 			self::Trace("End of processing of the new message $index ({$oEmail->sUIDL}) retCode: $sAction");
 		}
 		catch(Exception $e) {
+			ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
 			$eNextAction = ProcessingHelper::GetNextAction();
 			$this->sLastErrorSubject = "Failed to process email $index ({$oEmail->sUIDL})";
 			$this->sLastErrorMessage = "Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage();
