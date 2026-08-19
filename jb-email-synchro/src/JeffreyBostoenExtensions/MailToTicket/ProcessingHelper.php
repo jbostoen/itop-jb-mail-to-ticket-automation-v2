@@ -438,11 +438,11 @@ abstract class ProcessingHelper {
 
 				if(in_array($sReplicaStatus, ['ok', 'undesired'])) {
 
-					// - An EmailReplica might still be present even if it's related ticket has been deleted.
+					// - An EmailReplica might still be present even if its related ticket has been deleted.
 					//   This EmailReplica may contain a reference to the UID of the message.
 					$oInbox->Trace('EmailReplica is not new. No ticket found. Status: "%1$s". Delete message. It is labeled as OK or undesired; which means it was processed before.', $sReplicaStatus);
-					static::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
-					
+					static::SetNextAction(eNextAction::DELETE_MESSAGE);
+
 				}
 				else {
 
