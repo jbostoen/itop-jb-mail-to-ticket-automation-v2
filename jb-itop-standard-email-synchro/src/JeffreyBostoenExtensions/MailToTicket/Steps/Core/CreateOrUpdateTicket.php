@@ -219,7 +219,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		$oTicketTitleAttDef = MetaModel::GetAttributeDef($sTargetClass, 'title');
 		$iTitleMaxSize = $oTicketTitleAttDef->GetMaxSize();
 		$sSubject = $oEmail->sSubject;
-		$oTicket->Set('title', substr($sSubject, 0, $iTitleMaxSize));
+		$oTicket->Set('title', mb_substr($sSubject, 0, $iTitleMaxSize));
 		
 		// Insert the remaining attachments so that their ID is known, and the attachments can be referenced in the message's body.
 		// Cannot insert them for real since the Ticket is not saved yet (so Ticket id is unknown).
