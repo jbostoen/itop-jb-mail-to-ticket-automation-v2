@@ -167,9 +167,15 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		
 		$this->Trace("-----------------------------------------------------------------------------------------");
 		$this->Trace('. '.count(ProcessingHelper::GetAvailableSteps()).' steps to process.');
-		
+
+		$bAbortAllProcessing = false;
+
 		foreach(self::$aEmailProcessors as $sProcessorClass) {
-			
+
+			if($bAbortAllProcessing) {
+				break;
+			}
+
 			/** @var MailInboxesEmailProcessor $oProcessor */
 			$oProcessor = new $sProcessorClass();
 			$aSources = $oProcessor->ListEmailSources();
@@ -497,6 +503,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												if($oEmailReplica->IsNew() == false) {
 													$oEmailReplica->DBDelete();
 												}
+												$bAbortAllProcessing = true;
 												break 3;
 												
 											default:
