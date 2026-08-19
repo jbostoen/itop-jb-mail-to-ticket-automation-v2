@@ -186,9 +186,9 @@ class RawEmailMessage {
 				if(($sContentDisposition != '') && (preg_match('/filename="([^"]+)"/', $sContentDisposition, $aMatches))) {
 					$sFileName = $aMatches[1];
 				}
-				elseif(($sContentDisposition != '') && (preg_match('/filename=([^"]+)/', $sContentDisposition, $aMatches))) {
+				elseif(($sContentDisposition !== '') && (preg_match('/filename=([^";]+)/', $sContentDisposition, $aMatches))) {
 					// same but without quotes
-					$sFileName = $aMatches[1];
+					$sFileName = trim($aMatches[1]);
 				}
 				
 				$bInline = true;
