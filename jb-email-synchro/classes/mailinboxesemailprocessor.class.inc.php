@@ -180,8 +180,9 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 			else {
 
 				// - An old mail is being reprocessed.
+				ProcessingHelper::SetExecutedSteps([]);
 				ProcessingHelper::SetNextAction(eNextAction::NO_ACTION);
-				
+
 			}
 			$eNextAction = ProcessingHelper::GetNextAction();
 			$sAction = $eNextAction->name;
