@@ -85,6 +85,10 @@ class MessageFromMailbox extends RawEmailMessage {
 		$sDecodeStatus = '';
 		$oRelatedObject = $this->GetRelatedObject();
 		$iTime = strtotime($this->GetHeader('date'), 0); // Parse the RFC822 date format
+		if($iTime === false) {
+			IssueLog::Trace("Missing or unparsable Date header for message '{$this->sUIDL}', falling back to the current time.", 'jb-email-synchro');
+			$iTime = time();
+		}
  		$sDate = date('Y-m-d H:i:s', $iTime);
 		
  		$aTos = $this->GetTo();
