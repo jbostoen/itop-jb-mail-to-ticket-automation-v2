@@ -91,7 +91,15 @@ abstract class FindCaller extends Base {
 								break;
 
 							case 'fallback_create_person':
-								
+
+								if(preg_match('/\b(spf|dkim)=fail\b/i', $oRawEmail->GetHeader('authentication-results'))) {
+
+									static::Trace("Refusing to create a Person for '{$sCallerEmail}': the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
+									static::HandleViolation();
+									return;
+
+								}
+
 								static::Trace("Creating a new Person for the email: {$sCallerEmail}");
 								$oCaller = new Person();
 								$oCaller->Set('email', $oEmail->sCallerEmail);
