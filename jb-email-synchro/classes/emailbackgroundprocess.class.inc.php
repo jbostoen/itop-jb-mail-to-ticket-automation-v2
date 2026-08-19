@@ -177,8 +177,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 			foreach($aSources as $oSource) {
 
 				ProcessingHelper::SetMailSource($oSource);
-				
-				$iMsgCount = $oSource->GetMessagesCount();
+
 				$this->Trace("-----------------------------------------------------------------------------------------");
 				$this->Trace("Processing Message Source: ".$oSource->GetName());
 				try {
