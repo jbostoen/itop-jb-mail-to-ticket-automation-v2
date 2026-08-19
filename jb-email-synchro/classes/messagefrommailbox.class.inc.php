@@ -168,7 +168,11 @@ class MessageFromMailbox extends RawEmailMessage {
 	protected function ParseMessageId($sMessageId) {
 		$aMatches = array();
 		$ret = false;
-		if (preg_match('/^<iTop_(.+)_([0-9]+)(?:_.+)?@.+openitop\.org>$/', $sMessageId, $aMatches))
+		// The signature group is mandatory (#95): a Message-ID lacking it, or carrying one that
+		// doesn't verify against this installation's own secret, must not be trusted - otherwise
+		// an external sender could forge a reference to an arbitrary, guessed class/id pair.
+		if (preg_match('/^<iTop_(.+)_([0-9]+)_([a-f0-9]+)_.+@.+openitop\.org>$/', $sMessageId, $aMatches)
+			&& EmailReplica::IsValidMessageIdSignature($aMatches[1], $aMatches[2], $aMatches[3]))
 		{
 			$ret = array('class' => $aMatches[1], 'id' => $aMatches[2]);
 		}

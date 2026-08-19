@@ -69,15 +69,67 @@ class EmailReplica extends DBObject {
 		return $sReferences;
 	}
 	
-	public static function MakeMessageId($oObject) {
-		
+	public static function MakeMessageId(DBObject $oObject) : string {
+
+		$sClass = get_class($oObject);
+		$sId = $oObject->GetKey();
+
 		//  N°5216 Fix invalid message-id when sending notification using cron on system with a specific locale set (#15) The timestamp used was indeed locale dependent.
-		$sMessageId = sprintf('<iTop_%s_%d_%F@%s.openitop.org>',
-			get_class($oObject),
-			$oObject->GetKey(),
+		$sMessageId = sprintf('<iTop_%s_%d_%s_%F@%s.openitop.org>',
+			$sClass,
+			$sId,
+			self::MakeMessageIdSignature($sClass, $sId),
 			microtime(true /* get as float*/),
 			MetaModel::GetConfig()->Get('session_name')
 		);
 		return $sMessageId;
+	}
+
+	/**
+	 * Returns this installation's own secret for signing Message-IDs (#95).
+	 *
+	 * Uses iTop's own encryption key (Config::GetEncryptionKey(), already persisted at install
+	 * time to back AttributePassword/encrypted attributes) rather than either a brand new setting
+	 * or a value like the DB password: the DB password can be rotated independently of anything
+	 * else, which would silently invalidate every Message-ID signed before the rotation - breaking
+	 * reply-threading for any ticket notification already in a customer's inbox. The encryption key
+	 * has no reason to change on its own and needs no new config/persistence of its own.
+	 *
+	 * @return string
+	 */
+	private static function GetMessageIdSecret() : string {
+
+		return MetaModel::GetConfig()->GetEncryptionKey();
+
+	}
+
+	/**
+	 * Computes a signature binding a class/id pair to this iTop installation's own secret, so an
+	 * incoming e-mail's In-Reply-To/References header can't just be forged with a guessed/sequential
+	 * object id to have the message attached to an arbitrary existing object (#95).
+	 *
+	 * @param string $sClass
+	 * @param int|string $sId
+	 * @return string
+	 */
+	public static function MakeMessageIdSignature(string $sClass, int|string $sId) : string {
+
+		return substr(hash_hmac('sha256', $sClass.'_'.$sId, self::GetMessageIdSecret()), 0, 16);
+
+	}
+
+	/**
+	 * Verifies a class/id/signature triple extracted from an incoming Message-ID against what
+	 * MakeMessageIdSignature() would have produced for this installation (#95).
+	 *
+	 * @param string $sClass
+	 * @param int|string $sId
+	 * @param string $sSignature
+	 * @return bool
+	 */
+	public static function IsValidMessageIdSignature(string $sClass, int|string $sId, string $sSignature) : bool {
+
+		return hash_equals(self::MakeMessageIdSignature($sClass, $sId), $sSignature);
+
 	}
 }
