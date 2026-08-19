@@ -106,6 +106,7 @@ abstract class StepFindCallerByContactMethod extends Base {
 		// Don't bother if the caller is already determined.
 		if($oCaller !== null) {
 			static::Trace("Caller already determined by previous step. Skip.");
+			return;
 		}
 
 		$sCallerEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
