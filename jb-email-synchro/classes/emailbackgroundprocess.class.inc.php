@@ -239,22 +239,27 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						
 					}
 					
-					$sOQL = '
-						SELECT EmailReplica 
-						WHERE
-							uidl IN (' . implode(',', CMDBSource::Quote($aInternalIdentifiers)) . ') 
-							AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox')).'
-							AND mailbox_id = '.$oInbox->GetKey();
-
-					$this->Trace("Searching EmailReplicas: '$sOQL'");
-					$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 					$aReplicas = [];
 
-					/** @var EmailReplica $oReplica */
-					while($oReplica = $oReplicaSet->Fetch()) {
-						$aReplicas[$oReplica->Get('uidl')] = $oReplica;
+					if($aInternalIdentifiers !== []) {
+
+						$sOQL = '
+							SELECT EmailReplica
+							WHERE
+								uidl IN (' . implode(',', CMDBSource::Quote($aInternalIdentifiers)) . ')
+								AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox')).'
+								AND mailbox_id = '.$oInbox->GetKey();
+
+						$this->Trace("Searching EmailReplicas: '$sOQL'");
+						$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
+
+						/** @var EmailReplica $oReplica */
+						while($oReplica = $oReplicaSet->Fetch()) {
+							$aReplicas[$oReplica->Get('uidl')] = $oReplica;
+						}
+
 					}
-					
+
 					// Processes the actual messages in the correct order
 					/** @var int $iMessage Due to sorting above with uasort(), the array keys might have changed from e.g. 0, 1, 2  to 0, 2, 1 **/
 					/** @var MessageHandler $oMsgHandler */
