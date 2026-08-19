@@ -40,7 +40,9 @@ abstract class AttachmentCriteria extends Base {
 	 * @inheritDoc
 	 */
 	public static string $sXMLSettingsPrefix = 'step_attachment_criteria';
-	
+
+	const int MAX_PIXEL_COUNT = 40000000;
+
 	/**
 	 * @inheritDoc
 	 *
@@ -117,7 +119,15 @@ abstract class AttachmentCriteria extends Base {
 							
 							$iWidth = $aImgInfo[0];
 							$iHeight = $aImgInfo[1];
-							
+
+							if($iWidth * $iHeight > self::MAX_PIXEL_COUNT) {
+
+								static::Trace('Image dimensions (%1$sx%2$s) exceed the hard safety limit, ignoring attachment.', $iWidth, $iHeight);
+								unset($oEmail->aAttachments[$sAttachmentRef]);
+								continue;
+
+							}
+
 							// Image too small?
 							if($bDoCheckIfImageDimensionTooSmall && ($iWidth < $iMinWidth || $iHeight < $iMinHeight)) {
 								
