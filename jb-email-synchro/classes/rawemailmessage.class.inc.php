@@ -523,8 +523,19 @@ class RawEmailMessage {
 				if(preg_match('/([^:]+): ?(.*)$/', $sLine, $aMatches)) {
 					$sNewHeader = strtolower($aMatches[1]);
 					$sValue = $aMatches[2];
-					$aRawFields[$sNewHeader] = $sValue;
-					$sCurrentHeader = $sNewHeader;
+					if(isset($aRawFields[$sNewHeader])) {
+						// The first occurrence of a header wins; a later duplicate is ignored instead
+						// of silently overwriting it. RFC 5322 header fields such as "From" are not
+						// meant to occur more than once, so a message containing a duplicate did not
+						// come from a spec-compliant mail client. Rejecting or stripping that kind of
+						// malformed input is properly a mail server's job; this is just a defensive,
+						// deterministic fallback for whatever already reached this parser.
+						$sCurrentHeader = '';
+					}
+					else {
+						$aRawFields[$sNewHeader] = $sValue;
+						$sCurrentHeader = $sNewHeader;
+					}
 				}
 			}
 			else {
