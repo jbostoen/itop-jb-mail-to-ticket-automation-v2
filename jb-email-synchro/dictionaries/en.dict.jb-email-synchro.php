@@ -89,11 +89,24 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:TriggerOnMailUpdate+' => 'Trigger activated when a ticket is updated by processing an incoming email',
 
 	'Class:TriggerOnMailProcessingEvent' => 'Trigger (on mail processing event)',
-	'Class:TriggerOnMailProcessingEvent+' => 'Trigger activated when an incoming email violates a mailbox policy (step)',
-	'Class:TriggerOnMailProcessingEvent/Attribute:step_list' => 'Policy steps',
-	'Class:TriggerOnMailProcessingEvent/Attribute:step_list+' => 'One policy step identifier per line (e.g. "policy_no_subject"), see each step\'s documentation for its identifier',
+	'Class:TriggerOnMailProcessingEvent+' => 'Trigger activated upon a step during the processing of an incoming email',
+	'Class:TriggerOnMailProcessingEvent/Attribute:steps_list' => 'Steps',
+	'Class:TriggerOnMailProcessingEvent/Attribute:steps_list+' => 'The steps to subscribe to, see each step\'s documentation for its identifier',
 	'Class:TriggerOnMailProcessingEvent/Attribute:include_original_message' => 'Include original message',
 	'Class:TriggerOnMailProcessingEvent/Attribute:include_original_message+' => 'Attach the original email (.eml) to the linked actions, and expose it as the "mail->eml_base64" placeholder',
+
+	'Class:MailProcessingStep' => 'Mail processing step',
+	'Class:MailProcessingStep+' => 'A step in the mail processing pipeline that a trigger can subscribe to',
+	'Class:MailProcessingStep/Attribute:code' => 'XML settings prefix',
+	'Class:MailProcessingStep/Attribute:code+' => 'The step\'s XML settings prefix, e.g. "policy_no_subject". Not unique: several steps can share the same prefix',
+	'Class:MailProcessingStep/Attribute:category' => 'Step class',
+	'Class:MailProcessingStep/Attribute:category+' => 'The step\'s implementing class (fully qualified). The actual unique identifier',
+
+	'Class:lnkMailProcessingStepToTrigger' => 'Step - trigger',
+	'Class:lnkMailProcessingStepToTrigger+' => 'Link between a mail processing step and a trigger subscribed to it',
+	'Class:lnkMailProcessingStepToTrigger/Attribute:trigger_id' => 'Trigger',
+	'Class:lnkMailProcessingStepToTrigger/Attribute:step_id' => 'Step',
+	'Class:lnkMailProcessingStepToTrigger/Attribute:code' => 'Code',
 
 	'MailInbox:EmptyMailbox' => 'Empty mailbox',
 	

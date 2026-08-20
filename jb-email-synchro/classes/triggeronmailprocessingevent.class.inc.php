@@ -7,8 +7,9 @@
 
 /**
  * Class TriggerOnMailProcessingEvent.
- * A trigger that is activated when an incoming e-mail violates a mailbox policy ("step"),
+ * A trigger that is activated upon a step during the processing of an incoming e-mail,
  * e.g. an undesired title pattern, a forbidden attachment mime type, an unknown caller, ...
+ * Triggers subscribe to steps (Step::GetXMLSettingsPrefix()), the parent class; a policy is just one kind of step.
  *
  * @details Unlike TriggerOnMailUpdate, this does NOT extend TriggerOnObject: a mail processing event does not necessarily
  * relate to an existing Ticket (e.g. the message may be rejected before any Ticket is created or found).
@@ -35,13 +36,20 @@ class TriggerOnMailProcessingEvent extends Trigger {
 		MetaModel::Init_Params($aParams);
 		MetaModel::Init_InheritAttributes();
 
-		// The steps to subscribe to: one step identifier (Step::GetXMLSettingsPrefix()) per line, e.g. "policy_no_subject".
-		MetaModel::Init_AddAttribute(new AttributeText('step_list', [
+		// The steps (MailProcessingStep, e.g. "policy_no_subject") to subscribe to.
+		MetaModel::Init_AddAttribute(new AttributeLinkedSetIndirect('steps_list', [
+			'linked_class' => 'lnkMailProcessingStepToTrigger',
+			'ext_key_to_me' => 'trigger_id',
+			'ext_key_to_remote' => 'step_id',
+			'count_min' => 0,
+			'count_max' => 0,
+			'duplicates' => false,
+			'display_style' => '',
 			'allowed_values' => null,
-			'sql' => 'step_list',
-			'default_value' => '',
-			'is_null_allowed' => false,
+			'with_php_constraint' => false,
+			'with_php_computation' => false,
 			'depends_on' => [],
+			'always_load_in_tables' => false,
 		]));
 
 		// Whether the original e-mail should be attached (as .eml) to the context arguments passed to the linked actions.
@@ -55,8 +63,8 @@ class TriggerOnMailProcessingEvent extends Trigger {
 		]));
 
 		// Display lists
-		MetaModel::Init_SetZListItems('details', ['description', 'step_list', 'include_original_message', 'subscription_policy', 'action_list']);
-		MetaModel::Init_SetZListItems('list', ['description', 'step_list']);
+		MetaModel::Init_SetZListItems('details', ['description', 'steps_list', 'include_original_message', 'subscription_policy', 'action_list']);
+		MetaModel::Init_SetZListItems('list', ['description']);
 		// Search criteria
 		MetaModel::Init_SetZListItems('standard_search', ['description']);
 

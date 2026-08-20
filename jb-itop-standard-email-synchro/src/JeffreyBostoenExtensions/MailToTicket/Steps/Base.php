@@ -21,6 +21,7 @@ use EmailContact;
 use EmailMessage;
 use EmailProcessor;
 use EmailSource;
+use lnkMailProcessingStepToTrigger;
 use MailInboxStandard;
 use ormDocument;
 use RawEmailMessage;
@@ -263,28 +264,43 @@ abstract class Base implements iStep {
 
 		$oMailBox = ProcessingHelper::GetMailBox();
 		$sStepId = static::GetXMLSettingsPrefix();
+		$sStepClass = static::class;
 
 		$oSet_Triggers = new DBObjectSet(DBObjectSearch::FromOQL_AllData('SELECT TriggerOnMailProcessingEvent'));
 
 		/** @var TriggerOnMailProcessingEvent $oTrigger */
 		while($oTrigger = $oSet_Triggers->Fetch()) {
 
-			$aStepIds = array_map('trim', preg_split(static::NEWLINE_REGEX, (string)$oTrigger->Get('step_list')));
+			/** @var ormLinkSet $oSet_Steps */
+			$oSet_Steps = $oTrigger->Get('steps_list');
+			$bSubscribed = false;
 
-			if(in_array($sStepId, $aStepIds, true) == false) {
+			// Matched on the step's class (category), not its XML settings prefix (code): several step classes can share the same prefix.
+			/** @var lnkMailProcessingStepToTrigger $oLink */
+			while($oLink = $oSet_Steps->Fetch()) {
+
+				if($oLink->Get('category') === $sStepClass) {
+					$bSubscribed = true;
+					break;
+				}
+
+			}
+
+			if($bSubscribed === false) {
 				continue;
 			}
 
-			static::Trace('.. Activating TriggerOnMailProcessingEvent #%1$s ("%2$s") for step "%3$s".', $oTrigger->GetKey(), $oTrigger->Get('description'), $sStepId);
+			static::Trace('.. Activating TriggerOnMailProcessingEvent #%1$s ("%2$s") for step "%3$s".', $oTrigger->GetKey(), $oTrigger->Get('description'), $sStepClass);
 
 			// 'this->object()' is required by ActionEmail (assumes a notification is linked to an object); the mailbox is the most relevant object here,
 			// since - unlike TriggerOnMailUpdate - there may not be a related Ticket yet at this point.
 			$aContextArgs = static::GetMailPlaceholderParams([
 				'this->object()' => $oMailBox,
-				'policy->step' => $sStepId,
+				'step->id' => $sStepId,
+				'step->class' => $sStepClass,
 			]);
 
-			if($oTrigger->Get('include_original_message') == true) {
+			if($oTrigger->Get('include_original_message') === true) {
 
 				$oRawEmail = ProcessingHelper::GetRawMail();
 				$aContextArgs['attachments'] = [

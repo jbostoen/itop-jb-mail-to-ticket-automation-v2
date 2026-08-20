@@ -89,11 +89,24 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:TriggerOnMailUpdate+' => 'Déclencheur activé sur la mise à jour de tickets par mail',
 
 	'Class:TriggerOnMailProcessingEvent' => 'Déclencheur (sur événement de traitement du mail)',
-	'Class:TriggerOnMailProcessingEvent+' => 'Déclencheur activé lorsqu\'un email entrant viole une politique de la boîte mail (étape)',
-	'Class:TriggerOnMailProcessingEvent/Attribute:step_list' => 'Étapes de politique',
-	'Class:TriggerOnMailProcessingEvent/Attribute:step_list+' => 'Un identifiant d\'étape de politique par ligne (ex. "policy_no_subject")',
+	'Class:TriggerOnMailProcessingEvent+' => 'Déclencheur activé lors d\'une étape du traitement d\'un email entrant',
+	'Class:TriggerOnMailProcessingEvent/Attribute:steps_list' => 'Étapes',
+	'Class:TriggerOnMailProcessingEvent/Attribute:steps_list+' => 'Les étapes auxquelles s\'abonner, voir la documentation de chaque étape pour son identifiant',
 	'Class:TriggerOnMailProcessingEvent/Attribute:include_original_message' => 'Inclure le message original',
 	'Class:TriggerOnMailProcessingEvent/Attribute:include_original_message+' => 'Joindre l\'email original (.eml) aux actions liées, et l\'exposer via le paramètre "mail->eml_base64"',
+
+	'Class:MailProcessingStep' => 'Étape de traitement du mail',
+	'Class:MailProcessingStep+' => 'Une étape du pipeline de traitement du mail, à laquelle un déclencheur peut s\'abonner',
+	'Class:MailProcessingStep/Attribute:code' => 'Préfixe des paramètres XML',
+	'Class:MailProcessingStep/Attribute:code+' => 'Le préfixe des paramètres XML de l\'étape (ex. "policy_no_subject"). Non unique : plusieurs étapes peuvent partager le même préfixe',
+	'Class:MailProcessingStep/Attribute:category' => 'Classe de l\'étape',
+	'Class:MailProcessingStep/Attribute:category+' => 'La classe d\'implémentation de l\'étape (nom complet). L\'identifiant unique réel',
+
+	'Class:lnkMailProcessingStepToTrigger' => 'Étape - déclencheur',
+	'Class:lnkMailProcessingStepToTrigger+' => 'Lien entre une étape de traitement du mail et un déclencheur qui y est abonné',
+	'Class:lnkMailProcessingStepToTrigger/Attribute:trigger_id' => 'Déclencheur',
+	'Class:lnkMailProcessingStepToTrigger/Attribute:step_id' => 'Étape',
+	'Class:lnkMailProcessingStepToTrigger/Attribute:code' => 'Code',
 
 	'MailInbox:EmptyMailbox' => 'La boîte mail est vide.',
 	
