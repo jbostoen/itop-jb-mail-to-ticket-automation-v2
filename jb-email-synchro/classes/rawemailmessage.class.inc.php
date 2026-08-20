@@ -644,13 +644,16 @@ class RawEmailMessage {
 	 * Decodes the 'lines' of the 'body' of the given part according to its headers (and the message's global headers)
 	 * This function decode base64 and qencoded strings and converts the result to UTF-8 if needed
 	 *
+	 * Per RFC 2045, a part lacking its own Content-Transfer-Encoding header defaults to 7bit - it
+	 * must not inherit the enclosing multipart envelope's own encoding.
+	 *
 	 * @param hash $aHeaders The part headers, for the part to decode
 	 * @param array $aLines The body to decode as an array of text strings (one entry per line)
 	 *
 	 * @return string The decoded 'body' of the part, in UTF-8
 	 */
 	function DecodePart($aHeaders, $aLines) {
-		$sContentTransferEncoding = $this->GetHeader('Content-Transfer-Encoding');
+		$sContentTransferEncoding = '7bit';
 		$sCharset = 'UTF-8';
 		$sContentTypeHeader = $this->GetHeader('Content-Type');
 		
