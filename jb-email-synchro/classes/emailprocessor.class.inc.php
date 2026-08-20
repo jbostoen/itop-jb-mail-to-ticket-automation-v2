@@ -66,16 +66,16 @@ abstract class EmailProcessor {
 	 * @param \RawEmailMessage $oRawEmail
 	 * @param array $aErrors
 	 *
-	 * @return integer Next Action Code
+	 * @return eNextAction Next Action Code
 	 */
-	public function OnDecodeError(EmailSource $oSource, $sUIDL, $oEmail, RawEmailMessage $oRawEmail, &$aErrors = array()) {
+	public function OnDecodeError(EmailSource $oSource, $sUIDL, $oEmail, RawEmailMessage $oRawEmail, &$aErrors = array()) : eNextAction {
 		$sEmailSubject = '';
 		if($oEmail != null) {
 			$sEmailSubject = $oEmail->sSubject;
 			$aErrors = $oEmail->GetInvalidReasons();
 		}
 		$aErrors[] = "The message (".$sUIDL."), subject: '$sEmailSubject', was not decoded properly and therefore was not processed.";
-		return self::MARK_MESSAGE_AS_ERROR;
+		return eNextAction::MARK_MESSAGE_AS_ERROR;
 	}
 	
 	/**
