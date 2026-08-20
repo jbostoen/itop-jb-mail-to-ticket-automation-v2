@@ -31,7 +31,6 @@ SetupWebPage::AddModule(
 			'model.jb-itop-standard-email-synchro.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/EventListener.php',
 			// Core processing.
-			'src/JeffreyBostoenExtensions/MailToTicket/EventListener.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Base.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/AttachmentCriteria.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Core/CreateOrUpdateTicket.php',
@@ -45,7 +44,6 @@ SetupWebPage::AddModule(
 			// Extra.
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AttachmentForbiddenMimeType.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AutoReply.php',
-			'src/JeffreyBostoenExtensions/MailToTicket/Steps/Base.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/LimitMailSize.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/MatchByInReplyToOrReferences.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/NonDeliveryReport.php',
