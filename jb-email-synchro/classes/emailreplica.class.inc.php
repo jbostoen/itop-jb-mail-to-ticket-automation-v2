@@ -99,7 +99,13 @@ class EmailReplica extends DBObject {
 	 */
 	private static function GetMessageIdSecret() : string {
 
-		return MetaModel::GetConfig()->GetEncryptionKey();
+		$sKey = MetaModel::GetConfig()->GetEncryptionKey();
+
+		if($sKey === DEFAULT_ENCRYPTION_KEY) {
+			IssueLog::Warning('Message-ID signing is using the hardcoded default encryption key (no Sodium, OpenSSL or Mcrypt available); this is a publicly known secret and defeats the purpose of signing Message-IDs.', 'jb-email-synchro');
+		}
+
+		return $sKey;
 
 	}
 
