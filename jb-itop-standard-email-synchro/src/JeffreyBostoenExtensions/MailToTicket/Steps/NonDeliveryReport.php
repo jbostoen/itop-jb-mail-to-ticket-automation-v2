@@ -16,6 +16,9 @@ use JeffreyBostoenExtensions\MailToTicket\{
 // iTop internals.
 use DBObjectSearch;
 use DBOBjectSet;
+use EmailMessage;
+use RawEmailMessage;
+use Exception;
 
 
 
@@ -83,25 +86,40 @@ abstract class NonDeliveryReport extends Base {
 						// List phrase
 						static::Trace('.. Keywords: '.$aKeywords[1]);
  
-						// Mark as inactive?
-						if($bMarkAsInactive == true) {
+						if($bMarkAsInactive) {
 
-							// Build a list of e-mail addresses of recipients to whom delivery failed.
-							// Note: field name is matched case-insensitively; RFC 3464 examples capitalize it as "Final-Recipient".
-							if(preg_match('/Final-Recipient: RFC822; (.*?@.*)/i', $sContent, $aRecipient) === 1) {
+							if(preg_match('/Final-Recipient: RFC822; (.*?@.*)/i', $sContent, $aRecipient) !== 1) {
+
+								static::Trace('.. Could not determine the "Final-Recipient" from the Non-Delivery Report.');
+
+							}
+							else {
 
 								$sRecipient = $aRecipient[1];
-
 								static::Trace('.. Recipient: '.$sRecipient);
 
-								// Lookup if there is a person whose e-mail is in the list.
+								$oTicket = ProcessingHelper::GetTicket();
+
+								if($oTicket !== null) {
+									$bTrusted = (strcasecmp($sRecipient, (string) $oTicket->Get('caller_id->email')) === 0);
+								}
+								else {
+									$bTrusted = static::EmbeddedOriginalSenderMatchesMailbox($oEmail);
+								}
+
+								if(!$bTrusted) {
+
+									static::Trace('.. Could not verify this Non-Delivery Report relates to a notification this mailbox actually sent; not marking anyone as inactive based on it.');
+
+								}
+								else {
 
 									// email field of Person object
 									$oSetPerson = new DBObjectSet(DBObjectSearch::FromOQL('SELECT Person WHERE email LIKE :email'), [], [
 										'email' => $sRecipient
 									]);
 
-									if($oSetPerson->Count() == 0) {
+									if($oSetPerson->Count() === 0) {
 
 										static::Trace('.. No Person found.');
 
@@ -125,13 +143,12 @@ abstract class NonDeliveryReport extends Base {
 
 									}
 
-							}
-							else {
-								static::Trace('.. Could not determine the "Final-Recipient" from the Non-Delivery Report.');
+								}
+
 							}
 
 						}
-								
+
 						// Handle behavior.
 						static::HandleViolation();
 					
@@ -145,6 +162,44 @@ abstract class NonDeliveryReport extends Base {
 		
 		
 		
+	}
+
+	/**
+	 * Whether this bounce embeds an original message (RFC 3464's message/rfc822 or
+	 * text/rfc822-headers part) whose own sender matches this mailbox's own address/aliases -
+	 * the closest available proxy for "this mailbox actually sent the notification that bounced"
+	 * when no ticket is linked to anchor the check against instead.
+	 *
+	 * @param EmailMessage $oEmail
+	 * @return bool
+	 */
+	private static function EmbeddedOriginalSenderMatchesMailbox(EmailMessage $oEmail) : bool {
+
+		$aAliases = array_map('strtolower', static::GetMailBoxAliases());
+
+		foreach($oEmail->aAttachments as $aAttachment) {
+
+			if(!in_array($aAttachment['mimeType'], ['message/rfc822', 'text/rfc822-headers'], true)) {
+				continue;
+			}
+
+			try {
+				$oEmbedded = new RawEmailMessage((string) $aAttachment['content']);
+			}
+			catch(Exception $e) {
+				continue;
+			}
+
+			$aSenders = $oEmbedded->GetSender();
+
+			if($aSenders !== [] && in_array(strtolower($aSenders[0]->GetEmailAddress()), $aAliases, true)) {
+				return true;
+			}
+
+		}
+
+		return false;
+
 	}
 
 }
