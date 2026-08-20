@@ -258,6 +258,10 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:yes' => 'Yes',
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:no' => 'No',
 
+	// Step: Update caller attributes
+	'Class:MailInboxStandard/Attribute:step_update_caller_attributes' => 'Update caller attributes (one per line, example: status:active)',
+	'Class:MailInboxStandard/Attribute:step_update_caller_attributes+' => 'Applied to the caller\'s Person record whenever a successfully processed e-mail is matched to an existing contact. Leave empty to not update anything. Mail placeholders (e.g. $mail->caller_email$) can be used in the values.',
+
 	// Policy: Sender Email Address
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Behavior on violation',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'Bounce to sender and delete',
@@ -301,6 +305,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Limit accepted e-mail replies to original ticket caller\'s e-mail address',
 	'MailInbox:PolicyAutoReply' => 'Auto reply',
 	'MailInbox:PolicyNonDeliveryReport' => 'Non Delivery Reports',
+	'MailInbox:StepUpdateCallerAttributes' => 'Update caller attributes',
 	'MailInbox:PolicySenderEmailAddress' => 'Block senders using e-mail address patterns',
 
 	// Validation messages

@@ -124,20 +124,11 @@ abstract class FindAdditionalContacts extends Base {
 							$oContact = new Person();
 							$oContact->Set('email', $sRecipientEmail);
 							$sDefaultValues = static::GetStepSetting('default_values');
-							$aDefaults = preg_split(static::NEWLINE_REGEX, $sDefaultValues);
-							$aDefaultValues = array();
-							foreach($aDefaults as $sLine) {
-								if(preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
-									$sAttCode = trim($aMatches[1]);
-									$sValue = trim($aMatches[2]);
-									$sValue = static::ReplaceMailPlaceholders($sValue, [
-										'recipient->name' => $sRecipientName,
-										'recipient->email' => $sRecipientEmail,
-									]);
-									$aDefaultValues[$sAttCode] = $sValue;
-								}
-							}
-							
+							$aDefaultValues = static::ParseAttributeValues($sDefaultValues, [
+								'recipient->name' => $sRecipientName,
+								'recipient->email' => $sRecipientEmail,
+							]);
+
 							ProcessingHelper::InitObjectFromDefaultValues($oContact, $aDefaultValues);
 							try {
 								static::Trace("Try to create user with default values");

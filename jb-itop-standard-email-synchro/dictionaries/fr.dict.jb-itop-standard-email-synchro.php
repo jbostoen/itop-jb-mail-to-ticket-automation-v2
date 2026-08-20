@@ -237,7 +237,11 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive+' => 'L\'appelant sera marqué comme inactif si l\'échec de livraison du mail semble permanent et qu\'il y a une forte probabilité que le destinataire ne soit plus joignable via cette adresse e-mail.',
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:yes' => 'Oui',
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:no' => 'Non',
-	
+
+	// Step: Update caller attributes
+	'Class:MailInboxStandard/Attribute:step_update_caller_attributes' => 'Mettre à jour les attributs de l\'appelant (un par ligne, exemple : status:active)',
+	'Class:MailInboxStandard/Attribute:step_update_caller_attributes+' => 'Appliqué à la fiche Person de l\'appelant lorsqu\'un e-mail traité avec succès correspond à un contact existant. Laisser vide pour ne rien mettre à jour. Les placeholders (par ex. $mail->caller_email$) peuvent être utilisés dans les valeurs.',
+
 	// Policy: Sender Email Address
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
@@ -278,6 +282,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:PolicyOtherRecipients' => 'Autres destinataires',
 	'MailInbox:PolicyAutoReply' => 'Auto réponse',
 	'MailInbox:PolicyNonDeliveryReport' => 'Non Delivery Reports',
+	'MailInbox:StepUpdateCallerAttributes' => 'Mettre à jour les attributs de l\'appelant',
 	'MailInbox:PolicySenderEmailAddress' => 'Bloquer les expéditeurs à l\'aide de motifs d\'adresses e-mail',
 
 	// Messages de validation

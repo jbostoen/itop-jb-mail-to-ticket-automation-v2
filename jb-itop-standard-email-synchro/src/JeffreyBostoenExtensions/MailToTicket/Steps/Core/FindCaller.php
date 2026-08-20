@@ -108,19 +108,9 @@ abstract class FindCaller extends Base {
 								if(trim($sDefaultValues) != '') {
 									
 									try {
-									
-										$aDefaults = preg_split(static::NEWLINE_REGEX, $sDefaultValues);
-										$aDefaultValues = [];
-										
-										foreach($aDefaults as $sLine) {
-											if(preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
-												$sAttCode = trim($aMatches[1]);
-												$sValue = trim($aMatches[2]);
-												$sValue = static::ReplaceMailPlaceholders($sValue);
-												$aDefaultValues[$sAttCode] = $sValue;
-											}
-										}
-										
+
+										$aDefaultValues = static::ParseAttributeValues($sDefaultValues);
+
 										static::Trace('... Default values: '.http_build_query($aDefaultValues));
 										ProcessingHelper::InitObjectFromDefaultValues($oCaller, $aDefaultValues);
 										

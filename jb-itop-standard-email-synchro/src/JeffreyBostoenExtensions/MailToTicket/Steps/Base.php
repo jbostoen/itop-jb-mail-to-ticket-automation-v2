@@ -165,10 +165,39 @@ abstract class Base implements iStep {
 		}
 		
 		return MetaModel::ApplyParams($sString, $aParamsExtended);
-		
+
 	}
-	
-	
+
+
+	/**
+	 * Parses a newline-separated "attcode:value" setting (e.g. a mailbox's default_values field)
+	 * into an attcode => value array ready for ProcessingHelper::InitObjectFromDefaultValues(),
+	 * applying mail placeholders to each value.
+	 *
+	 * @param string $sRawValues
+	 * @param array $aExtraPlaceholders Optional: extra placeholders, forwarded to ReplaceMailPlaceholders().
+	 *
+	 * @return array
+	 */
+	public static function ParseAttributeValues(string $sRawValues, array $aExtraPlaceholders = []) : array {
+
+		$aLines = preg_split(static::NEWLINE_REGEX, $sRawValues);
+		$aValues = [];
+
+		foreach($aLines as $sLine) {
+			if(preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
+				$sAttCode = trim($aMatches[1]);
+				$sValue = trim($aMatches[2]);
+				$sValue = static::ReplaceMailPlaceholders($sValue, $aExtraPlaceholders);
+				$aValues[$sAttCode] = $sValue;
+			}
+		}
+
+		return $aValues;
+
+	}
+
+
 	/**
 	 * Trace function used to log information about the e-mail processing.
 	 *

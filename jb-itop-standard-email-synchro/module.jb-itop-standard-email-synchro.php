@@ -58,6 +58,7 @@ SetupWebPage::AddModule(
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/TicketResolved.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/UndesiredTitlePatterns.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/UnknownTicketReference.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/UpdateCallerAttributes.php',
 		),
 		'webservice' => array(
 			

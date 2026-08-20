@@ -271,17 +271,8 @@ abstract class CreateOrUpdateTicket extends Base {
 
 		// Default values.
 		$sDefaultValues = $oMailBox->Get('ticket_default_values');
-		$aDefaults = preg_split(static::NEWLINE_REGEX, $sDefaultValues);
-		$aDefaultValues = [];
-		foreach($aDefaults as $sLine) {
-			if (preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
-				$sAttCode = trim($aMatches[1]);
-				$sValue = trim($aMatches[2]);
-				$sValue = static::ReplaceMailPlaceholders($sValue);
-				$aDefaultValues[$sAttCode] = $sValue;
-			}
-		}
-		
+		$aDefaultValues = static::ParseAttributeValues($sDefaultValues);
+
 		ProcessingHelper::InitObjectFromDefaultValues($oTicket, $aDefaultValues);
 		
 		static::AddAdditionalContacts();
