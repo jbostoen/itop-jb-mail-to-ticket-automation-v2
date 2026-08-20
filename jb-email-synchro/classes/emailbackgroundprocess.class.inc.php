@@ -465,7 +465,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												break;
 											
 											case eNextAction::MOVE_MESSAGE:
-											
+
 												$iTotalMoved++;
 												$this->Trace("Move message (and replica): $sUIDL / index $iMessage");
 												try {
@@ -474,6 +474,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												}
 												catch(Exception $e) {
 													$this->Trace("Unable to move message");
+												}
+												if(!$oEmailReplica->IsNew()) {
+													$aReplicas[$sUIDL] = $oEmailReplica;
 												}
 												break;
 											
