@@ -111,6 +111,11 @@ abstract class StepFindCallerByContactMethod extends Base {
 
 		$sCallerEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
 
+		if(preg_match('/\b(spf|dkim)=fail\b/i', $oRawEmail->GetHeader('authentication-results'))) {
+			static::Trace("Refusing to trust '{$sCallerEmail}' as a contact method match: the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
+			return;
+		}
+
 		/** @var Person|null $oCaller The related person. */
 		$oPerson = StepFindCallerByContactMethod::FindContactByEmail($sCallerEmail);
 
