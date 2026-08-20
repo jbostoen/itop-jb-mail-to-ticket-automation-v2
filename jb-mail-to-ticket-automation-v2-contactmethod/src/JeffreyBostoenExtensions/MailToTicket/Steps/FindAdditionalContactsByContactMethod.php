@@ -33,10 +33,17 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 	 * @inheritDoc
 	 *
 	 */
-	// Should be executed before StepFindAdditionalContacts; 
+	// Should be executed before StepFindAdditionalContacts;
 	// therefore $iPrecedence should be lower than that of StepFindAdditionalContacts (115).
 	public static int $iPrecedence = 114;
-	
+
+	/**
+	 * @inheritDoc
+	 * @details Shares the core FindAdditionalContacts step's setting, so both matching mechanisms
+	 * honor the same admin-facing "other recipients" policy.
+	 */
+	public static string $sXMLSettingsPrefix = 'policy_other_recipients';
+
 	/**
 	 * @inheritDoc
 	 * @details Checks if all information within the e-mail is compliant with the steps defined for this mailbox
@@ -51,7 +58,13 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 				static::Trace(". Step not relevant: No relevant classes exist (ContactMethod, EmailAlias).");
 				return;
 			}
-			
+
+			$sPolicyBehavior = static::GetStepSetting('behavior');
+			if(!in_array($sPolicyBehavior, ['fallback_add_existing_other_contacts', 'fallback_add_other_contacts'], true)) {
+				static::Trace(". Step not relevant: policy_other_recipients_behavior is '{$sPolicyBehavior}', not one of the 'add' behaviors.");
+				return;
+			}
+
 			/** @var EmailMessage $oEmail E-mail message. */
 			$oEmail = ProcessingHelper::GetMail();
 			
@@ -98,9 +111,7 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 					// Only do so if the e-mail is sent by the person!
 					// static::Trace(". Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCurrentEmail}");
 					// $oPerson->Set('email', $sCurrentEmail);
-					$oPerson->DBUpdate();
-					
-				
+
 				}
 				
 			}
