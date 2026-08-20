@@ -101,14 +101,18 @@ class RawEmailMessage {
 	
 	/**
 	 * Retrieves the address(es) from the originator of the message.
-	 * 
+	 *
 	 * It tries so by analyzing the e-mail headers in in the following order:
 	 * 1) "From"
 	 * 2) "Sender"
 	 * 3) "Reply-To".
-	 * 
+	 *
 	 * See RFC 822, RFC 2822, RFC 5322 which allows this.
 	 * In the real world, it's rather rare though.
+	 *
+	 * By the time any Step consumes this (via GetSender()[0]), it is never empty: EmailMessage's
+	 * constructor already ran this same lookup and EmailBackgroundProcess::Process() routes a
+	 * message with no caller email to OnDecodeError() before the Steps pipeline ever runs.
 	 *
 	 * @return EmailContact[] One per sender.
 	 */
