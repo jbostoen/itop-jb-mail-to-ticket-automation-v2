@@ -28,7 +28,7 @@ class IMAPOAuthEmailSource extends IMAPEmailSource {
 	public function __construct(MailInboxBase $oMailbox) {
 
 		$oProvider = ProviderHelper::GetProviderForIMAP($oMailbox);
-		$this->sAccessToken = '';
+		$this->sAccessToken = null;
 
 		try {
 			$this->sAccessToken = ProviderHelper::GetAccessTokenForProvider($oProvider);
