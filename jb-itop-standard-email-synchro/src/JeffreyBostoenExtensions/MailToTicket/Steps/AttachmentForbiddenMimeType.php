@@ -35,11 +35,16 @@ abstract class AttachmentForbiddenMimeType extends Base {
 		if(!empty($aAttachment['content']) && function_exists('finfo_open')) {
 
 			$rFinfo = finfo_open(FILEINFO_MIME_TYPE);
-			$sSniffed = finfo_buffer($rFinfo, $aAttachment['content']);
-			finfo_close($rFinfo);
 
-			if($sSniffed !== false) {
-				$aTypes[] = $sSniffed;
+			if($rFinfo !== false) {
+
+				$sSniffed = finfo_buffer($rFinfo, $aAttachment['content']);
+				finfo_close($rFinfo);
+
+				if($sSniffed !== false) {
+					$aTypes[] = $sSniffed;
+				}
+
 			}
 
 		}
