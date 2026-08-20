@@ -182,6 +182,10 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 			
 			foreach($aSources as $oSource) {
 
+				if($bAbortAllProcessing) {
+					break;
+				}
+
 				ProcessingHelper::SetMailSource($oSource);
 
 				$this->Trace("-----------------------------------------------------------------------------------------");
