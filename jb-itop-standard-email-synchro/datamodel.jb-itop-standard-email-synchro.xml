@@ -627,16 +627,17 @@ EOF
 					<access>public</access>
 					<type>Overload-DBObject</type>
 					<code>
-						<![CDATA[		
+						<![CDATA[
 				public function Trace($sMessage, ...$args) : void {
 
+					$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
+
 					parent::Trace($sMessage);
-					
-					if($this->Get('trace') == 'yes') {
+
+					if($this->Get('trace') === 'yes') {
 
 						// htmlentities($sMessage) might be applied again on AJAX page.
 						$iMaxTraceLength = 500*1024; // Maximum size of the Trace to keep in the database.
-						$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
 						$sStampedText = date('Y-m-d H:i:s').' | '.$sMessage."\n";
 						$this->Set('debug_trace', $sStampedText.mb_substr($this->Get('debug_trace'), 0, $iMaxTraceLength));
 						$this->DBUpdate();
