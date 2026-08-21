@@ -210,7 +210,7 @@ class MessageHandler {
 
 		$oHandler->SetMessageObject($oMessage);
 
-		$oHandler->SetMessageId($oMessage->messageId());
+		$oHandler->SetMessageId($oMessage->messageId() ?? '');
 		$oHandler->SetUid($oMessage->uid());
 
 		$oHandler->SetEmailSource($oSource);
@@ -218,11 +218,13 @@ class MessageHandler {
 
 		// - Date/time.
 			$oDate = $oMessage->date();
-			$oHandler->SetTimestamp($oDate->timestamp);
+			$oHandler->SetTimestamp($oDate !== null ? $oDate->timestamp : time());
 
 		// - Internal identifier.
+			// Message-ID can be absent on some providers/messages; the UID is always available, so fall
+			// back to it rather than leaving the message without any usable identifier.
 			$sInternalIdentifier = Helper::UseMessageIdAsUid() ? $oMessage->messageId() : $oMessage->uid();
-			$oHandler->SetInternalIdentifier($sInternalIdentifier);
+			$oHandler->SetInternalIdentifier($sInternalIdentifier ?? $oMessage->uid());
 
 		return $oHandler;
 
