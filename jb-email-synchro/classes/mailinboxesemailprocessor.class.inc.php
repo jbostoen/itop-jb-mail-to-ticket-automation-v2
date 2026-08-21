@@ -30,7 +30,6 @@ use JeffreyBostoenExtensions\MailToTicket\{
  */
 class MailInboxesEmailProcessor extends EmailProcessor {
 	
-	protected static $bDebug;
 	protected static $aExcludeAttachments;
 	protected static $sBodyPartsOrder;
 	protected static $sModuleName;
@@ -43,7 +42,6 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	public function __construct() {
 		
 		self::$sModuleName = 'jb-email-synchro';
-		self::$bDebug = MetaModel::GetModuleSetting(self::$sModuleName, 'debug', false);
 		self::$aExcludeAttachments = MetaModel::GetModuleSetting(self::$sModuleName, 'exclude_attachment_types', array());
 		self::$sBodyPartsOrder = MetaModel::GetModuleSetting(self::$sModuleName, 'body_parts_order', 'text/html,text/plain');
 		$this->aInboxes = array();
@@ -56,9 +54,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	 * @return void
 	 */
 	public static function Trace($sText) {
-		if(self::$bDebug) {
-			echo $sText."\n";
-		}
+		ProcessingHelper::TraceCron($sText);
 	}
 	/**
 	 * Initializes the email sources: one source is created and associated with each MailInboxBase instance

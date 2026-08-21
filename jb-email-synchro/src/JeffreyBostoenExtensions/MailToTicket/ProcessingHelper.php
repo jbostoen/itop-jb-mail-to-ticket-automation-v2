@@ -106,6 +106,61 @@ abstract class ProcessingHelper {
 
 
 	/**
+	 * Trace function used for debugging.
+	 *
+	 * @param string $sMessage The message.
+	 * @param mixed ...$args
+	 *
+	 * @return void
+	 */
+	public static function Trace($sMessage, ...$args) : void {
+
+		static::TraceChannel(Logger::CHANNEL_DEFAULT, $sMessage, ...$args);
+
+	}
+
+	/**
+	 * Trace function used for debugging, tagging the message with a specific log channel.
+	 * iTop's log_level_min config can be set per channel, so this allows an admin to tune the
+	 * verbosity of a specific area (e.g. 'cron') independently of the rest, without any code change.
+	 *
+	 * @param string $sChannel The log channel to tag this message with.
+	 * @param string $sMessage The message.
+	 * @param mixed ...$args
+	 *
+	 * @return void
+	 */
+	public static function TraceChannel(string $sChannel, $sMessage, ...$args) : void {
+
+		$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
+
+		Logger::Trace($sMessage, $sChannel);
+
+	}
+
+	/**
+	 * Trace function used for debugging during a cron run.
+	 * Echoes the message when the module's 'debug' setting is enabled (matching the existing
+	 * cron-visible tracing behavior), and always logs it to the 'cron' channel.
+	 *
+	 * @param string $sMessage The message.
+	 * @param mixed ...$args
+	 *
+	 * @return void
+	 */
+	public static function TraceCron($sMessage, ...$args) : void {
+
+		$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
+
+		if(MetaModel::GetModuleSetting('jb-email-synchro', 'debug', false)) {
+			echo $sMessage."\n";
+		}
+
+		static::TraceChannel('cron', $sMessage);
+
+	}
+
+	/**
 	 * Gets the mailbox.
 	 *
 	 * @return MailInboxStandard

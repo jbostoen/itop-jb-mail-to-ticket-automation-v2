@@ -34,7 +34,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	protected static $sNotifyErrorsTo = '';
 	protected static $sNotifyErrorsFrom = '';
 	public static $iMaxEmailSize = 0;
-	protected bool $bDebug;
 	private $aMessageTrace = array();
 	private MessageHandler $oCurrentMessageHandler;
 	/**
@@ -57,8 +56,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	}
 	
 	public function __construct() {
-		
-		$this->bDebug = MetaModel::GetModuleSetting('jb-email-synchro', 'debug', false);
+
 		self::$sSaveErrorsTo = MetaModel::GetModuleSetting('jb-email-synchro', 'save_errors_to', '');
 		self::$sNotifyErrorsTo = MetaModel::GetModuleSetting('jb-email-synchro', 'notify_errors_to', '');
 		self::$sNotifyErrorsFrom = MetaModel::GetModuleSetting('jb-email-synchro', 'notify_errors_from', '');
@@ -70,9 +68,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 	protected function Trace(string $sText) : void {
 		$this->aMessageTrace[] = $sText;
-		if ($this->bDebug) {
-			echo $sText."\n";
-		}
+		ProcessingHelper::TraceCron($sText);
 	}
 	
     /**
