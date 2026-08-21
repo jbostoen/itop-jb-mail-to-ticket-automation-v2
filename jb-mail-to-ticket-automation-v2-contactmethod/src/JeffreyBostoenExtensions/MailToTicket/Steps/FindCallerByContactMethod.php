@@ -51,7 +51,7 @@ abstract class StepFindCallerByContactMethod extends Base {
 		$oPerson = null;
 
 		foreach([
-			'ContactMethod' => 'SELECT Person AS p JOIN ContactMethod AS c ON c.person_id = p.id WHERE c.contact_method = "email" AND c.contact_detail LIKE :email',
+			'ContactMethod' => 'SELECT Person AS p JOIN ContactMethod AS c ON c.person_id = p.id WHERE c.contact_method = "email" AND c.contact_detail = :email',
 			'EmailAlias' => 'SELECT Person AS p JOIN EmailAlias AS a ON a.contact_id = p.id WHERE a.email = :email'
 		] as $sClass => $sOQL) {
 
