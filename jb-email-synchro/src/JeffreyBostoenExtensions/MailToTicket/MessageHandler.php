@@ -210,7 +210,9 @@ class MessageHandler {
 
 		$oHandler->SetMessageObject($oMessage);
 
-		$oHandler->SetMessageId($oMessage->messageId() ?? '');
+		// Message-ID can be absent; fall back to the UID, consistent with the internal identifier's
+		// own fallback below.
+		$oHandler->SetMessageId($oMessage->messageId() ?? (string) $oMessage->uid());
 		$oHandler->SetUid($oMessage->uid());
 
 		$oHandler->SetEmailSource($oSource);
