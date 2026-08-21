@@ -461,7 +461,8 @@ EOF
  *
  * "code" (Step::GetXMLSettingsPrefix(), e.g. "policy_other_recipients") is NOT unique: multiple step classes can share
  * the same XML settings prefix (they gate on the same mailbox setting, but fire at different points in the pipeline).
- * "category" (the step's FQCN) is what actually identifies a specific event, and is therefore the unique/reconciliation key.
+ * "category" (the step's FQCN, with '\' replaced by '_' so it doesn't need escaping wherever it ends up, e.g. dictionary/translation keys)
+ * is what actually identifies a specific event, and is therefore the unique/reconciliation key. See Steps\Base::GetCategory().
  *
  * @package     jb-email-synchro
  */</comment>
@@ -584,7 +585,7 @@ EOF
 					<extkey_attcode>event_id</extkey_attcode>
 					<target_attcode>code</target_attcode>
 				</field>
-				<!-- The event's implementing class (FQCN). This, not "code", is what FireMailProcessingEventTriggers() actually matches on. -->
+				<!-- The event's implementing class (FQCN, with '\' replaced by '_'). This, not "code", is what FireMailProcessingEventTriggers() actually matches on. -->
 				<field id="category" xsi:type="AttributeExternalField">
 					<extkey_attcode>event_id</extkey_attcode>
 					<target_attcode>category</target_attcode>

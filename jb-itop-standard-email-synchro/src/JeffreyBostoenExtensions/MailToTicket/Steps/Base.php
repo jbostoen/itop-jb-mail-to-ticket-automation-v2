@@ -101,11 +101,24 @@ abstract class Base implements iStep {
 	  * @return string
 	 */
 	public static function GetXMLSettingsPrefix() : string {
-		
+
 		return static::$sXMLSettingsPrefix;
-		
+
 	}
-	
+
+	/**
+	 * Gets the step's "category" identifier: its FQCN with '\' replaced by '_', matching
+	 * MailProcessingEvent::category (see lnkMailProcessingEventToTrigger) - avoids the need to
+	 * escape backslashes wherever this identifier ends up (e.g. dictionary/translation keys).
+	 *
+	 * @return string
+	 */
+	public static function GetCategory() : string {
+
+		return str_replace('\\', '_', static::class);
+
+	}
+
 	/**
 	 * Shorthand to obtain a setting configured in the maibox properties for a specific step.
 	 *
@@ -265,6 +278,7 @@ abstract class Base implements iStep {
 		$oMailBox = ProcessingHelper::GetMailBox();
 		$sStepId = static::GetXMLSettingsPrefix();
 		$sStepClass = static::class;
+		$sStepCategory = static::GetCategory();
 
 		$oSet_Triggers = new DBObjectSet(DBObjectSearch::FromOQL_AllData('SELECT TriggerOnMailProcessingEvent'));
 
@@ -279,7 +293,7 @@ abstract class Base implements iStep {
 			/** @var lnkMailProcessingEventToTrigger $oLink */
 			while($oLink = $oSet_Steps->Fetch()) {
 
-				if($oLink->Get('category') === $sStepClass) {
+				if($oLink->Get('category') === $sStepCategory) {
 					$bSubscribed = true;
 					break;
 				}
