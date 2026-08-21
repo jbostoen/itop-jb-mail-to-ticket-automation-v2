@@ -450,6 +450,173 @@ EOF
 				</list>
 			</presentation>
 		</class>
+		<class id="MailProcessingEvent" _delta="define">
+			<parent>cmdbAbstractObject</parent>
+			<properties>
+				<comment>/**
+ * Class MailProcessingEvent.
+ * A pre-created, reference-data object representing one event in the mail processing pipeline.
+ * These objects are what TriggerOnMailProcessingEvent subscribes to (see lnkMailProcessingEventToTrigger), instead of a free-text list of identifiers.
+ * Pre-created by the module installer for every available step class.
+ *
+ * "code" (Step::GetXMLSettingsPrefix(), e.g. "policy_other_recipients") is NOT unique: multiple step classes can share
+ * the same XML settings prefix (they gate on the same mailbox setting, but fire at different points in the pipeline).
+ * "category" (the step's FQCN) is what actually identifies a specific event, and is therefore the unique/reconciliation key.
+ *
+ * @package     jb-email-synchro
+ */</comment>
+				<category>grant_by_profile,searchable</category>
+				<abstract>false</abstract>
+				<key_type>autoincrement</key_type>
+				<db_table>mail_processing_event</db_table>
+				<db_key_field>id</db_key_field>
+				<db_final_class_field/>
+				<naming>
+					<format>%1$s</format>
+					<attributes>
+						<attribute id="code"/>
+					</attributes>
+				</naming>
+				<display_template/>
+				<reconciliation>
+					<attributes>
+						<attribute id="category"/>
+					</attributes>
+				</reconciliation>
+				<uniqueness_rules>
+					<rule id="category">
+						<attributes>
+							<attribute id="category"/>
+						</attributes>
+						<filter><![CDATA[]]></filter>
+						<disabled>false</disabled>
+						<is_blocking>true</is_blocking>
+					</rule>
+				</uniqueness_rules>
+			</properties>
+			<fields>
+				<field id="code" xsi:type="AttributeString">
+					<sql>code</sql>
+					<default_value/>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
+				<field id="category" xsi:type="AttributeText">
+					<sql>category</sql>
+					<default_value/>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
+			</fields>
+			<methods/>
+			<presentation>
+				<details>
+					<items>
+						<item id="code">
+							<rank>10</rank>
+						</item>
+						<item id="category">
+							<rank>20</rank>
+						</item>
+					</items>
+				</details>
+				<list>
+					<items>
+						<item id="code">
+							<rank>10</rank>
+						</item>
+						<item id="category">
+							<rank>20</rank>
+						</item>
+					</items>
+				</list>
+				<search>
+					<items>
+						<item id="code">
+							<rank>10</rank>
+						</item>
+						<item id="category">
+							<rank>20</rank>
+						</item>
+					</items>
+				</search>
+			</presentation>
+		</class>
+		<class id="lnkMailProcessingEventToTrigger" _delta="define">
+			<parent>cmdbAbstractObject</parent>
+			<properties>
+				<comment>/**
+ * Class lnkMailProcessingEventToTrigger.
+ * N:N link between a MailProcessingEvent (a pre-created event identifier) and a TriggerOnMailProcessingEvent subscribed to it.
+ *
+ * @package     jb-email-synchro
+ */</comment>
+				<is_link>true</is_link>
+				<category>grant_by_profile,searchable</category>
+				<abstract>false</abstract>
+				<key_type>autoincrement</key_type>
+				<db_table>mail_lnk_event_to_trigger</db_table>
+				<db_key_field>id</db_key_field>
+				<db_final_class_field/>
+				<naming>
+					<attributes/>
+				</naming>
+				<display_template/>
+				<reconciliation>
+					<attributes>
+						<attribute id="event_id"/>
+						<attribute id="trigger_id"/>
+					</attributes>
+				</reconciliation>
+			</properties>
+			<fields>
+				<field id="trigger_id" xsi:type="AttributeExternalKey">
+					<sql>trigger_id</sql>
+					<target_class>TriggerOnMailProcessingEvent</target_class>
+					<is_null_allowed>false</is_null_allowed>
+					<on_target_delete>DEL_AUTO</on_target_delete>
+				</field>
+				<field id="event_id" xsi:type="AttributeExternalKey">
+					<sql>event_id</sql>
+					<target_class>MailProcessingEvent</target_class>
+					<is_null_allowed>false</is_null_allowed>
+					<on_target_delete>DEL_AUTO</on_target_delete>
+				</field>
+				<field id="code" xsi:type="AttributeExternalField">
+					<extkey_attcode>event_id</extkey_attcode>
+					<target_attcode>code</target_attcode>
+				</field>
+				<!-- The event's implementing class (FQCN). This, not "code", is what FireMailProcessingEventTriggers() actually matches on. -->
+				<field id="category" xsi:type="AttributeExternalField">
+					<extkey_attcode>event_id</extkey_attcode>
+					<target_attcode>category</target_attcode>
+				</field>
+			</fields>
+			<methods/>
+			<presentation>
+				<details>
+					<items>
+						<item id="trigger_id">
+							<rank>10</rank>
+						</item>
+						<item id="event_id">
+							<rank>20</rank>
+						</item>
+					</items>
+				</details>
+				<list>
+					<items>
+						<item id="event_id">
+							<rank>10</rank>
+						</item>
+						<item id="code">
+							<rank>20</rank>
+						</item>
+						<item id="category">
+							<rank>30</rank>
+						</item>
+					</items>
+				</list>
+			</presentation>
+		</class>
 	</classes>
 	<user_rights>
 		<groups>

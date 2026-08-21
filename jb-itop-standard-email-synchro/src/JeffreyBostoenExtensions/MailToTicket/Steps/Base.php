@@ -21,7 +21,7 @@ use EmailContact;
 use EmailMessage;
 use EmailProcessor;
 use EmailSource;
-use lnkMailProcessingStepToTrigger;
+use lnkMailProcessingEventToTrigger;
 use MailInboxStandard;
 use ormDocument;
 use RawEmailMessage;
@@ -276,7 +276,7 @@ abstract class Base implements iStep {
 			$bSubscribed = false;
 
 			// Matched on the step's class (category), not its XML settings prefix (code): several step classes can share the same prefix.
-			/** @var lnkMailProcessingStepToTrigger $oLink */
+			/** @var lnkMailProcessingEventToTrigger $oLink */
 			while($oLink = $oSet_Steps->Fetch()) {
 
 				if($oLink->Get('category') === $sStepClass) {
@@ -300,7 +300,7 @@ abstract class Base implements iStep {
 				'step->class' => $sStepClass,
 			]);
 
-			if($oTrigger->Get('include_original_message') === true) {
+			if($oTrigger->Get('include_original_message') === 'yes') {
 
 				$oRawEmail = ProcessingHelper::GetRawMail();
 				$aContextArgs['attachments'] = [
