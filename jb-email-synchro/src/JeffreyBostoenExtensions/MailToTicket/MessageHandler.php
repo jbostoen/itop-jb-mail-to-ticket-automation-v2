@@ -221,10 +221,24 @@ class MessageHandler {
 			$oHandler->SetTimestamp($oDate !== null ? $oDate->timestamp : time());
 
 		// - Internal identifier.
-			// Message-ID can be absent on some providers/messages; the UID is always available, so fall
-			// back to it rather than leaving the message without any usable identifier.
+			// Message-ID can be absent on some providers/messages. The IMAP UID is always available,
+			// but per Helper::UseMessageIdAsUid()'s own docblock, it can be unstable across sessions
+			// on some providers (e.g. Outlook 365, GMail) - precisely the providers use_message_id_as_uid
+			// exists for. Silently falling back to the UID there would produce a different "identifier"
+			// on every poll of the same message, defeating EmailReplica-based deduplication and creating
+			// a duplicate ticket each run. Instead, derive a stable synthetic identifier from data that
+			// doesn't change between polls of the same message.
 			$sInternalIdentifier = Helper::UseMessageIdAsUid() ? $oMessage->messageId() : $oMessage->uid();
-			$oHandler->SetInternalIdentifier($sInternalIdentifier ?? $oMessage->uid());
+
+			if($sInternalIdentifier === null) {
+
+				$oFrom = $oMessage->from();
+				$sSyntheticSource = ($oFrom !== null ? $oFrom->email() : '').'|'.($oMessage->subject() ?? '').'|'.($oDate !== null ? $oDate->format('Y-m-d H:i:s') : '');
+				$sInternalIdentifier = 'synthetic_'.hash('sha256', $sSyntheticSource);
+
+			}
+
+			$oHandler->SetInternalIdentifier($sInternalIdentifier);
 
 		return $oHandler;
 
