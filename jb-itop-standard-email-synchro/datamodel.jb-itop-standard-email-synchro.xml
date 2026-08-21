@@ -471,6 +471,8 @@ name:Unknown caller]]></default_value>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
 				<!-- Auto-reply / out-of-office -->
+				<!-- Intentionally no bounce_delete/bounce_mark_as_undesired here (unlike sibling policies): bouncing a
+					 reply back to an automated out-of-office sender risks a mail loop with that system. -->
 				<field id="policy_autoreply_behavior" xsi:type="AttributeEnum">
 					<values>
 						<value>delete</value>
@@ -483,6 +485,8 @@ name:Unknown caller]]></default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<!-- Non Delivery Reports -->
+				<!-- Intentionally no bounce_delete/bounce_mark_as_undesired here (unlike sibling policies): bouncing a
+					 reply back to a Non-Delivery-Report is the classic "backscatter" mail loop problem. -->
 				<field id="policy_non_delivery_report_behavior" xsi:type="AttributeEnum" _delta="define">
 					<values>
 						<value>delete</value>
