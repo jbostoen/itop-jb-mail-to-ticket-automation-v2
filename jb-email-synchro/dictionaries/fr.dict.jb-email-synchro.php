@@ -102,7 +102,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailProcessingEvent/Attribute:code' => 'Description',
 	'Class:MailProcessingEvent/Attribute:code+' => 'Description de l\'événement.',
 	'Class:MailProcessingEvent/Attribute:category' => 'Classe de l\'événement',
-	'Class:MailProcessingEvent/Attribute:category+' => 'La classe d\'implémentation de l\'événement (nom complet, avec \'\\\' remplacé par \'_\'). L\'identifiant unique réel',
+	'Class:MailProcessingEvent/Attribute:category+' => 'La classe d\'implémentation de l\'événement (nom complet ; les \'_\' existants sont échappés en \'__\' avant que \'\\\' soit remplacé par \'_\'). L\'identifiant unique réel utilisé pour la correspondance.',
 
 	'Class:lnkMailProcessingEventToTrigger' => 'Lien Événement de traitement du mail / Déclencheur',
 	'Class:lnkMailProcessingEventToTrigger+' => 'Lien entre un événement de traitement du mail et un déclencheur qui y est abonné',

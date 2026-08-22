@@ -111,11 +111,15 @@ abstract class Base implements iStep {
 	 * MailProcessingEvent::category (see lnkMailProcessingEventToTrigger) - avoids the need to
 	 * escape backslashes wherever this identifier ends up (e.g. dictionary/translation keys).
 	 *
+	 * @details Existing underscores are escaped ('_' becomes '__') before namespace separators
+	 * are replaced ('\' becomes '_'). Without this, two distinct classes could map to the same
+	 * category (e.g. 'Foo\Bar_Baz' and 'Foo\Bar\Baz' would both become 'Foo_Bar_Baz').
+	 *
 	 * @return string
 	 */
 	public static function GetCategory() : string {
 
-		return str_replace('\\', '_', static::class);
+		return str_replace('\\', '_', str_replace('_', '__', static::class));
 
 	}
 

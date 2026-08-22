@@ -102,7 +102,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailProcessingEvent/Attribute:code' => 'Description',
 	'Class:MailProcessingEvent/Attribute:code+' => 'Description of the event.',
 	'Class:MailProcessingEvent/Attribute:category' => 'Event class',
-	'Class:MailProcessingEvent/Attribute:category+' => 'The event\'s implementing class (fully qualified, with \'\\\' replaced by \'_\'). The actual unique identifier',
+	'Class:MailProcessingEvent/Attribute:category+' => 'The event\'s implementing class (fully qualified; existing \'_\' is escaped as \'__\' before \'\\\' is replaced by \'_\'). The actual unique identifier used for matching.',
 
 	'Class:lnkMailProcessingEventToTrigger' => 'Link Mail Processing Event / Trigger',
 	'Class:lnkMailProcessingEventToTrigger+' => 'Link between a mail processing event and a trigger subscribed to it',
