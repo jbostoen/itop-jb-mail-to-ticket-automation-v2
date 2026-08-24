@@ -220,9 +220,10 @@ class RawEmailMessage {
 				if(empty($sFileName)) {
 					// generate a name based on the type of the file...
 					$aTypes = explode('/', $sType);
-					$sFileExtension = $aTypes[1];
+					// A Content-Type without a subtype (e.g. just "application") has no index 1; fall back to a generic extension.
+					$sFileExtension = $aTypes[1] ?? 'bin';
 					// map the type to a useful extension if needed
-					switch($aTypes[1]) {
+					switch($sFileExtension) {
 						case 'rfc822':
 							// Special case for messages: use the .eml extension
 							$sFileExtension = 'eml';
