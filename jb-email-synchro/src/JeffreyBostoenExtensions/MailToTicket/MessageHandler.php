@@ -52,9 +52,12 @@ class MessageHandler {
 	private EmailSource $oSource;
 	
 	/**
-	 * @var Message The message object from the IMAP engine. Higher chance to change at some point.
+	 * @var Message|null The message object from the IMAP engine. Higher chance to change at some point.
+	 * Nullable to match GetMessageObject()'s documented ?Message return type and the null-guards used
+	 * at every call site; a non-nullable typed property with no default would instead throw an
+	 * uncaught Error if ever read before SetMessageObject() had run.
 	 */
-	private Message $oMessage;
+	private ?Message $oMessage = null;
 	
 	/**
 	 * Sets the original index of the mail within a listing of the e-mails in the folder.
