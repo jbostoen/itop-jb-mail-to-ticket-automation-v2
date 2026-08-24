@@ -483,7 +483,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		$sTicketDescription = '';
 		$oEmail = ProcessingHelper::GetMail();
 		
-		if($oEmail->sBodyFormat == 'text/html') {
+		if($oEmail->sBodyFormat === 'text/html') {
 
 			// Original message is in HTML.
 			static::Trace('Managing inline images...');
@@ -497,7 +497,11 @@ abstract class CreateOrUpdateTicket extends Base {
 		else {
 
 			// Original message is in plain text.
-			$sTicketDescription = utils::TextToHtml($oEmail->sBodyText);
+			$sTicketDescription = $oEmail->sBodyText;
+			if(!$bForPlainText) {
+				static::Trace("Converting text to HTML using utils::TextToHtml...");
+				$sTicketDescription = utils::TextToHtml($sTicketDescription);
+			}
 
 		}
 
