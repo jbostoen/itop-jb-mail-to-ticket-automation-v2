@@ -45,9 +45,17 @@ abstract class SaveEmailsToPath extends Base {
 		
 		// Add some logic for file name. Mind time zones!
 		$sDateTime = strtotime($oRawEmail->GetHeader('date'));
+		if($sDateTime === false) {
+			// Missing or malformed "Date" header: fall back to the current time rather than the epoch.
+			$sDateTime = time();
+		}
 		// Better expose this for configuration somewhere.
 		$sFolder = 'C:/temp/'.date('Ymd', $sDateTime);
 		$sMessageId = $oRawEmail->GetMessageId();
+		if($sMessageId === '') {
+			// Missing "Message-ID" header: fall back to a unique identifier to avoid filename collisions.
+			$sMessageId = uniqid('no-message-id-', true);
+		}
 		
 		// Forbidden on Windows
 		$aForbiddenChars = array_merge(
