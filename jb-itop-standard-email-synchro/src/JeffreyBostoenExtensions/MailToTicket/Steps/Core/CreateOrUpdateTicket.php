@@ -1032,8 +1032,15 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 		
 		foreach($oEmail->aAttachments as $iIndex => $aAttachment) {
-			
+
 			$bIgnoreAttachment = false;
+
+			// Only inline images referenced via cid: normally carry a Content-ID; ordinary attachments
+			// typically don't, so their content-id is empty. Fall back to a synthetic, unique key so
+			// multiple such attachments on the same email don't overwrite each other in the tracking
+			// array below. ManageInlineImages() only ever looks up real, non-empty content-ids, so this
+			// fallback never interferes with inline-image resolution.
+			$sAddedAttachmentKey = ($aAttachment['content-id'] !== '') ? $aAttachment['content-id'] : 'no-content-id-'.$iIndex;
 
 			if($bNoDuplicates) {
 
@@ -1044,12 +1051,12 @@ abstract class CreateOrUpdateTicket extends Base {
 					if (
 						($aAttachment['filename'] === $aPrevious['filename']) &&
 						($aAttachment['mimeType'] === $aPrevious['mimeType']) &&
-						($iSize == $aPrevious['size']) &&
-						($sMd5 == $aPrevious['md5']) )
+						($iSize === $aPrevious['size']) &&
+						($sMd5 === $aPrevious['md5']) )
 					{
 						// Skip this attachment
 						static::Trace("Attachment {$aAttachment['filename']} skipped, already attached to the ticket.");
-						static::$aAddedAttachments[$aAttachment['content-id']] = $aPrevious['object']; // Still remember it for processing inline images
+						static::$aAddedAttachments[$sAddedAttachmentKey] = $aPrevious['object']; // Still remember it for processing inline images
 						$bIgnoreAttachment = true;
 						break;
 					}
@@ -1102,7 +1109,7 @@ abstract class CreateOrUpdateTicket extends Base {
 				$oMyChangeOp->Set('description', Dict::Format('Attachments:History_File_Added', $aAttachment['filename']));
 				$iId = $oMyChangeOp->DBInsertNoReload();
 				static::Trace("Attachment {$aAttachment['filename']} added to the ticket.");
-				static::$aAddedAttachments[$aAttachment['content-id']] = $oAttachment;
+				static::$aAddedAttachments[$sAddedAttachmentKey] = $oAttachment;
 			}
 		}
 		
