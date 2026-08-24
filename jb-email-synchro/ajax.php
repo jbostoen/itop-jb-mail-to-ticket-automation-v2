@@ -222,7 +222,7 @@ function GetMailboxContent($oPage, $oInbox) {
 								$sTicketUrl = ApplicationContext::MakeObjectUrl($oInbox->Get('target_class'), $aProcessed[$sUIDL]['ticket_id']);
 								$sLink = '<a href="'.$sTicketUrl.'">'.$oInbox->Get('target_class').'::'.$aProcessed[$sUIDL]['ticket_id'].'</a>';
 							}
-							$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDL];
+							$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDL, 'mailbox_id' => $oInbox->GetKey()];
 							$sDetailsURL = utils::GetAbsoluteUrlModulePage(basename(dirname(__FILE__)), 'details.php', $aArgs);
 							$sDetailsLink = '<a href="'.$sDetailsURL.'">'.Dict::S('MailInbox:MessageDetails').'</a>';
 
