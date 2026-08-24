@@ -255,9 +255,9 @@ abstract class AttachmentCriteria extends Base {
 	 *
 	 * @param string $sImageData Image data
 	 *
-	 * @return array Array with image dimensions
+	 * @return array|false Array with image dimensions, or false if $sImageData is not a valid image.
 	 */
-	public static function GetImageSize(string $sImageData) : array {
+	public static function GetImageSize(string $sImageData) : array|false {
 		
 		if(function_exists('getimagesizefromstring')) {
 			// PHP 5.4.0 or higher
