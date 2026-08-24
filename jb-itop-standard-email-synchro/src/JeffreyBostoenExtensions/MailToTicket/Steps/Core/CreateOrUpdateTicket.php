@@ -289,6 +289,17 @@ abstract class CreateOrUpdateTicket extends Base {
 			// - E-mail notifications (?)
 			static::Trace('Ticket %1$s could not be created.', $oTicket->GetName());
 			static::Trace($e->getMessage()); // Add actual error message (if available)
+
+			// Attachments/InlineImages were already inserted (with a temporary item_id) so they could be
+			// referenced in the ticket's body; since the ticket itself was not created, remove them again
+			// to avoid leaving orphaned records behind.
+			foreach(static::$aAddedAttachments as $oAttachment) {
+				if(!$oAttachment->IsNew()) {
+					$oAttachment->DBDelete();
+				}
+			}
+			static::$aAddedAttachments = [];
+
 			throw new Exception('Ticket creation failed');
 		}
 			
