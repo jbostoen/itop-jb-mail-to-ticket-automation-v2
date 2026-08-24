@@ -287,6 +287,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:Error:TargetFolderRequired' => 'The target folder must be specified for an active mailbox.',
 	'MailInbox:Error:CaseLogAttCodeRequired' => 'The case log attribute code must be a valid attribute of the target class \'%1$s\'.',
 	'MailInbox:Error:DescriptionOrCaseLogAttCodeRequired' => 'Either the description attribute code or the case log attribute code must be a valid attribute of the target class \'%1$s\'.',
+	'MailInbox:Error:DescriptionAttCodeMustHaveMaxSize' => 'The description attribute \'%1$s\' of the target class \'%2$s\' does not have a maximum size, and can not be used to store the initial ticket description.',
 
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Embedded e-mail images',

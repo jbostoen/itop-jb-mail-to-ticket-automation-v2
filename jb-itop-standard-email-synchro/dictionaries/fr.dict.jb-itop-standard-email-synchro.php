@@ -265,6 +265,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:Error:TargetFolderRequired' => 'Le dossier cible doit être renseigné pour une boîte mail active.',
 	'MailInbox:Error:CaseLogAttCodeRequired' => 'Le code de l\'attribut du journal des échanges (case log) doit être un attribut valide de la classe cible \'%1$s\'.',
 	'MailInbox:Error:DescriptionOrCaseLogAttCodeRequired' => 'Le code de l\'attribut de la description ou celui du journal des échanges (case log) doit être un attribut valide de la classe cible \'%1$s\'.',
+	'MailInbox:Error:DescriptionAttCodeMustHaveMaxSize' => 'L\'attribut de description \'%1$s\' de la classe cible \'%2$s\' n\'a pas de taille maximale et ne peut pas être utilisé pour stocker la description initiale du ticket.',
 
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Pièce jointe - criteria',

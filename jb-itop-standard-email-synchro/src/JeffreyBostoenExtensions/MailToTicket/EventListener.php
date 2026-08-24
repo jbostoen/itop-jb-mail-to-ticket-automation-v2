@@ -96,6 +96,16 @@ abstract class EventListener {
 		$sAttCodeDescription = trim($oMailInbox->Get('attcode_description'));
 		$sAttCodeCaseLog = trim($oMailInbox->Get('attcode_caselog'));
 
+		if($sAttCodeDescription !== '' && MetaModel::IsValidAttCode($sTargetClass, $sAttCodeDescription)) {
+
+			if(MetaModel::GetAttributeDef($sTargetClass, $sAttCodeDescription)->GetMaxSize() === null) {
+
+				$oMailInbox->AddCheckIssue(Dict::Format('MailInbox:Error:DescriptionAttCodeMustHaveMaxSize', $sAttCodeDescription, $sTargetClass));
+
+			}
+
+		}
+
 		if($sBehavior === 'both' || $sBehavior === 'update_only') {
 
 			if($sAttCodeCaseLog === '' || !MetaModel::IsValidAttCode($sTargetClass, $sAttCodeCaseLog)) {

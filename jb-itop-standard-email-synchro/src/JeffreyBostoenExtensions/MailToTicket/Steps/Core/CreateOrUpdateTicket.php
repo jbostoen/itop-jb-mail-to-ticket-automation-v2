@@ -252,7 +252,7 @@ abstract class CreateOrUpdateTicket extends Base {
 
 		$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize(); // Keep some room just in case...
 		
-		if(mb_strlen($sTicketDescription) > $iDescriptionMaxSize) {
+		if($iDescriptionMaxSize !== null && mb_strlen($sTicketDescription) > $iDescriptionMaxSize) {
 
 			$sMsg = "CreateTicketFromEmail: Truncated description for [{$oTicket->Get('title')}] actual length: ".mb_strlen($sTicketDescription)." maximum: $iDescriptionMaxSize";
 		    IssueLog::Error($sMsg);
@@ -1160,21 +1160,21 @@ abstract class CreateOrUpdateTicket extends Base {
 	 * 2) Trims the result to emulate the behavior of iTop's inputs
 	 *
 	 * @param string $sInputText
-	 * @param int $iMaxLength
+	 * @param int|null $iMaxLength Maximum length, or null when the target attribute has no maximum size (no truncation applied).
 	 *
 	 * @return string The fitted text
 	 */
-	public static function FitTextIn($sInputText, $iMaxLength) : string {
-		
+	public static function FitTextIn($sInputText, ?int $iMaxLength) : string {
+
 		$sInputText = trim($sInputText);
 		$sInputText = str_replace("\r\n", "\r", $sInputText);
 		$sInputText = str_replace("\n", "\r", $sInputText);
 		$sInputText = str_replace("\r", "\r\n", $sInputText);
-		if(mb_strlen($sInputText) > $iMaxLength) {
+		if($iMaxLength !== null && mb_strlen($sInputText) > $iMaxLength) {
 			$sInputText = trim(mb_substr($sInputText, 0, $iMaxLength - 3)).'...';
 		}
 		return $sInputText;
-		
+
 	}
 	 
 }
