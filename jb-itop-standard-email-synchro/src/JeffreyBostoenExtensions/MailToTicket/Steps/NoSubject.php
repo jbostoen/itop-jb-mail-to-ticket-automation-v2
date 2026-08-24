@@ -41,7 +41,7 @@ abstract class NoSubject extends Base {
 		
 			$sPolicyBehavior = static::GetStepSetting('behavior');
 			
-			if($oEmail->sSubject == '') {
+			if($oEmail->sSubject === '') {
 				
 				switch($sPolicyBehavior) {
 					 // Will use default subject.
@@ -68,10 +68,14 @@ abstract class NoSubject extends Base {
 						// Setting the ticket title on the ticket object happens later and not in this policy!
 						$sDefaultTitle = static::GetStepSetting('default_value');
 						
-						// Inproper configuration
-						if(trim($sDefaultTitle) == '') {
+						// Inproper configuration. Not a policy violation "behavior" (e.g. bounce_delete) that
+						// HandleViolation() knows how to translate into a next action, so it would silently
+						// fall through to eNextAction::NO_ACTION - marking the message as successfully
+						// processed while actually dropping it. Use HandleError() instead, which always
+						// results in either DELETE_MESSAGE or MARK_MESSAGE_AS_ERROR, and can notify admins.
+						if(trim($sDefaultTitle) === '') {
 							static::Trace('.. Undesired: Empty subject. Fallback to set a default subject failed, because default subject is empty.');
-							static::HandleViolation();
+							ProcessingHelper::HandleError('no_subject_default_value_missing');
 							return;
 						}
 						
