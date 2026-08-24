@@ -76,33 +76,39 @@ abstract class AttachmentForbiddenMimeType extends Base {
 				static::Trace('.. Forbidden MimeTypes: '. implode(' - ', $aForbiddenMimeTypes));
 				static::Trace('.. # Attachments: '. count($oEmail->aAttachments));
 				
-				switch(static::GetStepSetting('behavior')) {
-					
+				$sBehavior = static::GetStepSetting('behavior');
+				static::Trace('.. Behavior: %1$s', $sBehavior);
+
+				switch($sBehavior) {
+
 					case PolicyBehavior::BOUNCE_DELETE->value:
 					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
 					case PolicyBehavior::DELETE->value:
 					case PolicyBehavior::MARK_AS_UNDESIRED->value:
 					case PolicyBehavior::DO_NOTHING->value:
-						
-						// Forbidden attachments? 
-						foreach($oEmail->aAttachments as $iIndex => $aAttachment) { 
+					default:
+						// Also the safe fallback for an unrecognized "behavior" value: fail closed
+						// (block) rather than let forbidden attachments through unfiltered.
+
+						// Forbidden attachments?
+						foreach($oEmail->aAttachments as $iIndex => $aAttachment) {
 							static::Trace('.. Attachment #'.$iIndex.' MimeType: '.$aAttachment['mimeType']);
-							
+
 							if(array_intersect(static::GetEffectiveMimeTypes($aAttachment), $aForbiddenMimeTypes) !== []) {
 
 								static::Trace('... Found attachment with forbidden MimeType "'.$aAttachment['mimeType'].'"');
 								static::HandleViolation();
-								
-								// No specific fallback								
+
+								// No specific fallback
 								// Stop processing any further!
 								return;
 							}
 						}
-					
+
 						break; // Defensive programming
-					
+
 					case 'fallback_ignore_forbidden_attachments':
-					
+
 						// Ticket will be processed. Forbidden attachments will be removed here.
 						foreach($oEmail->aAttachments as $index => $aAttachment) {
 							if(array_intersect(static::GetEffectiveMimeTypes($aAttachment), $aForbiddenMimeTypes) !== []) {
@@ -115,11 +121,7 @@ abstract class AttachmentForbiddenMimeType extends Base {
 							}
 						}
 						break;
-						
-					
-					default:
-						static::Trace('.. Unexpected "behavior"');
-						break;
+
 				}
 		
 			}
