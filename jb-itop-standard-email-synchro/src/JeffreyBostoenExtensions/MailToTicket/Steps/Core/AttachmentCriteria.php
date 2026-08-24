@@ -220,7 +220,7 @@ abstract class AttachmentCriteria extends Base {
 			$iNewWidth = round($iWidth * $fScale);
 			$iNewHeight = round($iHeight * $fScale);
 			
-			static::Trace('Resizing image from %1$s x %2$s to %3$s x %4$s .', $iWidth, $iHeight, $iNewHeight, $iNewHeight);
+			static::Trace('Resizing image from %1$s x %2$s to %3$s x %4$s .', $iWidth, $iHeight, $iNewWidth, $iNewHeight);
 			$new = imagecreatetruecolor($iNewWidth, $iNewHeight);
 			
 			// Preserve transparency.
