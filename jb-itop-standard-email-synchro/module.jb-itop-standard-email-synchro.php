@@ -141,8 +141,8 @@ if (!class_exists('StandardEmailSynchroInstaller')) {
 			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.210219', '<')) {
 				CMDBSource::Query('
 					UPDATE mailinbox_standard
-					SET policy_unknown_caller_behavior = "mark_as_undesired"
-					WHERE policy_unknown_caller_behavior = "do_nothing"
+					SET policy_unknown_caller_behavior = \'mark_as_undesired\'
+					WHERE policy_unknown_caller_behavior = \'do_nothing\'
 				');
 			}
 
