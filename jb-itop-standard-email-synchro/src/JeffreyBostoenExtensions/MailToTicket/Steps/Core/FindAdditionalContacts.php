@@ -104,7 +104,9 @@ abstract class FindAdditionalContacts extends Base {
 					// Non-existing contacts must be created.
 					// Actual linking of contacts happens after policies have been processed.
 					$sContactQuery = 'SELECT Person WHERE email = :email';
-					$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], [
+					// Order by id so that an ambiguous match (multiple Persons sharing this email address)
+					// picks a deterministic, stable "first" result instead of an arbitrary one.
+					$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), ['id' => true], [
 						'email' => $sRecipientEmail
 					]);
 					

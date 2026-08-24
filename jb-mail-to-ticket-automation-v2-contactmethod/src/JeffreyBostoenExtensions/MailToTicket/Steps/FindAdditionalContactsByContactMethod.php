@@ -98,9 +98,13 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 			// For each recipient: Try to find the person object.
 			foreach($aRemainingContacts as $sCurrentEmail) {
 			
-				/** @var Person|null $oCaller The related person. */	
+				/** @var Person|null $oCaller The related person. */
 				$oPerson = StepFindCallerByContactMethod::FindContactByEmail($sCurrentEmail);
-				
+
+				if(StepFindCallerByContactMethod::$bLastMatchAmbiguous) {
+					static::Trace(". Ambiguous match for '{$sCurrentEmail}': multiple people share this contact detail, linking the first one found.");
+				}
+
 				// Only if there is a match.
 				if($oPerson !== null) {
 

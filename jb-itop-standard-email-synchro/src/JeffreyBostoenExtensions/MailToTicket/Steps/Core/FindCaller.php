@@ -65,7 +65,9 @@ abstract class FindCaller extends Base {
 				$oCaller = null;
 				$sContactQuery = 'SELECT Person WHERE email = :email';
 				
-				$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sCallerEmail]);
+				// Order by id so that an ambiguous match (multiple Persons sharing this email address)
+				// picks a deterministic, stable "first" result instead of an arbitrary one.
+				$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), ['id' => true], ['email' => $sCallerEmail]);
 				
 				switch($oSet_Person->Count()) {
 					
@@ -105,7 +107,7 @@ abstract class FindCaller extends Base {
 								$oCaller->Set('email', $oEmail->sCallerEmail);
 								$sDefaultValues = static::GetStepSetting('default_values');
 								
-								if(trim($sDefaultValues) != '') {
+								if(trim($sDefaultValues) !== '') {
 									
 									try {
 
