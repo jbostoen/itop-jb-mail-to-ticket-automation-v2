@@ -37,15 +37,20 @@ abstract class StepFindCallerByContactMethod extends Base {
 	// Should be executed before StepFindCaller;
 	// therefore $iPrecedence should be lower than that of StepFindCaller (110).
 	public static int $iPrecedence = 109;
-	
+
+	/** @var bool $bLastMatchAmbiguous Whether the last FindContactByEmail() call matched more than one Person. */
+	public static bool $bLastMatchAmbiguous = false;
+
 	/**
 	 * Finds contacts by contact method (ContactMethod) or e-mail alias (Combodo's EmailAlias).
-	 * 
+	 *
 	 * @param string $sEmail E-mail address.
 	 *
 	 * @return Person|null
 	 */
 	public static function FindContactByEmail(String $sEmail) : ?Person {
+
+		static::$bLastMatchAmbiguous = false;
 
 		/** @var Person $oPerson|null A person object in iTop. */
 		$oPerson = null;
@@ -57,14 +62,19 @@ abstract class StepFindCallerByContactMethod extends Base {
 
 			// The class must exist.
 			if(MetaModel::IsValidClass($sClass) == true) {
-				
+
 				// Find person objects; oldest first.
 				$oFilter_Person = DBObjectSearch::FromOQL_AllData($sOQL);
 				$oSet_Person = new DBObjectSet($oFilter_Person, ['id' => true], [
-					'email' => $sEmail	
+					'email' => $sEmail
 				]);
 
 				static::Trace(sprintf('... OQL %1$s returned %2$s results.', $sClass, $oSet_Person->Count()));
+
+				if($oSet_Person->Count() > 1) {
+					static::Trace("Found {$oSet_Person->Count()} people matching '{$sEmail}' via {$sClass}, the first one will be used...");
+					static::$bLastMatchAmbiguous = true;
+				}
 
 				$oPerson = $oSet_Person->Fetch();
 
@@ -123,11 +133,18 @@ abstract class StepFindCallerByContactMethod extends Base {
 			return;
 		}
 
-		// Update the e-mail address (on the person object) to the one which was used last by the caller.
-		static::Trace(". Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCallerEmail}");
-		$oPerson->Set('email', $sCallerEmail);
-		$oPerson->DBUpdate();
-		
+		// A match via a secondary/alternate contact method is weaker evidence than a match on the primary
+		// email address itself; only sync it as the person's primary e-mail when the match was unambiguous,
+		// to avoid overwriting the wrong person's contact data when a contact detail is shared (e.g. a team mailbox).
+		if(static::$bLastMatchAmbiguous) {
+			static::Trace(". Ambiguous match for '{$sCallerEmail}': not updating {$oPerson->Get('friendlyname')}'s primary e-mail.");
+		}
+		else {
+			static::Trace(". Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCallerEmail}");
+			$oPerson->Set('email', $sCallerEmail);
+			$oPerson->DBUpdate();
+		}
+
 		// Set caller for email
 		$oEmail->SetSender($oPerson);
 
