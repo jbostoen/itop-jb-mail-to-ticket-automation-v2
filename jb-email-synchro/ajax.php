@@ -71,8 +71,10 @@ function GetMailboxContent($oPage, $oInbox) {
 			if($iStartIndex < 0 || $iMaxCount <= 0) {
 				// Don't process, invalid indexes
 				$oPage->add('Invalid start or max.');
+				$oSource->Disconnect();
+				return;
 			}
-			
+
 			// Avoid user specifying a higher number (start) than the total message number count
 			$iStart = $iStartIndex;
 		
