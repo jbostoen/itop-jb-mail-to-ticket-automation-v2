@@ -521,8 +521,10 @@ abstract class CreateOrUpdateTicket extends Base {
 					'position' => $aInfo[1]
 				);
 			}
-			foreach ($aMatches[1] as $idx => $aInfo) {
-				$sCID = $aInfo[0];
+			foreach ($aMatches[0] as $idx => $aInfo) {
+				// Group 1 = quoted src="cid:...", group 2 = unquoted src=cid:... . Only one of the
+				// two ever participates in a given match; the other is captured as an empty string.
+				$sCID = ($aMatches[1][$idx][0] !== '') ? $aMatches[1][$idx][0] : $aMatches[2][$idx][0];
 				if(array_key_exists($sCID, static::$aAddedAttachments) == false) {
 					static::Trace("... Info: inline image: {$sCID} not found as an attachment. Ignored.");
 				}
