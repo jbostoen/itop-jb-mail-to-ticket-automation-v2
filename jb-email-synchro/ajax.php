@@ -345,7 +345,12 @@ try {
 
 		case 'mailbox_reset_status':
 		case 'mailbox_delete_messages':
-		
+
+			if($oInbox === null) {
+				$oPage->add('Invalid or missing mailbox id.');
+				break;
+			}
+
 			// As for the replicas, consider this:
 			// - There could be multiple mailboxes that received the same message (and UIDL).
 			// - There could be a copy of the same message (same UIDL) in a different folder on the same mailbox (different "Mailbox" config in iTop).
@@ -392,6 +397,11 @@ try {
 			break;
 
 		case 'mailbox_ignore_messages':
+
+			if($oInbox === null) {
+				$oPage->add('Invalid or missing mailbox id.');
+				break;
+			}
 
 			$aInternalIdentifiers = utils::ReadParam('aInternalIdentifiers', [], false, 'raw_data');
 			$aReplicas = [];
