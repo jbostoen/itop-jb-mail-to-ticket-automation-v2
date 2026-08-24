@@ -526,9 +526,10 @@ abstract class CreateOrUpdateTicket extends Base {
 	 */
 	public static function ManageInlineImages(string $sBodyText, bool $bForPlainText) : string {
 		 
-		// Search for inline images: i.e. <img tags containing an src="cid:...." or without double quotes e.g. src=cid:xyzxyzx
+		// Search for inline images: i.e. <img tags containing an src="cid:....", src='cid:....', or without
+		// quotes e.g. src=cid:xyzxyzx
 		// Note: (?: ... ) is used for grouping the alternative without creating a "matching group"
-		if(preg_match_all('/<img[^>]+src=(?:"cid:([^"]+)"|cid:([^ >]+))[^>]*>/i', $sBodyText, $aMatches, PREG_OFFSET_CAPTURE)) {
+		if(preg_match_all('/<img[^>]+src=(?:"cid:([^"]+)"|\'cid:([^\']+)\'|cid:([^ >]+))[^>]*>/i', $sBodyText, $aMatches, PREG_OFFSET_CAPTURE)) {
 
 			$aInlineImages = [];
 			foreach ($aMatches[0] as $idx => $aInfo) {
@@ -537,18 +538,19 @@ abstract class CreateOrUpdateTicket extends Base {
 				);
 			}
 			foreach ($aMatches[0] as $idx => $aInfo) {
-				// Group 1 = quoted src="cid:...", group 2 = unquoted src=cid:... . Only one of the
-				// two ever participates in a given match; the other is captured as an empty string.
-				$sCID = ($aMatches[1][$idx][0] !== '') ? $aMatches[1][$idx][0] : $aMatches[2][$idx][0];
-				if(array_key_exists($sCID, static::$aAddedAttachments) == false) {
+				// Group 1 = double-quoted src="cid:...", group 2 = single-quoted src='cid:...',
+				// group 3 = unquoted src=cid:... . Only one of the three ever participates in a given
+				// match; the others are captured as an empty string.
+				$sCID = $aMatches[1][$idx][0] !== '' ? $aMatches[1][$idx][0] : ($aMatches[2][$idx][0] !== '' ? $aMatches[2][$idx][0] : $aMatches[3][$idx][0]);
+				if(!array_key_exists($sCID, static::$aAddedAttachments)) {
 					static::Trace("... Info: inline image: {$sCID} not found as an attachment. Ignored.");
 				}
-				elseif(array_key_exists($sCID, static::$aAddedAttachments)) {
+				else {
 					$aInlineImages[$idx]['cid'] = $sCID;
 					static::Trace("... Inline image cid:$sCID stored as ".get_class(static::$aAddedAttachments[$sCID])."::".static::$aAddedAttachments[$sCID]->GetKey());
 				}
 			}
-			if(defined('ATTACHMENT_DOWNLOAD_URL') == false) {
+			if(!defined('ATTACHMENT_DOWNLOAD_URL')) {
 				define('ATTACHMENT_DOWNLOAD_URL', 'pages/ajax.render.php?operation=download_document&class=Attachment&field=contents&id=');
 			}
 			if($bForPlainText) {
@@ -586,7 +588,16 @@ abstract class CreateOrUpdateTicket extends Base {
 					else {
 						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'"';
 					}
-					
+
+					$aSearches[] = "src='cid:".$sCID."'"; // Same with single quotes
+					if(class_exists('InlineImage') && $oAttachment instanceof InlineImage) {
+						// Inline images have a special download URL requiring the 'secret' token
+						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().INLINEIMAGE_DOWNLOAD_URL.$oAttachment->GetKey().'&s='.$oAttachment->Get('secret').'"';
+					}
+					else {
+						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'"';
+					}
+
 					$aSearches[] = 'src=cid:'.$sCID; // Same without quotes
 					if (class_exists('InlineImage') && ($oAttachment instanceof InlineImage)) {
 						// Inline images have a special download URL requiring the 'secret' token
