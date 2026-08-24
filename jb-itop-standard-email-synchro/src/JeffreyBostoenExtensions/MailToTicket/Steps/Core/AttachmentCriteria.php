@@ -73,11 +73,10 @@ abstract class AttachmentCriteria extends Base {
 				$bDoCheckIfImageDimensionTooSmall = false;
 			}
 			
-			if($iMaxWidth < 0 || $iMaxHeight < 0) {
-				static::Trace('Max dimensions can not be negative.');
-				$bDoCheckIfImageDimensionTooLarge = false;
-			}
-			
+			// A max dimension of 0 (or a negative value) means "no limit" for that dimension.
+			$iEffectiveMaxWidth = ($iMaxWidth < 1) ? PHP_INT_MAX : $iMaxWidth;
+			$iEffectiveMaxHeight = ($iMaxHeight < 1) ? PHP_INT_MAX : $iMaxHeight;
+
 			if(function_exists('imagecopyresampled') == false) {
 				static::Trace('php-gd seems to be missing. Resizing is not possible.');
 				$bDoCheckIfImageDimensionTooLarge = false;
@@ -139,12 +138,12 @@ abstract class AttachmentCriteria extends Base {
 							}
 							
 							// Image too large?
-							if($bDoCheckIfImageDimensionTooLarge && ($iWidth > $iMaxWidth || $iHeight > $iMaxHeight)) {
-								
+							if($bDoCheckIfImageDimensionTooLarge && ($iWidth > $iEffectiveMaxWidth || $iHeight > $iEffectiveMaxHeight)) {
+
 								// Resize
 								static::Trace('Resize image (dimensions too large).');
-								$aAttachment = static::ResizeImageToFit($aAttachment, $iWidth, $iHeight, $iMaxWidth, $iMaxHeight);
-								
+								$aAttachment = static::ResizeImageToFit($aAttachment, $iWidth, $iHeight, $iEffectiveMaxWidth, $iEffectiveMaxHeight);
+
 							}
 						
 						}
