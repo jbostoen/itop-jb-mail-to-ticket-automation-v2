@@ -99,12 +99,13 @@ abstract class AttachmentCriteria extends Base {
 				// - Ignore certain MIME types (This could include images).
 					
 					if(in_array($aAttachment['mimeType'], $aMimeTypes)) {
-						
+
 						static::Trace('Ignore this attachment (excluded MIME type).');
-						
+
 						// Removing attachment
 						unset($oEmail->aAttachments[$sAttachmentRef]);
-									
+						continue;
+
 					}
 
 
