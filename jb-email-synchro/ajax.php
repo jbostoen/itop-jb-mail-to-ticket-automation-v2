@@ -78,8 +78,9 @@ function GetMailboxContent($oPage, $oInbox) {
 		
 			// Avoid user specifying a higher number (start + count) than the total mesage number count
 			// The largest index is (message count - 1), since messages are retrieved by index (starting at 0)
-			// Check the total (readable) message count here.
-			$iEnd = min($iStart + $iMaxCount - 1, $iTotalMsgCount - 1); 
+			// Bound against $iTotalMsgOkCount (the number of entries actually present in $aMessages/$aMessageIndexes),
+			// not $iTotalMsgCount (a separate IMAP STATUS count that can differ), to avoid indexing past the array.
+			$iEnd = min($iStart + $iMaxCount - 1, $iTotalMsgOkCount - 1);
 			
 		}
 		catch(Exception $e) {
