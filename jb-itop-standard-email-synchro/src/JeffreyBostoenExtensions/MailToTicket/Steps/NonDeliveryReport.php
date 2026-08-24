@@ -75,16 +75,18 @@ abstract class NonDeliveryReport extends Base {
 					// Another that may be more doubtful: mailbox unavailable
 					// Do NOT simply rely on 550, it's too generic and doesn't always mean the recipient's mailbox no longer exists.
 					if(
-						preg_match('/(unknown recipient|unknown user|mailbox unavailable)/', $sContent, $aKeywords) ||
-						
+						preg_match('/(unknown recipient|unknown user|mailbox unavailable)/i', $sContent, $aKeywords) ||
+
 						// 5.1.1 = Bad destination mailbox address
 						// 5.1.2 = Bad destination system address
 						// 5.1.3 = Bad destination mailbox address syntax
 						preg_match('/5\.1\.(1|2|3)/', $sCode)
 					) {
-						
-						// List phrase
-						static::Trace('.. Keywords: '.$aKeywords[1]);
+
+						// List phrase, if the keyword pattern is what matched (it may not be: the status code alone can also satisfy this condition).
+						if(array_key_exists(1, $aKeywords)) {
+							static::Trace('.. Keywords: '.$aKeywords[1]);
+						}
  
 						if($bMarkAsInactive) {
 
