@@ -573,7 +573,12 @@ abstract class ProcessingHelper {
 		// - This is extra info.
 			$aPreviouslyExecutedSteps = [];
 			static::SetExecutedSteps($aPreviouslyExecutedSteps);
-			
+
+		// - Default to the current next action, in case no step is applicable at all (empty $aStepClasses):
+		//   the loop below would otherwise never assign $eNextAction, leaving the post-loop check unable
+		//   to ever reset the next action to NO_ACTION, wedging the message into permanent reprocessing.
+			$eNextAction = static::GetNextAction();
+
 		foreach($aStepClasses as $sStep) {
 		
 			$sShortStep = basename($sStep);
