@@ -79,10 +79,10 @@ abstract class OtherRecipients extends Base {
 							$oPregMatch = @preg_match($sPattern, $sCurrentEmail);
 							
 							if($oPregMatch === false) {
-								
-								// Pattern mistake
+
+								// Pattern mistake: skip this pattern only, still check the remaining allowed patterns.
 								static::Trace(". Invalid pattern: '{$sPattern}'");
-								continue 2;
+								continue;
 							}
 							elseif(preg_match($sPattern, $sCurrentEmail)) {
 								
