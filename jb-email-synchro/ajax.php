@@ -298,20 +298,9 @@ function GetMailboxContent($oPage, $oInbox) {
 				
 				// Contrary to the original Combodo message: this could mean there are actually e-mails in the mailbox, but they can not be processed.
 				$oPage->p(Dict::Format('MailInbox:NoValidEmailsFound'));
-				
+
 			}
 
-			if($iTotalMsgCount > 0) {
-				// If we have messages in the mailbox, even if none can be read (meaning they can't be displayed), we are displaying the mailbox stats
-				// This will greatly help the user understanding what's going on !
-				$oPage->p(Dict::Format('MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox',
-					$iMsgOkCount,
-					$iTotalMsgCount,
-					($iTotalMsgCount - $iProcessedCount),
-					($iTotalMsgCount - $iTotalMsgOkCount))
-				);
-			}
-			
 		}
 		else {
 			$oPage->p(Dict::Format('MailInbox:EmptyMailbox'));
