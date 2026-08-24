@@ -57,6 +57,15 @@ class DefaultText extends Base {
         
         $oEmail = ProcessingHelper::GetMail();
         $sCaseLogEntry = $oEmail->GetNewPart($sEntry, $oEmail->sBodyFormat); // GetNewPart always returns a plain text version of the message.
+
+        if(trim($sCaseLogEntry) === '') {
+
+            // No new part (only blank content)...
+            // It's better to use the whole text of the message.
+            $sCaseLogEntry = $oEmail->sBodyText;
+
+        }
+
         $sCaseLogEntry = utils::TextToHtml($sCaseLogEntry);
 
         return $sCaseLogEntry;
