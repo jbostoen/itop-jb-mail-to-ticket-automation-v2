@@ -10,6 +10,7 @@ namespace JeffreyBostoenExtensions\MailToTicket\Steps\Core;
 
 use JeffreyBostoenExtensions\MailToTicket\Steps\{
 	Base,
+	FindAdditionalContactsByContactMethod,
 	PolicyBehavior
 };
 
@@ -93,13 +94,25 @@ abstract class FindAdditionalContacts extends Base {
 					$sRecipientName = $oRecipient->GetName();
 					
 					// Is this an e-mail address that should be ignored?
-					if(in_array(mb_strtolower($sRecipientEmail), $aExcludedAddresses) == true) {
+					if(in_array(mb_strtolower($sRecipientEmail), $aExcludedAddresses)) {
 						static::Trace('.. Ignore '.$sRecipientEmail.' ('.$sRecipientName.')');
 						continue;
 					}
-					
+
+					// Was this recipient already resolved (and linked) by the contactmethod extension's
+					// step (precedence 114), via a secondary ContactMethod/EmailAlias match rather than
+					// their primary email? If so, don't process it again here: this step's own lookup is
+					// primary-email-only, so it would find no match and create a duplicate Person.
+					if(
+						class_exists(FindAdditionalContactsByContactMethod::class) &&
+						in_array(mb_strtolower($sRecipientEmail), FindAdditionalContactsByContactMethod::$aResolvedRecipientEmails, true)
+					) {
+						static::Trace('.. Already resolved via ContactMethod/EmailAlias: '.$sRecipientEmail.' ('.$sRecipientName.')');
+						continue;
+					}
+
 					// Found other contacts in To: or CC:
-							
+
 					// Check if this contact exists.
 					// Non-existing contacts must be created.
 					// Actual linking of contacts happens after policies have been processed.
@@ -112,14 +125,14 @@ abstract class FindAdditionalContacts extends Base {
 					
 					static::Trace(". Results for Person with email address '{$sRecipientEmail}: {$oSet_Person->Count()}");
 					
-					if($oSet_Person->Count() == 0) {
-						
-						if($sPolicyBehavior != 'fallback_add_other_contacts') {
-							
+					if($oSet_Person->Count() === 0) {
+
+						if($sPolicyBehavior !== 'fallback_add_other_contacts') {
+
 							// No existing contacts were found; and no new person should be created.
 
 						}
-						elseif($sPolicyBehavior == 'fallback_add_other_contacts') {
+						elseif($sPolicyBehavior === 'fallback_add_other_contacts') {
 							
 							// Create
 							static::Trace(". Creating a new Person with email address '{$sRecipientEmail}'");
@@ -151,7 +164,7 @@ abstract class FindAdditionalContacts extends Base {
 						}
 						
 					}
-					elseif($oSet_Person->Count() == 1) {
+					elseif($oSet_Person->Count() === 1) {
 						// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)
 						$oContact = $oSet_Person->Fetch();
 						$oEmail->AddRelatedContact($oContact);

@@ -38,6 +38,14 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 	public static int $iPrecedence = 114;
 
 	/**
+	 * @var string[] Lowercased e-mail addresses that were resolved to an existing Person by this step,
+	 * for the current e-mail being processed. Read by the core FindAdditionalContacts step (precedence
+	 * 115) so it doesn't re-process (and potentially create a duplicate Person for) the same recipient
+	 * via its own, primary-email-only lookup.
+	 */
+	public static array $aResolvedRecipientEmails = [];
+
+	/**
 	 * @inheritDoc
 	 * @details Shares the core FindAdditionalContacts step's setting, so both matching mechanisms
 	 * honor the same admin-facing "other recipients" policy.
@@ -50,11 +58,14 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 	 *
 	 */
 	public static function Execute() : void {
-		
+
+		// Reset before processing each mail.
+		static::$aResolvedRecipientEmails = [];
+
 		// Checking if there's an unknown caller
-		
+
 			// Don't even bother if jb-contactmethod is not enabled as an extension.
-			if(MetaModel::IsValidClass('ContactMethod') == false && MetaModel::IsValidClass('EmailAlias') == false) {
+			if(!MetaModel::IsValidClass('ContactMethod') && !MetaModel::IsValidClass('EmailAlias')) {
 				static::Trace(". Step not relevant: No relevant classes exist (ContactMethod, EmailAlias).");
 				return;
 			}
@@ -107,6 +118,8 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 
 				// Only if there is a match.
 				if($oPerson !== null) {
+
+					static::$aResolvedRecipientEmails[] = mb_strtolower($sCurrentEmail);
 
 					// Add to related contacts.
 					$oEmail->AddRelatedContact($oPerson);
