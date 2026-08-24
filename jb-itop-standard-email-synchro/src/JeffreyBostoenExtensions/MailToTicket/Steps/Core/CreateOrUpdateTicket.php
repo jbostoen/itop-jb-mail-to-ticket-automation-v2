@@ -891,7 +891,6 @@ abstract class CreateOrUpdateTicket extends Base {
 
 		$oAttachment = new Attachment();
 		$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
-		$oAttachment->SetIfNull('creation_date', time());
 
 		if($oCaller !== null && MetaModel::GetAttributeDef('Attachment', 'contact_id') instanceof AttributeExternalKey) {
 			$oAttachment->Set('contact_id', $oCaller);
@@ -1035,9 +1034,9 @@ abstract class CreateOrUpdateTicket extends Base {
 		foreach($oEmail->aAttachments as $iIndex => $aAttachment) {
 			
 			$bIgnoreAttachment = false;
-			
-			if($bIgnoreAttachment === false && $bNoDuplicates) {
-				
+
+			if($bNoDuplicates) {
+
 				// Check if an attachment with the same name/type/size/md5 already exists
 				$iSize = strlen($aAttachment['content']);
 				$sMd5 = md5($aAttachment['content']);
@@ -1055,62 +1054,55 @@ abstract class CreateOrUpdateTicket extends Base {
 						break;
 					}
 				}
-				
-				if(!$bIgnoreAttachment) {
-					
-					// - Save inline images.
 
-					if(static::IsImage($aAttachment['mimeType']) && class_exists('InlineImage') && $aAttachment['inline']) {
-
-						$oAttachment = new InlineImage();
-						static::Trace('Attachment "%1$s" will be stored as an InlineImage.', $aAttachment['filename']);
-						$oAttachment->Set('secret', bin2hex(random_bytes(16))); // 128 bits of entropy, cryptographically secure
-
-					}
-					else {
-
-						static::Trace('Attachment "%1$s" will be stored as an Attachment.', $aAttachment['filename']);
-						$oAttachment = new Attachment();
-						
-						$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
-						$oAttachment->SetIfNull('creation_date', time());
-
-						if($oUser !== null) {
-							$oAttachment->Set('user_id', $oUser);
-						}
-						// Difference between iTop 3.0 (AttributeExternalField) and iTop 3.1 (AttributeExternalKey).
-						if(MetaModel::GetAttributeDef('Attachment', 'contact_id') instanceof AttributeExternalKey && $oCaller !== null) {
-							$oAttachment->Set('contact_id', $oCaller);
-						}
-						
-					}
-					if ($oTicket->IsNew()) {
-						$oAttachment->Set('item_class', get_class($oTicket));
-					}
-					else {
-						$oAttachment->SetItem($oTicket);
-					}
-					
-					$oBlob = new ormDocument($aAttachment['content'], $aAttachment['mimeType'], $aAttachment['filename']);
-					$oAttachment->Set('contents', $oBlob);
-					$oAttachment->DBInsert();
-					$oMyChangeOp = MetaModel::NewObject('CMDBChangeOpPlugin');
-					$oMyChange = CMDBObject::GetCurrentChange();
-					$oMyChangeOp->Set('change', $oMyChange->GetKey());
-					$oMyChangeOp->Set('objclass', get_class($oTicket));
-					$oMyChangeOp->Set('objkey', $oTicket->GetKey());
-					$oMyChangeOp->Set('description', Dict::Format('Attachments:History_File_Added', $aAttachment['filename']));
-					$iId = $oMyChangeOp->DBInsertNoReload();
-					static::Trace("Attachment {$aAttachment['filename']} added to the ticket.");
-					static::$aAddedAttachments[$aAttachment['content-id']] = $oAttachment;
-				}
 			}
-			else {
-				static::Trace('The attachment #%1$s %2$s was NOT added to the ticket because its type "%3$s" is excluded according to the configuration.',
-					$iIndex,
-					$aAttachment['filename'],
-					$aAttachment['mimeType']
-				);
+
+			if(!$bIgnoreAttachment) {
+
+				// - Save inline images.
+
+				if(static::IsImage($aAttachment['mimeType']) && class_exists('InlineImage') && $aAttachment['inline']) {
+
+					$oAttachment = new InlineImage();
+					static::Trace('Attachment "%1$s" will be stored as an InlineImage.', $aAttachment['filename']);
+					$oAttachment->Set('secret', bin2hex(random_bytes(16))); // 128 bits of entropy, cryptographically secure
+
+				}
+				else {
+
+					static::Trace('Attachment "%1$s" will be stored as an Attachment.', $aAttachment['filename']);
+					$oAttachment = new Attachment();
+
+					$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
+
+					if($oUser !== null) {
+						$oAttachment->Set('user_id', $oUser);
+					}
+					// Difference between iTop 3.0 (AttributeExternalField) and iTop 3.1 (AttributeExternalKey).
+					if(MetaModel::GetAttributeDef('Attachment', 'contact_id') instanceof AttributeExternalKey && $oCaller !== null) {
+						$oAttachment->Set('contact_id', $oCaller);
+					}
+
+				}
+				if ($oTicket->IsNew()) {
+					$oAttachment->Set('item_class', get_class($oTicket));
+				}
+				else {
+					$oAttachment->SetItem($oTicket);
+				}
+
+				$oBlob = new ormDocument($aAttachment['content'], $aAttachment['mimeType'], $aAttachment['filename']);
+				$oAttachment->Set('contents', $oBlob);
+				$oAttachment->DBInsert();
+				$oMyChangeOp = MetaModel::NewObject('CMDBChangeOpPlugin');
+				$oMyChange = CMDBObject::GetCurrentChange();
+				$oMyChangeOp->Set('change', $oMyChange->GetKey());
+				$oMyChangeOp->Set('objclass', get_class($oTicket));
+				$oMyChangeOp->Set('objkey', $oTicket->GetKey());
+				$oMyChangeOp->Set('description', Dict::Format('Attachments:History_File_Added', $aAttachment['filename']));
+				$iId = $oMyChangeOp->DBInsertNoReload();
+				static::Trace("Attachment {$aAttachment['filename']} added to the ticket.");
+				static::$aAddedAttachments[$aAttachment['content-id']] = $oAttachment;
 			}
 		}
 		
