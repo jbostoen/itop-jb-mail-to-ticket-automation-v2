@@ -293,6 +293,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	 
 	'MailInboxStandard:DebugTrace' => 'Trace de debug',
 	'MailInboxStandard:DebugTraceNotActive' => 'Activer la trace de debug de cette boîte email pour avoir un journal détaillé de ce qui se produit.',
+	'MailInboxStandard:DebugTraceAccessDenied' => 'Vous n\'êtes pas autorisé à consulter la trace de debug de cette boîte email.',
 	
 	'MailPolicy:CreateOrUpdateTicket:NoDescriptionProvided' => 'Aucune description',
 	

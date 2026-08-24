@@ -316,6 +316,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	 
 	'MailInboxStandard:DebugTrace' => 'Debug Trace',
 	'MailInboxStandard:DebugTraceNotActive' => 'Activate the debug trace on this Inbox to see a detailed log of what happens.',
+	'MailInboxStandard:DebugTraceAccessDenied' => 'You are not allowed to view the debug trace of this Inbox.',
 	
 	'MailPolicy:CreateOrUpdateTicket:NoDescriptionProvided' => 'No description provided',
 	
