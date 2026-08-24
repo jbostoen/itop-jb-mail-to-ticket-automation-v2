@@ -422,8 +422,9 @@ try {
 					$oEmailReplica->Set('status', 'ignored');
 					$oEmailReplica->Set('mailbox_id', $oInbox->GetKey());
 					$oEmailReplica->Set('mailbox_path', $oSource->GetMailbox());
-					foreach ($aMessages as $iMessage => $aMessage) {
-						if($aMessage['uidl'] == $sUIDL) {
+					/** @var MessageHandler $oMsgHandler */
+					foreach ($aMessages as $iMessage => $oMsgHandler) {
+						if($oMsgHandler->GetInternalIdentifier() == $sUIDL) {
 							$oEmailReplica->Set('message_id', $iMessage);
 							$oEmailReplica->DBInsert();
 							break;
