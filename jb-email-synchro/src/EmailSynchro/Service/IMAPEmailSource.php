@@ -92,6 +92,10 @@ class IMAPEmailSource extends EmailSource {
 			$aOptions['validate_cert'] = true;
 		}
 
+		// The IMAP engine instantiates the "debug" logger itself (with no constructor arguments), so hand
+		// over the mailbox being processed via a static property; IMAPEmailLogger routes lines through it.
+		IMAPEmailLogger::$oCurrentMailbox = $oMailbox;
+
 		$this->oMailbox = new Mailbox($aOptions);
 		$this->oMailbox->connect();
 
