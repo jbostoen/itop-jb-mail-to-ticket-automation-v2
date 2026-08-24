@@ -12,6 +12,8 @@ use JeffreyBostoenExtensions\MailToTicket\{
 	ProcessingHelper
 };
 
+use Exception;
+
 /**
  * Class UpdateCallerAttributes.
  * A step to update attributes on an already-known caller (e.g. reactivating a Person whose
@@ -65,7 +67,13 @@ abstract class UpdateCallerAttributes extends Base {
 
 		static::Trace('.. Updating Person::'.$oCaller->GetKey().' with: '.http_build_query($aValues));
 		ProcessingHelper::InitObjectFromDefaultValues($oCaller, $aValues);
-		$oCaller->DBUpdate();
+
+		try {
+			$oCaller->DBUpdate();
+		}
+		catch(Exception $e) {
+			static::Trace('.. Unable to update Person::'.$oCaller->GetKey().': '.$e->getMessage());
+		}
 
 	}
 
