@@ -30,7 +30,8 @@ abstract class AttachmentForbiddenMimeType extends Base {
 		
 	private static function GetEffectiveMimeTypes(array $aAttachment) : array {
 
-		$aTypes = [$aAttachment['mimeType']];
+		// MIME types are compared case-insensitively against the configured forbidden list.
+		$aTypes = [strtolower(trim($aAttachment['mimeType']))];
 
 		if(!empty($aAttachment['content']) && function_exists('finfo_open')) {
 
@@ -42,7 +43,7 @@ abstract class AttachmentForbiddenMimeType extends Base {
 				finfo_close($rFinfo);
 
 				if($sSniffed !== false) {
-					$aTypes[] = $sSniffed;
+					$aTypes[] = strtolower(trim($sSniffed));
 				}
 
 			}
@@ -70,7 +71,8 @@ abstract class AttachmentForbiddenMimeType extends Base {
 			else {
 				
 				$aForbiddenMimeTypes = preg_split(static::NEWLINE_REGEX, $sForbiddenMimeTypes);
-			
+				$aForbiddenMimeTypes = array_map(fn(string $sMimeType) : string => strtolower(trim($sMimeType)), $aForbiddenMimeTypes);
+
 				static::Trace('.. Forbidden MimeTypes: '. implode(' - ', $aForbiddenMimeTypes));
 				static::Trace('.. # Attachments: '. count($oEmail->aAttachments));
 				
