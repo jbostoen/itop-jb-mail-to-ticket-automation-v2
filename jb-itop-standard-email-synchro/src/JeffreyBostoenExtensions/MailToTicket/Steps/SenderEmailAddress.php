@@ -36,8 +36,9 @@ abstract class SenderEmailAddress extends Base {
 		
 		$oRawEmail = ProcessingHelper::GetRawMail();
 
-		/** @var EmailContact $oSender */
-		$sSenderEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
+		/** @var EmailContact[] $aSenders */
+		$aSenders = $oRawEmail->GetSender();
+		$sSenderEmail = ($aSenders !== []) ? $aSenders[0]->GetEmailAddress() : '';
 
 		
 		// Checking if the e-mail address does NOT match the configured pattern.
