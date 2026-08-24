@@ -92,8 +92,11 @@ function GetMailboxContent($oPage, $oInbox) {
 			);
 			IssueLog::Error('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage(), null, $aContext);
 			$oPage->p('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
+			if(isset($oSource)) {
+				$oSource->Disconnect();
+			}
 			return;
-			
+
 		}
 
 		
@@ -311,6 +314,10 @@ function GetMailboxContent($oPage, $oInbox) {
 		else {
 			$oPage->p(Dict::Format('MailInbox:EmptyMailbox'));
 		}
+
+		if(isset($oSource)) {
+			$oSource->Disconnect();
+		}
 	}
 	else {
 		$oPage->P(Dict::S('UI:ObjectDoesNotExist'));
@@ -442,10 +449,13 @@ try {
 						}
 					}
 				}
+
+				/** @var EmailSource $oSource */
+				$oSource->Disconnect();
 			}
 			GetMailboxContent($oPage, $oInbox);
 			break;
-			
+
 	}
 	$oPage->output();
 }
