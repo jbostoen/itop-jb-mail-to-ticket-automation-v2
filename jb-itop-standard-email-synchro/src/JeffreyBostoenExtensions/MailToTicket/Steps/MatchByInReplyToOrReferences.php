@@ -89,7 +89,7 @@ abstract class MatchByInReplyToOrReferences extends Base {
 
 		// In the wild, it was observed that In-Reply-To is sometimes set - but empty, e.g.:
 		// In-Reply-To: <>
-		$aReferences = array_unique(array_diff($aReferences, ['']));
+		$aReferences = array_unique(array_diff($aReferences, ['', '<>']));
 		
 
 		static::Trace('.. '.count($aReferences).' references: '.implode(', ', $aReferences));
