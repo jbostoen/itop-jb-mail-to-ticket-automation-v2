@@ -166,7 +166,7 @@ if (!class_exists('EmailSynchroInstaller')) {
 					
 					$iRet = CMDBSource::Query($sUpdateQuery); // Throws an exception in case of error
 					
-					if($bUpgradeOptionsIMAP == true && trim($oInbox->Get('imap_options') == '')) {
+					if($bUpgradeOptionsIMAP && trim((string) $oInbox->Get('imap_options')) === '') {
 						$aOptionsIMAP = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap', 'ssl', 'novalidate-cert'));
 						$oInbox->Set('imap_options', implode(PHP_EOL, $aOptionsIMAP));
 						$oInbox->DBUpdate();
