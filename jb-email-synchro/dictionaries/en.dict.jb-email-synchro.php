@@ -110,6 +110,15 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:lnkMailProcessingEventToTrigger/Attribute:event_id' => 'Event',
 	'Class:lnkMailProcessingEventToTrigger/Attribute:code' => 'Code',
 
+	'Class:ActionEmailLiteralRecipients' => 'Send an e-mail (with fallback recipient address)',
+	'Class:ActionEmailLiteralRecipients+' => 'Same as "Send an e-mail", but "To"/"Cc"/"Bcc" can additionally be (or be completed by) a literal, placeholder-aware address, for recipients that have no corresponding object in iTop (e.g. an unidentified e-mail sender)',
+	'Class:ActionEmailLiteralRecipients/Attribute:to_address' => 'To (address)',
+	'Class:ActionEmailLiteralRecipients/Attribute:to_address+' => 'Literal address(es), comma-separated; placeholders (e.g. "$mail->caller_email$") are resolved. Added to whatever "To" (OQL) already finds.',
+	'Class:ActionEmailLiteralRecipients/Attribute:cc_address' => 'Cc (address)',
+	'Class:ActionEmailLiteralRecipients/Attribute:cc_address+' => 'Literal address(es), comma-separated; placeholders (e.g. "$mail->caller_email$") are resolved. Added to whatever "Cc" (OQL) already finds.',
+	'Class:ActionEmailLiteralRecipients/Attribute:bcc_address' => 'Bcc (address)',
+	'Class:ActionEmailLiteralRecipients/Attribute:bcc_address+' => 'Literal address(es), comma-separated; placeholders (e.g. "$mail->caller_email$") are resolved. Added to whatever "Bcc" (OQL) already finds.',
+
 	'MailInbox:EmptyMailbox' => 'Empty mailbox',
 	
 	'Class:EmailReplica' => 'Email Replica',

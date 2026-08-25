@@ -110,6 +110,15 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:lnkMailProcessingEventToTrigger/Attribute:event_id' => 'Événement',
 	'Class:lnkMailProcessingEventToTrigger/Attribute:code' => 'Code',
 
+	'Class:ActionEmailLiteralRecipients' => 'Envoyer un e-mail (avec adresse de secours)',
+	'Class:ActionEmailLiteralRecipients+' => 'Identique à "Envoyer un e-mail", mais "À"/"Cc"/"Cci" peuvent en plus être (ou être complétés par) une adresse littérale, résolue via les paramètres, pour les destinataires sans objet correspondant dans iTop (par exemple un expéditeur d\'e-mail non identifié)',
+	'Class:ActionEmailLiteralRecipients/Attribute:to_address' => 'À (adresse)',
+	'Class:ActionEmailLiteralRecipients/Attribute:to_address+' => 'Adresse(s) littérale(s), séparées par une virgule ; les paramètres (par exemple "$mail->caller_email$") sont résolus. Ajoutées à ce que "À" (OQL) trouve déjà.',
+	'Class:ActionEmailLiteralRecipients/Attribute:cc_address' => 'Cc (adresse)',
+	'Class:ActionEmailLiteralRecipients/Attribute:cc_address+' => 'Adresse(s) littérale(s), séparées par une virgule ; les paramètres (par exemple "$mail->caller_email$") sont résolus. Ajoutées à ce que "Cc" (OQL) trouve déjà.',
+	'Class:ActionEmailLiteralRecipients/Attribute:bcc_address' => 'Cci (adresse)',
+	'Class:ActionEmailLiteralRecipients/Attribute:bcc_address+' => 'Adresse(s) littérale(s), séparées par une virgule ; les paramètres (par exemple "$mail->caller_email$") sont résolus. Ajoutées à ce que "Cci" (OQL) trouve déjà.',
+
 	'MailInbox:EmptyMailbox' => 'La boîte mail est vide.',
 	
 	'Class:EmailReplica' => 'Email Replica~~',
