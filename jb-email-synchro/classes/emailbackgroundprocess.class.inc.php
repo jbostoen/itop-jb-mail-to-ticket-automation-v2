@@ -119,7 +119,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 			
 			$oEmailReplica->DBWrite();
 		}
-		catch (Exception $e) {
+		catch (Throwable $e) {
 			$this->Trace('Error: ' . $oProcessor->GetLastErrorSubject() . " - " . $oProcessor->GetLastErrorMessage());
 			IssueLog::Error('Email not processed for email replica of uidl "' . $oEmailReplica->Get('uidl') . '" and message_id "' . $oEmailReplica->Get('message_id') . '" : ' . $oProcessor->GetLastErrorSubject() . " - " . $oProcessor->GetLastErrorMessage());
 
