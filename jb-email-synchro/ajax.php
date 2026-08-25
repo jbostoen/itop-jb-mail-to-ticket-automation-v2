@@ -421,6 +421,7 @@ try {
 				// Add them to the database.
 				$oSource = $oInbox->GetEmailSource();
 				$aMessages = $oSource->GetListing();
+				$aNotFound = [];
 				foreach($aInternalIdentifiers as $sUIDL) {
 					if (isset($aReplicas[$sUIDL])) {
 						// Already processed
@@ -431,14 +432,27 @@ try {
 					$oEmailReplica->Set('status', 'ignored');
 					$oEmailReplica->Set('mailbox_id', $oInbox->GetKey());
 					$oEmailReplica->Set('mailbox_path', $oSource->GetMailbox());
+					$bFound = false;
 					/** @var MessageHandler $oMsgHandler */
 					foreach ($aMessages as $iMessage => $oMsgHandler) {
 						if($oMsgHandler->GetInternalIdentifier() == $sUIDL) {
 							$oEmailReplica->Set('message_id', $iMessage);
 							$oEmailReplica->DBInsert();
+							$bFound = true;
 							break;
 						}
 					}
+					if(!$bFound) {
+						// The message is no longer in the mailbox's listing (e.g. a concurrent cron run
+						// already moved/deleted it): there is nothing left to mark as "ignored".
+						$aNotFound[] = $sUIDL;
+					}
+				}
+
+				if($aNotFound !== []) {
+					$sMessage = 'Could not ignore '.count($aNotFound).' message(s), no longer found in the mailbox listing: '.implode(', ', $aNotFound);
+					$oInbox->Trace($sMessage);
+					$oPage->add($sMessage);
 				}
 
 				/** @var EmailSource $oSource */
