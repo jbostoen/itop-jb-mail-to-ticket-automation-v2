@@ -435,26 +435,31 @@ abstract class CreateOrUpdateTicket extends Base {
 		static::AddAdditionalContacts();
 		
 		static::BeforeUpdateTicket();
-		
-		try {
-			$oTicket->DBUpdate();			
-			static::Trace("Ticket '{$oTicket->GetName()}' has been updated.");
-		}
-		catch(Exception $e) {
-			static::Trace("Ticket {$oTicket->GetName()} might not be properly updated or something else went wrong (for instance: notifications).");
-			static::Trace($e->getMessage()); // Add actual error message (if available)
-			throw new Exception('Unable to update ticket.');
-		}
-		
-		static::AfterUpdateTicket();
 
-		// Restore previous change as current change
-		if($bInsertChangeUserId){
-			CMDBObject::SetTrackUserId($iCurrentUserId);
-			/** @var CMDBChange $oCMDBChange */
-			CMDBObject::SetCurrentChange($oCMDBChange);
+		try {
+			try {
+				$oTicket->DBUpdate();
+				static::Trace("Ticket '{$oTicket->GetName()}' has been updated.");
+			}
+			catch(Exception $e) {
+				static::Trace("Ticket {$oTicket->GetName()} might not be properly updated or something else went wrong (for instance: notifications).");
+				static::Trace($e->getMessage()); // Add actual error message (if available)
+				throw new Exception('Unable to update ticket.');
+			}
+
+			static::AfterUpdateTicket();
 		}
-		
+		finally {
+			// Restore previous change as current change, whether the update succeeded or failed - otherwise
+			// a failed DBUpdate() above would leave every subsequent DB write for the rest of this cron run
+			// silently attributed to this e-mail's caller instead of the background-process user.
+			if($bInsertChangeUserId){
+				CMDBObject::SetTrackUserId($iCurrentUserId);
+				/** @var CMDBChange $oCMDBChange */
+				CMDBObject::SetCurrentChange($oCMDBChange);
+			}
+		}
+
 	}
 	
 	/**
