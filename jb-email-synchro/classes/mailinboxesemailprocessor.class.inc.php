@@ -88,7 +88,10 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 				$oSource->SetPartsOrder(static::$sBodyPartsOrder); // in which order to decode the message's body
 				$aSources[] = $oSource;
 			}
-			catch(Exception $e) {
+			catch(Throwable $e) {
+				// Catch \Throwable, not just \Exception: GetEmailSource() performs live IMAP connect via a
+				// third-party library that can raise a \TypeError/\ValueError/other \Error for bad config,
+				// which would otherwise propagate out of this method and abort every other mailbox too.
 				// Don't use Trace, always output the error so that the log file can be monitored for errors
 				echo "Error - Failed to initialize the mailbox: ".$oInbox->GetName().", the mailbox will not be polled. Reason (".$e->getMessage().")\n";
 				static::Trace("Error - Failed to initialize the mailbox: ".$oInbox->GetName().", the mailbox will not be polled. Reason (".$e->getMessage().")\n");
