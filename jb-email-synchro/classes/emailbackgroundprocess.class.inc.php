@@ -18,6 +18,7 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
+use Combodo\iTop\Extension\EmailSynchro\Service\IMAPEmailLogger;
 use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
 use JeffreyBostoenExtensions\MailToTicket\{
 	eNextAction,
@@ -183,6 +184,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 				}
 
 				ProcessingHelper::SetMailSource($oSource);
+
+				// Route IMAP protocol trace lines through this specific mailbox's own Trace(), instead of
+				// whichever mailbox's connection happened to be established last: IMAPEmailLogger is a
+				// static singleton shared across every mailbox connection, only updated when a connection
+				// is (re-)established, so it must also be updated here whenever processing switches source.
+				IMAPEmailLogger::$oCurrentMailbox = $oProcessor->GetInboxFromSource($oSource);
 
 				$this->Trace("-----------------------------------------------------------------------------------------");
 				$this->Trace("Processing Message Source: ".$oSource->GetName());
