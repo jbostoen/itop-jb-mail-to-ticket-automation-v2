@@ -59,10 +59,10 @@ abstract class Base implements iBase {
 	public static ?array $aCachedEntryProcessors = null;
 
 
-    /** 
-     * @var float $fRank The rank of execution. Lower = first. 
+    /**
+     * @var float $fRank The rank of execution. Lower = first.
      */
-    private static float $fRank = 1;
+    protected static float $fRank = 1;
 
     /**
      * @inheritDoc
