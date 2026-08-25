@@ -233,27 +233,28 @@ if (!class_exists('EmailSynchroInstaller')) {
 
 					// For this mailbox, also remove the prefix.
 					$sQuery = "
-						UPDATE $sTableNameReplica 
-						SET 
-							$sUidlColName = REPLACE($sUidlColName, " . CMDBSource::Quote($oInbox->Get('login') . '_') . ", '') 
-						WHERE 
+						UPDATE $sTableNameReplica
+						SET
+							$sUidlColName = REPLACE($sUidlColName, " . CMDBSource::Quote($oInbox->Get('login') . '_') . ", '')
+						WHERE
 							$sMailboxIdAttDef = " . $oInbox->GetKey();
 
 					SetupLog::Info($sQuery);
 					CMDBSource::Query($sQuery);
-					
-					// Remove unmatched email replicas.
-					$sQuery = "
-						DELETE FROM $sTableNameReplica 
-						WHERE 
-							$sMailboxIdAttDef IS NULL OR $sMailboxIdAttDef = 0
-					";
 
-					SetupLog::Info($sQuery);
-					CMDBSource::Query($sQuery);
-
-					
 				}
+
+				// Remove unmatched email replicas, now that every mailbox above has had a chance to
+				// backfill its own. Doing this inside the loop above would delete replicas belonging to
+				// mailboxes not yet reached by the loop, since they haven't been backfilled yet either.
+				$sQuery = "
+					DELETE FROM $sTableNameReplica
+					WHERE
+						$sMailboxIdAttDef IS NULL OR $sMailboxIdAttDef = 0
+				";
+
+				SetupLog::Info($sQuery);
+				CMDBSource::Query($sQuery);
 
 			}
 			
