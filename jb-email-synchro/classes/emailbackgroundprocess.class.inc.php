@@ -400,11 +400,14 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 			
 			
 									$oRawEmail = $oSource->GetMessage($oMsgHandler);
-									
-									// IMAP error occurred?
+
+									// IMAP error occurred? Skip the rest of this mailbox (the connection may no longer be
+									// reliable) rather than aborting Process() entirely: every other configured mailbox
+									// still deserves a chance to be processed in this cron run.
 									if(is_null($oRawEmail)) {
-										$this->Trace("Could not get message (raw email): {$sUIDL}");
-										return "Stopped processing due to (possible temporary) IMAP error. Message(s) read: {$iTotalMessages}, message(s) skipped: {$iTotalSkippedUndesired}, message(s) processed: {$iTotalProcessed}, message(s) deleted: {$iTotalDeleted}, message(s) marked as error: {$iTotalMarkedAsError}, undesired message(s): {$iTotalUndesired}";
+										$this->Trace("Could not get message (raw email): {$sUIDL}. Skipping the rest of this mailbox due to a (possibly temporary) IMAP error.");
+										$oSource->Disconnect();
+										continue 3;
 									}
 
 
