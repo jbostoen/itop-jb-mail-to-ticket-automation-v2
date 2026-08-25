@@ -27,6 +27,9 @@ class IMAPEmailSource extends EmailSource {
 	/** @var string CONFIG_AUTHENTICATION Authentication type. */
 	public const CONFIG_AUTHENTICATION = 'plain';
 
+	/** @var string CONFIG_DEBUG_LOGGER Class used to log the raw IMAP protocol conversation. */
+	public const CONFIG_DEBUG_LOGGER = IMAPEmailLogger::class;
+
 	/** @var string $sLogin Mailbox login. */
 	protected $sLogin;
 	
@@ -84,7 +87,7 @@ class IMAPEmailSource extends EmailSource {
 			'encryption' => $sSSL,
 			'authentication' => static::CONFIG_AUTHENTICATION,
 			'host' => $this->sServer,
-			'debug' => IMAPEmailLogger::class,
+			'debug' => static::CONFIG_DEBUG_LOGGER,
 		];
 
 		if(in_array('validate_cert', $aImapOptions)) {

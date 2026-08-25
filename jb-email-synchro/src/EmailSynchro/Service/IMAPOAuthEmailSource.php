@@ -22,6 +22,9 @@ class IMAPOAuthEmailSource extends IMAPEmailSource {
 	/** @inheritDoc */
 	public const CONFIG_AUTHENTICATION = 'oauth';
 
+	/** @inheritDoc */
+	public const CONFIG_DEBUG_LOGGER = IMAPOAuthEmailLogger::class;
+
 	/**
 	 * @inheritDoc
 	 */
