@@ -116,8 +116,10 @@ abstract class NonDeliveryReport extends Base {
 								}
 								else {
 
-									// email field of Person object
-									$oSetPerson = new DBObjectSet(DBObjectSearch::FromOQL('SELECT Person WHERE email LIKE :email'), [], [
+									// email field of Person object. Exact match: $sRecipient comes from an
+									// attacker-controlled "Final-Recipient" header, so a LIKE pattern here
+									// would let unescaped SQL wildcards (%, _) match unintended Persons.
+									$oSetPerson = new DBObjectSet(DBObjectSearch::FromOQL('SELECT Person WHERE email = :email'), [], [
 										'email' => $sRecipient
 									]);
 
