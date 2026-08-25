@@ -127,7 +127,7 @@ abstract class StepFindCallerByContactMethod extends Base {
 		}
 
 		/** @var Person|null $oCaller The related person. */
-		$oPerson = StepFindCallerByContactMethod::FindContactByEmail($sCallerEmail);
+		$oPerson = static::FindContactByEmail($sCallerEmail);
 
 		if($oPerson === null) {
 			return;
