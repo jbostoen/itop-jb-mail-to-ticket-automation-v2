@@ -83,7 +83,7 @@ abstract class RemoveTitlePatterns extends Base {
 									
 								default:
 									// Should not happen.
-									static::Trace("Unknown action for closed tickets.");
+									static::Trace("Unexpected 'behavior' for removing title patterns.");
 									break; 
 								
 							}
