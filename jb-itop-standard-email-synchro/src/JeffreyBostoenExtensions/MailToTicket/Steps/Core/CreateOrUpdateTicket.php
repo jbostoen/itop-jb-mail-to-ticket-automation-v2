@@ -117,10 +117,14 @@ abstract class CreateOrUpdateTicket extends Base {
 					break;
 				
 				case 'update_only':
-				
+
 					if(!is_object($oTicket)) {
-						// No ticket associated with the incoming email, nothing to update, reject the email
+						// No ticket associated with the incoming email, nothing to update, reject the email.
+						// Return immediately: HandleError() already set the appropriate next action, and
+						// falling through to the unconditional SetNextAction(PROCESS_MESSAGE) below would
+						// silently overwrite it.
 						ProcessingHelper::HandleError('nothing_to_update');
+						return;
 					}
 					else {
 						// Update the ticket with the incoming email
@@ -345,17 +349,20 @@ abstract class CreateOrUpdateTicket extends Base {
 		if(!is_a($oTicket, $sTargetClass)) {
 			
 			$sClass = get_class($oTicket);
-			$sError = 'Error: the incoming email refers to the ticket "%1$s" of class "%2$s", but this mailbox is configured to process only tickets of class "%3$s"';
-			static::Trace($sError,
+			$sError = sprintf(
+				'Error: the incoming email refers to the ticket "%1$s" of class "%2$s", but this mailbox is configured to process only tickets of class "%3$s"',
 				$oTicket->GetName(),
 				$sClass,
 				$sTargetClass
 			);
+			static::Trace($sError);
 			$oMailBox->sLastError = $sError;
 			$oMailBox->Trace($sError);
 			ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR); // Keep the message in the mailbox, but marked as error
-			return;
-			
+			// Throw (rather than return): Execute()'s catch(Exception $e) skips its own unconditional
+			// SetNextAction(PROCESS_MESSAGE) on the way out, so the MARK_MESSAGE_AS_ERROR set above survives.
+			throw new Exception($sError);
+
 		}
 		
 		// Try to extract what's new from the message's body
