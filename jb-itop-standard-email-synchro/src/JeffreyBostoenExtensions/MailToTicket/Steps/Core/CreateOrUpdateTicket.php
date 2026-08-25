@@ -84,16 +84,24 @@ abstract class CreateOrUpdateTicket extends Base {
 	 */
 	public static array $aAddedAttachments = [];
 
+	/*
+	 * @var array $aPendingAttachmentChangeOpDescriptions Descriptions for "attachment added" change-history entries
+	 * that could not be recorded yet because the ticket did not have its real key (still being created).
+	 * Flushed by UpdateAttachments() once the ticket has been inserted.
+	 */
+	private static array $aPendingAttachmentChangeOpDescriptions = [];
+
 	/** @var string $sCaseLogEntry The case log entry that has been added (during execution). */
 	private static string $sCaseLogEntry = '';
-	
+
 	/**
 	 * @inheritDoc
 	 */
 	public static function Execute() : void {
-		
+
 		// Reset before processing each mail.
 		static::$aAddedAttachments = [];
+		static::$aPendingAttachmentChangeOpDescriptions = [];
 		static::$sCaseLogEntry = '';
 		
 		$oMailBox = ProcessingHelper::GetMailBox();
@@ -1116,13 +1124,23 @@ abstract class CreateOrUpdateTicket extends Base {
 				$oBlob = new ormDocument($aAttachment['content'], $aAttachment['mimeType'], $aAttachment['filename']);
 				$oAttachment->Set('contents', $oBlob);
 				$oAttachment->DBInsert();
-				$oMyChangeOp = MetaModel::NewObject('CMDBChangeOpPlugin');
-				$oMyChange = CMDBObject::GetCurrentChange();
-				$oMyChangeOp->Set('change', $oMyChange->GetKey());
-				$oMyChangeOp->Set('objclass', get_class($oTicket));
-				$oMyChangeOp->Set('objkey', $oTicket->GetKey());
-				$oMyChangeOp->Set('description', Dict::Format('Attachments:History_File_Added', $aAttachment['filename']));
-				$iId = $oMyChangeOp->DBInsertNoReload();
+
+				if($oTicket->IsNew()) {
+					// The ticket does not have its real key yet: recording the change-history entry now
+					// would permanently store the ticket's temporary key. Defer it to UpdateAttachments(),
+					// which runs after the ticket has actually been inserted.
+					static::$aPendingAttachmentChangeOpDescriptions[] = Dict::Format('Attachments:History_File_Added', $aAttachment['filename']);
+				}
+				else {
+					$oMyChangeOp = MetaModel::NewObject('CMDBChangeOpPlugin');
+					$oMyChange = CMDBObject::GetCurrentChange();
+					$oMyChangeOp->Set('change', $oMyChange->GetKey());
+					$oMyChangeOp->Set('objclass', get_class($oTicket));
+					$oMyChangeOp->Set('objkey', $oTicket->GetKey());
+					$oMyChangeOp->Set('description', Dict::Format('Attachments:History_File_Added', $aAttachment['filename']));
+					$oMyChangeOp->DBInsertNoReload();
+				}
+
 				static::Trace("Attachment {$aAttachment['filename']} added to the ticket.");
 				static::$aAddedAttachments[$sAddedAttachmentKey] = $oAttachment;
 			}
@@ -1139,18 +1157,38 @@ abstract class CreateOrUpdateTicket extends Base {
 	 * @return void
 	 */
 	public static function UpdateAttachments() : void {
-		
+
 		$iNumAttachments = count(static::$aAddedAttachments);
 		if($iNumAttachments > 0) {
 			static::Trace('Linking %1$s attachments...', $iNumAttachments);
 		}
-			
+
+		$oTicket = ProcessingHelper::GetTicket();
+
 		foreach(static::$aAddedAttachments as $oAttachment) {
-			$oTicket = ProcessingHelper::GetTicket();
 			$oAttachment->SetItem($oTicket);
 			$oAttachment->DBUpdate();
 		}
-		
+
+		// Record the "attachment added" change-history entries that could not be recorded during
+		// AddAttachments(), now that the ticket has been inserted and has its real key.
+		if(count(static::$aPendingAttachmentChangeOpDescriptions) > 0) {
+
+			$oMyChange = CMDBObject::GetCurrentChange();
+
+			foreach(static::$aPendingAttachmentChangeOpDescriptions as $sDescription) {
+				$oMyChangeOp = MetaModel::NewObject('CMDBChangeOpPlugin');
+				$oMyChangeOp->Set('change', $oMyChange->GetKey());
+				$oMyChangeOp->Set('objclass', get_class($oTicket));
+				$oMyChangeOp->Set('objkey', $oTicket->GetKey());
+				$oMyChangeOp->Set('description', $sDescription);
+				$oMyChangeOp->DBInsertNoReload();
+			}
+
+			static::$aPendingAttachmentChangeOpDescriptions = [];
+
+		}
+
 	}
 
 	
