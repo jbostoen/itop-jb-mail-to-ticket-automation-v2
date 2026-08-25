@@ -41,7 +41,7 @@ abstract class NoSubject extends Base {
 		
 			$sPolicyBehavior = static::GetStepSetting('behavior');
 			
-			if($oEmail->sSubject === '') {
+			if(trim($oEmail->sSubject) === '') {
 				
 				switch($sPolicyBehavior) {
 					 // Will use default subject.
