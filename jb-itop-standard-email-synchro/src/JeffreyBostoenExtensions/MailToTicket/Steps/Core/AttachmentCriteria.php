@@ -217,8 +217,10 @@ abstract class AttachmentCriteria extends Base {
 			// Scale the image, preserving the transparency for GIFs and PNGs.
 			$fScale = min($iMaxImageWidth / $iWidth, $iMaxImageHeight / $iHeight);
 
-			$iNewWidth = round($iWidth * $fScale);
-			$iNewHeight = round($iHeight * $fScale);
+			// Clamp to at least 1px: for a very elongated image, the uniform scale factor can round the
+			// non-constrained dimension down to 0, and imagecreatetruecolor() rejects a 0 dimension.
+			$iNewWidth = max(1, (int) round($iWidth * $fScale));
+			$iNewHeight = max(1, (int) round($iHeight * $fScale));
 			
 			static::Trace('Resizing image from %1$s x %2$s to %3$s x %4$s .', $iWidth, $iHeight, $iNewWidth, $iNewHeight);
 			$new = imagecreatetruecolor($iNewWidth, $iNewHeight);
