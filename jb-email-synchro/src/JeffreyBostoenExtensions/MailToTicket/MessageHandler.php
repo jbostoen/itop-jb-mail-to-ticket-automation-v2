@@ -283,14 +283,12 @@ class MessageHandler {
 		try {
 
 			$oSource = $this->GetEmailSource();
-			$oSource->DeleteMessage($this);
+			return $oSource->DeleteMessage($this);
 
 		}
 		catch(Exception $e) {
 			return false;
 		}
-
-		return true;
 
 	}
 
@@ -306,15 +304,12 @@ class MessageHandler {
 		try {
 
 			$oSource = $this->GetEmailSource();
-			$oSource->MoveMessage($this, $sTargetFolder);
+			return $oSource->MoveMessage($this, $sTargetFolder);
 
 		}
 		catch(Exception $e) {
 			return false;
 		}
-
-		return true;
-
 
 	}
 
@@ -330,15 +325,12 @@ class MessageHandler {
 		try {
 
 			$oSource = $this->GetEmailSource();
-			$oSource->CopyMessage($this, $sTargetFolder);
+			return $oSource->CopyMessage($this, $sTargetFolder);
 
 		}
 		catch(Exception $e) {
 			return false;
 		}
-
-		return true;
-
 
 	}
 
@@ -348,18 +340,16 @@ class MessageHandler {
 	 * @return boolean
 	 */
 	public function MarkAsSeen() : bool {
-		
+
 		try {
 
 			$oSource = $this->GetEmailSource();
-			$oSource->MarkAsSeen($this);
+			return $oSource->MarkAsSeen($this);
 
 		}
 		catch(Exception $e) {
 			return false;
 		}
-
-		return true;
 
 	}
 
