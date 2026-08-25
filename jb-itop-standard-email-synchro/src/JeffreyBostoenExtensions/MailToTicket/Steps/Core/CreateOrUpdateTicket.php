@@ -84,16 +84,24 @@ abstract class CreateOrUpdateTicket extends Base {
 	 */
 	public static array $aAddedAttachments = [];
 
+	/*
+	 * @var array $aPendingAttachmentChangeOpDescriptions Descriptions for "attachment added" change-history entries
+	 * that could not be recorded yet because the ticket did not have its real key (still being created).
+	 * Flushed by UpdateAttachments() once the ticket has been inserted.
+	 */
+	private static array $aPendingAttachmentChangeOpDescriptions = [];
+
 	/** @var string $sCaseLogEntry The case log entry that has been added (during execution). */
 	private static string $sCaseLogEntry = '';
-	
+
 	/**
 	 * @inheritDoc
 	 */
 	public static function Execute() : void {
-		
+
 		// Reset before processing each mail.
 		static::$aAddedAttachments = [];
+		static::$aPendingAttachmentChangeOpDescriptions = [];
 		static::$sCaseLogEntry = '';
 		
 		$oMailBox = ProcessingHelper::GetMailBox();
@@ -219,7 +227,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		$oTicketTitleAttDef = MetaModel::GetAttributeDef($sTargetClass, 'title');
 		$iTitleMaxSize = $oTicketTitleAttDef->GetMaxSize();
 		$sSubject = $oEmail->sSubject;
-		$oTicket->Set('title', substr($sSubject, 0, $iTitleMaxSize));
+		$oTicket->Set('title', mb_substr($sSubject, 0, $iTitleMaxSize));
 		
 		// Insert the remaining attachments so that their ID is known, and the attachments can be referenced in the message's body.
 		// Cannot insert them for real since the Ticket is not saved yet (so Ticket id is unknown).
@@ -252,7 +260,7 @@ abstract class CreateOrUpdateTicket extends Base {
 
 		$iDescriptionMaxSize = $oTicketDescriptionAttDef->GetMaxSize(); // Keep some room just in case...
 		
-		if(mb_strlen($sTicketDescription) > $iDescriptionMaxSize) {
+		if($iDescriptionMaxSize !== null && mb_strlen($sTicketDescription) > $iDescriptionMaxSize) {
 
 			$sMsg = "CreateTicketFromEmail: Truncated description for [{$oTicket->Get('title')}] actual length: ".mb_strlen($sTicketDescription)." maximum: $iDescriptionMaxSize";
 		    IssueLog::Error($sMsg);
@@ -271,17 +279,8 @@ abstract class CreateOrUpdateTicket extends Base {
 
 		// Default values.
 		$sDefaultValues = $oMailBox->Get('ticket_default_values');
-		$aDefaults = preg_split(static::NEWLINE_REGEX, $sDefaultValues);
-		$aDefaultValues = [];
-		foreach($aDefaults as $sLine) {
-			if (preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
-				$sAttCode = trim($aMatches[1]);
-				$sValue = trim($aMatches[2]);
-				$sValue = static::ReplaceMailPlaceholders($sValue);
-				$aDefaultValues[$sAttCode] = $sValue;
-			}
-		}
-		
+		$aDefaultValues = static::ParseAttributeValues($sDefaultValues);
+
 		ProcessingHelper::InitObjectFromDefaultValues($oTicket, $aDefaultValues);
 		
 		static::AddAdditionalContacts();
@@ -298,6 +297,17 @@ abstract class CreateOrUpdateTicket extends Base {
 			// - E-mail notifications (?)
 			static::Trace('Ticket %1$s could not be created.', $oTicket->GetName());
 			static::Trace($e->getMessage()); // Add actual error message (if available)
+
+			// Attachments/InlineImages were already inserted (with a temporary item_id) so they could be
+			// referenced in the ticket's body; since the ticket itself was not created, remove them again
+			// to avoid leaving orphaned records behind.
+			foreach(static::$aAddedAttachments as $oAttachment) {
+				if(!$oAttachment->IsNew()) {
+					$oAttachment->DBDelete();
+				}
+			}
+			static::$aAddedAttachments = [];
+
 			throw new Exception('Ticket creation failed');
 		}
 			
@@ -425,26 +435,31 @@ abstract class CreateOrUpdateTicket extends Base {
 		static::AddAdditionalContacts();
 		
 		static::BeforeUpdateTicket();
-		
-		try {
-			$oTicket->DBUpdate();			
-			static::Trace("Ticket '{$oTicket->GetName()}' has been updated.");
-		}
-		catch(Exception $e) {
-			static::Trace("Ticket {$oTicket->GetName()} might not be properly updated or something else went wrong (for instance: notifications).");
-			static::Trace($e->getMessage()); // Add actual error message (if available)
-			throw new Exception('Unable to update ticket.');
-		}
-		
-		static::AfterUpdateTicket();
 
-		// Restore previous change as current change
-		if($bInsertChangeUserId){
-			CMDBObject::SetTrackUserId($iCurrentUserId);
-			/** @var CMDBChange $oCMDBChange */
-			CMDBObject::SetCurrentChange($oCMDBChange);
+		try {
+			try {
+				$oTicket->DBUpdate();
+				static::Trace("Ticket '{$oTicket->GetName()}' has been updated.");
+			}
+			catch(Exception $e) {
+				static::Trace("Ticket {$oTicket->GetName()} might not be properly updated or something else went wrong (for instance: notifications).");
+				static::Trace($e->getMessage()); // Add actual error message (if available)
+				throw new Exception('Unable to update ticket.');
+			}
+
+			static::AfterUpdateTicket();
 		}
-		
+		finally {
+			// Restore previous change as current change, whether the update succeeded or failed - otherwise
+			// a failed DBUpdate() above would leave every subsequent DB write for the rest of this cron run
+			// silently attributed to this e-mail's caller instead of the background-process user.
+			if($bInsertChangeUserId){
+				CMDBObject::SetTrackUserId($iCurrentUserId);
+				/** @var CMDBChange $oCMDBChange */
+				CMDBObject::SetCurrentChange($oCMDBChange);
+			}
+		}
+
 	}
 	
 	/**
@@ -481,7 +496,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		$sTicketDescription = '';
 		$oEmail = ProcessingHelper::GetMail();
 		
-		if($oEmail->sBodyFormat == 'text/html') {
+		if($oEmail->sBodyFormat === 'text/html') {
 
 			// Original message is in HTML.
 			static::Trace('Managing inline images...');
@@ -495,7 +510,11 @@ abstract class CreateOrUpdateTicket extends Base {
 		else {
 
 			// Original message is in plain text.
-			$sTicketDescription = utils::TextToHtml($oEmail->sBodyText);
+			$sTicketDescription = $oEmail->sBodyText;
+			if(!$bForPlainText) {
+				static::Trace("Converting text to HTML using utils::TextToHtml...");
+				$sTicketDescription = utils::TextToHtml($sTicketDescription);
+			}
 
 		}
 
@@ -520,9 +539,10 @@ abstract class CreateOrUpdateTicket extends Base {
 	 */
 	public static function ManageInlineImages(string $sBodyText, bool $bForPlainText) : string {
 		 
-		// Search for inline images: i.e. <img tags containing an src="cid:...." or without double quotes e.g. src=cid:xyzxyzx
+		// Search for inline images: i.e. <img tags containing an src="cid:....", src='cid:....', or without
+		// quotes e.g. src=cid:xyzxyzx
 		// Note: (?: ... ) is used for grouping the alternative without creating a "matching group"
-		if(preg_match_all('/<img[^>]+src=(?:"cid:([^"]+)"|cid:([^ >]+))[^>]*>/i', $sBodyText, $aMatches, PREG_OFFSET_CAPTURE)) {
+		if(preg_match_all('/<img[^>]+src=(?:"cid:([^"]+)"|\'cid:([^\']+)\'|cid:([^ >]+))[^>]*>/i', $sBodyText, $aMatches, PREG_OFFSET_CAPTURE)) {
 
 			$aInlineImages = [];
 			foreach ($aMatches[0] as $idx => $aInfo) {
@@ -530,17 +550,20 @@ abstract class CreateOrUpdateTicket extends Base {
 					'position' => $aInfo[1]
 				);
 			}
-			foreach ($aMatches[1] as $idx => $aInfo) {
-				$sCID = $aInfo[0];
-				if(array_key_exists($sCID, static::$aAddedAttachments) == false) {
+			foreach ($aMatches[0] as $idx => $aInfo) {
+				// Group 1 = double-quoted src="cid:...", group 2 = single-quoted src='cid:...',
+				// group 3 = unquoted src=cid:... . Only one of the three ever participates in a given
+				// match; the others are captured as an empty string.
+				$sCID = $aMatches[1][$idx][0] !== '' ? $aMatches[1][$idx][0] : ($aMatches[2][$idx][0] !== '' ? $aMatches[2][$idx][0] : $aMatches[3][$idx][0]);
+				if(!array_key_exists($sCID, static::$aAddedAttachments)) {
 					static::Trace("... Info: inline image: {$sCID} not found as an attachment. Ignored.");
 				}
-				elseif(array_key_exists($sCID, static::$aAddedAttachments)) {
+				else {
 					$aInlineImages[$idx]['cid'] = $sCID;
 					static::Trace("... Inline image cid:$sCID stored as ".get_class(static::$aAddedAttachments[$sCID])."::".static::$aAddedAttachments[$sCID]->GetKey());
 				}
 			}
-			if(defined('ATTACHMENT_DOWNLOAD_URL') == false) {
+			if(!defined('ATTACHMENT_DOWNLOAD_URL')) {
 				define('ATTACHMENT_DOWNLOAD_URL', 'pages/ajax.render.php?operation=download_document&class=Attachment&field=contents&id=');
 			}
 			if($bForPlainText) {
@@ -578,7 +601,16 @@ abstract class CreateOrUpdateTicket extends Base {
 					else {
 						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'"';
 					}
-					
+
+					$aSearches[] = "src='cid:".$sCID."'"; // Same with single quotes
+					if(class_exists('InlineImage') && $oAttachment instanceof InlineImage) {
+						// Inline images have a special download URL requiring the 'secret' token
+						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().INLINEIMAGE_DOWNLOAD_URL.$oAttachment->GetKey().'&s='.$oAttachment->Get('secret').'"';
+					}
+					else {
+						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'"';
+					}
+
 					$aSearches[] = 'src=cid:'.$sCID; // Same without quotes
 					if (class_exists('InlineImage') && ($oAttachment instanceof InlineImage)) {
 						// Inline images have a special download URL requiring the 'secret' token
@@ -887,7 +919,6 @@ abstract class CreateOrUpdateTicket extends Base {
 
 		$oAttachment = new Attachment();
 		$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
-		$oAttachment->SetIfNull('creation_date', time());
 
 		if($oCaller !== null && MetaModel::GetAttributeDef('Attachment', 'contact_id') instanceof AttributeExternalKey) {
 			$oAttachment->Set('contact_id', $oCaller);
@@ -1029,11 +1060,18 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 		
 		foreach($oEmail->aAttachments as $iIndex => $aAttachment) {
-			
+
 			$bIgnoreAttachment = false;
-			
-			if($bIgnoreAttachment === false && $bNoDuplicates) {
-				
+
+			// Only inline images referenced via cid: normally carry a Content-ID; ordinary attachments
+			// typically don't, so their content-id is empty. Fall back to a synthetic, unique key so
+			// multiple such attachments on the same email don't overwrite each other in the tracking
+			// array below. ManageInlineImages() only ever looks up real, non-empty content-ids, so this
+			// fallback never interferes with inline-image resolution.
+			$sAddedAttachmentKey = ($aAttachment['content-id'] !== '') ? $aAttachment['content-id'] : 'no-content-id-'.$iIndex;
+
+			if($bNoDuplicates) {
+
 				// Check if an attachment with the same name/type/size/md5 already exists
 				$iSize = strlen($aAttachment['content']);
 				$sMd5 = md5($aAttachment['content']);
@@ -1041,72 +1079,75 @@ abstract class CreateOrUpdateTicket extends Base {
 					if (
 						($aAttachment['filename'] === $aPrevious['filename']) &&
 						($aAttachment['mimeType'] === $aPrevious['mimeType']) &&
-						($iSize == $aPrevious['size']) &&
-						($sMd5 == $aPrevious['md5']) )
+						($iSize === $aPrevious['size']) &&
+						($sMd5 === $aPrevious['md5']) )
 					{
 						// Skip this attachment
 						static::Trace("Attachment {$aAttachment['filename']} skipped, already attached to the ticket.");
-						static::$aAddedAttachments[$aAttachment['content-id']] = $aPrevious['object']; // Still remember it for processing inline images
+						static::$aAddedAttachments[$sAddedAttachmentKey] = $aPrevious['object']; // Still remember it for processing inline images
 						$bIgnoreAttachment = true;
 						break;
 					}
 				}
-				
-				if(!$bIgnoreAttachment) {
-					
-					// - Save inline images.
 
-					if(static::IsImage($aAttachment['mimeType']) && class_exists('InlineImage') && $aAttachment['inline']) {
+			}
 
-						$oAttachment = new InlineImage();
-						static::Trace('Attachment "%1$s" will be stored as an InlineImage.', $aAttachment['filename']);
-						$oAttachment->Set('secret', bin2hex(random_bytes(16))); // 128 bits of entropy, cryptographically secure
+			if(!$bIgnoreAttachment) {
 
+				// - Save inline images.
+
+				if(static::IsImage($aAttachment['mimeType']) && class_exists('InlineImage') && $aAttachment['inline']) {
+
+					$oAttachment = new InlineImage();
+					static::Trace('Attachment "%1$s" will be stored as an InlineImage.', $aAttachment['filename']);
+					$oAttachment->Set('secret', bin2hex(random_bytes(16))); // 128 bits of entropy, cryptographically secure
+
+				}
+				else {
+
+					static::Trace('Attachment "%1$s" will be stored as an Attachment.', $aAttachment['filename']);
+					$oAttachment = new Attachment();
+
+					$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
+
+					if($oUser !== null) {
+						$oAttachment->Set('user_id', $oUser);
 					}
-					else {
+					// Difference between iTop 3.0 (AttributeExternalField) and iTop 3.1 (AttributeExternalKey).
+					if(MetaModel::GetAttributeDef('Attachment', 'contact_id') instanceof AttributeExternalKey && $oCaller !== null) {
+						$oAttachment->Set('contact_id', $oCaller);
+					}
 
-						static::Trace('Attachment "%1$s" will be stored as an Attachment.', $aAttachment['filename']);
-						$oAttachment = new Attachment();
-						
-						$oAttachment->Set('creation_date', date('Y-m-d H:i:s'));
-						$oAttachment->SetIfNull('creation_date', time());
+				}
+				if ($oTicket->IsNew()) {
+					$oAttachment->Set('item_class', get_class($oTicket));
+				}
+				else {
+					$oAttachment->SetItem($oTicket);
+				}
 
-						if($oUser !== null) {
-							$oAttachment->Set('user_id', $oUser);
-						}
-						// Difference between iTop 3.0 (AttributeExternalField) and iTop 3.1 (AttributeExternalKey).
-						if(MetaModel::GetAttributeDef('Attachment', 'contact_id') instanceof AttributeExternalKey && $oCaller !== null) {
-							$oAttachment->Set('contact_id', $oCaller);
-						}
-						
-					}
-					if ($oTicket->IsNew()) {
-						$oAttachment->Set('item_class', get_class($oTicket));
-					}
-					else {
-						$oAttachment->SetItem($oTicket);
-					}
-					
-					$oBlob = new ormDocument($aAttachment['content'], $aAttachment['mimeType'], $aAttachment['filename']);
-					$oAttachment->Set('contents', $oBlob);
-					$oAttachment->DBInsert();
+				$oBlob = new ormDocument($aAttachment['content'], $aAttachment['mimeType'], $aAttachment['filename']);
+				$oAttachment->Set('contents', $oBlob);
+				$oAttachment->DBInsert();
+
+				if($oTicket->IsNew()) {
+					// The ticket does not have its real key yet: recording the change-history entry now
+					// would permanently store the ticket's temporary key. Defer it to UpdateAttachments(),
+					// which runs after the ticket has actually been inserted.
+					static::$aPendingAttachmentChangeOpDescriptions[] = Dict::Format('Attachments:History_File_Added', $aAttachment['filename']);
+				}
+				else {
 					$oMyChangeOp = MetaModel::NewObject('CMDBChangeOpPlugin');
 					$oMyChange = CMDBObject::GetCurrentChange();
 					$oMyChangeOp->Set('change', $oMyChange->GetKey());
 					$oMyChangeOp->Set('objclass', get_class($oTicket));
 					$oMyChangeOp->Set('objkey', $oTicket->GetKey());
 					$oMyChangeOp->Set('description', Dict::Format('Attachments:History_File_Added', $aAttachment['filename']));
-					$iId = $oMyChangeOp->DBInsertNoReload();
-					static::Trace("Attachment {$aAttachment['filename']} added to the ticket.");
-					static::$aAddedAttachments[$aAttachment['content-id']] = $oAttachment;
+					$oMyChangeOp->DBInsertNoReload();
 				}
-			}
-			else {
-				static::Trace('The attachment #%1$s %2$s was NOT added to the ticket because its type "%3$s" is excluded according to the configuration.',
-					$iIndex,
-					$aAttachment['filename'],
-					$aAttachment['mimeType']
-				);
+
+				static::Trace("Attachment {$aAttachment['filename']} added to the ticket.");
+				static::$aAddedAttachments[$sAddedAttachmentKey] = $oAttachment;
 			}
 		}
 		
@@ -1121,18 +1162,38 @@ abstract class CreateOrUpdateTicket extends Base {
 	 * @return void
 	 */
 	public static function UpdateAttachments() : void {
-		
+
 		$iNumAttachments = count(static::$aAddedAttachments);
 		if($iNumAttachments > 0) {
 			static::Trace('Linking %1$s attachments...', $iNumAttachments);
 		}
-			
+
+		$oTicket = ProcessingHelper::GetTicket();
+
 		foreach(static::$aAddedAttachments as $oAttachment) {
-			$oTicket = ProcessingHelper::GetTicket();
 			$oAttachment->SetItem($oTicket);
 			$oAttachment->DBUpdate();
 		}
-		
+
+		// Record the "attachment added" change-history entries that could not be recorded during
+		// AddAttachments(), now that the ticket has been inserted and has its real key.
+		if(count(static::$aPendingAttachmentChangeOpDescriptions) > 0) {
+
+			$oMyChange = CMDBObject::GetCurrentChange();
+
+			foreach(static::$aPendingAttachmentChangeOpDescriptions as $sDescription) {
+				$oMyChangeOp = MetaModel::NewObject('CMDBChangeOpPlugin');
+				$oMyChangeOp->Set('change', $oMyChange->GetKey());
+				$oMyChangeOp->Set('objclass', get_class($oTicket));
+				$oMyChangeOp->Set('objkey', $oTicket->GetKey());
+				$oMyChangeOp->Set('description', $sDescription);
+				$oMyChangeOp->DBInsertNoReload();
+			}
+
+			static::$aPendingAttachmentChangeOpDescriptions = [];
+
+		}
+
 	}
 
 	
@@ -1167,21 +1228,21 @@ abstract class CreateOrUpdateTicket extends Base {
 	 * 2) Trims the result to emulate the behavior of iTop's inputs
 	 *
 	 * @param string $sInputText
-	 * @param int $iMaxLength
+	 * @param int|null $iMaxLength Maximum length, or null when the target attribute has no maximum size (no truncation applied).
 	 *
 	 * @return string The fitted text
 	 */
-	public static function FitTextIn($sInputText, $iMaxLength) : string {
-		
+	public static function FitTextIn($sInputText, ?int $iMaxLength) : string {
+
 		$sInputText = trim($sInputText);
 		$sInputText = str_replace("\r\n", "\r", $sInputText);
 		$sInputText = str_replace("\n", "\r", $sInputText);
 		$sInputText = str_replace("\r", "\r\n", $sInputText);
-		if(mb_strlen($sInputText) > $iMaxLength) {
+		if($iMaxLength !== null && mb_strlen($sInputText) > $iMaxLength) {
 			$sInputText = trim(mb_substr($sInputText, 0, $iMaxLength - 3)).'...';
 		}
 		return $sInputText;
-		
+
 	}
 	 
 }

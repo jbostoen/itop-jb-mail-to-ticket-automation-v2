@@ -52,9 +52,12 @@ class MessageHandler {
 	private EmailSource $oSource;
 	
 	/**
-	 * @var Message The message object from the IMAP engine. Higher chance to change at some point.
+	 * @var Message|null The message object from the IMAP engine. Higher chance to change at some point.
+	 * Nullable to match GetMessageObject()'s documented ?Message return type and the null-guards used
+	 * at every call site; a non-nullable typed property with no default would instead throw an
+	 * uncaught Error if ever read before SetMessageObject() had run.
 	 */
-	private Message $oMessage;
+	private ?Message $oMessage = null;
 	
 	/**
 	 * Sets the original index of the mail within a listing of the e-mails in the folder.
@@ -210,7 +213,9 @@ class MessageHandler {
 
 		$oHandler->SetMessageObject($oMessage);
 
-		$oHandler->SetMessageId($oMessage->messageId());
+		// Message-ID can be absent; fall back to the UID, consistent with the internal identifier's
+		// own fallback below.
+		$oHandler->SetMessageId($oMessage->messageId() ?? (string) $oMessage->uid());
 		$oHandler->SetUid($oMessage->uid());
 
 		$oHandler->SetEmailSource($oSource);
@@ -218,10 +223,26 @@ class MessageHandler {
 
 		// - Date/time.
 			$oDate = $oMessage->date();
-			$oHandler->SetTimestamp($oDate->timestamp);
+			$oHandler->SetTimestamp($oDate !== null ? $oDate->timestamp : time());
 
 		// - Internal identifier.
+			// Message-ID can be absent on some providers/messages. The IMAP UID is always available,
+			// but per Helper::UseMessageIdAsUid()'s own docblock, it can be unstable across sessions
+			// on some providers (e.g. Outlook 365, GMail) - precisely the providers use_message_id_as_uid
+			// exists for. Silently falling back to the UID there would produce a different "identifier"
+			// on every poll of the same message, defeating EmailReplica-based deduplication and creating
+			// a duplicate ticket each run. Instead, derive a stable synthetic identifier from data that
+			// doesn't change between polls of the same message.
 			$sInternalIdentifier = Helper::UseMessageIdAsUid() ? $oMessage->messageId() : $oMessage->uid();
+
+			if($sInternalIdentifier === null) {
+
+				$oFrom = $oMessage->from();
+				$sSyntheticSource = ($oFrom !== null ? $oFrom->email() : '').'|'.($oMessage->subject() ?? '').'|'.($oDate !== null ? $oDate->format('Y-m-d H:i:s') : '');
+				$sInternalIdentifier = 'synthetic_'.hash('sha256', $sSyntheticSource);
+
+			}
+
 			$oHandler->SetInternalIdentifier($sInternalIdentifier);
 
 		return $oHandler;

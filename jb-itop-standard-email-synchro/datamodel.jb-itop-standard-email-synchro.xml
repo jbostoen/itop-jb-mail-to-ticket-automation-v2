@@ -92,7 +92,7 @@ status:assigned]]></default_value>
 					<default_value>mark_as_error</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="notify_errors_to" xsi:type="AttributeEmailAddress">
+				<field id="notify_errors_to" xsi:type="AttributeOQL">
 					<sql>notify_errors_to</sql>
 					<default_value/>
 					<is_null_allowed>true</is_null_allowed>
@@ -471,6 +471,8 @@ name:Unknown caller]]></default_value>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
 				<!-- Auto-reply / out-of-office -->
+				<!-- Intentionally no bounce_delete/bounce_mark_as_undesired here (unlike sibling policies): bouncing a
+					 reply back to an automated out-of-office sender risks a mail loop with that system. -->
 				<field id="policy_autoreply_behavior" xsi:type="AttributeEnum">
 					<values>
 						<value>delete</value>
@@ -483,6 +485,8 @@ name:Unknown caller]]></default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<!-- Non Delivery Reports -->
+				<!-- Intentionally no bounce_delete/bounce_mark_as_undesired here (unlike sibling policies): bouncing a
+					 reply back to a Non-Delivery-Report is the classic "backscatter" mail loop problem. -->
 				<field id="policy_non_delivery_report_behavior" xsi:type="AttributeEnum" _delta="define">
 					<values>
 						<value>delete</value>
@@ -502,6 +506,13 @@ name:Unknown caller]]></default_value>
 					<sql>policy_non_delivery_report_mark_caller_as_inactive</sql>
 					<default_value>no</default_value>
 					<is_null_allowed>false</is_null_allowed>
+				</field>
+				<!-- Update caller attributes -->
+				<field id="step_update_caller_attributes" xsi:type="AttributeText">
+					<sql>step_update_caller_attributes</sql>
+					<default_value>
+						<![CDATA[status:active]]></default_value>
+					<is_null_allowed>true</is_null_allowed>
 				</field>
 				<field id="policy_sender_email_address_behavior" xsi:type="AttributeEnum">
 					<values>
@@ -616,16 +627,17 @@ EOF
 					<access>public</access>
 					<type>Overload-DBObject</type>
 					<code>
-						<![CDATA[		
+						<![CDATA[
 				public function Trace($sMessage, ...$args) : void {
 
+					$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
+
 					parent::Trace($sMessage);
-					
-					if($this->Get('trace') == 'yes') {
+
+					if($this->Get('trace') === 'yes') {
 
 						// htmlentities($sMessage) might be applied again on AJAX page.
 						$iMaxTraceLength = 500*1024; // Maximum size of the Trace to keep in the database.
-						$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
 						$sStampedText = date('Y-m-d H:i:s').' | '.$sMessage."\n";
 						$this->Set('debug_trace', $sStampedText.mb_substr($this->Get('debug_trace'), 0, $iMaxTraceLength));
 						$this->DBUpdate();
@@ -944,6 +956,15 @@ EOF
 										</item>
 										<item id="policy_non_delivery_report_mark_caller_as_inactive">
 											<rank>15</rank>
+										</item>
+									</items>
+								</item>
+								<!-- Update caller attributes -->
+								<item id="fieldset:MailInbox:StepUpdateCallerAttributes">
+									<rank>164</rank>
+									<items>
+										<item id="step_update_caller_attributes">
+											<rank>10</rank>
 										</item>
 									</items>
 								</item>

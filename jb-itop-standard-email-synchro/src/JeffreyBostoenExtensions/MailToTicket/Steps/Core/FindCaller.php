@@ -65,7 +65,9 @@ abstract class FindCaller extends Base {
 				$oCaller = null;
 				$sContactQuery = 'SELECT Person WHERE email = :email';
 				
-				$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), [], ['email' => $sCallerEmail]);
+				// Order by id so that an ambiguous match (multiple Persons sharing this email address)
+				// picks a deterministic, stable "first" result instead of an arbitrary one.
+				$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), ['id' => true], ['email' => $sCallerEmail]);
 				
 				switch($oSet_Person->Count()) {
 					
@@ -91,28 +93,26 @@ abstract class FindCaller extends Base {
 								break;
 
 							case 'fallback_create_person':
-								
+
+								if(preg_match('/\b(spf|dkim)=fail\b/i', $oRawEmail->GetHeader('authentication-results'))) {
+
+									static::Trace("Refusing to create a Person for '{$sCallerEmail}': the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
+									static::HandleViolation();
+									return;
+
+								}
+
 								static::Trace("Creating a new Person for the email: {$sCallerEmail}");
 								$oCaller = new Person();
 								$oCaller->Set('email', $oEmail->sCallerEmail);
 								$sDefaultValues = static::GetStepSetting('default_values');
 								
-								if(trim($sDefaultValues) != '') {
+								if(trim($sDefaultValues) !== '') {
 									
 									try {
-									
-										$aDefaults = preg_split(static::NEWLINE_REGEX, $sDefaultValues);
-										$aDefaultValues = [];
-										
-										foreach($aDefaults as $sLine) {
-											if(preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches)) {
-												$sAttCode = trim($aMatches[1]);
-												$sValue = trim($aMatches[2]);
-												$sValue = static::ReplaceMailPlaceholders($sValue);
-												$aDefaultValues[$sAttCode] = $sValue;
-											}
-										}
-										
+
+										$aDefaultValues = static::ParseAttributeValues($sDefaultValues);
+
 										static::Trace('... Default values: '.http_build_query($aDefaultValues));
 										ProcessingHelper::InitObjectFromDefaultValues($oCaller, $aDefaultValues);
 										

@@ -44,7 +44,10 @@ try
 		case 'debug_trace':
 			$oInbox = MetaModel::GetObject('MailInboxBase', $iMailInboxId, false);
 			if(is_object($oInbox)) {
-				if($oInbox->Get('trace') == 'yes') {
+				if(UserRights::IsActionAllowed('MailInboxBase', UR_ACTION_READ, DBObjectSet::FromObject($oInbox)) === UR_ALLOWED_NO) {
+					$oPage->P(Dict::S('MailInboxStandard:DebugTraceAccessDenied'));
+				}
+				elseif($oInbox->Get('trace') == 'yes') {
 					$oPage->add('<pre>'.htmlentities($oInbox->Get('debug_trace'), ENT_QUOTES, 'UTF-8').'</pre>');
 				}
 				else {

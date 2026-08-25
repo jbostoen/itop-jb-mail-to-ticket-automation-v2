@@ -18,6 +18,7 @@ use DBObjectSet;
 use DBObjectSearch;
 use DBSearch;
 use Email;
+use Exception;
 
 // iTop email processing.
 use EmailMessage;
@@ -103,6 +104,61 @@ abstract class ProcessingHelper {
 	 */
 	private static array $aAvailableStepClasses;
 
+
+	/**
+	 * Trace function used for debugging.
+	 *
+	 * @param string $sMessage The message.
+	 * @param mixed ...$args
+	 *
+	 * @return void
+	 */
+	public static function Trace($sMessage, ...$args) : void {
+
+		static::TraceChannel(Logger::CHANNEL_DEFAULT, $sMessage, ...$args);
+
+	}
+
+	/**
+	 * Trace function used for debugging, tagging the message with a specific log channel.
+	 * iTop's log_level_min config can be set per channel, so this allows an admin to tune the
+	 * verbosity of a specific area (e.g. 'cron') independently of the rest, without any code change.
+	 *
+	 * @param string $sChannel The log channel to tag this message with.
+	 * @param string $sMessage The message.
+	 * @param mixed ...$args
+	 *
+	 * @return void
+	 */
+	public static function TraceChannel(string $sChannel, $sMessage, ...$args) : void {
+
+		$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
+
+		Logger::Trace($sMessage, $sChannel);
+
+	}
+
+	/**
+	 * Trace function used for debugging during a cron run.
+	 * Echoes the message when the module's 'debug' setting is enabled (matching the existing
+	 * cron-visible tracing behavior), and always logs it to the 'cron' channel.
+	 *
+	 * @param string $sMessage The message.
+	 * @param mixed ...$args
+	 *
+	 * @return void
+	 */
+	public static function TraceCron($sMessage, ...$args) : void {
+
+		$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
+
+		if(MetaModel::GetModuleSetting('jb-email-synchro', 'debug', false)) {
+			echo $sMessage."\n";
+		}
+
+		static::TraceChannel('cron', $sMessage);
+
+	}
 
 	/**
 	 * Gets the mailbox.
@@ -437,11 +493,11 @@ abstract class ProcessingHelper {
 
 				if(in_array($sReplicaStatus, ['ok', 'undesired'])) {
 
-					// - An EmailReplica might still be present even if it's related ticket has been deleted.
+					// - An EmailReplica might still be present even if its related ticket has been deleted.
 					//   This EmailReplica may contain a reference to the UID of the message.
 					$oInbox->Trace('EmailReplica is not new. No ticket found. Status: "%1$s". Delete message. It is labeled as OK or undesired; which means it was processed before.', $sReplicaStatus);
-					static::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
-					
+					static::SetNextAction(eNextAction::DELETE_MESSAGE);
+
 				}
 				else {
 
@@ -517,7 +573,12 @@ abstract class ProcessingHelper {
 		// - This is extra info.
 			$aPreviouslyExecutedSteps = [];
 			static::SetExecutedSteps($aPreviouslyExecutedSteps);
-			
+
+		// - Default to the current next action, in case no step is applicable at all (empty $aStepClasses):
+		//   the loop below would otherwise never assign $eNextAction, leaving the post-loop check unable
+		//   to ever reset the next action to NO_ACTION, wedging the message into permanent reprocessing.
+			$eNextAction = static::GetNextAction();
+
 		foreach($aStepClasses as $sStep) {
 		
 			$sShortStep = basename($sStep);
@@ -678,7 +739,33 @@ abstract class ProcessingHelper {
 		/** @var MessageFromMailbox $oRawEmail This raw e-mail will be the specific subclass that supports sending the e-mail as attachment. */
 		$oRawEmail = static::GetRawMail();
 
-		$sTo = $oInbox->Get('notify_errors_to');
+		// - notify_errors_to holds an OQL query returning Person objects. Resolve it into a comma-separated list of e-mail addresses.
+		$sTo = '';
+		$sNotifyErrorsToOQL = $oInbox->Get('notify_errors_to');
+		if($sNotifyErrorsToOQL !== '') {
+
+			try {
+
+				$oPersonSet = new DBObjectSet(DBObjectSearch::FromOQL($sNotifyErrorsToOQL));
+				$aRecipients = [];
+				while($oPerson = $oPersonSet->Fetch()) {
+
+					$sEmail = $oPerson->Get('email');
+					if($sEmail !== '') {
+						$aRecipients[] = $sEmail;
+					}
+
+				}
+				$sTo = implode(',', $aRecipients);
+
+			}
+			catch(Exception $e) {
+
+				$oInbox->Trace('HandleError: Invalid OQL in notify_errors_to (%1$s): %2$s', $sNotifyErrorsToOQL, $e->getMessage());
+
+			}
+
+		}
 		$sFrom = $oInbox->Get('notify_from');
 		
 		// The behavior is overriden in case of undesired_message

@@ -37,34 +37,44 @@ abstract class StepFindCallerByContactMethod extends Base {
 	// Should be executed before StepFindCaller;
 	// therefore $iPrecedence should be lower than that of StepFindCaller (110).
 	public static int $iPrecedence = 109;
-	
+
+	/** @var bool $bLastMatchAmbiguous Whether the last FindContactByEmail() call matched more than one Person. */
+	public static bool $bLastMatchAmbiguous = false;
+
 	/**
 	 * Finds contacts by contact method (ContactMethod) or e-mail alias (Combodo's EmailAlias).
-	 * 
+	 *
 	 * @param string $sEmail E-mail address.
 	 *
 	 * @return Person|null
 	 */
 	public static function FindContactByEmail(String $sEmail) : ?Person {
 
+		static::$bLastMatchAmbiguous = false;
+
 		/** @var Person $oPerson|null A person object in iTop. */
 		$oPerson = null;
 
 		foreach([
-			'ContactMethod' => 'SELECT Person AS p JOIN ContactMethod AS c ON c.person_id = p.id WHERE c.contact_method = "email" AND c.contact_detail LIKE :email',
+			'ContactMethod' => 'SELECT Person AS p JOIN ContactMethod AS c ON c.person_id = p.id WHERE c.contact_method = "email" AND c.contact_detail = :email',
 			'EmailAlias' => 'SELECT Person AS p JOIN EmailAlias AS a ON a.contact_id = p.id WHERE a.email = :email'
 		] as $sClass => $sOQL) {
 
 			// The class must exist.
 			if(MetaModel::IsValidClass($sClass) == true) {
-				
+
 				// Find person objects; oldest first.
 				$oFilter_Person = DBObjectSearch::FromOQL_AllData($sOQL);
 				$oSet_Person = new DBObjectSet($oFilter_Person, ['id' => true], [
-					'email' => $sEmail	
+					'email' => $sEmail
 				]);
 
 				static::Trace(sprintf('... OQL %1$s returned %2$s results.', $sClass, $oSet_Person->Count()));
+
+				if($oSet_Person->Count() > 1) {
+					static::Trace("Found {$oSet_Person->Count()} people matching '{$sEmail}' via {$sClass}, the first one will be used...");
+					static::$bLastMatchAmbiguous = true;
+				}
 
 				$oPerson = $oSet_Person->Fetch();
 
@@ -106,9 +116,15 @@ abstract class StepFindCallerByContactMethod extends Base {
 		// Don't bother if the caller is already determined.
 		if($oCaller !== null) {
 			static::Trace("Caller already determined by previous step. Skip.");
+			return;
 		}
 
 		$sCallerEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
+
+		if(preg_match('/\b(spf|dkim)=fail\b/i', $oRawEmail->GetHeader('authentication-results'))) {
+			static::Trace("Refusing to trust '{$sCallerEmail}' as a contact method match: the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
+			return;
+		}
 
 		/** @var Person|null $oCaller The related person. */
 		$oPerson = StepFindCallerByContactMethod::FindContactByEmail($sCallerEmail);
@@ -117,11 +133,18 @@ abstract class StepFindCallerByContactMethod extends Base {
 			return;
 		}
 
-		// Update the e-mail address (on the person object) to the one which was used last by the caller.
-		static::Trace(". Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCallerEmail}");
-		$oPerson->Set('email', $sCallerEmail);
-		$oPerson->DBUpdate();
-		
+		// A match via a secondary/alternate contact method is weaker evidence than a match on the primary
+		// email address itself; only sync it as the person's primary e-mail when the match was unambiguous,
+		// to avoid overwriting the wrong person's contact data when a contact detail is shared (e.g. a team mailbox).
+		if(static::$bLastMatchAmbiguous) {
+			static::Trace(". Ambiguous match for '{$sCallerEmail}': not updating {$oPerson->Get('friendlyname')}'s primary e-mail.");
+		}
+		else {
+			static::Trace(". Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCallerEmail}");
+			$oPerson->Set('email', $sCallerEmail);
+			$oPerson->DBUpdate();
+		}
+
 		// Set caller for email
 		$oEmail->SetSender($oPerson);
 

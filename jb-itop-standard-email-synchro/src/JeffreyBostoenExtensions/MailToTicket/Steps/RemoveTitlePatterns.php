@@ -40,14 +40,14 @@ abstract class RemoveTitlePatterns extends Base {
 			
 			$sPatterns = static::GetStepSetting('patterns');
 
-			if($sPatterns != '' ) { 
+			if($sPatterns !== '' ) {
 			
 				// Go over each pattern and check.
 				$aPatterns = preg_split(static::NEWLINE_REGEX, $sPatterns); 
 				$sMailSubject = $oEmail->sSubject;
 				
 				foreach($aPatterns as $sPattern) {
-					if(trim($sPattern) != '') {
+					if(trim($sPattern) !== '') {
 							
 						$oPregMatched = @preg_match($sPattern, $sMailSubject);
 						
@@ -61,16 +61,19 @@ abstract class RemoveTitlePatterns extends Base {
 								case 'fallback_remove':
 								
 									$sNewMailSubject = preg_replace($sPattern, '', $sMailSubject);
-									
-									if($sMailSubject == $sNewMailSubject) {
+
+									if($sMailSubject === $sNewMailSubject) {
 										static::Trace("Found pattern to remove: {$sPattern}. Nothing to remove.");
 									}
 									else {
 										static::Trace("Found pattern to remove: {$sPattern}. Removing it.");
 									}
-									
+
+									// Update the working copy too, so subsequent patterns match/replace against
+									// the already-cleaned subject instead of undoing this removal.
+									$sMailSubject = $sNewMailSubject;
 									$oEmail->sSubject = $sNewMailSubject;
-									
+
 									break; // Defensive programming
 									
 								case PolicyBehavior::DO_NOTHING->value:
@@ -80,7 +83,7 @@ abstract class RemoveTitlePatterns extends Base {
 									
 								default:
 									// Should not happen.
-									static::Trace("Unknown action for closed tickets.");
+									static::Trace("Unexpected 'behavior' for removing title patterns.");
 									break; 
 								
 							}

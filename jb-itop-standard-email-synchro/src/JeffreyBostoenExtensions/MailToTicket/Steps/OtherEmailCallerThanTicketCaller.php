@@ -42,7 +42,7 @@ abstract class OtherEmailCallerThanTicketCaller extends Base {
 			
 			// Other caller?
 			$sTicketCallerEmail = $oTicket->Get('caller_id->email');
-			if($sTicketCallerEmail != $oEmail->sCallerEmail) {
+			if(strcasecmp($sTicketCallerEmail, $oEmail->sCallerEmail) !== 0) {
 				
 				static::Trace('.. Ticket caller\'s email address is different from the sender\'s email address.');
 				static::HandleViolation();

@@ -79,9 +79,19 @@ abstract class MatchByInReplyToOrReferences extends Base {
 		preg_match_all('/<.+?>/', $sReferences, $aMatches);
 		$aReferences = $aMatches[0];
 		
-		// Fallback: also check "In-Reply-To"
-		if($sInReplyTo != '') {
-			$aReferences[] = $sInReplyTo;
+		// Fallback: also check "In-Reply-To". Extract the <msgid> token(s) the same way as "References",
+		// instead of using the raw header value, so surrounding whitespace, a trailing RFC 5322 comment,
+		// or multiple identifiers don't prevent it from matching the normalized values stored from prior
+		// processing.
+		if($sInReplyTo !== '') {
+			preg_match_all('/<.+?>/', $sInReplyTo, $aInReplyToMatches);
+			if($aInReplyToMatches[0] !== []) {
+				$aReferences = array_merge($aReferences, $aInReplyToMatches[0]);
+			}
+			else {
+				// No <msgid> token found (non-standard header); fall back to the raw, trimmed value.
+				$aReferences[] = trim($sInReplyTo);
+			}
 		}
 		
 		// Just to prevent re-processing of an existing e-mail in this mailbox configuration:
@@ -89,7 +99,7 @@ abstract class MatchByInReplyToOrReferences extends Base {
 
 		// In the wild, it was observed that In-Reply-To is sometimes set - but empty, e.g.:
 		// In-Reply-To: <>
-		$aReferences = array_unique(array_diff($aReferences, ['']));
+		$aReferences = array_unique(array_diff($aReferences, ['', '<>']));
 		
 
 		static::Trace('.. '.count($aReferences).' references: '.implode(', ', $aReferences));

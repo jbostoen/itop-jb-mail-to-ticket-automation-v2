@@ -101,14 +101,18 @@ class RawEmailMessage {
 	
 	/**
 	 * Retrieves the address(es) from the originator of the message.
-	 * 
+	 *
 	 * It tries so by analyzing the e-mail headers in in the following order:
 	 * 1) "From"
 	 * 2) "Sender"
 	 * 3) "Reply-To".
-	 * 
+	 *
 	 * See RFC 822, RFC 2822, RFC 5322 which allows this.
 	 * In the real world, it's rather rare though.
+	 *
+	 * By the time any Step consumes this (via GetSender()[0]), it is never empty: EmailMessage's
+	 * constructor already ran this same lookup and EmailBackgroundProcess::Process() routes a
+	 * message with no caller email to OnDecodeError() before the Steps pipeline ever runs.
 	 *
 	 * @return EmailContact[] One per sender.
 	 */
@@ -186,9 +190,9 @@ class RawEmailMessage {
 				if(($sContentDisposition != '') && (preg_match('/filename="([^"]+)"/', $sContentDisposition, $aMatches))) {
 					$sFileName = $aMatches[1];
 				}
-				elseif(($sContentDisposition != '') && (preg_match('/filename=([^"]+)/', $sContentDisposition, $aMatches))) {
+				elseif(($sContentDisposition !== '') && (preg_match('/filename=([^";]+)/', $sContentDisposition, $aMatches))) {
 					// same but without quotes
-					$sFileName = $aMatches[1];
+					$sFileName = trim($aMatches[1]);
 				}
 				
 				$bInline = true;
@@ -216,15 +220,17 @@ class RawEmailMessage {
 				if(empty($sFileName)) {
 					// generate a name based on the type of the file...
 					$aTypes = explode('/', $sType);
-					$sFileExtension = $aTypes[1];
+					// A Content-Type without a subtype (e.g. just "application") has no index 1; fall back to a generic extension.
+					$sFileExtension = $aTypes[1] ?? 'bin';
 					// map the type to a useful extension if needed
-					switch($aTypes[1]) {
+					switch($sFileExtension) {
 						case 'rfc822':
 							// Special case for messages: use the .eml extension
 							$sFileExtension = 'eml';
 							break;
 					}
-					$sFileName = sprintf('%s%03d.%s', $aTypes[0], $index, $sFileExtension); // i.e. image001.jpg 
+					$sFileName = sprintf('%s%03d.%s', $aTypes[0], $index, $sFileExtension); // i.e. image001.jpg
+					$index++;
 				}
 				$aAttachments['part_'.$aPart['part_id']] = array(
 					'filename' => $sFileName,
@@ -378,7 +384,7 @@ class RawEmailMessage {
 		else {
 			foreach ($aPart['parts'] as $aSubPart) {
 				$aPartFound = $this->GetPartById($sId, $aSubPart);
-				if($aPartFound === null) {
+				if($aPartFound !== null) {
 					return $aPartFound;
 				}
 			}
@@ -522,8 +528,19 @@ class RawEmailMessage {
 				if(preg_match('/([^:]+): ?(.*)$/', $sLine, $aMatches)) {
 					$sNewHeader = strtolower($aMatches[1]);
 					$sValue = $aMatches[2];
-					$aRawFields[$sNewHeader] = $sValue;
-					$sCurrentHeader = $sNewHeader;
+					if(isset($aRawFields[$sNewHeader])) {
+						// The first occurrence of a header wins; a later duplicate is ignored instead
+						// of silently overwriting it. RFC 5322 header fields such as "From" are not
+						// meant to occur more than once, so a message containing a duplicate did not
+						// come from a spec-compliant mail client. Rejecting or stripping that kind of
+						// malformed input is properly a mail server's job; this is just a defensive,
+						// deterministic fallback for whatever already reached this parser.
+						$sCurrentHeader = '';
+					}
+					else {
+						$aRawFields[$sNewHeader] = $sValue;
+						$sCurrentHeader = $sNewHeader;
+					}
 				}
 			}
 			else {
@@ -628,13 +645,16 @@ class RawEmailMessage {
 	 * Decodes the 'lines' of the 'body' of the given part according to its headers (and the message's global headers)
 	 * This function decode base64 and qencoded strings and converts the result to UTF-8 if needed
 	 *
+	 * Per RFC 2045, a part lacking its own Content-Transfer-Encoding header defaults to 7bit - it
+	 * must not inherit the enclosing multipart envelope's own encoding.
+	 *
 	 * @param hash $aHeaders The part headers, for the part to decode
 	 * @param array $aLines The body to decode as an array of text strings (one entry per line)
 	 *
 	 * @return string The decoded 'body' of the part, in UTF-8
 	 */
 	function DecodePart($aHeaders, $aLines) {
-		$sContentTransferEncoding = $this->GetHeader('Content-Transfer-Encoding');
+		$sContentTransferEncoding = '7bit';
 		$sCharset = 'UTF-8';
 		$sContentTypeHeader = $this->GetHeader('Content-Type');
 		

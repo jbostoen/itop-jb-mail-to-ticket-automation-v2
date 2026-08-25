@@ -23,6 +23,7 @@ SetupWebPage::AddModule(
 			'classes/autoload.php',
 			'model.jb-email-synchro.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Helper.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Logger.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/MessageHandler.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/ProcessingHelper.php',
 		),
@@ -165,7 +166,7 @@ if (!class_exists('EmailSynchroInstaller')) {
 					
 					$iRet = CMDBSource::Query($sUpdateQuery); // Throws an exception in case of error
 					
-					if($bUpgradeOptionsIMAP == true && trim($oInbox->Get('imap_options') == '')) {
+					if($bUpgradeOptionsIMAP && trim((string) $oInbox->Get('imap_options')) === '') {
 						$aOptionsIMAP = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap', 'ssl', 'novalidate-cert'));
 						$oInbox->Set('imap_options', implode(PHP_EOL, $aOptionsIMAP));
 						$oInbox->DBUpdate();
@@ -232,27 +233,28 @@ if (!class_exists('EmailSynchroInstaller')) {
 
 					// For this mailbox, also remove the prefix.
 					$sQuery = "
-						UPDATE $sTableNameReplica 
-						SET 
-							$sUidlColName = REPLACE($sUidlColName, " . CMDBSource::Quote($oInbox->Get('login') . '_') . ", '') 
-						WHERE 
+						UPDATE $sTableNameReplica
+						SET
+							$sUidlColName = REPLACE($sUidlColName, " . CMDBSource::Quote($oInbox->Get('login') . '_') . ", '')
+						WHERE
 							$sMailboxIdAttDef = " . $oInbox->GetKey();
 
 					SetupLog::Info($sQuery);
 					CMDBSource::Query($sQuery);
-					
-					// Remove unmatched email replicas.
-					$sQuery = "
-						DELETE FROM $sTableNameReplica 
-						WHERE 
-							$sMailboxIdAttDef IS NULL OR $sMailboxIdAttDef = 0
-					";
 
-					SetupLog::Info($sQuery);
-					CMDBSource::Query($sQuery);
-
-					
 				}
+
+				// Remove unmatched email replicas, now that every mailbox above has had a chance to
+				// backfill its own. Doing this inside the loop above would delete replicas belonging to
+				// mailboxes not yet reached by the loop, since they haven't been backfilled yet either.
+				$sQuery = "
+					DELETE FROM $sTableNameReplica
+					WHERE
+						$sMailboxIdAttDef IS NULL OR $sMailboxIdAttDef = 0
+				";
+
+				SetupLog::Info($sQuery);
+				CMDBSource::Query($sQuery);
 
 			}
 			

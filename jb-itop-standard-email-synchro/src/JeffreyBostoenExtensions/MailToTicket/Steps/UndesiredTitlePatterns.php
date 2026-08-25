@@ -69,7 +69,7 @@ abstract class UndesiredTitlePatterns extends Base {
 									
 								default:
 									// Should not happen.
-									static::Trace(". Unknown action for closed tickets.");
+									static::Trace(". Unexpected 'behavior' for undesired title patterns.");
 									break; 
 								
 							}

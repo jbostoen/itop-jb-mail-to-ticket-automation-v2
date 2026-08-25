@@ -8,10 +8,7 @@
 
 namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
-use JeffreyBostoenExtensions\MailToTicket\{
-	eNextAction,
-	ProcessingHelper
-};
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 
 // iTop classes.
 use Ticket;
@@ -50,9 +47,10 @@ abstract class UnknownTicketReference extends Base {
 			// This could be a new ticket. Then it's logical the Ticket object is null. 
 			// So check if there was something (header or pattern in subject) which would have lead the system to believe there was a ticket. 
 			
-			// Are there patterns which should be ignored/removed from the title? 
-			// To find the reference, let's remove it from our temp variable. 
-			$sSubject = $oEmail->sSubject;
+			// Are there patterns which should be ignored/removed from the title?
+			// To find the reference, let's remove it from our temp variable.
+			$sOriginalSubject = $oEmail->sSubject;
+			$sSubject = $sOriginalSubject;
 			
 			// Here the removal/ignoring of patterns happens; on a copy of the subject string; only to find related tickets.
 			// The only purpose of this is to add some extra debug info.
@@ -60,14 +58,14 @@ abstract class UnknownTicketReference extends Base {
 
 				$sPatterns = $oMailBox->Get($sAttCode);
 				
-				if(trim($sPatterns) != '') {
+				if(trim($sPatterns) !== '') {
 					
 					$aPatterns = preg_split(static::NEWLINE_REGEX, $sPatterns);
 					
 					static::Trace("Ignoring patterns (defined in {$sAttCode}): {$sPatterns}");
 					
 					foreach($aPatterns as $sPattern) {
-						if(trim($sPattern) != '') {
+						if(trim($sPattern) !== '') {
 							$oPregMatch = @preg_match($sPattern, $sSubject);
 							
 							if($oPregMatch === false) {
@@ -86,9 +84,14 @@ abstract class UnknownTicketReference extends Base {
 			}
 			
 			$sPattern = $oMailBox->Get('title_pattern');
-			if(($sPattern != '') && (preg_match($sPattern, $sSubject, $aMatches))) {
-				static::Trace("ndesired: unable to find any prior ticket despite a matching ticket reference pattern in the subject ('{$sPattern}'). ".http_build_query($aMatches));
-				ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_UNDESIRED);
+			$oPregMatched = ($sPattern !== '') ? @preg_match($sPattern, $sOriginalSubject, $aMatches) : null;
+
+			if($oPregMatched === false) {
+				static::Trace("Invalid pattern: '{$sPattern}'");
+			}
+			elseif(($sPattern !== '') && $oPregMatched) {
+				static::Trace("Unable to find any prior ticket despite a matching ticket reference pattern in the subject ('{$sPattern}'). ".http_build_query($aMatches));
+				static::HandleViolation();
 				return;
 			}
 			elseif($oEmail->oRelatedObject !== null && !($oTicket instanceof Ticket)) {

@@ -22,13 +22,16 @@ class IMAPOAuthEmailSource extends IMAPEmailSource {
 	/** @inheritDoc */
 	public const CONFIG_AUTHENTICATION = 'oauth';
 
+	/** @inheritDoc */
+	public const CONFIG_DEBUG_LOGGER = IMAPOAuthEmailLogger::class;
+
 	/**
 	 * @inheritDoc
 	 */
 	public function __construct(MailInboxBase $oMailbox) {
 
 		$oProvider = ProviderHelper::GetProviderForIMAP($oMailbox);
-		$this->sAccessToken = '';
+		$this->sAccessToken = null;
 
 		try {
 			$this->sAccessToken = ProviderHelper::GetAccessTokenForProvider($oProvider);

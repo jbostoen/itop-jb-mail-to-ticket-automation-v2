@@ -30,7 +30,6 @@ use JeffreyBostoenExtensions\MailToTicket\{
  */
 class MailInboxesEmailProcessor extends EmailProcessor {
 	
-	protected static $bDebug;
 	protected static $aExcludeAttachments;
 	protected static $sBodyPartsOrder;
 	protected static $sModuleName;
@@ -43,7 +42,6 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	public function __construct() {
 		
 		self::$sModuleName = 'jb-email-synchro';
-		self::$bDebug = MetaModel::GetModuleSetting(self::$sModuleName, 'debug', false);
 		self::$aExcludeAttachments = MetaModel::GetModuleSetting(self::$sModuleName, 'exclude_attachment_types', array());
 		self::$sBodyPartsOrder = MetaModel::GetModuleSetting(self::$sModuleName, 'body_parts_order', 'text/html,text/plain');
 		$this->aInboxes = array();
@@ -56,9 +54,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	 * @return void
 	 */
 	public static function Trace($sText) {
-		if(self::$bDebug) {
-			echo $sText."\n";
-		}
+		ProcessingHelper::TraceCron($sText);
 	}
 	/**
 	 * Initializes the email sources: one source is created and associated with each MailInboxBase instance
@@ -173,19 +169,23 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 					$aErrors[] = $sMessage;
 					$aErrors[] = $oInbox->sLastError;
 					self::Trace($sMessage);
-				}	
+
+					ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
+				}
 			}
 			else {
 
 				// - An old mail is being reprocessed.
+				ProcessingHelper::SetExecutedSteps([]);
 				ProcessingHelper::SetNextAction(eNextAction::NO_ACTION);
-				
+
 			}
 			$eNextAction = ProcessingHelper::GetNextAction();
 			$sAction = $eNextAction->name;
 			self::Trace("End of processing of the new message $index ({$oEmail->sUIDL}) retCode: $sAction");
 		}
 		catch(Exception $e) {
+			ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
 			$eNextAction = ProcessingHelper::GetNextAction();
 			$this->sLastErrorSubject = "Failed to process email $index ({$oEmail->sUIDL})";
 			$this->sLastErrorMessage = "Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage();

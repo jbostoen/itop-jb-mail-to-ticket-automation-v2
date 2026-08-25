@@ -71,15 +71,18 @@ function GetMailboxContent($oPage, $oInbox) {
 			if($iStartIndex < 0 || $iMaxCount <= 0) {
 				// Don't process, invalid indexes
 				$oPage->add('Invalid start or max.');
+				$oSource->Disconnect();
+				return;
 			}
-			
+
 			// Avoid user specifying a higher number (start) than the total message number count
 			$iStart = $iStartIndex;
 		
 			// Avoid user specifying a higher number (start + count) than the total mesage number count
 			// The largest index is (message count - 1), since messages are retrieved by index (starting at 0)
-			// Check the total (readable) message count here.
-			$iEnd = min($iStart + $iMaxCount - 1, $iTotalMsgCount - 1); 
+			// Bound against $iTotalMsgOkCount (the number of entries actually present in $aMessages/$aMessageIndexes),
+			// not $iTotalMsgCount (a separate IMAP STATUS count that can differ), to avoid indexing past the array.
+			$iEnd = min($iStart + $iMaxCount - 1, $iTotalMsgOkCount - 1);
 			
 		}
 		catch(Exception $e) {
@@ -91,8 +94,11 @@ function GetMailboxContent($oPage, $oInbox) {
 			);
 			IssueLog::Error('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage(), null, $aContext);
 			$oPage->p('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
+			if(isset($oSource)) {
+				$oSource->Disconnect();
+			}
 			return;
-			
+
 		}
 
 		
@@ -222,7 +228,7 @@ function GetMailboxContent($oPage, $oInbox) {
 								$sTicketUrl = ApplicationContext::MakeObjectUrl($oInbox->Get('target_class'), $aProcessed[$sUIDL]['ticket_id']);
 								$sLink = '<a href="'.$sTicketUrl.'">'.$oInbox->Get('target_class').'::'.$aProcessed[$sUIDL]['ticket_id'].'</a>';
 							}
-							$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDL];
+							$aArgs = ['operation' => 'message_details', 'sUIDL' => $sUIDL, 'mailbox_id' => $oInbox->GetKey()];
 							$sDetailsURL = utils::GetAbsoluteUrlModulePage(basename(dirname(__FILE__)), 'details.php', $aArgs);
 							$sDetailsLink = '<a href="'.$sDetailsURL.'">'.Dict::S('MailInbox:MessageDetails').'</a>';
 
@@ -292,23 +298,16 @@ function GetMailboxContent($oPage, $oInbox) {
 				
 				// Contrary to the original Combodo message: this could mean there are actually e-mails in the mailbox, but they can not be processed.
 				$oPage->p(Dict::Format('MailInbox:NoValidEmailsFound'));
-				
+
 			}
 
-			if($iTotalMsgCount > 0) {
-				// If we have messages in the mailbox, even if none can be read (meaning they can't be displayed), we are displaying the mailbox stats
-				// This will greatly help the user understanding what's going on !
-				$oPage->p(Dict::Format('MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox',
-					$iMsgOkCount,
-					$iTotalMsgCount,
-					($iTotalMsgCount - $iProcessedCount),
-					($iTotalMsgCount - $iTotalMsgOkCount))
-				);
-			}
-			
 		}
 		else {
 			$oPage->p(Dict::Format('MailInbox:EmptyMailbox'));
+		}
+
+		if(isset($oSource)) {
+			$oSource->Disconnect();
 		}
 	}
 	else {
@@ -345,7 +344,12 @@ try {
 
 		case 'mailbox_reset_status':
 		case 'mailbox_delete_messages':
-		
+
+			if($oInbox === null) {
+				$oPage->add('Invalid or missing mailbox id.');
+				break;
+			}
+
 			// As for the replicas, consider this:
 			// - There could be multiple mailboxes that received the same message (and UIDL).
 			// - There could be a copy of the same message (same UIDL) in a different folder on the same mailbox (different "Mailbox" config in iTop).
@@ -393,6 +397,11 @@ try {
 
 		case 'mailbox_ignore_messages':
 
+			if($oInbox === null) {
+				$oPage->add('Invalid or missing mailbox id.');
+				break;
+			}
+
 			$aInternalIdentifiers = utils::ReadParam('aInternalIdentifiers', [], false, 'raw_data');
 			$aReplicas = [];
 
@@ -422,18 +431,22 @@ try {
 					$oEmailReplica->Set('status', 'ignored');
 					$oEmailReplica->Set('mailbox_id', $oInbox->GetKey());
 					$oEmailReplica->Set('mailbox_path', $oSource->GetMailbox());
-					foreach ($aMessages as $iMessage => $aMessage) {
-						if($aMessage['uidl'] == $sUIDL) {
+					/** @var MessageHandler $oMsgHandler */
+					foreach ($aMessages as $iMessage => $oMsgHandler) {
+						if($oMsgHandler->GetInternalIdentifier() == $sUIDL) {
 							$oEmailReplica->Set('message_id', $iMessage);
 							$oEmailReplica->DBInsert();
 							break;
 						}
 					}
 				}
+
+				/** @var EmailSource $oSource */
+				$oSource->Disconnect();
 			}
 			GetMailboxContent($oPage, $oInbox);
 			break;
-			
+
 	}
 	$oPage->output();
 }

@@ -83,7 +83,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:error_behavior' => 'Behavior when error occurs during processing',
 	'Class:MailInboxStandard/Attribute:error_behavior/Value:delete' => 'Delete the message from the mailbox',
 	'Class:MailInboxStandard/Attribute:error_behavior/Value:mark_as_error' => 'Mark as Error', 
-	'Class:MailInboxStandard/Attribute:notify_errors_to' => 'Forward e-mails (in error) To Address',
+	'Class:MailInboxStandard/Attribute:notify_errors_to' => 'Contacts to notify on error',
+	'Class:MailInboxStandard/Attribute:notify_errors_to+' => 'OQL query returning the Person(s) (e.g. "SELECT Person WHERE email = \'admin@example.com\'") to whom e-mails in error will be forwarded.',
 	'Class:MailInboxStandard/Attribute:notify_from' => 'Mail From Address',
 	
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Mail Aliases',
@@ -257,6 +258,10 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:yes' => 'Yes',
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_mark_caller_as_inactive/Value:no' => 'No',
 
+	// Step: Update caller attributes
+	'Class:MailInboxStandard/Attribute:step_update_caller_attributes' => 'Update caller attributes (one per line, example: status:active)',
+	'Class:MailInboxStandard/Attribute:step_update_caller_attributes+' => 'Applied to the caller\'s Person record whenever a successfully processed e-mail is matched to an existing contact. Leave empty to not update anything. Mail placeholders (e.g. $mail->caller_email$) can be used in the values.',
+
 	// Policy: Sender Email Address
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Behavior on violation',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'Bounce to sender and delete',
@@ -282,6 +287,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:Error:TargetFolderRequired' => 'The target folder must be specified for an active mailbox.',
 	'MailInbox:Error:CaseLogAttCodeRequired' => 'The case log attribute code must be a valid attribute of the target class \'%1$s\'.',
 	'MailInbox:Error:DescriptionOrCaseLogAttCodeRequired' => 'Either the description attribute code or the case log attribute code must be a valid attribute of the target class \'%1$s\'.',
+	'MailInbox:Error:DescriptionAttCodeMustHaveMaxSize' => 'The description attribute \'%1$s\' of the target class \'%2$s\' does not have a maximum size, and can not be used to store the initial ticket description.',
 
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Embedded e-mail images',
@@ -300,13 +306,18 @@ Dict::Add('EN US', 'English', 'English', array(
 	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Limit accepted e-mail replies to original ticket caller\'s e-mail address',
 	'MailInbox:PolicyAutoReply' => 'Auto reply',
 	'MailInbox:PolicyNonDeliveryReport' => 'Non Delivery Reports',
+	'MailInbox:StepUpdateCallerAttributes' => 'Update caller attributes',
 	'MailInbox:PolicySenderEmailAddress' => 'Block senders using e-mail address patterns',
-	
+
+	// Validation messages
+	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'The query to select the %1$s must target the \'Contact\' class (or a subclass such as \'Person\' or \'Team\'), not \'%2$s\'.',
+
 	'Menu:MailInboxes' => 'Incoming E-mail Inboxes',
 	'Menu:MailInboxes+' => 'Configuration of Inboxes to scan for incoming e-mails',
 	 
 	'MailInboxStandard:DebugTrace' => 'Debug Trace',
 	'MailInboxStandard:DebugTraceNotActive' => 'Activate the debug trace on this Inbox to see a detailed log of what happens.',
+	'MailInboxStandard:DebugTraceAccessDenied' => 'You are not allowed to view the debug trace of this Inbox.',
 	
 	'MailPolicy:CreateOrUpdateTicket:NoDescriptionProvided' => 'No description provided',
 	

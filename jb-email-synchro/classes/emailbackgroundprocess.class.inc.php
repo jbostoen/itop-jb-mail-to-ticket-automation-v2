@@ -18,6 +18,7 @@
  * @license     http://opensource.org/licenses/AGPL-3.0
  */
 
+use Combodo\iTop\Extension\EmailSynchro\Service\IMAPEmailLogger;
 use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
 use JeffreyBostoenExtensions\MailToTicket\{
 	eNextAction,
@@ -34,7 +35,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	protected static $sNotifyErrorsTo = '';
 	protected static $sNotifyErrorsFrom = '';
 	public static $iMaxEmailSize = 0;
-	protected bool $bDebug;
 	private $aMessageTrace = array();
 	private MessageHandler $oCurrentMessageHandler;
 	/**
@@ -57,8 +57,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	}
 	
 	public function __construct() {
-		
-		$this->bDebug = MetaModel::GetModuleSetting('jb-email-synchro', 'debug', false);
+
 		self::$sSaveErrorsTo = MetaModel::GetModuleSetting('jb-email-synchro', 'save_errors_to', '');
 		self::$sNotifyErrorsTo = MetaModel::GetModuleSetting('jb-email-synchro', 'notify_errors_to', '');
 		self::$sNotifyErrorsFrom = MetaModel::GetModuleSetting('jb-email-synchro', 'notify_errors_from', '');
@@ -70,9 +69,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 	protected function Trace(string $sText) : void {
 		$this->aMessageTrace[] = $sText;
-		if ($this->bDebug) {
-			echo $sText."\n";
-		}
+		ProcessingHelper::TraceCron($sText);
 	}
 	
     /**
@@ -167,18 +164,33 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		
 		$this->Trace("-----------------------------------------------------------------------------------------");
 		$this->Trace('. '.count(ProcessingHelper::GetAvailableSteps()).' steps to process.');
-		
+
+		$bAbortAllProcessing = false;
+
 		foreach(self::$aEmailProcessors as $sProcessorClass) {
-			
+
+			if($bAbortAllProcessing) {
+				break;
+			}
+
 			/** @var MailInboxesEmailProcessor $oProcessor */
 			$oProcessor = new $sProcessorClass();
 			$aSources = $oProcessor->ListEmailSources();
 			
 			foreach($aSources as $oSource) {
 
+				if($bAbortAllProcessing) {
+					break;
+				}
+
 				ProcessingHelper::SetMailSource($oSource);
-				
-				$iMsgCount = $oSource->GetMessagesCount();
+
+				// Route IMAP protocol trace lines through this specific mailbox's own Trace(), instead of
+				// whichever mailbox's connection happened to be established last: IMAPEmailLogger is a
+				// static singleton shared across every mailbox connection, only updated when a connection
+				// is (re-)established, so it must also be updated here whenever processing switches source.
+				IMAPEmailLogger::$oCurrentMailbox = $oProcessor->GetInboxFromSource($oSource);
+
 				$this->Trace("-----------------------------------------------------------------------------------------");
 				$this->Trace("Processing Message Source: ".$oSource->GetName());
 				try {
@@ -240,26 +252,33 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						
 					}
 					
-					$sOQL = '
-						SELECT EmailReplica 
-						WHERE
-							uidl IN (' . implode(',', CMDBSource::Quote($aInternalIdentifiers)) . ') 
-							AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox')).'
-							AND mailbox_id = '.$oInbox->GetKey();
-
-					$this->Trace("Searching EmailReplicas: '$sOQL'");
-					$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 					$aReplicas = [];
 
-					/** @var EmailReplica $oReplica */
-					while($oReplica = $oReplicaSet->Fetch()) {
-						$aReplicas[$oReplica->Get('uidl')] = $oReplica;
+					if($aInternalIdentifiers !== []) {
+
+						$sOQL = '
+							SELECT EmailReplica
+							WHERE
+								uidl IN (' . implode(',', CMDBSource::Quote($aInternalIdentifiers)) . ')
+								AND mailbox_path = ' . CMDBSource::Quote($oInbox->Get('mailbox')).'
+								AND mailbox_id = '.$oInbox->GetKey();
+
+						$this->Trace("Searching EmailReplicas: '$sOQL'");
+						$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
+
+						/** @var EmailReplica $oReplica */
+						while($oReplica = $oReplicaSet->Fetch()) {
+							$aReplicas[$oReplica->Get('uidl')] = $oReplica;
+						}
+
 					}
-					
+
 					// Processes the actual messages in the correct order
 					/** @var int $iMessage Due to sorting above with uasort(), the array keys might have changed from e.g. 0, 1, 2  to 0, 2, 1 **/
 					/** @var MessageHandler $oMsgHandler */
 					foreach($aMessages as $iMessage => $oMsgHandler) {
+
+						$oEmailReplica = null;
 
 						ProcessingHelper::SetMessageHandler($oMsgHandler);
 
@@ -449,7 +468,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												break;
 											
 											case eNextAction::MOVE_MESSAGE:
-											
+
 												$iTotalMoved++;
 												$this->Trace("Move message (and replica): $sUIDL / index $iMessage");
 												try {
@@ -458,6 +477,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												}
 												catch(Exception $e) {
 													$this->Trace("Unable to move message");
+												}
+												if(!$oEmailReplica->IsNew()) {
+													$aReplicas[$sUIDL] = $oEmailReplica;
 												}
 												break;
 											
@@ -491,6 +513,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												if($oEmailReplica->IsNew() == false) {
 													$oEmailReplica->DBDelete();
 												}
+												$bAbortAllProcessing = true;
 												break 3;
 												
 											default:
@@ -526,17 +549,17 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							
 							
 						}
-						catch(Exception $e) {
+						catch(Throwable $e) {
 
 							if(!empty($oEmailReplica)) {
 								$this->Trace($e->getMessage());
 								$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
 							}
-							
+
 							$this->LogProcessException($e, $oSource);
-							
+
 							throw $e;
-						}						
+						}
 						
 					}
 					

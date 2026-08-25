@@ -27,6 +27,9 @@ class IMAPEmailSource extends EmailSource {
 	/** @var string CONFIG_AUTHENTICATION Authentication type. */
 	public const CONFIG_AUTHENTICATION = 'plain';
 
+	/** @var string CONFIG_DEBUG_LOGGER Class used to log the raw IMAP protocol conversation. */
+	public const CONFIG_DEBUG_LOGGER = IMAPEmailLogger::class;
+
 	/** @var string $sLogin Mailbox login. */
 	protected $sLogin;
 	
@@ -84,13 +87,17 @@ class IMAPEmailSource extends EmailSource {
 			'encryption' => $sSSL,
 			'authentication' => static::CONFIG_AUTHENTICATION,
 			'host' => $this->sServer,
-			'debug' => IMAPEmailLogger::class,
+			'debug' => static::CONFIG_DEBUG_LOGGER,
 		];
 
 		if(in_array('validate_cert', $aImapOptions)) {
 			IssueLog::Debug("IMAPEmailSource - SSL certificate validation enabled", static::LOG_CHANNEL);
 			$aOptions['validate_cert'] = true;
 		}
+
+		// The IMAP engine instantiates the "debug" logger itself (with no constructor arguments), so hand
+		// over the mailbox being processed via a static property; IMAPEmailLogger routes lines through it.
+		IMAPEmailLogger::$oCurrentMailbox = $oMailbox;
 
 		$this->oMailbox = new Mailbox($aOptions);
 		$this->oMailbox->connect();

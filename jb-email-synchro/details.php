@@ -31,19 +31,28 @@ require_once(APPROOT.'/application/itopwebpage.class.inc.php');
 /**
  * @param iTopWebPage $oPage
  * @param string $sUIDL
+ * @param int $iMailboxId
  *
  * @throws \CoreException
  * @throws \CoreUnexpectedValue
  * @throws \MySQLException
  */
-function GetMessageDetails(iTopWebPage $oPage, string $sUIDL) : void {
-	
+function GetMessageDetails(iTopWebPage $oPage, string $sUIDL, int $iMailboxId) : void {
+
 	$oReplicaSearch = new DBObjectSearch('EmailReplica');
 	$oReplicaSearch->AddCondition('uidl', $sUIDL);
+	$oReplicaSearch->AddCondition('mailbox_id', $iMailboxId);
 	$oReplicaSet = new DBObjectSet($oReplicaSearch);
 	$oReplica = $oReplicaSet->Fetch();
 	if (empty($oReplica))
 	{
+		return;
+	}
+
+	// Enforce the same object-level ACL as the standard EmailReplica details page (grant_by_profile),
+	// rather than allowing any authenticated backoffice user to view arbitrary message content.
+	if(UserRights::IsActionAllowed('EmailReplica', UR_ACTION_READ, DBObjectSet::FromObject($oReplica)) === UR_ALLOWED_NO) {
+		$oPage->p(Dict::S('UI:ActionNotAllowed'));
 		return;
 	}
 
@@ -100,7 +109,8 @@ try
 	{
 		case 'message_details':
 			$sUIDL = utils::ReadParam('sUIDL', 0, false, 'raw_data');
-			GetMessageDetails($oPage, $sUIDL);
+			$iMailboxId = utils::ReadParam('mailbox_id', 0, false, 'raw_data');
+			GetMessageDetails($oPage, $sUIDL, $iMailboxId);
 			break;
 	}
 	$oPage->output();

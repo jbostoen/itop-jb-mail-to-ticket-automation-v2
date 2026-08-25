@@ -40,7 +40,9 @@ abstract class AttachmentCriteria extends Base {
 	 * @inheritDoc
 	 */
 	public static string $sXMLSettingsPrefix = 'step_attachment_criteria';
-	
+
+	const int MAX_PIXEL_COUNT = 40000000;
+
 	/**
 	 * @inheritDoc
 	 *
@@ -71,11 +73,10 @@ abstract class AttachmentCriteria extends Base {
 				$bDoCheckIfImageDimensionTooSmall = false;
 			}
 			
-			if($iMaxWidth < 0 || $iMaxHeight < 0) {
-				static::Trace('Max dimensions can not be negative.');
-				$bDoCheckIfImageDimensionTooLarge = false;
-			}
-			
+			// A max dimension of 0 (or a negative value) means "no limit" for that dimension.
+			$iEffectiveMaxWidth = ($iMaxWidth < 1) ? PHP_INT_MAX : $iMaxWidth;
+			$iEffectiveMaxHeight = ($iMaxHeight < 1) ? PHP_INT_MAX : $iMaxHeight;
+
 			if(function_exists('imagecopyresampled') == false) {
 				static::Trace('php-gd seems to be missing. Resizing is not possible.');
 				$bDoCheckIfImageDimensionTooLarge = false;
@@ -98,12 +99,13 @@ abstract class AttachmentCriteria extends Base {
 				// - Ignore certain MIME types (This could include images).
 					
 					if(in_array($aAttachment['mimeType'], $aMimeTypes)) {
-						
+
 						static::Trace('Ignore this attachment (excluded MIME type).');
-						
+
 						// Removing attachment
 						unset($oEmail->aAttachments[$sAttachmentRef]);
-									
+						continue;
+
 					}
 
 
@@ -117,7 +119,15 @@ abstract class AttachmentCriteria extends Base {
 							
 							$iWidth = $aImgInfo[0];
 							$iHeight = $aImgInfo[1];
-							
+
+							if($iWidth * $iHeight > self::MAX_PIXEL_COUNT) {
+
+								static::Trace('Image dimensions (%1$sx%2$s) exceed the hard safety limit, ignoring attachment.', $iWidth, $iHeight);
+								unset($oEmail->aAttachments[$sAttachmentRef]);
+								continue;
+
+							}
+
 							// Image too small?
 							if($bDoCheckIfImageDimensionTooSmall && ($iWidth < $iMinWidth || $iHeight < $iMinHeight)) {
 								
@@ -129,12 +139,12 @@ abstract class AttachmentCriteria extends Base {
 							}
 							
 							// Image too large?
-							if($bDoCheckIfImageDimensionTooLarge && ($iWidth > $iMaxWidth || $iHeight > $iMaxHeight)) {
-								
+							if($bDoCheckIfImageDimensionTooLarge && ($iWidth > $iEffectiveMaxWidth || $iHeight > $iEffectiveMaxHeight)) {
+
 								// Resize
 								static::Trace('Resize image (dimensions too large).');
-								$aAttachment = static::ResizeImageToFit($aAttachment, $iWidth, $iHeight, $iMaxWidth, $iMaxHeight);
-								
+								$aAttachment = static::ResizeImageToFit($aAttachment, $iWidth, $iHeight, $iEffectiveMaxWidth, $iEffectiveMaxHeight);
+
 							}
 						
 						}
@@ -207,10 +217,12 @@ abstract class AttachmentCriteria extends Base {
 			// Scale the image, preserving the transparency for GIFs and PNGs.
 			$fScale = min($iMaxImageWidth / $iWidth, $iMaxImageHeight / $iHeight);
 
-			$iNewWidth = round($iWidth * $fScale);
-			$iNewHeight = round($iHeight * $fScale);
+			// Clamp to at least 1px: for a very elongated image, the uniform scale factor can round the
+			// non-constrained dimension down to 0, and imagecreatetruecolor() rejects a 0 dimension.
+			$iNewWidth = max(1, (int) round($iWidth * $fScale));
+			$iNewHeight = max(1, (int) round($iHeight * $fScale));
 			
-			static::Trace('Resizing image from %1$s x %2$s to %3$s x %4$s .', $iWidth, $iHeight, $iNewHeight, $iNewHeight);
+			static::Trace('Resizing image from %1$s x %2$s to %3$s x %4$s .', $iWidth, $iHeight, $iNewWidth, $iNewHeight);
 			$new = imagecreatetruecolor($iNewWidth, $iNewHeight);
 			
 			// Preserve transparency.
@@ -245,9 +257,9 @@ abstract class AttachmentCriteria extends Base {
 	 *
 	 * @param string $sImageData Image data
 	 *
-	 * @return array Array with image dimensions
+	 * @return array|false Array with image dimensions, or false if $sImageData is not a valid image.
 	 */
-	public static function GetImageSize(string $sImageData) : array {
+	public static function GetImageSize(string $sImageData) : array|false {
 		
 		if(function_exists('getimagesizefromstring')) {
 			// PHP 5.4.0 or higher

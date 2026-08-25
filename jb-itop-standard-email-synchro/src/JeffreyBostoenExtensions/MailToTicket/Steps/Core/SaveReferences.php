@@ -16,6 +16,7 @@ use JeffreyBostoenExtensions\MailToTicket\{
 };
 
 // iTop internals.
+use CoreCannotSaveObjectException;
 use MetaModel;
 
 // Generic.
@@ -77,8 +78,15 @@ abstract class SaveReferences extends Base {
 				try {
 					$oLink->DBInsert();
 				}
+				catch(CoreCannotSaveObjectException $e) {
+					// lnkEmailUidToTicket has a uniqueness rule on (message_uid, mailbox_id, ticket_id);
+					// a CheckToWrite() failure here is, in practice, that rule catching an existing link.
+					static::Trace('.. Message ID "%1$s" is already linked to ticket ID %2$s (%3$s)', $sMessageId, $oTicket->GetKey(), $e->getMessage());
+				}
 				catch(Exception $e) {
-					static::Trace('.. Message ID "%1$s" is already linked to ticket ID %2$s', $sMessageId, $oTicket->GetKey());
+					// Anything else (DB connectivity, a bad foreign key, ...) is a genuine failure: trace
+					// the real cause instead of mislabeling it as "already linked".
+					static::Trace('.. Failed to link Message ID "%1$s" to ticket ID %2$s: %3$s', $sMessageId, $oTicket->GetKey(), $e->getMessage());
 				}
 				
 			}

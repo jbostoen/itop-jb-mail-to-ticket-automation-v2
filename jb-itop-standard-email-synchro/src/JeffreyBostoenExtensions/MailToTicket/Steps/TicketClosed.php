@@ -36,8 +36,7 @@ abstract class TicketClosed extends Base {
 	public static function Execute() : void {
 		
 		$oTicket = ProcessingHelper::GetTicket();
-		$oMailBox = ProcessingHelper::GetMailBox();
-		
+
 		// Checking if a previous ticket was found.
 		
 			if($oTicket !== null && $oTicket->Get('status') === 'closed') {
@@ -73,8 +72,8 @@ abstract class TicketClosed extends Base {
 						
 					default:
 						// Should not happen.
-						static::Trace('Unknown action for closed tickets: %1$s', $oMailBox->Get('behavior'));
-						break; 
+						static::Trace('Unknown action for closed tickets: %1$s', static::GetStepSetting('behavior'));
+						break;
 					
 					
 				}
