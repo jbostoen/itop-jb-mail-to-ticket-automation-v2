@@ -142,7 +142,7 @@ abstract class Base implements iStep {
 			'mail->message_id' => $oEmail->sMessageId,
 			'mail->subject' => $oEmail->sSubject,
 			'mail->caller_email' => $oEmail->sCallerEmail,
-			'mail->caller_email_suffix' => explode('@', $oEmail->sCallerEmail)[1],
+			'mail->caller_email_suffix' => explode('@', $oEmail->sCallerEmail, 2)[1] ?? '',
 			'mail->caller_name' => $oEmail->sCallerName,
 			'mail->recipient' => $oEmail->sRecipient,
 			'mail->date' => $oEmail->sDate,
