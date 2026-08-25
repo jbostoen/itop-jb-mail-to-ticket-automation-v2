@@ -549,17 +549,17 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							
 							
 						}
-						catch(Exception $e) {
+						catch(Throwable $e) {
 
 							if(!empty($oEmailReplica)) {
 								$this->Trace($e->getMessage());
 								$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
 							}
-							
+
 							$this->LogProcessException($e, $oSource);
-							
+
 							throw $e;
-						}						
+						}
 						
 					}
 					
