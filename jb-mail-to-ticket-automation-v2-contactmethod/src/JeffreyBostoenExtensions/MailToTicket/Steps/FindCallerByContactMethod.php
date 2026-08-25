@@ -134,16 +134,17 @@ abstract class StepFindCallerByContactMethod extends Base {
 		}
 
 		// A match via a secondary/alternate contact method is weaker evidence than a match on the primary
-		// email address itself; only sync it as the person's primary e-mail when the match was unambiguous,
-		// to avoid overwriting the wrong person's contact data when a contact detail is shared (e.g. a team mailbox).
+		// email address itself; when the match is ambiguous (the contact detail is shared by more than one
+		// Person, e.g. a team mailbox), don't sync it as the person's primary e-mail, and don't set it as
+		// the caller either - an arbitrary pick among the candidates would misattribute the ticket.
 		if(static::$bLastMatchAmbiguous) {
-			static::Trace(". Ambiguous match for '{$sCallerEmail}': not updating {$oPerson->Get('friendlyname')}'s primary e-mail.");
+			static::Trace(". Ambiguous match for '{$sCallerEmail}': not updating {$oPerson->Get('friendlyname')}'s primary e-mail, and not setting a caller.");
+			return;
 		}
-		else {
-			static::Trace(". Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCallerEmail}");
-			$oPerson->Set('email', $sCallerEmail);
-			$oPerson->DBUpdate();
-		}
+
+		static::Trace(". Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCallerEmail}");
+		$oPerson->Set('email', $sCallerEmail);
+		$oPerson->DBUpdate();
 
 		// Set caller for email
 		$oEmail->SetSender($oPerson);
