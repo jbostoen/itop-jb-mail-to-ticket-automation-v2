@@ -350,7 +350,7 @@ try {
 		
 			$aInternalIdentifiers = utils::ReadParam('aInternalIdentifiers', [], false, 'raw_data');
 			if(count($aInternalIdentifiers) > 0) {
-				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aInternalIdentifiers)).') AND mailbox_id = '.$oInbox->GetKey(); 
+				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aInternalIdentifiers)).') AND mailbox_path = '.CMDBSource::Quote($oInbox->Get('mailbox')).' AND mailbox_id = '.$oInbox->GetKey();
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 				$oReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl']]);
 				$aReplicas = [];
@@ -409,7 +409,7 @@ try {
 			$aReplicas = [];
 
 			if(count($aInternalIdentifiers) > 0) {
-				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aInternalIdentifiers)).') AND mailbox_id = '.$oInbox->GetKey(); 
+				$sOQL = 'SELECT EmailReplica WHERE uidl IN ('.implode(',', CMDBSource::Quote($aInternalIdentifiers)).') AND mailbox_path = '.CMDBSource::Quote($oInbox->Get('mailbox')).' AND mailbox_id = '.$oInbox->GetKey();
 				$oReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 				/** @var DBObject $oReplica */
 				while ($oReplica = $oReplicaSet->Fetch()) {
