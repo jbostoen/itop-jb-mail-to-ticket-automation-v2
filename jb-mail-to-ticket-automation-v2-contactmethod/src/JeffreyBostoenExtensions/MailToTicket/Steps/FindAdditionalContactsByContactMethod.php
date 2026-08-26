@@ -121,17 +121,15 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 				$oPerson = StepFindCallerByContactMethod::FindContactByEmail($sCurrentEmail);
 
 				if(StepFindCallerByContactMethod::$bLastMatchAmbiguous) {
-					static::Trace(". Ambiguous match for '{$sCurrentEmail}': multiple people share this contact detail, linking the first one found.");
+					static::Trace(". Ambiguous match for '{$sCurrentEmail}': multiple people share this contact detail, not linking any of them.");
+					continue;
 				}
 
-				// Only if there is a match.
+				// Only if there is a match. (An ambiguous match is already skipped above via
+				// "continue", so a match reaching this point is never ambiguous.)
 				if($oPerson !== null) {
 
-					// An ambiguous match must not block FindAdditionalContacts' own, potentially
-					// unambiguous, primary-email lookup for the same recipient.
-					if(!StepFindCallerByContactMethod::$bLastMatchAmbiguous) {
-						static::$aResolvedRecipientEmails[] = mb_strtolower($sCurrentEmail);
-					}
+					static::$aResolvedRecipientEmails[] = mb_strtolower($sCurrentEmail);
 
 					// Add to related contacts.
 					$oEmail->AddRelatedContact($oPerson);
