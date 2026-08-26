@@ -85,7 +85,7 @@ function GetMailboxContent($oPage, $oInbox) {
 			$iEnd = min($iStart + $iMaxCount - 1, $iTotalMsgOkCount - 1);
 			
 		}
-		catch(Exception $e) {
+		catch(Throwable $e) {
 			$oInbox->Trace('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
 			$oPage->p('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
 			if(isset($oSource)) {
@@ -467,7 +467,7 @@ try {
 	}
 	$oPage->output();
 }
-catch(Exception $e) {
+catch(Throwable $e) {
 	$oPage->SetContentType('text/html');
 	$oPage->add($e->getMessage());
 	$oPage->output();
