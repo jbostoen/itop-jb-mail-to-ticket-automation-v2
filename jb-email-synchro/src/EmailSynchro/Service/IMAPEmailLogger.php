@@ -21,14 +21,16 @@ class IMAPEmailLogger implements LoggerInterface {
 	/**
 	 * @var bool Whether the next "sent" line is expected to itself be a credential: the raw base64
 	 * SASL continuation line the client sends after an "AUTHENTICATE" command with no inline argument.
+	 * Instance property, not static: the IMAP engine instantiates this logger once per connection, and
+	 * this flag must not leak across connections if one is aborted mid-handshake.
 	 */
-	private static bool $bNextSentLineIsCredential = false;
+	private bool $bNextSentLineIsCredential = false;
 
 	/**
 	 * Log when a message is sent.
 	 */
 	public function sent(string $message): void {
-		static::Log('IMAP Sent: '.static::RedactCredentials($message));
+		static::Log('IMAP Sent: '.$this->RedactCredentials($message));
 	}
 
 	/**
@@ -65,12 +67,12 @@ class IMAPEmailLogger implements LoggerInterface {
 	 * @param string $sLine Raw protocol line, as sent to the IMAP server.
 	 * @return string
 	 */
-	private static function RedactCredentials(string $sLine) : string {
+	private function RedactCredentials(string $sLine) : string {
 
 		// A previous "AUTHENTICATE" command had no inline argument; this line is the raw
 		// (base64) credential the client sends once the server replies with a "+" continuation.
-		if(static::$bNextSentLineIsCredential) {
-			static::$bNextSentLineIsCredential = false;
+		if($this->bNextSentLineIsCredential) {
+			$this->bNextSentLineIsCredential = false;
 			return '********';
 		}
 
@@ -86,7 +88,7 @@ class IMAPEmailLogger implements LoggerInterface {
 
 		// AUTHENTICATE with no inline argument: the credential follows as a separate line.
 		if(preg_match('/^\S+\s+AUTHENTICATE\s+\S+\s*$/i', $sLine)) {
-			static::$bNextSentLineIsCredential = true;
+			$this->bNextSentLineIsCredential = true;
 			return $sLine;
 		}
 
