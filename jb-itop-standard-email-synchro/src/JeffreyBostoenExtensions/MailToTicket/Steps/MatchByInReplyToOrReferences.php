@@ -112,18 +112,24 @@ abstract class MatchByInReplyToOrReferences extends Base {
 		
 		// For this mailbox, find the e-mail references that were already known in the system (previously processed).
 		// Keep in mind, it's possible the same e-mail UID is linked to multiple tickets (copy of a ticket plus linked references).
-		$oFilterLinks = new DBObjectSearch('lnkEmailUidToTicket');
-		$oFilterLinks->AddCondition('mailbox_id', $oMailBox->GetKey(), '=');
-		$oFilterLinks->AddCondition('message_uid', $aReferences, 'IN');
-		$oSetLinks = new DBObjectSet($oFilterLinks);
-		
 		$aTicketIds = [-1];
 
 		$aKnownReferences = [];
-		
-		while($oLink = $oSetLinks->Fetch()) {
-			$aTicketIds[] = $oLink->Get('ticket_id');
-			$aKnownReferences[] = $oLink->Get('message_uid');
+
+		// AddCondition() throws on an empty IN list; nothing to match against anyway (e.g. an
+		// "In-Reply-To: <>" with no usable "References" and a missing "Message-Id").
+		if($aReferences !== []) {
+
+			$oFilterLinks = new DBObjectSearch('lnkEmailUidToTicket');
+			$oFilterLinks->AddCondition('mailbox_id', $oMailBox->GetKey(), '=');
+			$oFilterLinks->AddCondition('message_uid', $aReferences, 'IN');
+			$oSetLinks = new DBObjectSet($oFilterLinks);
+
+			while($oLink = $oSetLinks->Fetch()) {
+				$aTicketIds[] = $oLink->Get('ticket_id');
+				$aKnownReferences[] = $oLink->Get('message_uid');
+			}
+
 		}
 		
 		// Store the references that were NOT found, as new references;
