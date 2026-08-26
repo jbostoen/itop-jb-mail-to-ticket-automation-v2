@@ -127,7 +127,11 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 				// Only if there is a match.
 				if($oPerson !== null) {
 
-					static::$aResolvedRecipientEmails[] = mb_strtolower($sCurrentEmail);
+					// An ambiguous match must not block FindAdditionalContacts' own, potentially
+					// unambiguous, primary-email lookup for the same recipient.
+					if(!StepFindCallerByContactMethod::$bLastMatchAmbiguous) {
+						static::$aResolvedRecipientEmails[] = mb_strtolower($sCurrentEmail);
+					}
 
 					// Add to related contacts.
 					$oEmail->AddRelatedContact($oPerson);
