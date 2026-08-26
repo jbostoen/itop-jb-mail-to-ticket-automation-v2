@@ -566,8 +566,11 @@ abstract class ProcessingHelper {
 		//   Some steps may set info on the Ticket or derive the caller; other steps may block further processing.
 		//   The order in which these actions are executed, is important.
 			
+			// Class name is used as a deterministic tiebreaker: without it, the relative order of
+			// Steps sharing the same $iPrecedence would depend on get_declared_classes()/autoloader
+			// order, which isn't guaranteed stable across environments or PHP versions.
 			usort($aStepClasses, function($sClassNameA, $sClassNameB) {
-				return $sClassNameA::$iPrecedence <=> $sClassNameB::$iPrecedence;
+				return [$sClassNameA::$iPrecedence, $sClassNameA] <=> [$sClassNameB::$iPrecedence, $sClassNameB];
 			});
 		
 		// - This is extra info.
