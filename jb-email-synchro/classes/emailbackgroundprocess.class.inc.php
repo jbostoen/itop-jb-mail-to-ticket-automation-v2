@@ -561,7 +561,10 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 							$this->LogProcessException($e, $oSource);
 
-							throw $e;
+							// Don't let one message's failure abort the entire cron run: move on to the next
+							// message. The mailbox's IMAP connection is still valid and reused by the rest of
+							// this foreach, so it's not disconnected here (unlike the IMAP-error path above).
+							continue;
 						}
 						
 					}
