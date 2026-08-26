@@ -187,7 +187,7 @@ abstract class NonDeliveryReport extends Base {
 		// A failed SPF/DKIM check on the enclosing bounce message means the embedded From:
 		// header checked below - itself just attacker-suppliable content inside this message -
 		// can't be trusted as genuine either.
-		if(preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $oRawEmail->GetHeader('authentication-results'))) {
+		if($oRawEmail->HasFailedAuthentication()) {
 			return false;
 		}
 

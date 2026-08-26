@@ -54,7 +54,7 @@ abstract class OtherEmailCallerThanTicketCaller extends Base {
 			// authenticated by SMTP, so an attacker who knows the caller's address and the ticket
 			// reference could otherwise get spoofed content appended to the ticket's public log.
 			$oRawEmail = ProcessingHelper::GetRawMail();
-			if(preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $oRawEmail->GetHeader('authentication-results'))) {
+			if($oRawEmail->HasFailedAuthentication()) {
 
 				static::Trace(". Ticket caller's email address matches the sender's, but the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
 				static::HandleViolation();

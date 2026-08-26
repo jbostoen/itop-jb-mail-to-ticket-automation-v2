@@ -338,6 +338,18 @@ class RawEmailMessage {
 	public function GetHeaders() {
 		return $aHeaders = $this->aHeaders;
 	}
+
+	/**
+	 * Whether the receiving mail server reported a failed SPF or DKIM check for this message,
+	 * via the 'Authentication-Results' header (RFC 8601). A sender's 'From:' address is not
+	 * authenticated by SMTP itself, so this is the only signal available to distrust it.
+	 *
+	 * @return bool True if 'Authentication-Results' reports spf=fail, spf=softfail, dkim=fail
+	 *              or dkim=softfail; false otherwise (including when the header is absent).
+	 */
+	public function HasFailedAuthentication() : bool {
+		return preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $this->GetHeader('authentication-results')) === 1;
+	}
 	
 	/**
 	 * Gets the full hierarchical structure of the message
