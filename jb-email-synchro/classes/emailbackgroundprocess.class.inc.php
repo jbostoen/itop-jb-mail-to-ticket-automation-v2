@@ -468,16 +468,30 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 												$iTotalMoved++;
 												$this->Trace("Move message (and replica): $sUIDL / index $iMessage");
+												$bMoved = false;
 												try {
 													$sTargetFolder = $oInbox->Get('target_folder');
-													$ret = $oSource->MoveMessage($oMsgHandler, $sTargetFolder);
+													$bMoved = (bool) $oSource->MoveMessage($oMsgHandler, $sTargetFolder);
 												}
 												catch(Exception $e) {
 													$this->Trace("Unable to move message");
 												}
-												if(!$oEmailReplica->IsNew()) {
-													$aReplicas[$sUIDL] = $oEmailReplica;
+												if($bMoved) {
+													// Persist the replica even for a brand-new message: the moved
+													// message still physically exists (just in another folder), so
+													// without a replica row, a mailbox config also watching the
+													// target folder would see it as unprocessed and could create a
+													// duplicate ticket for it.
+													$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'ok', $oRawEmail);
 												}
+												else {
+													// The move didn't actually happen: don't mark the replica 'ok',
+													// that would claim success for a message that's still sitting
+													// unmoved in its original folder.
+													$this->Trace("Move failed; marking the message (and replica) as in error instead of 'ok'.");
+													$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
+												}
+												$aReplicas[$sUIDL] = $oEmailReplica;
 												break;
 											
 											// @todo Seems to be unused in this fork. Clean up?
