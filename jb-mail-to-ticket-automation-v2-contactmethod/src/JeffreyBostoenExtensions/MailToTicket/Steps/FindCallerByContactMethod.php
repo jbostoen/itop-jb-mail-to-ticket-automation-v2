@@ -142,9 +142,10 @@ abstract class StepFindCallerByContactMethod extends Base {
 			return;
 		}
 
-		static::Trace(". Update person {$oPerson->Get('friendlyname')} - Set primary e-mail to {$sCallerEmail}");
-		$oPerson->Set('email', $sCallerEmail);
-		$oPerson->DBUpdate();
+		// Don't promote the matched contact method to the person's primary e-mail address:
+		// a secondary/alternate contact method match is weaker evidence than an explicit
+		// request to change a primary address (mirrors FindAdditionalContactsByContactMethod).
+		static::Trace(". Set caller to {$oPerson->Get('friendlyname')} (matched via secondary contact method '{$sCallerEmail}').");
 
 		// Set caller for email
 		$oEmail->SetSender($oPerson);
