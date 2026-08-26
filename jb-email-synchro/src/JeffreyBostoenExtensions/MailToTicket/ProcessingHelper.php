@@ -787,15 +787,15 @@ abstract class ProcessingHelper {
 			
 				$sSubject = '[iTop] Failed to decode an incoming e-mail (mail inbox: '.$oInbox->GetName().')';
 				$sBody = '<p>The following eMail (see attachment) was not decoded properly and therefore was not processed at all.</p>';
-				$sBody .= '<ul><li>'.implode('</li><li>', $oEmail->GetInvalidReasons()).'</li></ul>';
+				$sBody .= '<ul><li>'.implode('</li><li>', array_map('htmlspecialchars', $oEmail->GetInvalidReasons())).'</li></ul>';
 				$sBody .= $sLastAction;
 				break;
-			
-			
+
+
 			case 'failed_to_create_contact':
-			
-				$sSubject = '[iTop] Failed to create a contact for the incoming e-mail - '.$oEmail->sSubject;
-				$sBody = "<p>The following email (see attachment) comes from an unknown caller (".$oEmail->sCallerEmail.").<br/>\n";
+
+				$sSubject = '[iTop] Failed to create a contact for the incoming e-mail - '.htmlspecialchars($oEmail->sSubject);
+				$sBody = "<p>The following email (see attachment) comes from an unknown caller (".htmlspecialchars($oEmail->sCallerEmail).").<br/>\n";
 				$sBody .= "The configuration of the Mail Inbox ".$oInbox->GetName()." instructs to create a new contact based on some default values, but this creation was not successful.<br/>\n";
 				$sBody .= "Check the contact's default values configured in the Mail Inbox.</p>\n";
 				$sBody .= $sLastAction;
@@ -804,7 +804,7 @@ abstract class ProcessingHelper {
 			
 			case 'rejected_attachments':
 			
-				$sSubject = '[iTop] Failed to process attachment(s) for the incoming e-mail - '.$oEmail->sSubject;
+				$sSubject = '[iTop] Failed to process attachment(s) for the incoming e-mail - '.htmlspecialchars($oEmail->sSubject);
 				$sBody = "<p>Some attachments to the eMail were not processed because they are too big:</p>\n";
 				$oInbox->sLastError = $sAdditionalErrorMessage;
 				$sBody .= "<pre>".$sAdditionalErrorMessage."</pre>\n";
@@ -825,7 +825,7 @@ abstract class ProcessingHelper {
 			 
 			case 'undesired_message':
 			
-				$sSubject = '[iTop] Undesired message - '.$oEmail->sSubject;
+				$sSubject = '[iTop] Undesired message - '.htmlspecialchars($oEmail->sSubject);
 				$sBody = "<p>The attached message was rejected because it is considered as undesired, based on the 'undesired_subject_patterns' specified in the iTop configuration file.</p>\n";
 				$sBody .= $sLastAction;
 				
