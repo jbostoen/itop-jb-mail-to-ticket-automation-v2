@@ -364,6 +364,7 @@ try {
 				}
 				
 				foreach($aInternalIdentifiers as $sUIDL) {
+					$bDeletedFromMailbox = true;
 					if($sOperation === 'mailbox_delete_messages') {
 
 						/** @var MessageHandler[] $aMessages */
@@ -373,8 +374,16 @@ try {
 
 						if($oMsgHandler) {
 							// Delete the actual email from the mailbox.
-							$oMsgHandler->DeleteMessage();
+							$bDeletedFromMailbox = $oMsgHandler->DeleteMessage();
 						}
+					}
+					if(!$bDeletedFromMailbox) {
+						// The IMAP delete failed: keep the replica, otherwise the still-present message would
+						// be treated as brand-new (and potentially recreate a ticket) on the next cron run.
+						$sMessage = "Could not delete message from the mailbox: {$sUIDL}. The replica was kept.";
+						$oInbox->Trace($sMessage);
+						$oPage->add($sMessage);
+						continue;
 					}
 					if(array_key_exists($sUIDL, $aReplicas)) {
 						// A replica exists for the given email, let's remove it.
