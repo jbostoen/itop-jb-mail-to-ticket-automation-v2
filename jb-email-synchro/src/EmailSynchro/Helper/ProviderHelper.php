@@ -28,6 +28,13 @@ class ProviderHelper {
 			throw new IdentityProviderException('Not prior authentication to OAuth', 255, []);
 		}
 
+		// Reuse the current token while it's still valid. Refreshing it on every call (this
+		// runs on every mailbox poll, by default every 30 seconds) risks triggering the identity
+		// provider's rate-limiting/abuse protection, which can invalidate the refresh token.
+		if(!$oProvider->GetAccessToken()->hasExpired()) {
+			return $oProvider->GetAccessToken()->getToken();
+		}
+
 		$oProvider->SetAccessToken($oProvider->GetVendorProvider()->getAccessToken('refresh_token', [
 			'refresh_token' => $oProvider->GetAccessToken()->getRefreshToken(),
 			'scope' => $oProvider->GetScope()

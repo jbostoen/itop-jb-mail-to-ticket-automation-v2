@@ -43,7 +43,10 @@ class IMAPOAuthEmailSource extends IMAPEmailSource {
 		}
 
 		if (empty($this->sAccessToken)) {
-			IssueLog::Error('No OAuth token for IMAP for provider '.$oProvider::GetVendorName(), static::LOG_CHANNEL);
+			// Don't fall through to an IMAP connection attempt with no usable credential:
+			// that would surface as a confusing low-level IMAP auth error rather than this
+			// actual, already-logged OAuth failure.
+			throw new IdentityProviderException('No OAuth token for IMAP for provider '.$oProvider::GetVendorName(), 255, []);
 		}
 
 		parent::__construct($oMailbox);
