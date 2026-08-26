@@ -43,8 +43,9 @@ abstract class NonDeliveryReport extends Base {
 	 * @inheritDoc
 	 */
 	public static function Execute() : void {
-		
+
 		$oEmail = ProcessingHelper::GetMail();
+		$oRawEmail = ProcessingHelper::GetRawMail();
 		
 		$bMarkAsInactive = (static::GetStepSetting('mark_caller_as_inactive') == 'yes');
 		$sBehavior = static::GetStepSetting('behavior');
@@ -107,7 +108,7 @@ abstract class NonDeliveryReport extends Base {
 									$bTrusted = (strcasecmp($sRecipient, (string) $oTicket->Get('caller_id->email')) === 0);
 								}
 								else {
-									$bTrusted = static::EmbeddedOriginalSenderMatchesMailbox($oEmail);
+									$bTrusted = static::EmbeddedOriginalSenderMatchesMailbox($oEmail, $oRawEmail);
 								}
 
 								if(!$bTrusted) {
@@ -178,9 +179,17 @@ abstract class NonDeliveryReport extends Base {
 	 * when no ticket is linked to anchor the check against instead.
 	 *
 	 * @param EmailMessage $oEmail
+	 * @param RawEmailMessage $oRawEmail The raw, enclosing bounce message (not the embedded part).
 	 * @return bool
 	 */
-	private static function EmbeddedOriginalSenderMatchesMailbox(EmailMessage $oEmail) : bool {
+	private static function EmbeddedOriginalSenderMatchesMailbox(EmailMessage $oEmail, RawEmailMessage $oRawEmail) : bool {
+
+		// A failed SPF/DKIM check on the enclosing bounce message means the embedded From:
+		// header checked below - itself just attacker-suppliable content inside this message -
+		// can't be trusted as genuine either.
+		if(preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $oRawEmail->GetHeader('authentication-results'))) {
+			return false;
+		}
 
 		$aAliases = array_map('strtolower', static::GetMailBoxAliases());
 
