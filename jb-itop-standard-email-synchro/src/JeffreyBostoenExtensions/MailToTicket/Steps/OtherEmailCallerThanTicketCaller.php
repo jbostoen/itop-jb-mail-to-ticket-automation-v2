@@ -39,17 +39,29 @@ abstract class OtherEmailCallerThanTicketCaller extends Base {
 		$oEmail = ProcessingHelper::GetMail();
 		
 		if($oTicket !== null) {
-			
+
 			// Other caller?
 			$sTicketCallerEmail = $oTicket->Get('caller_id->email');
 			if(strcasecmp($sTicketCallerEmail, $oEmail->sCallerEmail) !== 0) {
-				
+
 				static::Trace('.. Ticket caller\'s email address is different from the sender\'s email address.');
 				static::HandleViolation();
 				return;
-			
+
 			}
-		
+
+			// A sender address matching the ticket caller's is not sufficient trust: From: is not
+			// authenticated by SMTP, so an attacker who knows the caller's address and the ticket
+			// reference could otherwise get spoofed content appended to the ticket's public log.
+			$oRawEmail = ProcessingHelper::GetRawMail();
+			if(preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $oRawEmail->GetHeader('authentication-results'))) {
+
+				static::Trace(". Ticket caller's email address matches the sender's, but the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
+				static::HandleViolation();
+				return;
+
+			}
+
 		}
 		
 	}
