@@ -154,9 +154,11 @@ abstract class NonDeliveryReport extends Base {
 
 						}
 
-						// Handle behavior.
+						// Handle behavior. Return: don't let a second matching delivery-status part in the
+						// same message trigger another (e.g. bounce) violation for it.
 						static::HandleViolation();
-					
+						return;
+
 					}
 					
 				}
