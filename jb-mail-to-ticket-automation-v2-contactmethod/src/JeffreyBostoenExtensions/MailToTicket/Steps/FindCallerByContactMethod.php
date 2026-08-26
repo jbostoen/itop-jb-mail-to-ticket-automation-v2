@@ -61,7 +61,7 @@ abstract class StepFindCallerByContactMethod extends Base {
 		] as $sClass => $sOQL) {
 
 			// The class must exist.
-			if(MetaModel::IsValidClass($sClass) == true) {
+			if(MetaModel::IsValidClass($sClass)) {
 
 				// Find person objects; oldest first.
 				$oFilter_Person = DBObjectSearch::FromOQL_AllData($sOQL);
@@ -105,7 +105,7 @@ abstract class StepFindCallerByContactMethod extends Base {
 		$oRawEmail = ProcessingHelper::GetRawMail();
 	
 		// Don't even bother if jb-contactmethod is not enabled as an extension.
-		if(MetaModel::IsValidClass('ContactMethod') == false && MetaModel::IsValidClass('EmailAlias') == false) {
+		if(!MetaModel::IsValidClass('ContactMethod') && !MetaModel::IsValidClass('EmailAlias')) {
 			static::Trace(". Step not relevant: No relevant classes exist (ContactMethod, EmailAlias).");
 			return;
 		}
