@@ -121,13 +121,13 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		}
 		catch (Throwable $e) {
 			$this->Trace('Error: ' . $oProcessor->GetLastErrorSubject() . " - " . $oProcessor->GetLastErrorMessage());
-			IssueLog::Error('Email not processed for email replica of uidl "' . $oEmailReplica->Get('uidl') . '" and message_id "' . $oEmailReplica->Get('message_id') . '" : ' . $oProcessor->GetLastErrorSubject() . " - " . $oProcessor->GetLastErrorMessage());
+			$this->Trace('Email not processed for email replica of uidl "' . $oEmailReplica->Get('uidl') . '" and message_id "' . $oEmailReplica->Get('message_id') . '" : ' . $oProcessor->GetLastErrorSubject() . " - " . $oProcessor->GetLastErrorMessage());
 
 			$sMessage = $e->getMessage();
 			if(strlen($sMessage) > 10*1024) {
 				$sMessage = "Truncated message: \n".substr($sMessage, 0, 8*1024)."\n[...]\n".substr($sMessage, -2*1024);
 			}
-			IssueLog::Error($sMessage);
+			$this->Trace($sMessage);
 
 			if(strpos($e->getMessage(), 'MySQL server has gone away') === false) {
 				$oEmailReplica->Set('status', 'error');

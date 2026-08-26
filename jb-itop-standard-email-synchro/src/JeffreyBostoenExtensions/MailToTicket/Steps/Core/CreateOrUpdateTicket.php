@@ -40,7 +40,6 @@ use DBObjectSearch;
 use DBObjectSet;
 use Dict;
 use InlineImage;
-use IssueLog;
 use lnkContactToTicket;
 use MetaModel;
 use OQLException;
@@ -268,7 +267,6 @@ abstract class CreateOrUpdateTicket extends Base {
 		if($iDescriptionMaxSize !== null && mb_strlen($sTicketDescription) > $iDescriptionMaxSize) {
 
 			$sMsg = "CreateTicketFromEmail: Truncated description for [{$oTicket->Get('title')}] actual length: ".mb_strlen($sTicketDescription)." maximum: $iDescriptionMaxSize";
-		    IssueLog::Error($sMsg);
 			static::Trace($sMsg);
 
 			// Attach the original e-mail so no information is lost due to the truncated description.
