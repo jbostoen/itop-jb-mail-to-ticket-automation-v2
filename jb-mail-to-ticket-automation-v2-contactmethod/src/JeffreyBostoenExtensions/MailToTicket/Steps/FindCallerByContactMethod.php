@@ -119,7 +119,10 @@ abstract class StepFindCallerByContactMethod extends Base {
 			return;
 		}
 
-		$sCallerEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
+		// Normalize case too, for defense in depth: exact-match OQL comparisons below shouldn't
+		// depend on the DB's collation being case-insensitive (matches the mb_strtolower()
+		// normalization already used elsewhere in this codebase for comparing e-mail addresses).
+		$sCallerEmail = mb_strtolower(trim($oRawEmail->GetSender()[0]->GetEmailAddress()));
 
 		if($oRawEmail->HasFailedAuthentication()) {
 			static::Trace("Refusing to trust '{$sCallerEmail}' as a contact method match: the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
