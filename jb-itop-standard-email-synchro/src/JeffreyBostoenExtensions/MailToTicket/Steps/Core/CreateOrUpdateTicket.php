@@ -595,6 +595,7 @@ abstract class CreateOrUpdateTicket extends Base {
 				// The target format is text/html, keep the formatting, but just change the URLs
 				$aSearches = [];
 				$aReplacements = [];
+				$aUnquotedReplacementsByCID = [];
 				foreach(static::$aAddedAttachments as $sCID => $oAttachment) {
 
 					// Note: The below is the original code logic from 2016. It's unclear at this time why one case needs spaces, and the other doesn't.
@@ -617,16 +618,21 @@ abstract class CreateOrUpdateTicket extends Base {
 						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'"';
 					}
 
-					$aSearches[] = 'src=cid:'.$sCID; // Same without quotes
+					// Same without quotes: no self-terminating character follows the CID, so a plain substring
+					// search (below) would risk matching as a prefix of another attachment's longer CID. Matched
+					// instead via preg_replace_callback() against the exact, complete CID token.
 					if (class_exists('InlineImage') && ($oAttachment instanceof InlineImage)) {
 						// Inline images have a special download URL requiring the 'secret' token
-						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().INLINEIMAGE_DOWNLOAD_URL.$oAttachment->GetKey().'&s='.$oAttachment->Get('secret').'" '; // Beware: add a space at the end
+						$aUnquotedReplacementsByCID[$sCID] = 'src="'.utils::GetAbsoluteUrlAppRoot().INLINEIMAGE_DOWNLOAD_URL.$oAttachment->GetKey().'&s='.$oAttachment->Get('secret').'" '; // Beware: add a space at the end
 					}
 					else {
-						$aReplacements[] = 'src="'.utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'" '; // Beware: add a space at the end
+						$aUnquotedReplacementsByCID[$sCID] = 'src="'.utils::GetAbsoluteUrlAppRoot().ATTACHMENT_DOWNLOAD_URL.$oAttachment->GetKey().'" '; // Beware: add a space at the end
 					}
 				}
 				$sWholeText = str_replace($aSearches, $aReplacements, $sBodyText);
+				$sWholeText = preg_replace_callback('/src=cid:([^\s>]+)/i', function(array $aMatch) use ($aUnquotedReplacementsByCID) : string {
+					return $aUnquotedReplacementsByCID[$aMatch[1]] ?? $aMatch[0];
+				}, $sWholeText);
 			}
 			$sBodyText = $sWholeText;
 		}
