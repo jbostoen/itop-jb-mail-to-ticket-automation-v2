@@ -345,7 +345,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									}
 									if($iDelay <= 0) {
 										$iDelay = MetaModel::GetModuleSetting('jb-email-synchro', 'undesired_purge_delay', 7);
-										$this->Trace("\nDeleting undesired message (AND replica) due to purge delay threshold ({$iDelay}): uidl={$sUIDL} index={$iMessage}");
+										$this->Trace("\nDeleting undesired message (replica kept for the retention sweep) due to purge delay threshold ({$iDelay}): uidl={$sUIDL} index={$iMessage}");
 										$iTotalDeleted++;
 										$ret = $oMsgHandler->DeleteMessage();
 										$this->Trace("DeleteMessage() returned $ret");
@@ -374,7 +374,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								
 								case eNextAction::DELETE_MESSAGE:
 									$iTotalDeleted++;
-									$this->Trace("Deleting message (AND replica): uidl={$sUIDL} index={$iMessage}");
+									$this->Trace("Deleting message (replica kept for the retention sweep): uidl={$sUIDL} index={$iMessage}");
 									$ret = $oMsgHandler->DeleteMessage();
 									$this->Trace("DeleteMessage() returned {$ret}");
 									if(!$oEmailReplica->IsNew()) {
