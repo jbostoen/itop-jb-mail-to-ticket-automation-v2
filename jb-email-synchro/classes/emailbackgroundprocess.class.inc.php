@@ -160,8 +160,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		$iTotalDeleted = 0;
 		$iTotalMoved = 0;
         $iTotalUndesired = 0;
-		$iTotalUnreadable = 0; // Can not be red by the mail library (N° 5633)
-		
+
 		$this->Trace("-----------------------------------------------------------------------------------------");
 		$this->Trace('. '.count(ProcessingHelper::GetAvailableSteps()).' steps to process.');
 
@@ -240,16 +239,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					// Gets all UIDLs to identify EmailReplicas in iTop.
 					/** @var MessageHandler $oMsgHandler */
 					foreach($aMessages as $oMsgHandler) {
-						
-						$sUIDL = $oMsgHandler->GetInternalIdentifier();
-						
-						if(is_null($sUIDL)) {
-							$iTotalUnreadable++;
-							continue;
-						}
-						
-						$aInternalIdentifiers[] = $sUIDL;
-						
+
+						$aInternalIdentifiers[] = $oMsgHandler->GetInternalIdentifier();
+
 					}
 					
 					$aReplicas = [];
@@ -301,12 +293,6 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							$iTotalMessages++;
 
 							$sUIDL = $oMsgHandler->GetInternalIdentifier();
-							if(is_null($sUIDL)) {
-								$this->Trace('Invalid UIDL.');
-								continue; // invalid email, see \EmailSource::GetListing and N°5633
-							}
-							
-							$sUIDL = $sUIDL;
 
 							/** @var EmailReplica|null $oEmailReplica */
 							$oEmailReplica = $aReplicas[$sUIDL] ?? null;
@@ -620,7 +606,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 				
 			}
 		}
-		return "Message(s) read: $iTotalMessages, message(s) skipped: $iTotalSkippedError in error / $iTotalSkippedIgnored ignored / $iTotalSkippedUndesired undesired, message(s) processed: $iTotalProcessed, message(s) deleted: $iTotalDeleted, message(s) marked as error: $iTotalMarkedAsError, undesired message(s): $iTotalUndesired, message(s) moved: $iTotalMoved, unreadable: $iTotalUnreadable";
+		return "Message(s) read: $iTotalMessages, message(s) skipped: $iTotalSkippedError in error / $iTotalSkippedIgnored ignored / $iTotalSkippedUndesired undesired, message(s) processed: $iTotalProcessed, message(s) deleted: $iTotalDeleted, message(s) marked as error: $iTotalMarkedAsError, undesired message(s): $iTotalUndesired, message(s) moved: $iTotalMoved";
 	}
 	
 	/**
