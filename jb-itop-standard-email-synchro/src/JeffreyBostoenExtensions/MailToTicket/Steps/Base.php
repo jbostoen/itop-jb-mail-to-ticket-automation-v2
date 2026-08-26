@@ -10,6 +10,7 @@ namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
 use JeffreyBostoenExtensions\MailToTicket\{
 	eNextAction,
+	Helper,
 	ProcessingHelper
 };
 
@@ -55,14 +56,7 @@ enum PolicyBehavior : string {
  * Class Step. An abstract class defining a step (an action to take in the processing of the e-mail).
  */
 abstract class Base implements iStep {
-	
-    /**
-     * @var string NEWLINE_REGEX 
-     * Regular expression to split on new lines, supporting different formats (Unix, Windows, etc.).  
-     * Used for splitting the mailbox aliases configured in the mailbox properties.
-     */
-    const NEWLINE_REGEX = '/\r\n|\r|\n/';
-	
+
 	/**
 	 * @var int $iPrecedence It's not necessary that this number is unique; but when all steps are listed; they will be sorted ascending (intended to make sure some checks run first; before others).
 	 */
@@ -181,7 +175,7 @@ abstract class Base implements iStep {
 	 */
 	public static function ParseAttributeValues(string $sRawValues, array $aExtraPlaceholders = []) : array {
 
-		$aLines = preg_split(static::NEWLINE_REGEX, $sRawValues);
+		$aLines = Helper::SplitByLine($sRawValues);
 		$aValues = [];
 
 		foreach($aLines as $sLine) {
@@ -250,7 +244,7 @@ abstract class Base implements iStep {
 		
 		// Retrieve the configured aliases.
 		$sMailBoxAliases = $oMailBox->Get('mail_aliases');
-		$aMailBoxAliases = (trim($sMailBoxAliases) == '' ? [] : preg_split(static::NEWLINE_REGEX, $sMailBoxAliases));
+		$aMailBoxAliases = (trim($sMailBoxAliases) == '' ? [] : Helper::SplitByLine($sMailBoxAliases));
 
 		// Also retrieve the actual mailbox.
 		$aMailBoxAliases[] = $oMailBox->Get('login');
@@ -360,19 +354,6 @@ abstract class Base implements iStep {
 	public static function IsApplicable() : bool {
 
 		return true;
-
-	}
-
-
-	/**
-	 * A helper method to split by line.
-	 *
-	 * @param string $sContent
-	 * @return array
-	 */
-	public static function SplitByLine(string $sContent) : array {
-
-		return preg_split(static::NEWLINE_REGEX, $sContent);
 
 	}
 

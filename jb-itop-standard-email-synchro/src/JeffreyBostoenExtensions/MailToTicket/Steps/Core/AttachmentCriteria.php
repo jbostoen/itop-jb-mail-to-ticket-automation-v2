@@ -14,6 +14,7 @@ use JeffreyBostoenExtensions\MailToTicket\Steps\{
 };
 
 use JeffreyBostoenExtensions\MailToTicket\{
+	Helper,
 	ProcessingHelper
 };
 
@@ -84,7 +85,7 @@ abstract class AttachmentCriteria extends Base {
 
 
 			$sMimeTypes = static::GetStepSetting('exclude_mimetypes');
-			$aMimeTypes = preg_split(static::NEWLINE_REGEX, $sMimeTypes);
+			$aMimeTypes = Helper::SplitByLine($sMimeTypes);
 
 			static::Trace('Excluded MIME types: %1$s', implode(', ', $aMimeTypes));
 

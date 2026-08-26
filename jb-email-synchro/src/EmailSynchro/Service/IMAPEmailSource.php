@@ -72,7 +72,7 @@ class IMAPEmailSource extends EmailSource {
 		$this->sPassword = $this->sAccessToken ?? $oMailbox->Get('password');
 
 		IssueLog::Debug("IMAPEmailSource Start for $this->sServer", static::LOG_CHANNEL);
-		$aImapOptions = preg_split('/\\r\\n|\\r|\\n/', $oMailbox->Get('imap_options'));
+		$aImapOptions = Helper::SplitByLine($oMailbox->Get('imap_options'));
 
 		$sSSL = match(true) {
 			in_array('ssl', $aImapOptions) => 'ssl',

@@ -9,6 +9,7 @@
 namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
 use JeffreyBostoenExtensions\MailToTicket\{
+	Helper,
 	ProcessingHelper
 };
 
@@ -43,7 +44,7 @@ abstract class RemoveTitlePatterns extends Base {
 			if($sPatterns !== '' ) {
 			
 				// Go over each pattern and check.
-				$aPatterns = preg_split(static::NEWLINE_REGEX, $sPatterns); 
+				$aPatterns = Helper::SplitByLine($sPatterns);
 				$sMailSubject = $oEmail->sSubject;
 				
 				foreach($aPatterns as $sPattern) {

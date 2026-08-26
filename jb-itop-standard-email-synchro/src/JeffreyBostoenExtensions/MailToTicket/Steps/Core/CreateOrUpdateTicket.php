@@ -14,6 +14,7 @@ use JeffreyBostoenExtensions\MailToTicket\Steps\{
 };
 use JeffreyBostoenExtensions\MailToTicket\{
 	eNextAction,
+	Helper,
 	ProcessingHelper
 };
 
@@ -752,7 +753,7 @@ abstract class CreateOrUpdateTicket extends Base {
 			return;
 		}
 	
-		$aConf = preg_split(static::NEWLINE_REGEX, $sConf);
+		$aConf = Helper::SplitByLine($sConf);
 		$aStateToStimulus = [];
 		foreach($aConf as $sLine) {
 			if (preg_match('/^([^:]+):(.*)$/', $sLine, $aMatches))

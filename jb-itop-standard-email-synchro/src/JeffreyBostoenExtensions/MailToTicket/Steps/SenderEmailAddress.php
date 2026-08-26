@@ -9,6 +9,7 @@
 namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
 use JeffreyBostoenExtensions\MailToTicket\{
+	Helper,
 	ProcessingHelper
 };
 
@@ -51,7 +52,7 @@ abstract class SenderEmailAddress extends Base {
 			return;
 		}
 
-		$aPatterns = preg_split(static::NEWLINE_REGEX, $sPatterns);
+		$aPatterns = Helper::SplitByLine($sPatterns);
 		
 		foreach($aPatterns as $sPattern) {
 

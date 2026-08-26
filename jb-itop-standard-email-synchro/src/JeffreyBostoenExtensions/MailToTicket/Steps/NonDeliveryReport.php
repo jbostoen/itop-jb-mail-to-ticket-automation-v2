@@ -9,6 +9,7 @@
 namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
 use JeffreyBostoenExtensions\MailToTicket\{
+	Helper,
 	ProcessingHelper
 };
 
@@ -67,7 +68,7 @@ abstract class NonDeliveryReport extends Base {
 					static::Trace('.. Found a permanent Non-Delivery Report - Status code '.$sCode);
 					
 					// Log any permantent failure. This may also show cases in the logs that aren't handled yet; or that should not be handled.
-					static::Trace('.. '.preg_replace(static::NEWLINE_REGEX, '$0.. ', $sContent));
+					static::Trace('.. '.preg_replace(Helper::NEWLINE_REGEX, '$0.. ', $sContent));
 					
 					// Try to be more certain.
 					// This logic may need to be improved in the future.

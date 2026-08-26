@@ -14,7 +14,22 @@ use MetaMOdel;
  * Class Helper. A helper class.
  */
 abstract class Helper {
-    
+
+	/** @var string NEWLINE_REGEX Regular expression to split on new lines, supporting different formats (Unix, Windows, old Mac). */
+	const NEWLINE_REGEX = '/\r\n|\r|\n/';
+
+	/**
+	 * Splits a multi-line setting into an array of lines, trimmed of leading/trailing whitespace.
+	 *
+	 * @param string $sContent
+	 *
+	 * @return string[]
+	 */
+	public static function SplitByLine(string $sContent) : array {
+
+		return array_map('trim', preg_split(static::NEWLINE_REGEX, $sContent));
+
+	}
 
 	/**
 	 * Returns the value of the "use_message_id_as_uid" setting.

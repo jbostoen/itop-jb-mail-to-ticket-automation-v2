@@ -8,6 +8,7 @@
 
 namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
+use JeffreyBostoenExtensions\MailToTicket\Helper;
 use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 
 // iTop classes.
@@ -60,7 +61,7 @@ abstract class UnknownTicketReference extends Base {
 				
 				if(trim($sPatterns) !== '') {
 					
-					$aPatterns = preg_split(static::NEWLINE_REGEX, $sPatterns);
+					$aPatterns = Helper::SplitByLine($sPatterns);
 					
 					static::Trace("Ignoring patterns (defined in {$sAttCode}): {$sPatterns}");
 					

@@ -9,6 +9,7 @@
 namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
 use JeffreyBostoenExtensions\MailToTicket\{
+	Helper,
 	ProcessingHelper
 };
 
@@ -70,7 +71,7 @@ abstract class AttachmentForbiddenMimeType extends Base {
 			}
 			else {
 				
-				$aForbiddenMimeTypes = preg_split(static::NEWLINE_REGEX, $sForbiddenMimeTypes);
+				$aForbiddenMimeTypes = Helper::SplitByLine($sForbiddenMimeTypes);
 				$aForbiddenMimeTypes = array_map(fn(string $sMimeType) : string => strtolower(trim($sMimeType)), $aForbiddenMimeTypes);
 
 				static::Trace('.. Forbidden MimeTypes: '. implode(' - ', $aForbiddenMimeTypes));
