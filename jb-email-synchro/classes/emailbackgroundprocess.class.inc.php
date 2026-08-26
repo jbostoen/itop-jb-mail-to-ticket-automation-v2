@@ -334,6 +334,14 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 											$iDate = $oDate->getTimestamp();
 											$iDelay -= time() - $iDate;
 										}
+										else {
+											// No usable message_date to measure elapsed time against: back-fill it
+											// with the current time so the delay can start decaying from the next
+											// run onward, instead of being recomputed from the full configured
+											// delay indefinitely (which would stall the purge forever).
+											$oEmailReplica->SetCurrentDate('message_date');
+											$oEmailReplica->DBWrite();
+										}
 									}
 									if($iDelay <= 0) {
 										$iDelay = MetaModel::GetModuleSetting('jb-email-synchro', 'undesired_purge_delay', 7);
