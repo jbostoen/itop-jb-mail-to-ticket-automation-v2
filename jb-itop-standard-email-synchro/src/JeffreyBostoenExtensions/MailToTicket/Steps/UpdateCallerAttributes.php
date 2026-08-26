@@ -46,7 +46,7 @@ abstract class UpdateCallerAttributes extends Base {
 
 		$oRawEmail = ProcessingHelper::GetRawMail();
 
-		if(preg_match('/\b(spf|dkim)=fail\b/i', $oRawEmail->GetHeader('authentication-results'))) {
+		if(preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $oRawEmail->GetHeader('authentication-results'))) {
 			static::Trace(".. Refusing to update Person::{$oCaller->GetKey()}'s attributes: the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
 			return;
 		}
