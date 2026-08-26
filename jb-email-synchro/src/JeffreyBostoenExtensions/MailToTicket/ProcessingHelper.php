@@ -905,9 +905,9 @@ abstract class ProcessingHelper {
 
 		
 			$aArgs = array('this' => $oObj->ToArgs());
-			$aValues = $oAttDef->GetAllowedValues($aArgs);
+			$aAllowedValues = $oAttDef->GetAllowedValues($aArgs);
 
-			if($aValues == null) {
+			if($aAllowedValues === null) {
 
 				// No special constraint for this attribute
 				if($oAttDef->IsExternalKey()) {
@@ -938,20 +938,22 @@ abstract class ProcessingHelper {
 
 					$iIntVal = (int)$value;
 					$bByKey = false;
-					if(is_numeric($value) && ($iIntVal == $value)) {
+					// Numeric-string comparison via explicit string casts on both sides, rather than
+					// a loose int/string ==, so this doesn't rely on PHP's implicit type juggling.
+					if(is_numeric($value) && ((string) $iIntVal === (string) $value)) {
 						// A numeric value is supposed to be the object's key
 						$bByKey = true;
 					}
-					foreach($aValues as $id => $sName) {
+					foreach($aAllowedValues as $id => $sName) {
 						if($bByKey) {
 							if($id === $iIntVal) {
 								$bFound = true;
 								$oObj->Set($sAttCode, $id);
-								break;										
+								break;
 							}
 						}
 						else {
-							if(strcasecmp($sName,$value) == 0) {
+							if(strcasecmp($sName,$value) === 0) {
 								$bFound = true;
 								$oObj->Set($sAttCode, $id);
 								break;
@@ -961,9 +963,12 @@ abstract class ProcessingHelper {
 				}
 				elseif($oAttDef instanceof AttributeEnum) {
 
-					// For enums the allowed values are value => label.
-					foreach($aValues as $allowedValue => $sLocalizedLabel) {
-						if(($allowedValue == $value) || ($sLocalizedLabel == $value)) {
+					// For enums the allowed values are value => label. PHP auto-casts purely-numeric
+					// array keys to int, while $value (parsed from an admin-configured string) is
+					// always a string; compare via explicit string casts rather than a loose ==, so
+					// an enum whose value happens to look like an integer still matches correctly.
+					foreach($aAllowedValues as $allowedValue => $sLocalizedLabel) {
+						if(((string) $allowedValue === (string) $value) || ((string) $sLocalizedLabel === (string) $value)) {
 							$bFound = true;
 							$oObj->Set($sAttCode, $allowedValue);
 							break;
@@ -971,8 +976,8 @@ abstract class ProcessingHelper {
 					}
 				}
 				elseif($oAttDef->IsScalar()) {
-					foreach($aValues as $allowedValue) {
-						if($allowedValue == $value) {
+					foreach($aAllowedValues as $allowedValue) {
+						if((string) $allowedValue === (string) $value) {
 							$bFound = true;
 							$oObj->Set($sAttCode, $value);
 							break;
