@@ -74,7 +74,10 @@ abstract class OtherRecipients extends Base {
 							
 							// Regular e-mail address? Make case insensitive pattern
 							if(filter_var($sPattern, FILTER_VALIDATE_EMAIL) == true) {
-								$sPattern = '/^'.preg_quote($sPattern).'$/i';
+								// Escape the '/' delimiter too: it's valid, unquoted RFC 5322 atext in a
+								// local-part (e.g. "john/doe@example.com"), so an unescaped one would break
+								// the pattern's delimiters.
+								$sPattern = '/^'.preg_quote($sPattern, '/').'$/i';
 							}
 							$oPregMatch = @preg_match($sPattern, $sCurrentEmail);
 							
