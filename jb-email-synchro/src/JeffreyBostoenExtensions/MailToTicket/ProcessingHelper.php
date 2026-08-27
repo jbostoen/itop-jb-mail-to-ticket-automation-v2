@@ -820,25 +820,27 @@ abstract class ProcessingHelper {
 					$oEmailToSend = new Email();
 					$oEmailToSend->SetRecipientTO($sTo);
 					$oEmailToSend->SetSubject($sSubject);
-					$oEmailToSend->SetBody($sBody, 'text/html');	
+					$oEmailToSend->SetBody($sBody, 'text/html');
 					$oEmailToSend->SetRecipientFrom($sFrom);
+					$aIssues = array();
 					$oEmailToSend->Send($aIssues, true /* bForceSynchronous */, null /* $oLog */);
 				}
 				break;
-			 
+
 			case 'undesired_message':
-			
+
 				$sSubject = '[iTop] Undesired message - '.htmlspecialchars($oEmail->sSubject);
 				$sBody = "<p>The attached message was rejected because it is considered as undesired, based on the 'undesired_subject_patterns' specified in the iTop configuration file.</p>\n";
 				$sBody .= $sLastAction;
-				
+
 				// Send the email now...
 				if(($sTo != '') && ($sFrom != '')) {
 					$oEmailToSend = new Email();
 					$oEmailToSend->SetRecipientTO($sTo);
 					$oEmailToSend->SetSubject($sSubject);
-					$oEmailToSend->SetBody($sBody, 'text/html');	
+					$oEmailToSend->SetBody($sBody, 'text/html');
 					$oEmailToSend->SetRecipientFrom($sFrom);
+					$aIssues = array();
 					$oEmailToSend->Send($aIssues, true /* bForceSynchronous */, null /* $oLog */);
 				}
 				
