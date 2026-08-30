@@ -119,18 +119,22 @@ abstract class Base implements iStep {
 
 	/**
 	 * Replace email placeholders in a string.
-	 * 
+	 *
 	 * @param string $sString Input string.
 	 * @param array $aExtraPlaceholders Optional: extra place holders.
+	 * @param bool $bEscapeHtml Optional: HTML-escape placeholder values (e.g. caller-controlled subject/body) before
+	 *   substitution. Required whenever $sString will be sent/rendered as HTML (e.g. a bounce notification body),
+	 *   so attacker-controlled e-mail content can't inject markup. Leave false for non-HTML substitutions, such as
+	 *   ticket attribute default values, where the raw value must be preserved.
 	 *
 	 * @details Also exposes some properties which are not likely to be useful (body_format) at any time, but who knows?
 	 *
 	 * @return String String where the placeholders are filled in.
 	 */
-	public static function ReplaceMailPlaceholders(string $sString, array $aExtraPlaceholders = []) {
-		
+	public static function ReplaceMailPlaceholders(string $sString, array $aExtraPlaceholders = [], bool $bEscapeHtml = false) {
+
 		$oEmail = ProcessingHelper::GetMail();
-		
+
 		$aParams = [
 			'mail->uidl' => $oEmail->sUIDL,
 			'mail->message_id' => $oEmail->sMessageId,
@@ -148,16 +152,24 @@ abstract class Base implements iStep {
 		if($oEmail->GetSender() !== null) {
 			$aParams['sender->object()'] = $oEmail->GetSender();
 		}
-		
+
 		$aParams = array_merge($aParams, $aExtraPlaceholders);
-		
+
+		if($bEscapeHtml) {
+			foreach($aParams as $sParam => $sValue) {
+				if(is_string($sValue)) {
+					$aParams[$sParam] = htmlspecialchars($sValue, ENT_QUOTES, 'UTF-8');
+				}
+			}
+		}
+
 		// Extend. This is to allow for both the original parameter and the HTML-encoded version of it.
 		$aParamsExtended = [];
 		foreach($aParams as $sParam => $sValue) {
 			$aParamsExtended[$sParam] = $sValue;
 			$aParamsExtended[htmlentities($sParam)] = $sValue;
 		}
-		
+
 		return MetaModel::ApplyParams($sString, $aParamsExtended);
 
 	}
@@ -306,9 +318,13 @@ abstract class Base implements iStep {
 				}
 				elseif($oRawEmail) {
 					
-					// Allow some customization in the bounce message
+					// Allow some customization in the bounce message.
+					// The subject is a plain e-mail header, not HTML-rendered, so it's left unescaped.
+					// The body is sent as an HTML e-mail (see MessageFromMailbox::SendAsAttachment()),
+					// so caller-controlled values (subject, caller name, body text, ...) must be escaped
+					// to avoid injecting markup into it.
 					$sSubject = static::ReplaceMailPlaceholders($sSubject);
-					$sBody = static::ReplaceMailPlaceholders($sBody);
+					$sBody = static::ReplaceMailPlaceholders($sBody, [], true);
 					
 					if($sSubject == '') {
 						$sSubject = 'Message bounced - not compliant with an enforced policy.';
