@@ -702,11 +702,18 @@ abstract class ProcessingHelper {
 			}
 			
 			$sPattern = $oInbox->Get('title_pattern');
-			
+
 			// - If there are matches: Find the first matching ticket. (This will depend on the sort order from the datamodel).
-				
-				if(($sPattern != '') && (preg_match($sPattern, $sSubject, $aMatches))) {
-				
+
+				$oPregMatched = ($sPattern != '') ? @preg_match($sPattern, $sSubject, $aMatches) : null;
+
+				if($oPregMatched === false) {
+
+					$oInbox->Trace("Invalid pattern: '{$sPattern}'");
+
+				}
+				elseif(($sPattern != '') && $oPregMatched) {
+
 					$oFilter = DBSearch::FromOQL('SELECT Ticket WHERE ref = :ref');
 					foreach($aMatches as $sMatch) {
 						if(!empty($sMatch)) {
@@ -718,7 +725,7 @@ abstract class ProcessingHelper {
 							}
 						}
 					}
-					
+
 				}
 
 		}		
