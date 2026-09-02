@@ -799,6 +799,7 @@ abstract class ProcessingHelper {
 				$sBody = '<p>The following eMail (see attachment) was not decoded properly and therefore was not processed at all.</p>';
 				$sBody .= '<ul><li>'.implode('</li><li>', array_map('htmlspecialchars', $oEmail->GetInvalidReasons())).'</li></ul>';
 				$sBody .= $sLastAction;
+				$oInbox->sLastError = "Failed to decode the incoming e-mail. Reason(s): ".implode('; ', $oEmail->GetInvalidReasons());
 				break;
 
 
