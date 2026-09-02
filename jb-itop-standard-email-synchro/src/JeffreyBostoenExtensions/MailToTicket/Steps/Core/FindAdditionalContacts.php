@@ -155,7 +155,7 @@ abstract class FindAdditionalContacts extends Base {
 							}
 							catch(Exception $e) {
 								// This is an actual error.
-								static::Trace("Failed to create a Person for the email address '{$sCallerEmail}'.");
+								static::Trace("Failed to create a Person for the email address '{$sRecipientEmail}'.");
 								static::Trace($e->getMessage());
 								ProcessingHelper::HandleError('failed_to_create_contact');
 								return;
