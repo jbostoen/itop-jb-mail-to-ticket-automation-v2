@@ -235,11 +235,13 @@ function GetMailboxContent($oPage, $oInbox) {
 						$aData[] = [
 							'checkbox' => '<input type="checkbox" class="mailbox_item" value="'.htmlentities($sUIDL, ENT_QUOTES, 'UTF-8').'"/>',
 							'status' => $sStatus,
-							'date' => $oEmail->sDate,
-							'from' => $oEmail->sCallerEmail,
-							'subject' => $oEmail->sSubject,
+							// Decoded straight from the untrusted e-mail: the table renders cell values as
+							// raw HTML, so these must be escaped to prevent stored XSS via a crafted header.
+							'date' => htmlentities($oEmail->sDate, ENT_QUOTES, 'UTF-8'),
+							'from' => htmlentities($oEmail->sCallerEmail, ENT_QUOTES, 'UTF-8'),
+							'subject' => htmlentities($oEmail->sSubject, ENT_QUOTES, 'UTF-8'),
 							'ticket' => $sLink,
-							'error' => $sErrorMsg,
+							'error' => htmlentities($sErrorMsg, ENT_QUOTES, 'UTF-8'),
 							'details' => $sDetailsLink,
 							'uid' => $oMsgHandler->GetUid(),
 							'internalId' => $oMsgHandler->GetInternalIdentifier(),
