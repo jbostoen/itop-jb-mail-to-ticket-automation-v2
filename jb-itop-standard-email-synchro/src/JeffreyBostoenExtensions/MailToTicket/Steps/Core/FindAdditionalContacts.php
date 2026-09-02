@@ -154,11 +154,14 @@ abstract class FindAdditionalContacts extends Base {
 								
 							}
 							catch(Exception $e) {
-								// This is an actual error.
+								// A related contact is optional enrichment, not essential to the ticket
+								// itself (unlike the caller): skip just this recipient and keep processing
+								// the remaining ones and the rest of the pipeline, rather than calling
+								// ProcessingHelper::HandleError() and losing the entire message over a
+								// failure to create one secondary contact.
 								static::Trace("Failed to create a Person for the email address '{$sRecipientEmail}'.");
 								static::Trace($e->getMessage());
-								ProcessingHelper::HandleError('failed_to_create_contact');
-								return;
+								continue;
 							}
 
 						}
