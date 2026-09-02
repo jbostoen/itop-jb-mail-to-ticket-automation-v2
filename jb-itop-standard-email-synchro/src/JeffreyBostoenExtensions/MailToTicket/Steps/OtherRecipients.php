@@ -52,9 +52,10 @@ abstract class OtherRecipients extends Base {
 			// Mailbox aliases
 			$aMailBoxAliases = static::GetMailBoxAliases();
 			
-			// Ignore sender; helpdesk mailbox; any helpdesk mailbox aliases
-			$aAllowedContacts = array_merge([ $oEmail->sCallerEmail ], $aMailBoxAliases);
-			$aAllowedContacts = array_unique($aAllowedContacts);
+			// Ignore helpdesk mailbox; any helpdesk mailbox aliases.
+			// Note: the sender (caller) is intentionally NOT included here - see the literal
+			// comparison against $oEmail->sCallerEmail below.
+			$aAllowedContacts = array_unique($aMailBoxAliases);
 
 			$sPolicyBehavior = static::GetStepSetting('behavior');
 			
@@ -69,7 +70,14 @@ abstract class OtherRecipients extends Base {
 					foreach($aAllContacts as $oRecipient) {
 						
 						$sCurrentEmail = $oRecipient->GetEmailAddress();
-						
+
+						// The sender's own address is attacker-controlled (parsed from the From: header) and
+						// must never be used as a regex pattern, unlike the admin-configured mailbox aliases
+						// below - compare it as a literal, case-insensitive string instead.
+						if(strcasecmp($sCurrentEmail, $oEmail->sCallerEmail) === 0) {
+							continue;
+						}
+
 						foreach($aAllowedContacts as $sPattern) {
 							
 							// Regular e-mail address? Make case insensitive pattern
