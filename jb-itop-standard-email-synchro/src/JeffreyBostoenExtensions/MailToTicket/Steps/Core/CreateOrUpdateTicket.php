@@ -228,6 +228,13 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 		
 		// Max length for title
+		if(!MetaModel::IsValidAttCode($sTargetClass, 'title')) {
+
+			$sErrorMessage = "... Invalid 'target_class' configured: {$sTargetClass} has no 'title' attribute. Cannot create such an object.";
+			static::Trace($sErrorMessage);
+			throw new Exception($sErrorMessage);
+
+		}
 		$oTicketTitleAttDef = MetaModel::GetAttributeDef($sTargetClass, 'title');
 		$iTitleMaxSize = $oTicketTitleAttDef->GetMaxSize();
 		$sSubject = $oEmail->sSubject;
@@ -242,6 +249,13 @@ abstract class CreateOrUpdateTicket extends Base {
 		$sDescriptionAttCode = trim($oMailBox->Get('attcode_description'));
 		if($sDescriptionAttCode === '' || !MetaModel::IsValidAttCode($sTargetClass, $sDescriptionAttCode)) {
 			$sDescriptionAttCode = 'description';
+		}
+		if(!MetaModel::IsValidAttCode($sTargetClass, $sDescriptionAttCode)) {
+
+			$sErrorMessage = "... Invalid 'target_class' configured: {$sTargetClass} has no '{$sDescriptionAttCode}' attribute. Cannot create such an object.";
+			static::Trace($sErrorMessage);
+			throw new Exception($sErrorMessage);
+
 		}
 		$oTicketDescriptionAttDef = MetaModel::GetAttributeDef($sTargetClass, $sDescriptionAttCode);
 		$bForPlainText = true; // Target format is plain text (by default)
