@@ -72,6 +72,15 @@ abstract class FindCaller extends Base {
 				switch($oSet_Person->Count()) {
 					
 					case 1:
+
+						if($oRawEmail->HasFailedAuthentication()) {
+
+							static::Trace("Refusing to trust the matched Person for '{$sCallerEmail}' as caller: the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
+							static::HandleViolation();
+							return;
+
+						}
+
 						// Ok, the caller was found in iTop
 						static::Trace("Found person.");
 						$oCaller = $oSet_Person->Fetch();
@@ -143,10 +152,19 @@ abstract class FindCaller extends Base {
 						break;
 						
 					default:
+
+						if($oRawEmail->HasFailedAuthentication()) {
+
+							static::Trace("Refusing to trust a matched Person for '{$sCallerEmail}' as caller: the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
+							static::HandleViolation();
+							return;
+
+						}
+
 						static::Trace("Found ".$oSet_Person->Count()." callers with the same email address '{$sCallerEmail}', the first one will be used...");
 						// Multiple callers with the same email address!
 						$oCaller = $oSet_Person->Fetch();
-						
+
 				}
 				
 				// Set caller for e-mail.
