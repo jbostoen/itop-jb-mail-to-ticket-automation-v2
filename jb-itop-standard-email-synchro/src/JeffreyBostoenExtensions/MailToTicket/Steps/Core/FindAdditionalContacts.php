@@ -170,11 +170,11 @@ abstract class FindAdditionalContacts extends Base {
 						$oEmail->AddRelatedContact($oContact);
 					}
 					else {
-						// More than one Person returned. Inconclusive. Ignore?
-						static::Trace(". Multiple Persons found. Returning the first one.");
-						$oContact = $oSet_Person->Fetch();
-						$oEmail->AddRelatedContact($oContact);
-						
+						// More than one Person returned. Inconclusive: an arbitrary pick among the
+						// candidates could link the ticket to the wrong Person, so don't link any of
+						// them. Mirrors the ambiguous-match handling in FindCaller/FindCallerByContactMethod.
+						static::Trace(". Multiple Persons found for '{$sRecipientEmail}'. Ambiguous match: not adding a related contact.");
+
 					}
 					
 					

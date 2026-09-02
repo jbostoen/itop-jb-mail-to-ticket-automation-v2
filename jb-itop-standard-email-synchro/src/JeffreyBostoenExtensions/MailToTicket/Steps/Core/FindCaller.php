@@ -153,17 +153,12 @@ abstract class FindCaller extends Base {
 						
 					default:
 
-						if($oRawEmail->HasFailedAuthentication()) {
-
-							static::Trace("Refusing to trust a matched Person for '{$sCallerEmail}' as caller: the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
-							static::HandleViolation();
-							return;
-
-						}
-
-						static::Trace("Found ".$oSet_Person->Count()." callers with the same email address '{$sCallerEmail}', the first one will be used...");
-						// Multiple callers with the same email address!
-						$oCaller = $oSet_Person->Fetch();
+						// Multiple callers with the same email address! Leave $oCaller as null
+						// (set above) rather than arbitrarily picking one - an arbitrary pick among
+						// the candidates would misattribute the ticket. Mirrors the ambiguous-match
+						// handling in the companion FindCallerByContactMethod step. No SPF/DKIM check
+						// is needed here either way, since no caller is ever set in this branch.
+						static::Trace("Found ".$oSet_Person->Count()." callers with the same email address '{$sCallerEmail}'. Ambiguous match: not setting a caller.");
 
 				}
 				
