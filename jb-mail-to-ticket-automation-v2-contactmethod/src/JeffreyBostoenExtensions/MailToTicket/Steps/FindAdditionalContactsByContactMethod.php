@@ -116,7 +116,13 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 
 			// For each recipient: Try to find the person object.
 			foreach($aRemainingContacts as $sCurrentEmail) {
-			
+
+				// Normalize case and surrounding whitespace, for defense in depth: exact-match OQL
+				// comparisons in FindContactByEmail() shouldn't depend on the DB's collation being
+				// case-insensitive (matches the mb_strtolower()/trim() normalization already used in
+				// the companion FindCallerByContactMethod step, for the same reason).
+				$sCurrentEmail = mb_strtolower(trim($sCurrentEmail));
+
 				/** @var Person|null $oCaller The related person. */
 				$oPerson = StepFindCallerByContactMethod::FindContactByEmail($sCurrentEmail);
 

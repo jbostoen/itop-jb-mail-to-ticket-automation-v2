@@ -119,8 +119,13 @@ abstract class FindAdditionalContacts extends Base {
 					$sContactQuery = 'SELECT Person WHERE email = :email';
 					// Order by id so that an ambiguous match (multiple Persons sharing this email address)
 					// picks a deterministic, stable "first" result instead of an arbitrary one.
+					// Normalize case and surrounding whitespace for the lookup itself, for defense in
+					// depth: exact-match OQL comparisons shouldn't depend on the DB's collation being
+					// case-insensitive (matches the mb_strtolower()/trim() normalization already used in
+					// the companion FindCallerByContactMethod step, for the same reason). $sRecipientEmail
+					// itself is left as originally cased, e.g. for Set('email', ...) below.
 					$oSet_Person = new DBObjectSet(DBObjectSearch::FromOQL($sContactQuery), ['id' => true], [
-						'email' => $sRecipientEmail
+						'email' => mb_strtolower(trim($sRecipientEmail))
 					]);
 					
 					static::Trace(". Results for Person with email address '{$sRecipientEmail}: {$oSet_Person->Count()}");

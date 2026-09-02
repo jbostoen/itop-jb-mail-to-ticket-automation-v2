@@ -59,7 +59,11 @@ abstract class FindCaller extends Base {
 		
 			if($oCaller === null) {
 				
-				$sCallerEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
+				// Normalize case and surrounding whitespace, for defense in depth: exact-match OQL
+				// comparisons below shouldn't depend on the DB's collation being case-insensitive
+				// (matches the mb_strtolower()/trim() normalization already used in the companion
+				// FindCallerByContactMethod step, for the same reason).
+				$sCallerEmail = mb_strtolower(trim($oRawEmail->GetSender()[0]->GetEmailAddress()));
 				static::Trace("Determine caller: Person with email '{$sCallerEmail}'");
 				
 				$oCaller = null;
