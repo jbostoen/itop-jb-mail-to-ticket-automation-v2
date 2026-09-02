@@ -341,6 +341,13 @@ try {
 		case 'mailbox_reset_status':
 		case 'mailbox_delete_messages':
 
+			// CSRF protection: these operations delete/mutate data based solely on the admin
+			// session cookie, so a cross-site request forging this POST must be rejected.
+			if(!utils::IsTransactionValid(utils::ReadParam('transaction_id', '', false, 'raw_data'), false)) {
+				$oPage->add(Dict::S('UI:Error:InvalidToken'));
+				break;
+			}
+
 			if($oInbox === null) {
 				$oPage->add('Invalid or missing mailbox id.');
 				break;
@@ -401,6 +408,13 @@ try {
 			break;
 
 		case 'mailbox_ignore_messages':
+
+			// CSRF protection: this operation mutates data based solely on the admin session
+			// cookie, so a cross-site request forging this POST must be rejected.
+			if(!utils::IsTransactionValid(utils::ReadParam('transaction_id', '', false, 'raw_data'), false)) {
+				$oPage->add(Dict::S('UI:Error:InvalidToken'));
+				break;
+			}
 
 			if($oInbox === null) {
 				$oPage->add('Invalid or missing mailbox id.');

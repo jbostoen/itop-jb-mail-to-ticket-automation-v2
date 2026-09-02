@@ -161,6 +161,10 @@ novalidate-cert]]></default_value>
 			$sAjaxUrl = addslashes(utils::GetAbsoluteUrlModulesRoot().basename(dirname(__FILE__)).'/ajax.php');
 			$iId = $this->GetKey();
 			$sConfirmMessage = Dict::S('MailInbox:MailboxContent:ConfirmMessage');
+			// CSRF protection for the state-changing mailbox_reset_status/mailbox_delete_messages/mailbox_ignore_messages
+			// operations below: kept valid across the page's lifetime (not single-use), since these buttons can be used
+			// repeatedly without a full page reload, mirroring e.g. ObjectController's use of IsTransactionValid(..., false).
+			$sTransactionId = utils::GetNewTransactionId();
 			$oPage->add_script(
 <<<EOF
 function MailboxUpdateActionButtons() {
@@ -214,7 +218,7 @@ function MailboxResetStatus() {
 	var iStart = $('#mailbox_start_index').val();
 	var iCount = $('#mailbox_count').val();
 					
-	$.post('$sAjaxUrl', {operation: 'mailbox_reset_status', id: $iId, start: iStart, count: iCount, aInternalIdentifiers: aInternalIdentifiers }, function(data) {
+	$.post('$sAjaxUrl', {operation: 'mailbox_reset_status', id: $iId, start: iStart, count: iCount, aInternalIdentifiers: aInternalIdentifiers, transaction_id: '$sTransactionId' }, function(data) {
 		 MailboxRefresh(data);
 	});
 	return false;
@@ -231,7 +235,7 @@ function MailboxDeleteMessages() {
 	var iStart = $('#mailbox_start_index').val();
 	var iCount = $('#mailbox_count').val();
 					
-	$.post('$sAjaxUrl', {operation: 'mailbox_delete_messages', id: $iId, start: iStart, count: iCount, aInternalIdentifiers: aInternalIdentifiers }, function(data) {
+	$.post('$sAjaxUrl', {operation: 'mailbox_delete_messages', id: $iId, start: iStart, count: iCount, aInternalIdentifiers: aInternalIdentifiers, transaction_id: '$sTransactionId' }, function(data) {
 		 MailboxRefresh(data);
 	});
 	return false;	
@@ -248,7 +252,7 @@ function MailboxIgnoreMessages() {
 	var iStart = $('#mailbox_start_index').val();
 	var iCount = $('#mailbox_count').val();
 
-	$.post('$sAjaxUrl', {operation: 'mailbox_ignore_messages', id: $iId, start: iStart, count: iCount, aInternalIdentifiers: aInternalIdentifiers }, function(data) {
+	$.post('$sAjaxUrl', {operation: 'mailbox_ignore_messages', id: $iId, start: iStart, count: iCount, aInternalIdentifiers: aInternalIdentifiers, transaction_id: '$sTransactionId' }, function(data) {
 		 MailboxRefresh(data);
 	});
 	return false;
