@@ -512,17 +512,23 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												
 											case eNextAction::SKIP_FOR_NOW:
 											
+												// Keep an already-persisted replica's existing row untouched: deleting it
+												// here would make the still-present message look brand new on the next
+												// poll (and could result in a duplicate ticket) instead of genuinely skipped.
 												$this->Trace('Skip for now.');
-												if($oEmailReplica->IsNew() == false) {
-													$oEmailReplica->DBDelete();
+												if(!$oEmailReplica->IsNew()) {
+													$aReplicas[$sUIDL] = $oEmailReplica;
 												}
 												break 2;
 												
 											case eNextAction::ABORT_ALL_FURTHER_PROCESSING:
 
+												// Keep an already-persisted replica's existing row untouched: deleting it
+												// here would make the still-present message look brand new on the next
+												// poll (and could result in a duplicate ticket) instead of genuinely skipped.
 												$this->Trace('Abort all further processing.');
-												if($oEmailReplica->IsNew() == false) {
-													$oEmailReplica->DBDelete();
+												if(!$oEmailReplica->IsNew()) {
+													$aReplicas[$sUIDL] = $oEmailReplica;
 												}
 												$bAbortAllProcessing = true;
 												break 3;

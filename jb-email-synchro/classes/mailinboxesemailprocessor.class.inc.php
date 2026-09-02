@@ -162,9 +162,10 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 						$aErrors[] = $oInbox->sLastError;
 					}
 				}
-				else {
-					// - Other unexpected error.
-					//   Ticket creation might have failed due to a policy being violated.
+				elseif(in_array(ProcessingHelper::GetNextAction(), [eNextAction::PROCESS_MESSAGE, eNextAction::NO_ACTION], true)) {
+					// - No Ticket, and no Step claimed responsibility for this outcome either
+					//   (PROCESS_MESSAGE/NO_ACTION mean the pipeline ran to completion without any
+					//   policy deciding to skip/undesire/delete/move/abort): an actual, unexpected error.
 					$sUIDL = htmlentities($oEmail->sUIDL, ENT_QUOTES, 'UTF-8');
 					$this->sLastErrorSubject = "Failed to create a ticket for the incoming email ({$sUIDL}) (" . __METHOD__ . "). No Ticket object. ".(is_object($oResult) ? 'Class: '.get_class($oResult): 'No object.');
 					$this->sLastErrorMessage = $oInbox->sLastError;
@@ -174,6 +175,12 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 					self::Trace($sMessage);
 
 					ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
+				}
+				else {
+					// - No Ticket, but a Step already decided this e-mail's outcome (e.g. undesired,
+					//   skip for now, abort, delete, move): keep that decision instead of overriding
+					//   it with a generic error status.
+					self::Trace("No ticket created for the incoming email $index ({$oEmail->sUIDL}); next action already set by a policy step: ".ProcessingHelper::GetNextAction()->name);
 				}
 			}
 			else {
