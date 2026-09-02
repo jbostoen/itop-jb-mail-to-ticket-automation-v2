@@ -107,6 +107,13 @@ novalidate-cert]]></default_value>
 					<default_value>/</default_value>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
+				<field id="last_uidvalidity" xsi:type="AttributeString">
+					<comment>Last known IMAP UIDVALIDITY for this mailbox's folder, used to detect a server-side
+change (RFC 3501) that invalidates previously-recorded IMAP UIDs.</comment>
+					<sql>last_uidvalidity</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
 			</fields>
 			<methods>
 				<method id="__construct">

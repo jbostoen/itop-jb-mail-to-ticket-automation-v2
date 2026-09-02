@@ -237,9 +237,24 @@ class MessageHandler {
 
 			if($sInternalIdentifier === null) {
 
-				$oFrom = $oMessage->from();
-				$sSyntheticSource = ($oFrom !== null ? $oFrom->email() : '').'|'.($oMessage->subject() ?? '').'|'.($oDate !== null ? $oDate->format('Y-m-d H:i:s') : '');
-				$sInternalIdentifier = 'synthetic_'.hash('sha256', $sSyntheticSource);
+				// Hash the full raw header block (already fetched above via withHeaders(), so this
+				// needs no extra round-trip) rather than just From+Subject+Date: two distinct messages
+				// sharing the same sender, subject and Date header (truncated to second resolution -
+				// e.g. two auto-generated notifications sent by the same system in the same second)
+				// would otherwise collide on the same synthetic identifier, and the second one would be
+				// silently dropped as an apparent duplicate. The full header block (Received chain,
+				// To/Cc, every other header) is still stable across repeated polls of the same message.
+				$sRawHeaders = $oMessage->head();
+
+				if($sRawHeaders !== null && $sRawHeaders !== '') {
+					$sInternalIdentifier = 'synthetic_'.hash('sha256', $sRawHeaders);
+				}
+				else {
+					// Fallback if the raw header block itself could not be read.
+					$oFrom = $oMessage->from();
+					$sSyntheticSource = ($oFrom !== null ? $oFrom->email() : '').'|'.($oMessage->subject() ?? '').'|'.($oDate !== null ? $oDate->format('Y-m-d H:i:s') : '');
+					$sInternalIdentifier = 'synthetic_'.hash('sha256', $sSyntheticSource);
+				}
 
 			}
 

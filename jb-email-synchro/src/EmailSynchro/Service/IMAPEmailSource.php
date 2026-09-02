@@ -62,8 +62,12 @@ class IMAPEmailSource extends EmailSource {
 	/** @var bool $bMessagesDeleted Whether messages were deleted. */
 	private $bMessagesDeleted = false;
 
+	/** @var MailInboxBase The mailbox DBObject, kept for UIDVALIDITY tracking (see CheckUidValidity()). */
+	private MailInboxBase $oMailboxObject;
+
 	public function __construct(MailInboxBase $oMailbox) {
 
+		$this->oMailboxObject = $oMailbox;
 		$this->sServer = $oMailbox->Get('server');
 		$this->sLogin = $oMailbox->Get('login');
 		$this->sMailbox = $oMailbox->Get('mailbox');
@@ -102,8 +106,54 @@ class IMAPEmailSource extends EmailSource {
 		$this->oMailbox = new Mailbox($aOptions);
 		$this->oMailbox->connect();
 
+		$this->CheckUidValidity();
+
 		// Calls parent with original arguments
 		parent::__construct();
+	}
+
+	/**
+	 * Detects a server-side IMAP UIDVALIDITY change for this mailbox's folder and warns loudly
+	 * about it, rather than letting UID-based message identification (used when
+	 * Helper::UseMessageIdAsUid() is disabled for this mailbox) silently match the wrong message.
+	 *
+	 * Per RFC 3501, a server may change UIDVALIDITY at any time (e.g. after a mailbox rebuild),
+	 * at which point previously-recorded UIDs are no longer guaranteed to refer to the same
+	 * message - or may now refer to a completely different one.
+	 *
+	 * @return void
+	 */
+	private function CheckUidValidity() : void {
+
+		try {
+			$sCurrentUidValidity = (string) ($this->GetFolder()->status()['UIDVALIDITY'] ?? '');
+		}
+		catch(Exception $e) {
+			// Can't determine it right now (e.g. folder not resolvable yet); nothing to compare against.
+			return;
+		}
+
+		if($sCurrentUidValidity === '') {
+			return;
+		}
+
+		$sLastUidValidity = (string) $this->oMailboxObject->Get('last_uidvalidity');
+
+		if($sLastUidValidity !== '' && $sLastUidValidity !== $sCurrentUidValidity) {
+
+			$sMessage = "IMAP UIDVALIDITY changed for mailbox '{$this->sServer}/{$this->sMailbox}' (was {$sLastUidValidity}, now {$sCurrentUidValidity}). ".
+				"Previously-recorded IMAP UIDs for this mailbox may now refer to different messages than before. ".
+				"If 'Use Message-ID as UID' is disabled for this mailbox, verify its EmailReplica entries.";
+			IssueLog::Warning($sMessage, static::LOG_CHANNEL);
+			$this->oMailboxObject->Trace($sMessage);
+
+		}
+
+		if($sLastUidValidity !== $sCurrentUidValidity) {
+			$this->oMailboxObject->Set('last_uidvalidity', $sCurrentUidValidity);
+			$this->oMailboxObject->DBUpdate();
+		}
+
 	}
 
 
