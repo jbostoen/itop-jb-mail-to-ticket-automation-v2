@@ -11,6 +11,9 @@ use IssueLog;
 // iTop classes.
 use MailInboxBase;
 
+// Generic.
+use Throwable;
+
 class IMAPOAuthEmailSource extends IMAPEmailSource {
 
 	/** @inheritDoc */
@@ -30,13 +33,23 @@ class IMAPOAuthEmailSource extends IMAPEmailSource {
 	 */
 	public function __construct(MailInboxBase $oMailbox) {
 
-		$oProvider = ProviderHelper::GetProviderForIMAP($oMailbox);
 		$this->sAccessToken = null;
+		$sVendorName = 'unknown';
 
 		try {
+			// GetProviderForIMAP() is inside this try too: a misconfigured/missing oauth_client_id
+			// throws a CoreException (MetaModel::GetObject($bMustBeFound = true)), which otherwise
+			// wouldn't be caught at all.
+			$oProvider = ProviderHelper::GetProviderForIMAP($oMailbox);
+			$sVendorName = $oProvider::GetVendorName();
 			$this->sAccessToken = ProviderHelper::GetAccessTokenForProvider($oProvider);
-		} catch (IdentityProviderException $e) {
-			IssueLog::Error('Failed to get IMAP oAuth credentials for incoming mails for provider '.$oProvider::GetVendorName(), static::LOG_CHANNEL, [
+		}
+		catch(Throwable $e) {
+			// Catch Throwable, not just IdentityProviderException: a stored token with no expiry
+			// information throws a plain RuntimeException (AccessToken::hasExpired()), and a network
+			// failure reaching the token endpoint throws a Guzzle transfer exception - neither extends
+			// IdentityProviderException, so both would otherwise escape uncaught from here.
+			IssueLog::Error('Failed to get IMAP oAuth credentials for incoming mails for provider '.$sVendorName, static::LOG_CHANNEL, [
 				'exception.message' => $e->getMessage(),
 				'exception.stack' => $e->getTraceAsString(),
 			]);
@@ -46,7 +59,7 @@ class IMAPOAuthEmailSource extends IMAPEmailSource {
 			// Don't fall through to an IMAP connection attempt with no usable credential:
 			// that would surface as a confusing low-level IMAP auth error rather than this
 			// actual, already-logged OAuth failure.
-			throw new IdentityProviderException('No OAuth token for IMAP for provider '.$oProvider::GetVendorName(), 255, []);
+			throw new IdentityProviderException('No OAuth token for IMAP for provider '.$sVendorName, 255, []);
 		}
 
 		parent::__construct($oMailbox);
