@@ -18,6 +18,7 @@ use JeffreyBostoenExtensions\MailToTicket\{
 use DBObjectSearch;
 use DBOBjectSet;
 use EmailMessage;
+use EmailReplica;
 use RawEmailMessage;
 use Exception;
 
@@ -52,7 +53,9 @@ abstract class NonDeliveryReport extends Base {
 		
 		foreach($oEmail->aAttachments as $aAttachment) {
 			
-			if($aAttachment['mimeType'] == 'message/delivery-status') {
+			// MIME type tokens are case-insensitive (RFC 2045); compare accordingly, like
+			// AttachmentForbiddenMimeType::GetEffectiveMimeTypes() does for the same reason.
+			if(strtolower(trim($aAttachment['mimeType'])) === 'message/delivery-status') {
 				
 				$sContent = $aAttachment['content'];
 				
@@ -105,10 +108,17 @@ abstract class NonDeliveryReport extends Base {
 								$oTicket = ProcessingHelper::GetTicket();
 
 								if($oTicket !== null) {
-									$bTrusted = (strcasecmp($sRecipient, (string) $oTicket->Get('caller_id->email')) === 0);
+
+									// A matched ticket only proves this message references a Message-ID this
+									// mailbox itself issued for that ticket; it says nothing about whether the
+									// "Final-Recipient" claim below is genuine. Require the outer bounce to have
+									// passed SPF/DKIM too, consistent with the no-ticket branch below.
+									$bTrusted = !$oRawEmail->HasFailedAuthentication()
+										&& (strcasecmp($sRecipient, (string) $oTicket->Get('caller_id->email')) === 0);
+
 								}
 								else {
-									$bTrusted = static::EmbeddedOriginalSenderMatchesMailbox($oEmail, $oRawEmail);
+									$bTrusted = static::EmbeddedMessageIsGenuineBounce($oEmail, $oRawEmail);
 								}
 
 								if(!$bTrusted) {
@@ -174,28 +184,33 @@ abstract class NonDeliveryReport extends Base {
 
 	/**
 	 * Whether this bounce embeds an original message (RFC 3464's message/rfc822 or
-	 * text/rfc822-headers part) whose own sender matches this mailbox's own address/aliases -
-	 * the closest available proxy for "this mailbox actually sent the notification that bounced"
-	 * when no ticket is linked to anchor the check against instead.
+	 * text/rfc822-headers part) whose own Message-ID carries this installation's HMAC signature
+	 * (see EmailReplica::MakeMessageId()/IsValidMessageIdSignature(), #95) - proof this iTop
+	 * instance itself generated and sent that message, and not just attacker-suppliable content
+	 * inside this bounce.
+	 *
+	 * A prior implementation matched the embedded message's From: header against this mailbox's
+	 * own address/aliases instead. That is not a valid proxy for authenticity: the embedded
+	 * message/rfc822 part is MIME content fully controlled by whoever sent the *outer* bounce
+	 * message, regardless of whether the outer message itself passed SPF/DKIM - anyone with any
+	 * real, authenticated mail account could fabricate an embedded part claiming to be From this
+	 * mailbox's own address.
 	 *
 	 * @param EmailMessage $oEmail
 	 * @param RawEmailMessage $oRawEmail The raw, enclosing bounce message (not the embedded part).
 	 * @return bool
 	 */
-	private static function EmbeddedOriginalSenderMatchesMailbox(EmailMessage $oEmail, RawEmailMessage $oRawEmail) : bool {
+	private static function EmbeddedMessageIsGenuineBounce(EmailMessage $oEmail, RawEmailMessage $oRawEmail) : bool {
 
-		// A failed SPF/DKIM check on the enclosing bounce message means the embedded From:
-		// header checked below - itself just attacker-suppliable content inside this message -
-		// can't be trusted as genuine either.
+		// A failed SPF/DKIM check on the enclosing bounce message means it did not genuinely
+		// originate the way it claims to; don't even bother inspecting its embedded content.
 		if($oRawEmail->HasFailedAuthentication()) {
 			return false;
 		}
 
-		$aAliases = array_map('strtolower', static::GetMailBoxAliases());
-
 		foreach($oEmail->aAttachments as $aAttachment) {
 
-			if(!in_array($aAttachment['mimeType'], ['message/rfc822', 'text/rfc822-headers'], true)) {
+			if(!in_array(strtolower(trim($aAttachment['mimeType'])), ['message/rfc822', 'text/rfc822-headers'], true)) {
 				continue;
 			}
 
@@ -206,9 +221,12 @@ abstract class NonDeliveryReport extends Base {
 				continue;
 			}
 
-			$aSenders = $oEmbedded->GetSender();
+			$sEmbeddedMessageId = $oEmbedded->GetMessageId();
 
-			if($aSenders !== [] && in_array(strtolower($aSenders[0]->GetEmailAddress()), $aAliases, true)) {
+			if(
+				preg_match('/^<iTop_(.+)_([0-9]+)_([a-f0-9]+)_.+@.+openitop\.org>$/', $sEmbeddedMessageId, $aMatches) === 1
+				&& EmailReplica::IsValidMessageIdSignature($aMatches[1], $aMatches[2], $aMatches[3])
+			) {
 				return true;
 			}
 
