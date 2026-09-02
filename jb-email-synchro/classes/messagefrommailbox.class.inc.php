@@ -175,7 +175,13 @@ class MessageFromMailbox extends RawEmailMessage {
 		// The signature group is mandatory (#95): a Message-ID lacking it, or carrying one that
 		// doesn't verify against this installation's own secret, must not be trusted - otherwise
 		// an external sender could forge a reference to an arbitrary, guessed class/id pair.
-		if (preg_match('/^<iTop_(.+)_([0-9]+)_([a-f0-9]+)_.+@.+openitop\.org>$/', $sMessageId, $aMatches)
+		//
+		// Every quantifier is length-bounded (matching what EmailReplica::MakeMessageId() actually
+		// generates - a signature is always exactly 16 hex characters) so a crafted, non-matching
+		// In-Reply-To/References value can't force catastrophic backtracking across the sequence of
+		// otherwise-unbounded, ambiguous groups. Character classes are left as-is (not narrowed to
+		// e.g. exclude "_") since some iTop class names (e.g. URP_Profiles) legitimately contain it.
+		if (preg_match('/^<iTop_(.{1,64})_([0-9]{1,20})_([a-f0-9]{16})_.{1,32}@.{1,64}openitop\.org>$/', $sMessageId, $aMatches)
 			&& EmailReplica::IsValidMessageIdSignature($aMatches[1], $aMatches[2], $aMatches[3]))
 		{
 			$ret = array('class' => $aMatches[1], 'id' => $aMatches[2]);
