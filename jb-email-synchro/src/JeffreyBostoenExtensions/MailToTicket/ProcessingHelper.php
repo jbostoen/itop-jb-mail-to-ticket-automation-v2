@@ -817,7 +817,7 @@ abstract class ProcessingHelper {
 				$sSubject = '[iTop] Failed to process attachment(s) for the incoming e-mail - '.htmlspecialchars($oEmail->sSubject);
 				$sBody = "<p>Some attachments to the eMail were not processed because they are too big:</p>\n";
 				$oInbox->sLastError = $sAdditionalErrorMessage;
-				$sBody .= "<pre>".$sAdditionalErrorMessage."</pre>\n";
+				$sBody .= "<pre>".htmlspecialchars($sAdditionalErrorMessage)."</pre>\n";
 				$sBody .= $sLastAction;
 				
 				$oRawEmail = null; // No original message in attachment
