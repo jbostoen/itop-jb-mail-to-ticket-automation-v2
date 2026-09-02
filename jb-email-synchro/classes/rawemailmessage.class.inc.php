@@ -63,6 +63,15 @@ class RawEmailMessage {
 	 * @var int For internal numbering of the parts
 	 */
 	protected $iNextId;
+
+	/**
+	 * @var int Maximum combined recursion depth for ExtractHeadersAndRawBody()/ExtractParts().
+	 * Both attacker-controlled inputs (a large number of leading blank lines, or deeply nested
+	 * multipart MIME structure) would otherwise recurse without limit and exhaust the PHP/C stack -
+	 * a crash that, unlike a thrown exception, can't be caught by any of the try/catch blocks
+	 * elsewhere in this codebase. Legitimate messages never come close to this depth.
+	 */
+	protected const MAX_PARSE_DEPTH = 50;
 	
 	/**
 	 * Construct a new message from the full text version of it (equivalent to the content of a .eml file)
@@ -75,10 +84,10 @@ class RawEmailMessage {
 		
 		$this->sRawContent = $sRawContent;
 		$aLines = preg_split("/(\r?\n|\r)/", $sRawContent);
-		$aData = $this->ExtractHeadersAndRawBody($aLines);
+		$aData = $this->ExtractHeadersAndRawBody($aLines, 0);
 		
 		$this->aHeaders = $aData['headers'];
-		$this->aParts = $this->ExtractParts($aData['headers'], $aData['body']);
+		$this->aParts = $this->ExtractParts($aData['headers'], $aData['body'], 0);
 	}
 	
 	/**
@@ -459,11 +468,18 @@ class RawEmailMessage {
 	 *
 	 * @param array $aHeaders Hash table of header => header_text
 	 * @param array $aBodyLines Array of text lines
+	 * @param int $iDepth Current recursion depth, shared with ExtractHeadersAndRawBody(); guards
+	 *                     against a maliciously/deeply nested multipart structure exhausting the stack.
 	 *
 	 * @return array of parts. Each part is itself a hash: array(type => string, headers => hash, body => array, parts => array )
 	 * @throws \EmailDecodingException
 	 */
-	protected function ExtractParts($aHeaders, $aBodyLines) {
+	protected function ExtractParts($aHeaders, $aBodyLines, int $iDepth) {
+
+		if($iDepth > self::MAX_PARSE_DEPTH) {
+			throw new EmailDecodingException('The message exceeds the maximum supported parsing depth (MIME nesting and/or leading blank lines).');
+		}
+
 		$aParsedParts = array();
 		$sContentType = isset($aHeaders['content-type']) ? $aHeaders['content-type'] : '';
 
@@ -485,12 +501,12 @@ class RawEmailMessage {
 			$aRawParts = $this->SplitIntoParts($aBodyLines, $sBoundary);
 
 			foreach($aRawParts as $aLines) {
-				$aSubPart = $this->ExtractHeadersAndRawBody($aLines);
+				$aSubPart = $this->ExtractHeadersAndRawBody($aLines, $iDepth + 1);
 				if(count($aSubPart['headers']) > 0) {
-					$aParsedParts['parts'][] = $this->ExtractParts($aSubPart['headers'], $aSubPart['body']);
+					$aParsedParts['parts'][] = $this->ExtractParts($aSubPart['headers'], $aSubPart['body'], $iDepth + 1);
 				}
 				elseif(count($aHeaders) > 0) {
-					$aParsedParts['parts'][] = $this->ExtractParts($aHeaders, $aSubPart['body']);
+					$aParsedParts['parts'][] = $this->ExtractParts($aHeaders, $aSubPart['body'], $iDepth + 1);
 				}
 			}
 		}
@@ -513,20 +529,28 @@ class RawEmailMessage {
 	 * The body is returned as an array of strings (one per line)
 	 *
 	 * @param array $aLines
+	 * @param int $iDepth Current recursion depth, shared with ExtractParts(); guards against a
+	 *                     message with a very large number of leading blank lines exhausting the stack.
 	 *
 	 * @return array('headers' => hash, 'body' => array of strings)
+	 * @throws \EmailDecodingException
 	 */
-	protected function ExtractHeadersAndRawBody($aLines) {
+	protected function ExtractHeadersAndRawBody($aLines, int $iDepth) {
+
+		if($iDepth > self::MAX_PARSE_DEPTH) {
+			throw new EmailDecodingException('The message exceeds the maximum supported parsing depth (MIME nesting and/or leading blank lines).');
+		}
+
 		$aRawFields = array();
 		$sCurrentHeader = '';
 
 		$idx = 0;
 		$aRawBody = array();
 		foreach($aLines as $sLine) {
-			
+
 			// File begins with a new line, remove the line and restart the function
 			if (self::IsNewLine($sLine) && $idx == 0 ) {
-				return $this->ExtractHeadersAndRawBody(array_slice($aLines, 1));
+				return $this->ExtractHeadersAndRawBody(array_slice($aLines, 1), $iDepth + 1);
 			}
 			
 			if(self::IsNewLine($sLine)) {
