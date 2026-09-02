@@ -27,6 +27,14 @@ class IMAPEmailLogger implements LoggerInterface {
 	private bool $bNextSentLineIsCredential = false;
 
 	/**
+	 * @var int Number of subsequent "sent" lines still expected to be raw RFC 3501 literal data
+	 * (`{<octet-count>}`) belonging to a "LOGIN" command, e.g. `a1 LOGIN {5}` followed by the userid
+	 * bytes and then the password bytes as separate continuation lines. LOGIN takes exactly 2
+	 * arguments, so this only ever counts down from at most 2.
+	 */
+	private int $iPendingLoginLiterals = 0;
+
+	/**
 	 * Log when a message is sent.
 	 */
 	public function sent(string $message): void {
@@ -74,6 +82,24 @@ class IMAPEmailLogger implements LoggerInterface {
 		if($this->bNextSentLineIsCredential) {
 			$this->bNextSentLineIsCredential = false;
 			return '********';
+		}
+
+		// A previous "LOGIN" command used RFC 3501 literal syntax (e.g. "a1 LOGIN {5}"); this line
+		// is raw literal data (the userid or password itself), possibly followed by another literal
+		// spec continuing the same command (e.g. "admin {8}") if more literals remain.
+		if($this->iPendingLoginLiterals > 0) {
+			$this->iPendingLoginLiterals--;
+			if(preg_match('/\{[0-9]+\+?\}\s*$/', $sLine)) {
+				$this->iPendingLoginLiterals++;
+			}
+			return '********';
+		}
+
+		// LOGIN command using RFC 3501 literal syntax for one or both arguments, e.g. "a1 LOGIN {5}":
+		// the literal data itself follows as separate line(s), handled by the branch above.
+		if(preg_match('/^(\S+\s+LOGIN\b)/i', $sLine, $aMatches) && preg_match_all('/\{[0-9]+\+?\}/', $sLine, $aLiterals) > 0) {
+			$this->iPendingLoginLiterals = count($aLiterals[0]);
+			return $aMatches[1].' ********';
 		}
 
 		// LOGIN command: redact the password argument.
