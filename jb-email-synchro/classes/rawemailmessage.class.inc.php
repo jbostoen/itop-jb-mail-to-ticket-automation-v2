@@ -51,6 +51,11 @@ class RawEmailMessage {
 	 */
 	protected $aHeaders;
 	/**
+	 * @var hash of top-level headers that can legitimately occur more than once (see GetHeaderOccurrences()):
+	 *      header_code => array of values, in the order they appear in the message.
+	 */
+	protected $aHeaderOccurrences;
+	/**
 	 * @var array of parts for a multiparts message
 	 */
 	protected $aParts;
@@ -87,6 +92,7 @@ class RawEmailMessage {
 		$aData = $this->ExtractHeadersAndRawBody($aLines, 0);
 		
 		$this->aHeaders = $aData['headers'];
+		$this->aHeaderOccurrences = $aData['header_occurrences'];
 		$this->aParts = $this->ExtractParts($aData['headers'], $aData['body'], 0);
 	}
 	
@@ -349,15 +355,61 @@ class RawEmailMessage {
 	}
 
 	/**
+	 * Get every occurrence of a top-level header that was declared repeatable in ExtractHeadersAndRawBody()
+	 * (e.g. 'Authentication-Results', added once per mail hop per RFC 8601), in the order they appear in
+	 * the message. Unlike GetHeader(), which only ever returns the single occurrence the parser kept.
+	 *
+	 * @param string $sHeaderName The name of the header (non case sensitive)
+	 *
+	 * @return string[] The header's values, in the order they appear; empty if the header wasn't found
+	 *                   or isn't one of the headers tracked this way.
+	 */
+	public function GetHeaderOccurrences($sHeaderName) : array {
+		$sHeaderName = strtolower($sHeaderName);
+		return $this->aHeaderOccurrences[$sHeaderName] ?? [];
+	}
+
+	/**
 	 * Whether the receiving mail server reported a failed SPF or DKIM check for this message,
 	 * via the 'Authentication-Results' header (RFC 8601). A sender's 'From:' address is not
 	 * authenticated by SMTP itself, so this is the only signal available to distrust it.
 	 *
-	 * @return bool True if 'Authentication-Results' reports spf=fail, spf=softfail, dkim=fail
-	 *              or dkim=softfail; false otherwise (including when the header is absent).
+	 * Per RFC 8601 §5, an 'Authentication-Results' header should only be trusted when it was added
+	 * at or after the receiver's own trust boundary, identified by its authserv-id (the header
+	 * value's first token) -- anything added before that boundary could be forged by the original
+	 * sender. When $sExpectedAuthservId is given, only occurrences whose authserv-id matches it are
+	 * considered. Without it (the default, kept for backward compatibility), whichever occurrence
+	 * GetHeader() kept -- the first one found -- is used, which is only as trustworthy as the
+	 * assumption that every hop in front of this code strips any pre-existing, forged occurrence
+	 * before adding its own.
+	 *
+	 * @param string|null $sExpectedAuthservId Optional authserv-id (typically the receiving mail
+	 *                                          server's own hostname) to restrict which occurrence(s) are trusted.
+	 *
+	 * @return bool True if a trusted 'Authentication-Results' occurrence reports spf=fail, spf=softfail,
+	 *              dkim=fail or dkim=softfail; false otherwise (including when none is found).
 	 */
-	public function HasFailedAuthentication() : bool {
-		return preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $this->GetHeader('authentication-results')) === 1;
+	public function HasFailedAuthentication($sExpectedAuthservId = null) : bool {
+
+		if($sExpectedAuthservId === null || trim($sExpectedAuthservId) === '') {
+			return preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $this->GetHeader('authentication-results')) === 1;
+		}
+
+		foreach($this->GetHeaderOccurrences('authentication-results') as $sOccurrence) {
+
+			// The authserv-id is the header value's first token (RFC 8601 §2.2).
+			if(preg_match('/^\s*'.preg_quote(trim($sExpectedAuthservId), '/').'\b/i', $sOccurrence) !== 1) {
+				continue;
+			}
+
+			if(preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $sOccurrence) === 1) {
+				return true;
+			}
+
+		}
+
+		return false;
+
 	}
 	
 	/**
@@ -544,6 +596,13 @@ class RawEmailMessage {
 		$aRawFields = array();
 		$sCurrentHeader = '';
 
+		// - Headers that legitimately occur more than once (unlike e.g. "From") need every occurrence kept,
+		//   not just the first. Tracked independently of $aRawFields/$sCurrentHeader above so the existing
+		//   single-value behavior for all other headers is unaffected.
+		$aRepeatableHeaders = ['authentication-results'];
+		$aRawFieldsAll = array();
+		$sCurrentHeaderAll = '';
+
 		$idx = 0;
 		$aRawBody = array();
 		foreach($aLines as $sLine) {
@@ -552,7 +611,7 @@ class RawEmailMessage {
 			if (self::IsNewLine($sLine) && $idx == 0 ) {
 				return $this->ExtractHeadersAndRawBody(array_slice($aLines, 1), $iDepth + 1);
 			}
-			
+
 			if(self::IsNewLine($sLine)) {
 				// end of headers
 				$aRawBody = array_slice($aLines, 1 + $idx);
@@ -577,6 +636,14 @@ class RawEmailMessage {
 						$aRawFields[$sNewHeader] = $sValue;
 						$sCurrentHeader = $sNewHeader;
 					}
+
+					if(in_array($sNewHeader, $aRepeatableHeaders)) {
+						$aRawFieldsAll[$sNewHeader][] = $sValue;
+						$sCurrentHeaderAll = $sNewHeader;
+					}
+					else {
+						$sCurrentHeaderAll = '';
+					}
 				}
 			}
 			else {
@@ -585,16 +652,26 @@ class RawEmailMessage {
 					// Fix for long subjects where spaces get lost on split header lines.
 					$aRawFields[$sCurrentHeader] .= (in_array($sCurrentHeader, ['references', 'subject']) == true ? $sLine : substr($sLine, 1));
 				}
+				if($sCurrentHeaderAll !== '') {
+					$iLastOccurrence = count($aRawFieldsAll[$sCurrentHeaderAll]) - 1;
+					$aRawFieldsAll[$sCurrentHeaderAll][$iLastOccurrence] .= substr($sLine, 1);
+				}
 			}
 			$idx++;
 		}
-		
+
 		// Decode headers
 		$aHeaders = array();
 		foreach ($aRawFields as $sKey => $sValue) {
 			$aHeaders[$sKey] = self::DecodeHeaderString($sValue);
 		}
-		return array('headers' => $aHeaders, 'body' => $aRawBody);
+
+		$aHeaderOccurrences = array();
+		foreach($aRawFieldsAll as $sKey => $aValues) {
+			$aHeaderOccurrences[$sKey] = array_map(['self', 'DecodeHeaderString'], $aValues);
+		}
+
+		return array('headers' => $aHeaders, 'body' => $aRawBody, 'header_occurrences' => $aHeaderOccurrences);
 	}
 
 	/**

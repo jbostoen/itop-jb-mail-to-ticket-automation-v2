@@ -89,6 +89,9 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Alias d\'email',
 	'Class:MailInboxStandard/Attribute:mail_aliases+' => 'Alias d\'email : un par ligne. Les schémas en exp. rég. sont autorisés.',
 
+	'Class:MailInboxStandard/Attribute:authentication_results_authserv_id' => 'ID du serveur Authentication-Results de confiance',
+	'Class:MailInboxStandard/Attribute:authentication_results_authserv_id+' => 'Nom d\'hôte (authserv-id) du serveur mail qui authentifie réellement le courrier entrant pour cette boîte mail (ex. "mx.google.com"). Si renseigné, les vérifications SPF/DKIM (utilisées pour faire confiance à l\'adresse de l\'expéditeur) ne considèrent que l\'en-tête "Authentication-Results" ajouté par ce serveur, en ignorant toute autre occurrence - qui pourrait sinon être falsifiée par l\'expéditeur. Laisser vide pour faire confiance à la première occurrence rencontrée (comportement précédent).',
+
 	'Class:MailInboxStandard/Attribute:oauth_provider' => 'Oauth provider',
 	'Class:MailInboxStandard/Attribute:oauth_provider+' => '',
 	'Class:MailInboxStandard/Attribute:oauth_client_id' => 'OAuth client',

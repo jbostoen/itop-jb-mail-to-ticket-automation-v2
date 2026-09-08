@@ -45,9 +45,10 @@ abstract class NonDeliveryReport extends Base {
 	 */
 	public static function Execute() : void {
 
+		$oMailBox = ProcessingHelper::GetMailBox();
 		$oEmail = ProcessingHelper::GetMail();
 		$oRawEmail = ProcessingHelper::GetRawMail();
-		
+
 		$bMarkAsInactive = (static::GetStepSetting('mark_caller_as_inactive') == 'yes');
 		$sBehavior = static::GetStepSetting('behavior');
 		
@@ -113,7 +114,7 @@ abstract class NonDeliveryReport extends Base {
 									// mailbox itself issued for that ticket; it says nothing about whether the
 									// "Final-Recipient" claim below is genuine. Require the outer bounce to have
 									// passed SPF/DKIM too, consistent with the no-ticket branch below.
-									$bTrusted = !$oRawEmail->HasFailedAuthentication()
+									$bTrusted = !$oRawEmail->HasFailedAuthentication($oMailBox->Get('authentication_results_authserv_id'))
 										&& (strcasecmp($sRecipient, (string) $oTicket->Get('caller_id->email')) === 0);
 
 								}
@@ -204,7 +205,8 @@ abstract class NonDeliveryReport extends Base {
 
 		// A failed SPF/DKIM check on the enclosing bounce message means it did not genuinely
 		// originate the way it claims to; don't even bother inspecting its embedded content.
-		if($oRawEmail->HasFailedAuthentication()) {
+		$oMailBox = ProcessingHelper::GetMailBox();
+		if($oRawEmail->HasFailedAuthentication($oMailBox->Get('authentication_results_authserv_id'))) {
 			return false;
 		}
 

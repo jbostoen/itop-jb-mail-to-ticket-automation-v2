@@ -77,7 +77,7 @@ abstract class FindCaller extends Base {
 					
 					case 1:
 
-						if($oRawEmail->HasFailedAuthentication()) {
+						if($oRawEmail->HasFailedAuthentication($oMailBox->Get('authentication_results_authserv_id'))) {
 
 							static::Trace("Refusing to trust the matched Person for '{$sCallerEmail}' as caller: the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
 							static::HandleViolation();
@@ -107,7 +107,7 @@ abstract class FindCaller extends Base {
 
 							case 'fallback_create_person':
 
-								if($oRawEmail->HasFailedAuthentication()) {
+								if($oRawEmail->HasFailedAuthentication($oMailBox->Get('authentication_results_authserv_id'))) {
 
 									static::Trace("Refusing to create a Person for '{$sCallerEmail}': the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
 									static::HandleViolation();

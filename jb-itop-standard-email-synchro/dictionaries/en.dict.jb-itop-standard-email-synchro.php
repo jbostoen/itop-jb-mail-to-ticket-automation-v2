@@ -90,6 +90,9 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Mail Aliases',
 	'Class:MailInboxStandard/Attribute:mail_aliases+' => 'Mail Aliases: one per line. Regex patterns are allowed.',
 
+	'Class:MailInboxStandard/Attribute:authentication_results_authserv_id' => 'Trusted Authentication-Results server ID',
+	'Class:MailInboxStandard/Attribute:authentication_results_authserv_id+' => 'Hostname (authserv-id) of the mail server that actually authenticates incoming mail for this mailbox (e.g. "mx.google.com"). When set, SPF/DKIM checks (used to trust the caller\'s address) only consider the "Authentication-Results" header added by this server, ignoring any other occurrence - which could otherwise be forged by the sender. Leave empty to trust whichever occurrence comes first (previous behavior).',
+
 	'Class:MailInboxStandard/Attribute:oauth_provider' => 'Oauth provider',
 	'Class:MailInboxStandard/Attribute:oauth_provider+' => '',
 	'Class:MailInboxStandard/Attribute:oauth_client_id' => 'OAuth client',
