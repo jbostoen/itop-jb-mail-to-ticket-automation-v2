@@ -111,6 +111,17 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Ignore MIME types',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Attachments of these MIME types will not be processed. Specify one per line.',
 	
+	// Policy: DKIM check
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior' => 'Behavior on violation',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_delete' => 'Bounce to sender and delete',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_mark_as_undesired' => 'Bounce to sender and mark as undesired',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:delete' => 'Delete the message from the mailbox',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:do_nothing' => 'Do nothing',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:inactive' => 'Inactive',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_subject' => 'Bounce subject',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_notification' => 'Bounce message',
+
 	// Policy: mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Behavior on violation',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_delete' => 'Bounce to sender and delete',
@@ -294,6 +305,7 @@ Dict::Add('EN US', 'English', 'English', array(
 
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Embedded e-mail images',
+	'MailInbox:PolicyDkimCheck' => 'DKIM check',
 	'MailInbox:PolicyMailSize' => 'Mail Size',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Attachment - Forbidden MIME type',
 	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Attachment - Ignored MIME type',

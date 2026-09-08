@@ -109,6 +109,16 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Exclude MIME types',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Attachments of these MIME types will not be processed. Specify one per line.',
 	
+	// DKIM check
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior' => 'Comportement en cas d\'infraction',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_mark_as_undesired' => 'Renvoyer à l\'expéditeur et marquer comme indésirable',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:delete' => 'Supprimer',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:do_nothing' => 'Ne rien faire',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:mark_as_undesired' => 'Marquer comme indésirable / Garder l\'email temporairement',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_subject' => 'Rejeter l\'objet',
+	'Class:MailInboxStandard/Attribute:policy_dkim_check_notification' => 'Rejeter le message',
+
 	// mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
@@ -272,6 +282,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Pièce jointe - criteria',
+	'MailInbox:PolicyDkimCheck' => 'Vérification DKIM',
 	'MailInbox:PolicyMailSize' => 'Taille de l\'email',
 	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Pièce jointe - type MIME ignoré',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Pièce jointe - type MIME interdit',

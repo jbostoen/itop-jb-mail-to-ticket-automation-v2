@@ -44,6 +44,7 @@ SetupWebPage::AddModule(
 			// Extra.
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AttachmentForbiddenMimeType.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AutoReply.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/DkimVerification.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/LimitMailSize.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/MatchByInReplyToOrReferences.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/NonDeliveryReport.php',

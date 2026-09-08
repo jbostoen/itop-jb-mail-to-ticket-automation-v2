@@ -370,9 +370,7 @@ class RawEmailMessage {
 	}
 
 	/**
-	 * Whether the receiving mail server reported a failed SPF or DKIM check for this message,
-	 * via the 'Authentication-Results' header (RFC 8601). A sender's 'From:' address is not
-	 * authenticated by SMTP itself, so this is the only signal available to distrust it.
+	 * Gets the 'Authentication-Results' occurrence(s) (RFC 8601) that can be trusted for this message.
 	 *
 	 * Per RFC 8601 §5, an 'Authentication-Results' header should only be trusted when it was added
 	 * at or after the receiver's own trust boundary, identified by its authserv-id (the header
@@ -386,21 +384,44 @@ class RawEmailMessage {
 	 * @param string|null $sExpectedAuthservId Optional authserv-id (typically the receiving mail
 	 *                                          server's own hostname) to restrict which occurrence(s) are trusted.
 	 *
+	 * @return string[] The trusted occurrence(s), in the order they appear; empty if none is found.
+	 */
+	private function GetTrustedAuthenticationResultsOccurrences($sExpectedAuthservId = null) : array {
+
+		if($sExpectedAuthservId === null || trim($sExpectedAuthservId) === '') {
+			$sHeader = $this->GetHeader('authentication-results');
+			return ($sHeader === '') ? [] : [$sHeader];
+		}
+
+		$aTrusted = [];
+
+		foreach($this->GetHeaderOccurrences('authentication-results') as $sOccurrence) {
+
+			// The authserv-id is the header value's first token (RFC 8601 §2.2).
+			if(preg_match('/^\s*'.preg_quote(trim($sExpectedAuthservId), '/').'\b/i', $sOccurrence) === 1) {
+				$aTrusted[] = $sOccurrence;
+			}
+
+		}
+
+		return $aTrusted;
+
+	}
+
+	/**
+	 * Whether the receiving mail server reported a failed SPF or DKIM check for this message,
+	 * via the 'Authentication-Results' header (RFC 8601). A sender's 'From:' address is not
+	 * authenticated by SMTP itself, so this is the only signal available to distrust it.
+	 *
+	 * @param string|null $sExpectedAuthservId Optional authserv-id (typically the receiving mail
+	 *                                          server's own hostname) to restrict which occurrence(s) are trusted.
+	 *
 	 * @return bool True if a trusted 'Authentication-Results' occurrence reports spf=fail, spf=softfail,
 	 *              dkim=fail or dkim=softfail; false otherwise (including when none is found).
 	 */
 	public function HasFailedAuthentication($sExpectedAuthservId = null) : bool {
 
-		if($sExpectedAuthservId === null || trim($sExpectedAuthservId) === '') {
-			return preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $this->GetHeader('authentication-results')) === 1;
-		}
-
-		foreach($this->GetHeaderOccurrences('authentication-results') as $sOccurrence) {
-
-			// The authserv-id is the header value's first token (RFC 8601 §2.2).
-			if(preg_match('/^\s*'.preg_quote(trim($sExpectedAuthservId), '/').'\b/i', $sOccurrence) !== 1) {
-				continue;
-			}
+		foreach($this->GetTrustedAuthenticationResultsOccurrences($sExpectedAuthservId) as $sOccurrence) {
 
 			if(preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $sOccurrence) === 1) {
 				return true;
@@ -409,6 +430,36 @@ class RawEmailMessage {
 		}
 
 		return false;
+
+	}
+
+	/**
+	 * Gets every DKIM result state (RFC 8601 §2.7.1: 'pass', 'fail', 'none', 'neutral', 'policy',
+	 * 'temperror', 'permerror') reported for this message, from 'Authentication-Results' occurrence(s)
+	 * trusted per the same authserv-id boundary as HasFailedAuthentication(). A message can carry more
+	 * than one 'dkim=' result (e.g. multiple signatures, or one per mail hop), so all of them are returned,
+	 * instead of collapsing them into a single pass/fail outcome.
+	 *
+	 * @param string|null $sExpectedAuthservId Optional authserv-id (typically the receiving mail
+	 *                                          server's own hostname) to restrict which occurrence(s) are trusted.
+	 *
+	 * @return string[] Every trusted 'dkim=' state found, lower-cased, in the order they appear; empty if none found.
+	 */
+	public function GetDkimStates($sExpectedAuthservId = null) : array {
+
+		$aStates = [];
+
+		foreach($this->GetTrustedAuthenticationResultsOccurrences($sExpectedAuthservId) as $sOccurrence) {
+
+			if(preg_match_all('/\bdkim=([a-z]+)\b/i', $sOccurrence, $aMatches) > 0) {
+				foreach($aMatches[1] as $sState) {
+					$aStates[] = strtolower($sState);
+				}
+			}
+
+		}
+
+		return $aStates;
 
 	}
 	
