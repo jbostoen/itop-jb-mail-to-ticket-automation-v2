@@ -88,12 +88,15 @@ abstract class SaveReferences extends Base {
 					// the real cause instead of mislabeling it as "already linked".
 					static::Trace('.. Failed to link Message ID "%1$s" to ticket ID %2$s: %3$s', $sMessageId, $oTicket->GetKey(), $e->getMessage());
 				}
-				
 			}
-		
-		
+
 		}
-		
+
+		// Prevent leaking into the next message: MatchByInReplyToOrReferences only resets this array when it
+		// runs, and it is skipped for mailboxes that do not use "Use Message ID as UID". Clearing it here,
+		// unconditionally, guarantees a clean state for the next message regardless of that per-mailbox setting.
+		static::$aNewMessageIds = [];
+
 	}
-	
+
 }
