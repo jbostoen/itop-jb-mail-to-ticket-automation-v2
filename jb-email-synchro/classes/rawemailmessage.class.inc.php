@@ -736,15 +736,19 @@ class RawEmailMessage {
 		
 		// Fix an encoding issue which may occur in multiline headers if it is an encoded string.
 		// Check if the string starts with for example =?utf-8? (sometimes with space in front) or another character encoding.
-		if(preg_match('/^(\s|){1,}=\?([^?]+)\?(.*)\?=/', $sInput, $aMatches)) {
+		// Note: "(\s|){1,}" (a group that can match either one whitespace character or nothing,
+		// repeated an unbounded number of times) is equivalent to "\s*" here, but its nullable
+		// alternation is vulnerable to catastrophic backtracking on a crafted header that never
+		// completes a valid "=?charset?enc?text?=" token; "\s*" matches the same language safely.
+		if(preg_match('/^\s*=\?([^?]+)\?(.*)\?=/', $sInput, $aMatches)) {
 			// Remove leading white space.
 			$sInput = preg_replace('/^(\s)/', '', $sInput);
-			// $sCharset = $aMatches[2];
+			// $sCharset = $aMatches[1];
 			// Remove any space between the strings (originally lines) which were merged to one line in the ExtractHeadersAndRawBody() method
 			// Mind that it's possible that some lines of a multiline subject have different encodings! (utf-8-b; utf-8-q; ...)
 			// Examples: ?==?utf-8? , ?= =?utf-8?
 			// Note: there are also strings starting with different encodings, such as ISO-8859-1
-			$sInput = preg_replace('/\?=(\s|){1,}=\?([^?]+)\?/', '?==?$2?', $sInput);			
+			$sInput = preg_replace('/\?=\s*=\?([^?]+)\?/', '?==?$1?', $sInput);
 		}
 		
 		// Still being discussed in https://github.com/Combodo/combodo-email-synchro/pull/11 whether the last parameter here should be UTF-8 or the same as the charset.
