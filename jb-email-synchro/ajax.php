@@ -385,10 +385,18 @@ try {
 							// Delete the actual email from the mailbox.
 							$bDeletedFromMailbox = $oMsgHandler->DeleteMessage();
 						}
+						else {
+							// The message is no longer in the mailbox's listing (e.g. a concurrent cron run
+							// already moved/deleted it): nothing was actually deleted, so the replica must
+							// be kept - otherwise, if the message is in fact still present, the next cron
+							// run would treat it as brand-new (and potentially recreate a ticket).
+							$bDeletedFromMailbox = false;
+						}
 					}
 					if(!$bDeletedFromMailbox) {
-						// The IMAP delete failed: keep the replica, otherwise the still-present message would
-						// be treated as brand-new (and potentially recreate a ticket) on the next cron run.
+						// The IMAP delete failed, or the message was not found in the mailbox listing:
+						// keep the replica, otherwise a still-present message would be treated as
+						// brand-new (and potentially recreate a ticket) on the next cron run.
 						$sMessage = "Could not delete message from the mailbox: {$sUIDL}. The replica was kept.";
 						$oInbox->Trace($sMessage);
 						$oPage->add($sMessage);
