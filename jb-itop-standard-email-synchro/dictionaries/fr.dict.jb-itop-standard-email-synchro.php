@@ -141,10 +141,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_subject' => 'Rejeter l\'objet',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_notification' => 'Rejeter le message',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_mimetypes' => 'Types MIME (un par ligne)',
-	
-	// Policy: attachment - ignore MIME type
-	'Class:MailInboxStandard/Attribute:step_attachment_ignore_mimetypes' => 'Ignore MIME Types (one per line)~~',
-	
+
 	// no subject
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:fallback_default_subject' => 'Solution de secours : utiliser l\'objet par défaut',
