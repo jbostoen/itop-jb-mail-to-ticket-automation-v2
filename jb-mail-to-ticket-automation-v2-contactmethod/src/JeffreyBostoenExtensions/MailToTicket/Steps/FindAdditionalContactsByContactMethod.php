@@ -84,6 +84,8 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 
 			/** @var Ticket $oTicket The ticket. */
 			$oTicket = ProcessingHelper::GetTicket();
+
+			$oMailBox = ProcessingHelper::GetMailBox();
 			
 			$sSenderEmail = $oRawEmail->GetSender()[0]->GetEmailAddress();
 			
@@ -109,7 +111,7 @@ abstract class FindAdditionalContactsByContactMethod extends Base {
 			// A failed SPF/DKIM check on this message means its To:/CC: headers can't be trusted
 			// either; skip contact-method matching entirely rather than linking a possibly spoofed
 			// recipient as a contact (mirrors StepFindCallerByContactMethod's sender-side check).
-			if($oRawEmail->HasFailedAuthentication()) {
+			if($oRawEmail->HasFailedAuthentication($oMailBox->Get('authentication_results_authserv_id'))) {
 				static::Trace(". Refusing to trust recipient addresses as contact method matches: the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
 				return;
 			}
