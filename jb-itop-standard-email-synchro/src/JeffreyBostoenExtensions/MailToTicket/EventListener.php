@@ -111,7 +111,12 @@ abstract class EventListener {
 
 		if($sBehavior === 'both' || $sBehavior === 'update_only') {
 
-			if($sAttCodeCaseLog === '' || !MetaModel::IsValidAttCode($sTargetClass, $sAttCodeCaseLog)) {
+			// - An empty or invalid attcode_caselog falls back to 'public_log' at runtime (see GetCaseLogAttCode()),
+			//   so this is only an actual problem when the target class has no 'public_log' attribute either.
+			$bValidCaseLog = ($sAttCodeCaseLog !== '' && MetaModel::IsValidAttCode($sTargetClass, $sAttCodeCaseLog));
+			$bValidFallbackCaseLog = MetaModel::IsValidAttCode($sTargetClass, 'public_log');
+
+			if(!$bValidCaseLog && !$bValidFallbackCaseLog) {
 
 				$oMailInbox->AddCheckIssue(Dict::Format('MailInbox:Error:CaseLogAttCodeRequired', $sTargetClass));
 
