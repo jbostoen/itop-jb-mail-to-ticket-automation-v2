@@ -277,7 +277,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_subject' => 'Rejeter l\'objet',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_notification' => 'Rejeter le message',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns' => 'Motifs',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Tout e-mail dont l\'adresse de l\'expéditeur correspond à l\'un des motifs regex définis (un par ligne) sera considéré comme une violation. Ignorer les motifs dans l\'objet.',
+	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Tout e-mail dont l\'adresse de l\'expéditeur correspond à l\'un des motifs regex définis (un par ligne) sera considéré comme une violation.',
 
 	// Headers
 	'MailInbox:Server' => 'Configuration de la boîte mail',
