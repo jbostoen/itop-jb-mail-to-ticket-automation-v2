@@ -61,8 +61,8 @@ try
 	}
 	$oPage->output();
 }
-catch(Exception $e) {
-	
+catch(Throwable $e) {
+
 	$oPage = new AjaxPage('');
 	$oPage->SetContentType('text/html');
 	$oPage->add($e->getMessage());
