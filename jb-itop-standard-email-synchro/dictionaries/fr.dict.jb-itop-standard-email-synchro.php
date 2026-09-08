@@ -84,7 +84,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:error_behavior/Value:mark_as_error' => 'Garder l\'eMail dans la boîte mail',
 	'Class:MailInboxStandard/Attribute:notify_errors_to' => 'Contacts à notifier en cas d\'erreur',
 	'Class:MailInboxStandard/Attribute:notify_errors_to+' => 'Requête OQL retournant la ou les Personne(s) (ex. "SELECT Person WHERE email = \'admin@example.com\'") à qui les eMails en erreur seront transférés.',
-	'Class:MailInboxStandard/Attribute:notify_errors_from' => '(De)',
+	'Class:MailInboxStandard/Attribute:notify_from' => 'Adresse d\'expédition',
 	
 	'Class:MailInboxStandard/Attribute:mail_aliases' => 'Alias d\'email',
 	'Class:MailInboxStandard/Attribute:mail_aliases+' => 'Alias d\'email : un par ligne. Les schémas en exp. rég. sont autorisés.',
