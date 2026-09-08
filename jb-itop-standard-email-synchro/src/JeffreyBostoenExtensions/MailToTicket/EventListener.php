@@ -21,6 +21,9 @@ use Combodo\iTop\Service\Events\EventService;
 // iTop classes.
 use MailInboxStandard;
 
+// Module classes.
+use JeffreyBostoenExtensions\MailToTicket\Steps\PolicyBehavior;
+
 /**
  * Class EventListener.
  * Registers event listeners for this module. Kept separate from method overloads (such as MailInboxStandard::DoCheckToWrite())
@@ -56,7 +59,7 @@ abstract class EventListener {
 	}
 
 	/**
-	 * Validates that the target folder is specified for an active mailbox.
+	 * Validates that the target folder is specified for an active mailbox configured to move e-mails after processing.
 	 *
 	 * @param EventData $oEventData Event data. Contains the object ('object') being checked.
 	 *
@@ -67,7 +70,7 @@ abstract class EventListener {
 		/** @var MailInboxStandard $oMailInbox */
 		$oMailInbox = $oEventData->Get('object');
 
-		if($oMailInbox->Get('active') === 'yes' && trim($oMailInbox->Get('target_folder')) === '') {
+		if($oMailInbox->Get('active') === 'yes' && $oMailInbox->Get('email_storage') === PolicyBehavior::MOVE->value && trim($oMailInbox->Get('target_folder')) === '') {
 
 			$oMailInbox->AddCheckIssue(Dict::Format('MailInbox:Error:TargetFolderRequired'));
 
