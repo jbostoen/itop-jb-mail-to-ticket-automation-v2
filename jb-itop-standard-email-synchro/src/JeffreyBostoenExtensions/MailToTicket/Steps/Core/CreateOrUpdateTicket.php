@@ -54,6 +54,7 @@ use utils;
 // Generic.
 use Exception;
 use ReflectionClass;
+use Throwable;
 
 /**
  * Class CreateOrUpdateTicket. Special step; at this point the Ticket is created or updated.
@@ -151,12 +152,12 @@ abstract class CreateOrUpdateTicket extends Base {
 				ProcessingHelper::SetNextAction(eNextAction::PROCESS_MESSAGE);
 			
 		}
-		catch(Exception $e) {
-		
+		catch(Throwable $e) {
+
 			$oMailBox->sLastError = $e->getMessage();
 
 			static::Trace($e->getMessage());
-					
+
 			// - Stop further processing (will delete or mark as error, based on user's settings)
 				return;
 			
@@ -308,7 +309,7 @@ abstract class CreateOrUpdateTicket extends Base {
 			$oTicket->DBInsert();
 			static::Trace('. Ticket %1$s created.', $oTicket->GetName());
 		}
-		catch(Exception $e) {
+		catch(Throwable $e) {
 			// Known issues:
 			// - Incorrect related contacts
 			// - E-mail notifications (?)
@@ -461,7 +462,7 @@ abstract class CreateOrUpdateTicket extends Base {
 				$oTicket->DBUpdate();
 				static::Trace("Ticket '{$oTicket->GetName()}' has been updated.");
 			}
-			catch(Exception $e) {
+			catch(Throwable $e) {
 				static::Trace("Ticket {$oTicket->GetName()} might not be properly updated or something else went wrong (for instance: notifications).");
 				static::Trace($e->getMessage()); // Add actual error message (if available)
 				throw new Exception('Unable to update ticket.');
