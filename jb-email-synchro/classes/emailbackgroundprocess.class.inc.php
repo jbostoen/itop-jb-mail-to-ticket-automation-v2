@@ -309,7 +309,9 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								$oEmailReplica->Set('last_seen', date('Y-m-d H:i:s'));
 								
 								// Initialize e-mail for which there is currently no replica (yet, or anymore).
-								$oMsgHandler->InitMessage();
+								if(!$oMsgHandler->InitMessage()) {
+									$this->Trace("Failed to initialize message: uidl=$sUIDL index=$iMessage. The 'marked for removal' IMAP flag (if any) may not have been cleared.");
+								}
 								
 							}
 							else {
