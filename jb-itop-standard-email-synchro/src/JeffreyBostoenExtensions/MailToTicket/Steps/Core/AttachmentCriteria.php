@@ -85,7 +85,9 @@ abstract class AttachmentCriteria extends Base {
 
 
 			$sMimeTypes = static::GetStepSetting('exclude_mimetypes');
-			$aMimeTypes = Helper::SplitByLine($sMimeTypes);
+			// Compare case-insensitively: MIME type tokens are case-insensitive per RFC 2045 §5.1, and
+			// Helper::SplitByLine() only trims each configured line, it doesn't lowercase it.
+			$aMimeTypes = array_map('strtolower', Helper::SplitByLine($sMimeTypes));
 
 			static::Trace('Excluded MIME types: %1$s', implode(', ', $aMimeTypes));
 
@@ -99,7 +101,7 @@ abstract class AttachmentCriteria extends Base {
 						
 				// - Ignore certain MIME types (This could include images).
 					
-					if(in_array($aAttachment['mimeType'], $aMimeTypes)) {
+					if(in_array(strtolower($aAttachment['mimeType']), $aMimeTypes)) {
 
 						static::Trace('Ignore this attachment (excluded MIME type).');
 
