@@ -148,10 +148,12 @@ status:assigned]]></default_value>
 				</field>
 				<!-- All policy options -->
 				<!-- DKIM check -->
+				<!-- Intentionally no bounce_delete/bounce_mark_as_undesired here (unlike sibling policies): this
+					 step runs before AutoReply/NonDeliveryReport detection, so bouncing a DKIM-failing message
+					 that turns out to be an auto-reply or NDR risks the same mail-loop problem those two
+					 policies were already restricted to avoid. -->
 				<field id="policy_dkim_check_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
 						<value>delete</value>
 						<value>do_nothing</value>
 						<value>mark_as_undesired</value>
