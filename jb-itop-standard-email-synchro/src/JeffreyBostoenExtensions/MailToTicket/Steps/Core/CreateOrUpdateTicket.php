@@ -742,7 +742,16 @@ abstract class CreateOrUpdateTicket extends Base {
 
 		/** @var Trigger $oTrigger iTop Trigger. */
 		while($oTrigger = $oSet_TriggerMailUpdate->Fetch()) {
-			$oTrigger->DoActivate($aContext);
+			try {
+				$oTrigger->DoActivate($aContext);
+			}
+			catch(Throwable $e) {
+				// The ticket update (case log entry, attribute changes) has already been committed by this
+				// point: a failing trigger action must not propagate out and be mistaken for a failed
+				// update, which would otherwise leave the e-mail queued for reprocessing and duplicate the
+				// case log entry on retry.
+				static::Trace('.. Trigger %1$s failed to activate: %2$s', $oTrigger->GetKey(), $e->getMessage());
+			}
 		}
 
 		// Apply a stimulus if needed, will write the ticket to the database, may launch triggers, etc...
