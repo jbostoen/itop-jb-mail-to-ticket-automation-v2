@@ -108,7 +108,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_height' => 'Max. height (px)',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_height+' => 'Maximum height (px). Set to 0 to accept any height. If the php-gd extension is installed, larger images will be resized. Otherwise, they will not be processed.',
 
-	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Ignore MIME types',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Exclude MIME types',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Attachments of these MIME types will not be processed. Specify one per line.',
 	
 	// Policy: DKIM check

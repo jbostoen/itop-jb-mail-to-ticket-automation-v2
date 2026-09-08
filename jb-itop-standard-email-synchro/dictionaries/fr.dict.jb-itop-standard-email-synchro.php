@@ -106,8 +106,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_min_height+' => 'Hauteur min. (px). Doit être d\'au minimum 1.',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_height' => 'Hauteur max. (px)',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_image_max_height+' => 'hauteur max. (px). Mettre à 0 pour ne pas limiter.',
-	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Exclude MIME types',
-	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Attachments of these MIME types will not be processed. Specify one per line.',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Exclure les types MIME',
+	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Les pièces jointes de ces types MIME ne seront pas traitées. Une par ligne.',
 	
 	// DKIM check
 	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior' => 'Comportement en cas d\'infraction',
@@ -231,13 +231,24 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_remove_pattern_behavior/Value:do_nothing' => 'Ne rien faire',
 	'Class:MailInboxStandard/Attribute:policy_remove_pattern_behavior/Value:fallback_remove' => 'Retirer des parties de l\'objet',
 	'Class:MailInboxStandard/Attribute:policy_remove_pattern_patterns' => 'Schémas à retirer du sujet (Schémas en exp. rég., un par ligne)',
-	
+
+	// Le bénéficiaire doit être le même que celui du ticket d'origine
+	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior' => 'Comportement en cas d\'infraction',
+	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:delete' => 'Supprimer',
+	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
+	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_mark_as_undesired' => 'Renvoyer à l\'expéditeur et marquer comme indésirable',
+	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:do_nothing' => 'Ne rien faire',
+	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:inactive' => 'Inactif',
+	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:mark_as_undesired' => 'Marquer comme indésirable / Garder l\'email temporairement',
+	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_subject' => 'Rejeter l\'objet',
+	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_notification' => 'Rejeter le message',
+
 	// Auto reply
-	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Behavior on violation',
-	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:delete' => 'Delete the message from the mailbox',
-	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:do_nothing' => 'Do nothing',
-	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:inactive' => 'Inactive',
-	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Comportement en cas d\'infraction',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:delete' => 'Supprimer',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:do_nothing' => 'Ne rien faire',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:inactive' => 'Inactif',
+	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior/Value:mark_as_undesired' => 'Marquer comme indésirable / Garder l\'email temporairement',
 	
 	// Policy: Non Delivery Report
 	'Class:MailInboxStandard/Attribute:policy_non_delivery_report_behavior' => 'Comportement en cas d\'infraction',
@@ -295,6 +306,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'MailInbox:PolicyNoSubject' => 'Pas d\'objet',
 	'MailInbox:PolicyUnknownCaller' => 'Bénéficiaire inconnu',
 	'MailInbox:PolicyOtherRecipients' => 'Autres destinataires',
+	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Limiter les réponses acceptées à l\'adresse e-mail du bénéficiaire original du ticket',
 	'MailInbox:PolicyAutoReply' => 'Auto réponse',
 	'MailInbox:PolicyNonDeliveryReport' => 'Non Delivery Reports',
 	'MailInbox:StepUpdateCallerAttributes' => 'Mettre à jour les attributs de l\'appelant',
