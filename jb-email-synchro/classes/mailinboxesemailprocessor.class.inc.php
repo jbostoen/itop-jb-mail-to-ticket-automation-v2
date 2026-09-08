@@ -222,9 +222,20 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 	public function OnDecodeError(EmailSource $oSource, $sUIDL, $oEmail, RawEmailMessage $oRawEmail, &$aErrors = array()) : eNextAction {
 
 		$oInbox = $this->GetInboxFromSource($oSource);
-		$aErrors[] = "Failed to decode the message ({$sUIDL})";
+
+		// Reset before setting: this processor instance is reused across every mailbox/message in a cron
+		// run, and UpdateEmailReplica() reads these properties afterwards to build the replica's
+		// error_message. Without resetting them here, a decode failure would keep showing whatever a
+		// previous, unrelated message's error was.
+		$this->sLastErrorSubject = "Failed to decode the message ({$sUIDL})";
+		$aErrors[] = $this->sLastErrorSubject;
 		if(isset($oEmail)) {
-			$aErrors = array_merge($aErrors, $oEmail->GetInvalidReasons());
+			$aInvalidReasons = $oEmail->GetInvalidReasons();
+			$aErrors = array_merge($aErrors, $aInvalidReasons);
+			$this->sLastErrorMessage = implode(', ', $aInvalidReasons);
+		}
+		else {
+			$this->sLastErrorMessage = '';
 		}
 		ProcessingHelper::HandleError('decode_failed');
 		return ProcessingHelper::GetNextAction();
