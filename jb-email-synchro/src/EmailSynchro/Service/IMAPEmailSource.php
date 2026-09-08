@@ -434,13 +434,24 @@ class IMAPEmailSource extends EmailSource {
 	 */
 	public function Disconnect() : void {
 
-		// Expunge deleted messages before disconnecting.
-		if($this->bMessagesDeleted) {
-			IssueLog::Debug(__METHOD__." Expunging deleted messages for $this->sServer", static::LOG_CHANNEL);
-			$this->GetFolder()->expunge();
-		}
+		try {
 
-		$this->oMailbox->disconnect();
+			// Expunge deleted messages before disconnecting.
+			if($this->bMessagesDeleted) {
+				IssueLog::Debug(__METHOD__." Expunging deleted messages for $this->sServer", static::LOG_CHANNEL);
+				$this->GetFolder()->expunge();
+			}
+
+			$this->oMailbox->disconnect();
+
+		} catch(Exception $e) {
+			// A dropped connection here (e.g. between expunge() and disconnect()) must not abort the whole
+			// cron run: every caller of Disconnect() runs it unguarded inside a loop over all mailboxes.
+			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
+				'exception.message' => $e->getMessage(),
+				'exception.stack'   => $e->getTraceAsString(),
+			]);
+		}
 	}
 
 	/**
