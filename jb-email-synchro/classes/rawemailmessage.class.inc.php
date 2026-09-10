@@ -719,7 +719,7 @@ class RawEmailMessage {
 
 		$aHeaderOccurrences = array();
 		foreach($aRawFieldsAll as $sKey => $aValues) {
-			$aHeaderOccurrences[$sKey] = array_map(['self', 'DecodeHeaderString'], $aValues);
+			$aHeaderOccurrences[$sKey] = array_map([self::class, 'DecodeHeaderString'], $aValues);
 		}
 
 		return array('headers' => $aHeaders, 'body' => $aRawBody, 'header_occurrences' => $aHeaderOccurrences);
