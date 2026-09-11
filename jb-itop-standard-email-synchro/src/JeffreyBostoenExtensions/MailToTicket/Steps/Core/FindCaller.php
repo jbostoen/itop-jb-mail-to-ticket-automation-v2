@@ -168,10 +168,14 @@ abstract class FindCaller extends Base {
 						static::Trace("Found ".$oSet_Person->Count()." callers with the same email address '{$sCallerEmail}'. Ambiguous match: not setting a caller.");
 
 				}
-				
-				// Set caller for e-mail.
-				$oEmail->SetSender($oCaller);
-				
+
+				// Set caller for e-mail. $oCaller can still be null here (ambiguous match,
+				// caller not found with a "no fallback" behavior, ...); SetSender() requires a
+				// non-null Person, so skip it rather than passing null through.
+				if($oCaller !== null) {
+					$oEmail->SetSender($oCaller);
+				}
+
 			}
 			else {
 				static::Trace("Caller already determined by previous policy. Skip.");
