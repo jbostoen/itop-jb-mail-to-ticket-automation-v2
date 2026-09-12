@@ -289,8 +289,37 @@ abstract class CreateOrUpdateTicket extends Base {
 
 		}
 
-		// Keep some room just in case... (in case of what?)
-		$oTicket->Set($sDescriptionAttCode, static::FitTextIn($sTicketDescription, $iDescriptionMaxSize));
+		$iEffectiveDescriptionMaxSize = $iDescriptionMaxSize;
+		$oTicket->Set($sDescriptionAttCode, static::FitTextIn($sTicketDescription, $iEffectiveDescriptionMaxSize));
+
+		if($iDescriptionMaxSize !== null) {
+
+			// - For an 'html'-format attribute, Set() above runs the value through
+			//   HTMLSanitizer::Sanitize(), which can grow the string back past
+			//   $iDescriptionMaxSize while repairing markup broken by FitTextIn()'s plain
+			//   character-count cut (e.g. re-closing a tag truncation left open). Re-check what
+			//   actually got stored and shrink further if it overshot; each retry trims at least
+			//   as much as the previous overshoot, so this converges within a handful of attempts.
+			for($iAttempt = 0; $iAttempt < 5; $iAttempt++) {
+
+				$iStoredLength = mb_strlen((string) $oTicket->Get($sDescriptionAttCode));
+				if($iStoredLength <= $iDescriptionMaxSize) {
+					break;
+				}
+
+				$iEffectiveDescriptionMaxSize = max(0, $iEffectiveDescriptionMaxSize - ($iStoredLength - $iDescriptionMaxSize));
+				$oTicket->Set($sDescriptionAttCode, static::FitTextIn($sTicketDescription, $iEffectiveDescriptionMaxSize));
+
+			}
+
+			// - Last resort: a hard cut of the sanitized value itself, in case the sanitizer keeps
+			//   re-growing the text past the retry loop above. Guarantees the column's real max
+			//   size is never exceeded, even at the cost of possibly-unbalanced trailing markup.
+			if(mb_strlen((string) $oTicket->Get($sDescriptionAttCode)) > $iDescriptionMaxSize) {
+				$oTicket->Set($sDescriptionAttCode, mb_substr((string) $oTicket->Get($sDescriptionAttCode), 0, $iDescriptionMaxSize));
+			}
+
+		}
 
 		// Harmonize with UpdateTicketFromEmail(): also add the original message as a first case log entry.
 		static::AddInitialCaseLogEntry($oTicket, $oCaller);
