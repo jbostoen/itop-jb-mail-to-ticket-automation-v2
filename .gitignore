@@ -1,5 +1,17 @@
 docs/
+node_modules/
 private/
 vendor/
 composer.lock
-jb-email-synchro/vendor
+**/*.zip
+data/*
+conf/params.local.xml
+**/js/dist/
+**/keys/
+
+# - Claude Code
+**/.claude/
+**/CLAUDE.MD
+**/CLAUDE.md
+**/PLAN.MD
+**/PLAN.md
