@@ -98,10 +98,11 @@ abstract class Base implements iStep {
 	 * @return string
 	 */
 	public static function GetStepSetting(string $sSetting) : string {
-	
+
 		$oMailBox = ProcessingHelper::GetMailBox();
-		return $oMailBox->Get(static::GetXMLSettingsPrefix().'_'.$sSetting);
-		
+		// - Some settings (e.g. subject, notification) allow null in the datamodel; the column may still hold NULL for existing rows.
+		return $oMailBox->Get(static::GetXMLSettingsPrefix().'_'.$sSetting) ?? '';
+
 	}
 	
 	
