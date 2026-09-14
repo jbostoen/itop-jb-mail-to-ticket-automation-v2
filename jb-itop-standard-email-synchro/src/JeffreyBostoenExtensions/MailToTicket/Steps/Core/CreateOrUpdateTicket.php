@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen
  * @license     See license.md
- * @version     3.2.260912
+ * @version     3.2.260914
  */
  
 
@@ -23,7 +23,7 @@ use JeffreyBostoenExtensions\MailToTicket\Steps\Core\EntryProcessor\{
 	iBase as iEntryProcessor
 };
 
-use jb_itop_extensions\components\ormCustomCaseLog;
+use JeffreyBostoenExtensions\Framework\ormCustomCaseLog;
 
 // iTop.
 use Attachment;
