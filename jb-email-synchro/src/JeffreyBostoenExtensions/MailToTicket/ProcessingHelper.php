@@ -19,6 +19,7 @@ use DBObjectSearch;
 use DBSearch;
 use Email;
 use Exception;
+use utils;
 
 // iTop email processing.
 use EmailMessage;
@@ -142,6 +143,9 @@ abstract class ProcessingHelper {
 	 * Trace function used for debugging during a cron run.
 	 * Echoes the message when the module's 'debug' setting is enabled (matching the existing
 	 * cron-visible tracing behavior), and always logs it to the 'cron' channel.
+	 * The same Trace() chain is also reached from web contexts (e.g. the mailbox content preview
+	 * in ajax.php), where an unconditional echo would leak raw IMAP protocol/trace lines into the
+	 * response; the echo is therefore restricted to CLI (actual cron) execution.
 	 *
 	 * @param string $sMessage The message.
 	 * @param mixed ...$args
@@ -152,7 +156,7 @@ abstract class ProcessingHelper {
 
 		$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
 
-		if(MetaModel::GetModuleSetting('jb-email-synchro', 'debug', false)) {
+		if(utils::IsModeCLI() && MetaModel::GetModuleSetting('jb-email-synchro', 'debug', false)) {
 			echo $sMessage."\n";
 		}
 
