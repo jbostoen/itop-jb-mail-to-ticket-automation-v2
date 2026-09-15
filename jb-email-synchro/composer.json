@@ -8,6 +8,7 @@
   "type": "itop-extension",
   "description": "IMAP e-mail synchronization (with support for OAuth 2.0) for iTop.",
   "require": {
-    "directorytree/imapengine": "^1.24.0"
+    "directorytree/imapengine": "^1.25.6",
+    "guzzlehttp/psr7": "^2.5.1"
   }
 }

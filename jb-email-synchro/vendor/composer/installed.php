@@ -3,7 +3,7 @@
         'name' => 'jbostoen/jb-email-synchro',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '742029e73c186b9e06e9b09a71a91fee94e7231e',
+        'reference' => 'a8c730205cdbb366111d59493ae661edc7b0b22c',
         'type' => 'itop-extension',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -47,9 +47,9 @@
             'dev_requirement' => false,
         ),
         'guzzlehttp/psr7' => array(
-            'pretty_version' => '3.1.0',
-            'version' => '3.1.0.0',
-            'reference' => 'a3059ba1a84c9139c4ae03cf0f45bea276c97c74',
+            'pretty_version' => '2.13.1',
+            'version' => '2.13.1.0',
+            'reference' => '95e7828100de18b4e269fb1703be530082d5166d',
             'type' => 'library',
             'install_path' => __DIR__ . '/../guzzlehttp/psr7',
             'aliases' => array(),
@@ -94,7 +94,7 @@
         'jbostoen/jb-email-synchro' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '742029e73c186b9e06e9b09a71a91fee94e7231e',
+            'reference' => 'a8c730205cdbb366111d59493ae661edc7b0b22c',
             'type' => 'itop-extension',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -110,9 +110,9 @@
             'dev_requirement' => false,
         ),
         'nesbot/carbon' => array(
-            'pretty_version' => '3.13.2',
-            'version' => '3.13.2.0',
-            'reference' => 'a1c54919f5fff9800cd03c32bd01defd5a4061cb',
+            'pretty_version' => '3.14.0',
+            'version' => '3.14.0.0',
+            'reference' => '0023eaa2c9110e47446dd512a263c69c40cd41f2',
             'type' => 'library',
             'install_path' => __DIR__ . '/../nesbot/carbon',
             'aliases' => array(),
@@ -178,7 +178,7 @@
         'psr/http-factory-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.1',
+                0 => '1.0',
             ),
         ),
         'psr/http-message' => array(
@@ -193,7 +193,7 @@
         'psr/http-message-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '2.0',
+                0 => '1.0',
             ),
         ),
         'psr/log' => array(
@@ -211,6 +211,15 @@
             'reference' => '764e0b3939f5ca87cb904f570ef9be2d78a07865',
             'type' => 'library',
             'install_path' => __DIR__ . '/../psr/simple-cache',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'ralouphie/getallheaders' => array(
+            'pretty_version' => '3.0.3',
+            'version' => '3.0.3.0',
+            'reference' => '120b605dfeb996808c31b6477290a714d356e822',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../ralouphie/getallheaders',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -233,9 +242,9 @@
             'dev_requirement' => false,
         ),
         'symfony/mime' => array(
-            'pretty_version' => 'v7.4.18',
-            'version' => '7.4.18.0',
-            'reference' => 'bf328d82105831db3e409195db0540ff57f27c80',
+            'pretty_version' => 'v7.4.19',
+            'version' => '7.4.19.0',
+            'reference' => 'f8ac7d0a800bcabbcd1f7de56594cf05e6cd5693',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/mime',
             'aliases' => array(),
@@ -283,15 +292,6 @@
             'reference' => 'dfb55726c3a76ea3b6459fcfda1ec2d80a682411',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/polyfill-php80',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
-        'symfony/polyfill-php82' => array(
-            'pretty_version' => 'v1.38.1',
-            'version' => '1.38.1.0',
-            'reference' => '002dc0cfe5fd4ed6033d48f27d4f19a486c4b04b',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../symfony/polyfill-php82',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
