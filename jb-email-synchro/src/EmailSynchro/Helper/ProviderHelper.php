@@ -18,6 +18,24 @@ class ProviderHelper {
 
 
 	/**
+	 * @param $oMailbox
+	 *
+	 * @return string
+	 *
+	 * @details Reads the vendor name straight from the OAuthClient's 'provider' attribute
+	 * rather than through OAuthClientProviderAbstract::GetVendorName(), which always
+	 * returns an empty string: it reads self::$sVendorName, and PHP resolves that to the
+	 * declaring (abstract) class's own redeclared property, never the calling subclass's.
+	 */
+	public static function GetVendorNameForIMAP($oMailbox): string {
+
+		$oOAuthClient = MetaModel::GetObject('OAuthClient', $oMailbox->Get('oauth_client_id'));
+		return (string)$oOAuthClient->Get('provider');
+
+	}
+
+
+	/**
 	 * @param $oProvider
 	 *
 	 * @return string

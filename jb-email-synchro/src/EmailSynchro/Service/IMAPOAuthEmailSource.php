@@ -41,7 +41,10 @@ class IMAPOAuthEmailSource extends IMAPEmailSource {
 			// throws a CoreException (MetaModel::GetObject($bMustBeFound = true)), which otherwise
 			// wouldn't be caught at all.
 			$oProvider = ProviderHelper::GetProviderForIMAP($oMailbox);
-			$sVendorName = $oProvider::GetVendorName();
+			// Not $oProvider::GetVendorName(): OAuthClientProviderAbstract::GetVendorName() always
+			// returns an empty string regardless of vendor, since self::$sVendorName resolves to the
+			// declaring abstract class's own redeclared property, not the calling subclass's.
+			$sVendorName = ProviderHelper::GetVendorNameForIMAP($oMailbox);
 			$this->sAccessToken = ProviderHelper::GetAccessTokenForProvider($oProvider);
 		}
 		catch(Throwable $e) {
