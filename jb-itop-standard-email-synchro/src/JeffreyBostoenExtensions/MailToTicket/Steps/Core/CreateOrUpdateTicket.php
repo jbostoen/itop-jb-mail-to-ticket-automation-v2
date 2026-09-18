@@ -30,6 +30,7 @@ use Attachment;
 use AttributeExternalKey;
 use AttributeHTML;
 use AttributeText;
+use AttributeYesNo;
 use CMDBChange;
 use CMDBObject;
 use CMDBSource;
@@ -321,8 +322,10 @@ abstract class CreateOrUpdateTicket extends Base {
 
 		}
 
-		// Harmonize with UpdateTicketFromEmail(): also add the original message as a first case log entry.
-		static::AddInitialCaseLogEntry($oTicket, $oCaller);
+		// Harmonize with UpdateTicketFromEmail(): also add the original message as a first case log entry, if enabled.
+		if($oMailBox->Get('caselog_entry_on_create') === AttributeYesNo::DEFAULT_TRUE_VALUE) {
+			static::AddInitialCaseLogEntry($oTicket, $oCaller);
+		}
 
 		// Default values.
 		$sDefaultValues = $oMailBox->Get('ticket_default_values');

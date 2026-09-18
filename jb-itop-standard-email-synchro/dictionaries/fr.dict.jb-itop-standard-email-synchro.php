@@ -59,6 +59,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:attcode_description+' => 'Code de l\'attribut de la classe cible qui doit recevoir la description initiale du ticket. Par défaut : "description" si laissé vide.',
 	'Class:MailInboxStandard/Attribute:attcode_caselog' => 'Attribut du journal (case log)',
 	'Class:MailInboxStandard/Attribute:attcode_caselog+' => 'Code de l\'attribut de la classe cible (journal des échanges) qui doit recevoir les nouvelles entrées lors de la création et/ou de la mise à jour du ticket. Par défaut : "public_log" si laissé vide ou invalide.',
+	'Class:MailInboxStandard/Attribute:caselog_entry_on_create' => 'Ajouter une entrée au journal lors de la création',
+	'Class:MailInboxStandard/Attribute:caselog_entry_on_create+' => 'Indique si une entrée initiale du journal (voir "Attribut du journal (case log)") doit également être ajoutée lors de la création du ticket, en plus de la description.',
 
 	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Valeurs par défaut du Ticket',
 	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Titre par défaut (en cas de sujet vide)',

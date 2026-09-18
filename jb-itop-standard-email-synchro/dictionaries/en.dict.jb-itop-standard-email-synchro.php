@@ -59,6 +59,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:attcode_description+' => 'Attribute code of the target class that should receive the initial ticket description. Defaults to "description" when left empty.',
 	'Class:MailInboxStandard/Attribute:attcode_caselog' => 'Case log attribute',
 	'Class:MailInboxStandard/Attribute:attcode_caselog+' => 'Attribute code of the target class (case log) that should receive new entries when the ticket is created and/or updated. Defaults to "public_log" when left empty or invalid.',
+	'Class:MailInboxStandard/Attribute:caselog_entry_on_create' => 'Add case log entry upon creation',
+	'Class:MailInboxStandard/Attribute:caselog_entry_on_create+' => 'Whether an initial case log entry (see "Case log attribute") should also be added when the ticket is created, in addition to the description.',
 
 	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Default values for new Ticket',
 	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Default title (if subject is empty)',
