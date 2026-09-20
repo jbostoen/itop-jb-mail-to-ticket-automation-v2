@@ -16,7 +16,7 @@ SetupWebPage::AddModule(
 		//
 		'dependencies' => array(
 			'itop-tickets/3.2.0',
-			'jb-framework/3.2.260918',
+			'jb-framework/3.2.260920',
 			'jb-email-synchro/2.6.190110',
 			'jb-news/3.2.0',
 			// no other dependency is listed, for backward 1.x compatibility... though this module uses implicitely the Ticket's derived classes...

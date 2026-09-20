@@ -75,11 +75,7 @@
 					<default_value>993</default_value>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
-				<field id="active" xsi:type="AttributeEnum">
-					<values>
-						<value>yes</value>
-						<value>no</value>
-					</values>
+				<field id="active" xsi:type="AttributeYesNo">
 					<sql>active</sql>
 					<default_value>yes</default_value>
 					<is_null_allowed>false</is_null_allowed>

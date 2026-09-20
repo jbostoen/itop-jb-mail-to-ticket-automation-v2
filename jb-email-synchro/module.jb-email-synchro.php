@@ -12,7 +12,8 @@ SetupWebPage::AddModule(
 		'category' => 'business',
 		// Setup
 		'dependencies' => array(
-			'itop-oauth-client/3.2.0'
+			'itop-oauth-client/3.2.0',
+			'jb-framework/3.2.260920'
 		),
 		'mandatory' => false,
 		'visible' => true,
