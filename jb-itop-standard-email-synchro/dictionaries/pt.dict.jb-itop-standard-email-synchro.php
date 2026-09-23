@@ -330,6 +330,7 @@ Dict::Add('PT PT', 'Portuguese', 'Português', array(
 
 	// Mensagens de validação
 	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'A consulta para selecionar %1$s deve visar a classe \'Contact\' (ou uma subclasse como \'Person\' ou \'Team\'), não \'%2$s\'.',
+	'Class:TriggerOnMailUpdate/Error:InvalidFilterArgument' => '%1$s: argumento de consulta não suportado \':%2$s\'. Disponíveis: :this->(atributo da classe de destino), :sender->(atributo de Person), :mail->(um de: %3$s), %4$s.',
 
 	'Menu:MailInboxes' => 'Caixas de correio de e-mail recebido',
 	'Menu:MailInboxes+' => 'Configuração das caixas de correio a analisar em busca de e-mails recebidos',

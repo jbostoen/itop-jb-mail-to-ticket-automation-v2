@@ -330,6 +330,7 @@ Dict::Add('ES ES', 'Spanish', 'Español', array(
 
 	// Mensajes de validación
 	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'La consulta para seleccionar %1$s debe apuntar a la clase \'Contact\' (o una subclase como \'Person\' o \'Team\'), no a \'%2$s\'.',
+	'Class:TriggerOnMailUpdate/Error:InvalidFilterArgument' => '%1$s: argumento de consulta no admitido \':%2$s\'. Disponibles: :this->(atributo de la clase destino), :sender->(atributo de Person), :mail->(uno de: %3$s), %4$s.',
 
 	'Menu:MailInboxes' => 'Buzones de correo entrante',
 	'Menu:MailInboxes+' => 'Configuración de los buzones a explorar en busca de correos entrantes',

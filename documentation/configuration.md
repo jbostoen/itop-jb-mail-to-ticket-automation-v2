@@ -164,6 +164,29 @@ In the ticket values (on creation and on update), the ticket itself is available
 It refers to the ticket as it is right before the values are applied.
 
 
+## Trigger "When updated by mail"
+
+The trigger is activated after a ticket has been updated by an incoming e-mail.  
+Its notifications can use the following placeholders:
+
+* `this` object: the ticket. Example: `$this->ref$`.
+* `sender` object (only after the sender was successfully linked to an iTop person). Example: `$sender->first_name$`.
+* `mail` placeholders (see the list above). Example: `$mail->subject$`. These values are HTML-escaped.
+* Date/time of processing (see above). Example: `$current_datetime$`.
+
+The **filter** (OQL) of the trigger restricts which tickets activate it.  
+The same arguments can be used in this filter (with the raw, unescaped `mail` values). Examples:
+
+```
+SELECT UserRequest WHERE caller_id = :sender->id
+SELECT UserRequest WHERE agent_id != :sender->id
+```
+
+Notes:
+* When the sender is unknown, a filter referring to `:sender` does not match.
+* Other query arguments are rejected when saving the trigger.
+
+
 ## Behavior on Incoming emails
 
 * **Policy violation behavior** - Only create new tickets, only update existing tickets; or do both.

@@ -330,6 +330,7 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 
 	// Ověřovací zprávy
 	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'Dotaz pro výběr %1$s musí cílit na třídu \'Contact\' (nebo podtřídu jako \'Person\' či \'Team\'), nikoli na \'%2$s\'.',
+	'Class:TriggerOnMailUpdate/Error:InvalidFilterArgument' => '%1$s: nepodporovaný argument dotazu \':%2$s\'. K dispozici: :this->(atribut cílové třídy), :sender->(atribut třídy Person), :mail->(jeden z: %3$s), %4$s.',
 
 	'Menu:MailInboxes' => 'Schránky pro příchozí poštu',
 	'Menu:MailInboxes+' => 'Konfigurace schránek, které se mají prohledávat na příchozí e-maily',

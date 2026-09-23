@@ -330,6 +330,7 @@ Dict::Add('SV SE', 'Swedish', 'Svenska', array(
 
 	// Valideringsmeddelanden
 	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'Frågan för att välja %1$s måste rikta sig mot klassen \'Contact\' (eller en underklass som \'Person\' eller \'Team\'), inte \'%2$s\'.',
+	'Class:TriggerOnMailUpdate/Error:InvalidFilterArgument' => '%1$s: fråge-argumentet \':%2$s\' stöds inte. Tillgängliga: :this->(attribut för målklassen), :sender->(attribut för Person), :mail->(ett av: %3$s), %4$s.',
 
 	'Menu:MailInboxes' => 'Brevlådor för inkommande e-post',
 	'Menu:MailInboxes+' => 'Konfiguration av brevlådor som ska genomsökas efter inkommande e-post',

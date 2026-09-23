@@ -330,6 +330,7 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 
 	// Messaggi di convalida
 	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'La query per selezionare %1$s deve avere come destinazione la classe \'Contact\' (o una sottoclasse come \'Person\' o \'Team\'), non \'%2$s\'.',
+	'Class:TriggerOnMailUpdate/Error:InvalidFilterArgument' => '%1$s: argomento della query non supportato \':%2$s\'. Disponibili: :this->(attributo della classe di destinazione), :sender->(attributo di Person), :mail->(uno tra: %3$s), %4$s.',
 
 	'Menu:MailInboxes' => 'Caselle di posta in entrata',
 	'Menu:MailInboxes+' => 'Configurazione delle caselle di posta da analizzare per le e-mail in entrata',

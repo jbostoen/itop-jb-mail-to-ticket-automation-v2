@@ -330,6 +330,7 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 
 	// Validierungsmeldungen
 	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'Die Abfrage zur Auswahl von %1$s muss auf die Klasse \'Contact\' (oder eine Unterklasse wie \'Person\' oder \'Team\') abzielen, nicht auf \'%2$s\'.',
+	'Class:TriggerOnMailUpdate/Error:InvalidFilterArgument' => '%1$s: nicht unterstütztes Abfrageargument \':%2$s\'. Verfügbar: :this->(Attribut der Zielklasse), :sender->(Attribut von Person), :mail->(eines von: %3$s), %4$s.',
 
 	'Menu:MailInboxes' => 'Postfächer für eingehende E-Mail',
 	'Menu:MailInboxes+' => 'Konfiguration der Postfächer, die nach eingehenden E-Mails durchsucht werden',

@@ -785,11 +785,18 @@ abstract class CreateOrUpdateTicket extends Base {
 		$aClasses = MetaModel::EnumParentClasses(get_class($oTicket), ENUM_PARENT_CLASSES_ALL);
 		$sClassList = implode(', ', CMDBSource::Quote($aClasses));
 		$oSet_TriggerMailUpdate = new DBObjectSet(DBObjectSearch::FromOQL_AllData("SELECT TriggerOnMailUpdate AS t WHERE t.target_class IN ($sClassList)"));
+		static::Trace('. Found %1$s TriggerOnMailUpdate trigger(s) for target class(es): %2$s.', $oSet_TriggerMailUpdate->Count(), implode(', ', $aClasses));
 
+		$oEmail = ProcessingHelper::GetMail();
+
+		// - The raw "mail->..." placeholders are passed: they are used as-is in the trigger's OQL filter,
+		//   and escaped by TriggerOnMailUpdate::DoActivate() before being passed to the actions.
 		$aContext = [
 			'this->object()' => $oTicket,
-			'sender->object()' => ProcessingHelper::GetMail()->GetSender(),
-        ];
+			'sender->object()' => $oEmail->GetSender(),
+			...static::GetMailPlaceholders($oEmail),
+			...static::GetDateTimePlaceholders(),
+		];
 
 		/** @var Trigger $oTrigger iTop Trigger. */
 		while($oTrigger = $oSet_TriggerMailUpdate->Fetch()) {

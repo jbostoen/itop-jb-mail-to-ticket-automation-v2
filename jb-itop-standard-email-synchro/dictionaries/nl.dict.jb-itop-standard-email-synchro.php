@@ -330,6 +330,7 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 
 	// Validatieberichten
 	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'De query om %1$s te selecteren moet gericht zijn op de klasse \'Contact\' (of een subklasse zoals \'Person\' of \'Team\'), niet op \'%2$s\'.',
+	'Class:TriggerOnMailUpdate/Error:InvalidFilterArgument' => '%1$s: niet-ondersteund query-argument \':%2$s\'. Beschikbaar: :this->(attribuut van de doelklasse), :sender->(attribuut van Person), :mail->(één van: %3$s), %4$s.',
 
 	'Menu:MailInboxes' => 'Mailboxen voor inkomende e-mail',
 	'Menu:MailInboxes+' => 'Configuratie van de mailboxen die worden doorzocht op inkomende e-mails',

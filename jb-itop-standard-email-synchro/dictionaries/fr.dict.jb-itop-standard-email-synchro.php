@@ -318,6 +318,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 
 	// Messages de validation
 	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'La requête pour sélectionner les %1$s doit cibler la classe \'Contact\' (ou une sous-classe telle que \'Person\' ou \'Team\'), et non \'%2$s\'.',
+	'Class:TriggerOnMailUpdate/Error:InvalidFilterArgument' => '%1$s : argument de requête non pris en charge \':%2$s\'. Disponibles : :this->(attribut de la classe cible), :sender->(attribut de Person), :mail->(parmi : %3$s), %4$s.',
 
 	'Menu:MailInboxes' => 'Boîtes emails de réception',
 	'Menu:MailInboxes+' => 'Configuration des boîtes emails à scanner pour de nouveaux messages',

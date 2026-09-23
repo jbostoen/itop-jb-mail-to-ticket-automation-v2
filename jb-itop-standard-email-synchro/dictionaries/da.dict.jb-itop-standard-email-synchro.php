@@ -330,6 +330,7 @@ Dict::Add('DA DK', 'Danish', 'Dansk', array(
 
 	// Valideringsbeskeder
 	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'Forespørgslen til at vælge %1$s skal målrette klassen \'Contact\' (eller en underklasse som \'Person\' eller \'Team\'), ikke \'%2$s\'.',
+	'Class:TriggerOnMailUpdate/Error:InvalidFilterArgument' => '%1$s: ikke-understøttet forespørgselsargument \':%2$s\'. Tilgængelige: :this->(attribut for målklassen), :sender->(attribut for Person), :mail->(en af: %3$s), %4$s.',
 
 	'Menu:MailInboxes' => 'Mailbokse for indgående e-mail',
 	'Menu:MailInboxes+' => 'Konfiguration af mailbokse, der skal gennemsøges for indgående e-mails',

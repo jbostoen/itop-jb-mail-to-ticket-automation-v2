@@ -333,6 +333,7 @@ Dict::Add('EN US', 'English', 'English', array(
 
 	// Validation messages
 	'MailInbox:Error:NotifyErrorsToMustTargetContact' => 'The query to select the %1$s must target the \'Contact\' class (or a subclass such as \'Person\' or \'Team\'), not \'%2$s\'.',
+	'Class:TriggerOnMailUpdate/Error:InvalidFilterArgument' => '%1$s: unsupported query argument \':%2$s\'. Available: :this->(attribute of the target class), :sender->(attribute of Person), :mail->(one of: %3$s), %4$s.',
 
 	'Menu:MailInboxes' => 'Incoming E-mail Inboxes',
 	'Menu:MailInboxes+' => 'Configuration of Inboxes to scan for incoming e-mails',

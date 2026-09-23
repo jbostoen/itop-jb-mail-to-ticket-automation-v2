@@ -122,6 +122,74 @@ abstract class Base implements iStep {
     
 
 	/**
+	 * @var string[] MAIL_PLACEHOLDER_ATTCODES Attribute codes of the "mail->..." placeholders (see GetMailPlaceholders()).
+	 */
+	public const MAIL_PLACEHOLDER_ATTCODES = [
+		'uidl',
+		'message_id',
+		'subject',
+		'caller_email',
+		'caller_email_suffix',
+		'caller_name',
+		'recipient',
+		'date',
+		'date_only',
+		'time_only',
+		'body_text_plain',
+		'body_text',
+		'body_format',
+	];
+
+	/**
+	 * Returns the (raw, unescaped) "mail->..." placeholders of the e-mail message.
+	 * The e-mail message is not a DBObject, so it can not be passed as "mail->object()"; each property is a scalar placeholder instead.
+	 *
+	 * @param EmailMessage $oEmail The e-mail message.
+	 *
+	 * @return array<string, string> Placeholders (e.g. 'mail->subject' => 'Hello world').
+	 */
+	public static function GetMailPlaceholders(EmailMessage $oEmail) : array {
+
+		// - Date and time parts of the e-mail's own date (formatted as 'Y-m-d H:i:s', see MessageFromMailbox).
+		$aDateParts = explode(' ', $oEmail->sDate, 2);
+
+		return [
+			'mail->uidl' => $oEmail->sUIDL,
+			'mail->message_id' => $oEmail->sMessageId,
+			'mail->subject' => $oEmail->sSubject,
+			'mail->caller_email' => $oEmail->sCallerEmail,
+			'mail->caller_email_suffix' => explode('@', $oEmail->sCallerEmail, 2)[1] ?? '',
+			'mail->caller_name' => $oEmail->sCallerName,
+			'mail->recipient' => $oEmail->sRecipient,
+			'mail->date' => $oEmail->sDate,
+			'mail->date_only' => $aDateParts[0],
+			'mail->time_only' => $aDateParts[1] ?? '',
+			'mail->body_text_plain' => strip_tags($oEmail->sBodyText),
+			'mail->body_text' => $oEmail->sBodyText,
+			'mail->body_format' => $oEmail->sBodyFormat,
+		];
+
+	}
+
+	/**
+	 * Returns the date/time of processing as placeholders, in iTop's internal formats (so they can be used as values of date/datetime attributes).
+	 * Unlike "mail->date", these do not depend on the (sender-controlled) Date header.
+	 *
+	 * @return array<string, string> Placeholders: 'current_date', 'current_time' and 'current_datetime'.
+	 */
+	public static function GetDateTimePlaceholders() : array {
+
+		$oNow = new DateTime();
+
+		return [
+			'current_date' => $oNow->format(AttributeDate::GetInternalFormat()),
+			'current_time' => $oNow->format('H:i:s'),
+			'current_datetime' => $oNow->format(AttributeDateTime::GetInternalFormat()),
+		];
+
+	}
+
+	/**
 	 * Replace email placeholders in a string.
 	 *
 	 * @param string $sString Input string.
@@ -139,35 +207,11 @@ abstract class Base implements iStep {
 
 		$oEmail = ProcessingHelper::GetMail();
 
-		$aParams = [
-			'mail->uidl' => $oEmail->sUIDL,
-			'mail->message_id' => $oEmail->sMessageId,
-			'mail->subject' => $oEmail->sSubject,
-			'mail->caller_email' => $oEmail->sCallerEmail,
-			'mail->caller_email_suffix' => explode('@', $oEmail->sCallerEmail, 2)[1] ?? '',
-			'mail->caller_name' => $oEmail->sCallerName,
-			'mail->recipient' => $oEmail->sRecipient,
-			'mail->date' => $oEmail->sDate,
-			'mail->body_text_plain' => strip_tags($oEmail->sBodyText),
-			'mail->body_text'  => $oEmail->sBodyText,
-			'mail->body_format' => $oEmail->sBodyFormat
-		];
+		$aParams = array_merge(static::GetMailPlaceholders($oEmail), static::GetDateTimePlaceholders());
 
 		if($oEmail->GetSender() !== null) {
 			$aParams['sender->object()'] = $oEmail->GetSender();
 		}
-
-		// - Date and time parts of the e-mail's own date (formatted as 'Y-m-d H:i:s', see MessageFromMailbox).
-		$aDateParts = explode(' ', $oEmail->sDate, 2);
-		$aParams['mail->date_only'] = $aDateParts[0];
-		$aParams['mail->time_only'] = $aDateParts[1] ?? '';
-
-		// - Date/time of processing, in iTop's internal formats, so they can be used as values of date/datetime attributes.
-		//   Unlike "mail->date", these do not depend on the (sender-controlled) Date header.
-		$oNow = new DateTime();
-		$aParams['current_date'] = $oNow->format(AttributeDate::GetInternalFormat());
-		$aParams['current_time'] = $oNow->format('H:i:s');
-		$aParams['current_datetime'] = $oNow->format(AttributeDateTime::GetInternalFormat());
 
 		$aParams = array_merge($aParams, $aExtraPlaceholders);
 
