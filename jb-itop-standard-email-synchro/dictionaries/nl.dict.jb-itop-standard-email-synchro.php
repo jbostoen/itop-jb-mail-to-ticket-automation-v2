@@ -68,9 +68,14 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Patronen negeren in het onderwerp (reguliere expressies, één per regel)',
 
-	'Class:MailInboxStandard/Attribute:stimuli' => 'Toe te passen stimuli',
+	'Class:MailInboxStandard/Attribute:stimuli' => 'Toe te passen stimuli bij bijwerken',
 	'Class:MailInboxStandard/Attribute:stimuli+' => 'Pas een stimulus toe wanneer het ticket in een bepaalde status verkeert',
 	'Class:MailInboxStandard/Attribute:stimuli?' => 'Een lijst van statuscode:stimuluscode (één per regel) om de toe te passen stimulus te bepalen (alleen na het bijwerken van een bestaand ticket), voor de gegeven status van het ticket. Dit is bijvoorbeeld nuttig om een ticket in de status "in afwachting" automatisch opnieuw toe te wijzen. Gebruik het formaat <statuscode>:<stimuluscode>',
+	'Class:MailInboxStandard/Attribute:ticket_update_values' => 'Waarden voor bijgewerkt ticket',
+	'Class:MailInboxStandard/Attribute:ticket_update_values+' => 'Waarden die worden toegepast op een bestaand ticket wanneer het wordt bijgewerkt door een inkomende e-mail (één attribuutcode:waarde per regel). Plaatshouders zoals $mail->subject$, $sender->name$, $this->ref$ en $current_datetime$ kunnen worden gebruikt.',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create' => 'Toe te passen stimuli bij aanmaken',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create+' => 'Pas een stimulus toe meteen nadat een ticket is aangemaakt, wanneer het in een bepaalde status verkeert',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create?' => 'Een lijst van statuscode:stimuluscode (één per regel) om de toe te passen stimulus te bepalen (enkel na het aanmaken van een nieuw ticket), voor de gegeven status van het ticket. Dit is bijvoorbeeld handig om een nieuw ticket automatisch toe te wijzen. Gebruik het formaat <statuscode>:<stimuluscode>',
 
 
 	'Class:MailInboxStandard/Attribute:trace' => 'Foutopsporingslog',

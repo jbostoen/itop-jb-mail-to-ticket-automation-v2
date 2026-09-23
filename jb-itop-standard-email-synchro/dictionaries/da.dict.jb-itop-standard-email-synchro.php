@@ -68,9 +68,14 @@ Dict::Add('DA DK', 'Danish', 'Dansk', array(
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignorer mønstre i emnet (regex-mønstre, ét pr. linje)',
 
-	'Class:MailInboxStandard/Attribute:stimuli' => 'Stimuli der skal anvendes',
+	'Class:MailInboxStandard/Attribute:stimuli' => 'Stimuli der skal anvendes ved opdatering',
 	'Class:MailInboxStandard/Attribute:stimuli+' => 'Anvend en stimulus, når sagen er i en given tilstand',
 	'Class:MailInboxStandard/Attribute:stimuli?' => 'En liste af tilstandskode:stimuluskode (én pr. linje), der definerer hvilken stimulus der skal anvendes (kun efter opdatering af en eksisterende sag), for den givne tilstand af sagen. Dette er f.eks. nyttigt til automatisk at gentildele en sag, der er i tilstanden "afventer". Brug formatet <tilstandskode>:<stimuluskode>',
+	'Class:MailInboxStandard/Attribute:ticket_update_values' => 'Værdier for opdateret sag',
+	'Class:MailInboxStandard/Attribute:ticket_update_values+' => 'Værdier, der anvendes på en eksisterende sag, når den opdateres af en indgående e-mail (én attributkode:værdi pr. linje). Pladsholdere som $mail->subject$, $sender->name$, $this->ref$ og $current_datetime$ kan bruges.',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create' => 'Stimuli der skal anvendes ved oprettelse',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create+' => 'Anvend en stimulus lige efter en sag er oprettet, når den er i en given tilstand',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create?' => 'En liste af tilstandskode:stimuluskode (én pr. linje), der definerer hvilken stimulus der skal anvendes (kun efter oprettelse af en ny sag), for sagens givne tilstand. Nyttigt fx til automatisk at tildele en ny sag. Brug formatet <tilstandskode>:<stimuluskode>',
 
 
 	'Class:MailInboxStandard/Attribute:trace' => 'Fejlfindingsspor',

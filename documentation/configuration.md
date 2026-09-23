@@ -143,12 +143,25 @@ body_text_plain (not a property of Email Message, but gives a version with HTML 
 caller_email
 caller_email_suffix
 caller_name
-date
+date (formatted as Y-m-d H:i:s)
+date_only (the date part of "date": Y-m-d)
 message_id
 recipient
 subject
+time_only (the time part of "date": H:i:s)
 uidl
 ```
+
+Note: `mail->date` is based on the e-mail's Date header, which is set by the sender.
+
+The date and time of processing are also available, in iTop's internal formats (so they can be used as values of date/datetime attributes):
+
+* `$current_date$` (Y-m-d)
+* `$current_time$` (H:i:s)
+* `$current_datetime$` (Y-m-d H:i:s)
+
+In the ticket values (on creation and on update), the ticket itself is available as the `this` object, e.g. `$this->ref$`.  
+It refers to the ticket as it is right before the values are applied.
 
 
 ## Behavior on Incoming emails
@@ -159,10 +172,12 @@ uidl
   * Keep the e-mail on the mail server in the same folder. Will slow down processing, as iTop needs to go over each e-mail every time.
   * Move to a different folder. Best for archiving purposes.
 * **Ticket Class** - Which ticket class (see iTop data model, usually UserRequest)
-* **Ticket Default Values** - Default values for tickets (see iTop data model, example below).
+* **Default values for new ticket** - Default values for new tickets (see iTop data model, example below).
+* **Values for updated ticket** - Values applied to an existing ticket when it is updated by an incoming e-mail (same format as the default values). Example: `last_reply_date:$current_datetime$`.
 * **Title Pattern** - Pattern which will be used to match tickets based on a reference. Example: /R-([0-9]{6})/
 * **Ignore patterns in subject** - Regex patterns, one per line. To make other patterns ignored while processing/finding related ticket (e.g. another ticket system with IR-123456 numbering).
-* **Stimuli to apply** - Example: reopen a ticket which was in a pending state (pending:ev_reopen). Note: this only works when a ticket is updated, not when it's created.
+* **Stimuli to apply on creation** - Applied right after a new ticket has been created. Example: automatically assign a new ticket (new:ev_assign), combined with default values for the team and agent.
+* **Stimuli to apply on update** - Applied after an existing ticket has been updated. Example: reopen a ticket which was in a pending state (pending:ev_reopen).
 * **Target folder**  
   When enabled (see "After processing the email") and a target folder is specified, processed e-mail messages will be moved to this folder.  
   Use case: useful when the e-mail should be kept (for archive purposes), but the inbox should contain as few e-mails as possible (for performance).

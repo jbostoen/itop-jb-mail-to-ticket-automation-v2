@@ -68,9 +68,14 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignora pattern nell\'oggetto (pattern di espressione regolare, uno per riga)',
 
-	'Class:MailInboxStandard/Attribute:stimuli' => 'Stimoli da applicare',
+	'Class:MailInboxStandard/Attribute:stimuli' => 'Stimoli da applicare all\'aggiornamento',
 	'Class:MailInboxStandard/Attribute:stimuli+' => 'Applicare uno stimolo quando il ticket si trova in un determinato stato',
 	'Class:MailInboxStandard/Attribute:stimuli?' => 'Un elenco di codice_stato:codice_stimolo (uno per riga) per definire lo stimolo da applicare (solo dopo l\'aggiornamento di un ticket esistente), per lo stato indicato del ticket. Ciò è utile, ad esempio, per riassegnare automaticamente un ticket che si trova nello stato "in attesa". Usare il formato <codice_stato>:<codice_stimolo>',
+	'Class:MailInboxStandard/Attribute:ticket_update_values' => 'Valori per il ticket aggiornato',
+	'Class:MailInboxStandard/Attribute:ticket_update_values+' => 'Valori applicati a un ticket esistente quando viene aggiornato da un\'e-mail in arrivo (un codice_attributo:valore per riga). È possibile usare segnaposto come $mail->subject$, $sender->name$, $this->ref$ e $current_datetime$.',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create' => 'Stimoli da applicare alla creazione',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create+' => 'Applicare uno stimolo subito dopo la creazione di un ticket, quando si trova in un determinato stato',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create?' => 'Un elenco di codice_stato:codice_stimolo (uno per riga) per definire lo stimolo da applicare (solo dopo la creazione di un nuovo ticket), per lo stato dato del ticket. Utile ad esempio per assegnare automaticamente un nuovo ticket. Usare il formato <codice_stato>:<codice_stimolo>',
 
 
 	'Class:MailInboxStandard/Attribute:trace' => 'Traccia di debug',

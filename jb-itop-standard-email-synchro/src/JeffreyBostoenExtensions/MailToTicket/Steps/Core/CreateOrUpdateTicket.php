@@ -328,8 +328,9 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 
 		// Default values.
-		$sDefaultValues = $oMailBox->Get('ticket_default_values');
-		$aDefaultValues = static::ParseAttributeValues($sDefaultValues);
+		// - $this->...$ refers to the ticket as it is at this point (e.g. org_id, caller_id, title are already set).
+		$sDefaultValues = $oMailBox->Get('ticket_default_values') ?? '';
+		$aDefaultValues = static::ParseAttributeValues($sDefaultValues, ['this->object()' => $oTicket]);
 
 		ProcessingHelper::InitObjectFromDefaultValues($oTicket, $aDefaultValues);
 		
@@ -486,7 +487,15 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		// Policy has already removed unwanted contacts
 		static::AddAdditionalContacts();
-		
+
+		// Update values.
+		// - Applied before DBUpdate(), so there is only one write and the update triggers see the new values.
+		// - $this->...$ refers to the ticket as it is at this point (including the new case log entry, excluding these values).
+		$sUpdateValues = $oMailBox->Get('ticket_update_values') ?? '';
+		$aUpdateValues = static::ParseAttributeValues($sUpdateValues, ['this->object()' => $oTicket]);
+
+		ProcessingHelper::InitObjectFromDefaultValues($oTicket, $aUpdateValues);
+
 		static::BeforeUpdateTicket();
 
 		try {
@@ -535,7 +544,17 @@ abstract class CreateOrUpdateTicket extends Base {
 		 
 		// Process attachments now the ID is known
 		static::UpdateAttachments();
-	
+
+		// Apply a stimulus if needed, will write the ticket to the database, may launch triggers, etc...
+		// - The ticket has already been created at this point: a failing stimulus must not be mistaken for a failed creation,
+		//   which would otherwise leave the e-mail queued for reprocessing and create a duplicate ticket on retry.
+		try {
+			static::ApplyConfiguredStimulus('stimuli_on_create');
+		}
+		catch(Throwable $e) {
+			static::Trace('.. Stimulus on creation failed: %1$s', $e->getMessage());
+		}
+
 	}
 	 
 	/**
@@ -795,17 +814,18 @@ abstract class CreateOrUpdateTicket extends Base {
 	}
 	
 	/**
-	 * Read the configuration in the 'stimuli' field (format: <state_code>:<stimulus_code>, one per line)
+	 * Read the configuration in a stimuli field (format: <state_code>:<stimulus_code>, one per line)
 	 * and apply the corresponding stimulus according to the current state of the ticket
 	 *
+	 * @param string $sSettingAttCode Attribute code of the mailbox setting: 'stimuli' (on update) or 'stimuli_on_create' (on creation).
 	 *
 	 * @return void
 	 */
-	public static function ApplyConfiguredStimulus() : void {
-		
+	public static function ApplyConfiguredStimulus(string $sSettingAttCode = 'stimuli') : void {
+
 		$oMailBox = ProcessingHelper::GetMailBox();
 		$oTicket = ProcessingHelper::GetTicket();
-		$sConf = $oMailBox->Get('stimuli');
+		$sConf = $oMailBox->Get($sSettingAttCode) ?? '';
 		
 		// In Combodo's version, this resulted in a warning?
 		// Reopen ticket elsewhere if needed.
@@ -823,7 +843,7 @@ abstract class CreateOrUpdateTicket extends Base {
 				$aStateToStimulus[$sState] = $sStimulus;
 			}
 			elseif(empty($sLine) == false) {
-				static::Trace("Invalid line in the 'stimuli' configuration: '{$sLine}'. The expected format for each line is <state_code>:<stimulus_code>");
+				static::Trace("Invalid line in the '{$sSettingAttCode}' configuration: '{$sLine}'. The expected format for each line is <state_code>:<stimulus_code>");
 			}
 		}
 		if (array_key_exists($oTicket->GetState(), $aStateToStimulus))

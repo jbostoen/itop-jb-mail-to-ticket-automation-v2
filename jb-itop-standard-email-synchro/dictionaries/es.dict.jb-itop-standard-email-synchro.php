@@ -68,9 +68,14 @@ Dict::Add('ES ES', 'Spanish', 'Español', array(
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignorar patrones en el asunto (patrones de expresión regular, uno por línea)',
 
-	'Class:MailInboxStandard/Attribute:stimuli' => 'Estímulos a aplicar',
+	'Class:MailInboxStandard/Attribute:stimuli' => 'Estímulos a aplicar en la actualización',
 	'Class:MailInboxStandard/Attribute:stimuli+' => 'Aplicar un estímulo cuando el ticket esté en un estado determinado',
 	'Class:MailInboxStandard/Attribute:stimuli?' => 'Una lista de codigo_estado:codigo_estimulo (uno por línea) para definir el estímulo a aplicar (solo tras actualizar un ticket existente), para el estado dado del ticket. Esto es útil, por ejemplo, para reasignar automáticamente un ticket que está en el estado "pendiente". Use el formato <codigo_estado>:<codigo_estimulo>',
+	'Class:MailInboxStandard/Attribute:ticket_update_values' => 'Valores para el ticket actualizado',
+	'Class:MailInboxStandard/Attribute:ticket_update_values+' => 'Valores aplicados a un ticket existente cuando se actualiza mediante un correo entrante (un codigo_atributo:valor por línea). Se pueden usar marcadores como $mail->subject$, $sender->name$, $this->ref$ y $current_datetime$.',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create' => 'Estímulos a aplicar en la creación',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create+' => 'Aplicar un estímulo justo después de crear un ticket, cuando esté en un estado determinado',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create?' => 'Una lista de codigo_estado:codigo_estimulo (uno por línea) para definir el estímulo a aplicar (solo tras crear un nuevo ticket), para el estado dado del ticket. Útil, por ejemplo, para asignar automáticamente un nuevo ticket. Use el formato <codigo_estado>:<codigo_estimulo>',
 
 
 	'Class:MailInboxStandard/Attribute:trace' => 'Traza de depuración',

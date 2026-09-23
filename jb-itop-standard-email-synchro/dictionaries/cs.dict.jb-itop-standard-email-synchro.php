@@ -68,9 +68,14 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignorovat vzory v předmětu (regulární výrazy, jeden na řádek)',
 
-	'Class:MailInboxStandard/Attribute:stimuli' => 'Podněty k použití',
+	'Class:MailInboxStandard/Attribute:stimuli' => 'Podněty k použití při aktualizaci',
 	'Class:MailInboxStandard/Attribute:stimuli+' => 'Použít podnět, když je tiket v daném stavu',
 	'Class:MailInboxStandard/Attribute:stimuli?' => 'Seznam kod_stavu:kod_podnetu (jeden na řádek) definující podnět, který se má použít (pouze po aktualizaci existujícího tiketu) pro daný stav tiketu. To je užitečné například k automatickému přeřazení tiketu, který je ve stavu "čeká". Použijte formát <kod_stavu>:<kod_podnetu>',
+	'Class:MailInboxStandard/Attribute:ticket_update_values' => 'Hodnoty pro aktualizovaný tiket',
+	'Class:MailInboxStandard/Attribute:ticket_update_values+' => 'Hodnoty použité na existující tiket, když je aktualizován příchozím e-mailem (jeden kod_atributu:hodnota na řádek). Lze použít zástupné symboly jako $mail->subject$, $sender->name$, $this->ref$ a $current_datetime$.',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create' => 'Podněty k použití při vytvoření',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create+' => 'Použít podnět ihned po vytvoření tiketu, když je v daném stavu',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create?' => 'Seznam kod_stavu:kod_podnetu (jeden na řádek) definující podnět, který se má použít (pouze po vytvoření nového tiketu), pro daný stav tiketu. Užitečné např. pro automatické přiřazení nového tiketu. Použijte formát <kod_stavu>:<kod_podnetu>',
 
 
 	'Class:MailInboxStandard/Attribute:trace' => 'Ladicí trasování',

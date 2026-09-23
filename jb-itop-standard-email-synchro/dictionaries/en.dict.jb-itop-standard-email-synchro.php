@@ -62,7 +62,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:caselog_entry_on_create' => 'Add case log entry upon creation',
 	'Class:MailInboxStandard/Attribute:caselog_entry_on_create+' => 'Whether an initial case log entry (see "Case log attribute") should also be added when the ticket is created, in addition to the description.',
 
-	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Default values for new Ticket',
+	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Default values for new ticket',
 	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Default title (if subject is empty)',
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Pattern to match in the subject',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Title Pattern',
@@ -70,9 +70,14 @@ Dict::Add('EN US', 'English', 'English', array(
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignore patterns in subject (regex patterns, one per line)', 
 	
-	'Class:MailInboxStandard/Attribute:stimuli' => 'Stimuli to apply',
+	'Class:MailInboxStandard/Attribute:stimuli' => 'Stimuli to apply on update',
 	'Class:MailInboxStandard/Attribute:stimuli+' => 'Apply a stimulus when the ticket is in a given state',
 	'Class:MailInboxStandard/Attribute:stimuli?' => 'A list of state_code:stimulus_code (one per line) to define the stimulus to apply (only after updating an existing ticket), for the given state of the ticket. This is useful for example to automatically reassign a ticket which is in the state “pending”. Use the format <state_code>:<stimulus_code>',
+	'Class:MailInboxStandard/Attribute:ticket_update_values' => 'Values for updated ticket',
+	'Class:MailInboxStandard/Attribute:ticket_update_values+' => 'Values applied to an existing ticket when it is updated by an incoming e-mail (one attcode:value per line). Placeholders such as $mail->subject$, $sender->name$, $this->ref$ and $current_datetime$ can be used.',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create' => 'Stimuli to apply on creation',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create+' => 'Apply a stimulus right after a ticket has been created, when it is in a given state',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create?' => 'A list of state_code:stimulus_code (one per line) to define the stimulus to apply (only after creating a new ticket), for the given state of the ticket. This is useful for example to automatically assign a new ticket. Use the format <state_code>:<stimulus_code>',
 
 
 	'Class:MailInboxStandard/Attribute:trace' => 'Debug trace',

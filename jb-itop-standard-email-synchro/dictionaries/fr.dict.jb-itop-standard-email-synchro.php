@@ -62,7 +62,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:caselog_entry_on_create' => 'Ajouter une entrée au journal lors de la création',
 	'Class:MailInboxStandard/Attribute:caselog_entry_on_create+' => 'Indique si une entrée initiale du journal (voir "Attribut du journal (case log)") doit également être ajoutée lors de la création du ticket, en plus de la description.',
 
-	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Valeurs par défaut du Ticket',
+	'Class:MailInboxStandard/Attribute:ticket_default_values' => 'Valeurs par défaut du nouveau ticket',
 	'Class:MailInboxStandard/Attribute:ticket_default_title' => 'Titre par défaut (en cas de sujet vide)',
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Expression régulière à rechercher dans l\'objet de l\'eMail',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Recherche dans l\'objet du mail (RegExp)',
@@ -70,9 +70,14 @@ Dict::Add('FR FR', 'French', 'Français', array(
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Schémas à ignorer dans l\'objet (Schémas en exp. rég., un par ligne)',
 	
-	'Class:MailInboxStandard/Attribute:stimuli' => 'Stimuli à appliquer',
+	'Class:MailInboxStandard/Attribute:stimuli' => 'Stimuli à appliquer lors de la mise à jour',
 	'Class:MailInboxStandard/Attribute:stimuli+' => 'Appliquer un stimulus quand le ticket est dans un état donné',
 	'Class:MailInboxStandard/Attribute:stimuli?' => 'Utilisez le format <code_etat>:<code_stimulus>',
+	'Class:MailInboxStandard/Attribute:ticket_update_values' => 'Valeurs du ticket mis à jour',
+	'Class:MailInboxStandard/Attribute:ticket_update_values+' => 'Valeurs appliquées à un ticket existant lorsqu\'il est mis à jour par un e-mail entrant (un code_attribut:valeur par ligne). Des placeholders tels que $mail->subject$, $sender->name$, $this->ref$ et $current_datetime$ peuvent être utilisés.',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create' => 'Stimuli à appliquer lors de la création',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create+' => 'Appliquer un stimulus juste après la création d\'un ticket, quand il est dans un état donné',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create?' => 'Utilisez le format <code_etat>:<code_stimulus> (un par ligne), appliqué uniquement après la création d\'un nouveau ticket. Utile par exemple pour assigner automatiquement un nouveau ticket.',
 
 
 	'Class:MailInboxStandard/Attribute:trace' => 'Activer la trace',

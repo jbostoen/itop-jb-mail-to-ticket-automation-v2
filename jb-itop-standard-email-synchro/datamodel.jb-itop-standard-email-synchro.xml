@@ -137,6 +137,11 @@ status:assigned]]></default_value>
 					<default_value>keep</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
+				<field id="ticket_update_values" xsi:type="AttributeText">
+					<sql>ticket_update_values</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
 				<field id="target_folder" xsi:type="AttributeString">
 					<sql>target_folder</sql>
 					<default_value/>
@@ -144,6 +149,11 @@ status:assigned]]></default_value>
 				</field>
 				<field id="stimuli" xsi:type="AttributeText">
 					<sql>stimuli</sql>
+					<default_value/>
+					<is_null_allowed>true</is_null_allowed>
+				</field>
+				<field id="stimuli_on_create" xsi:type="AttributeText">
+					<sql>stimuli_on_create</sql>
 					<default_value/>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
@@ -775,6 +785,12 @@ EOF
 								</item>
 								<item id="ticket_default_values">
 									<rank>60</rank>
+								</item>
+								<item id="ticket_update_values">
+									<rank>65</rank>
+								</item>
+								<item id="stimuli_on_create">
+									<rank>75</rank>
 								</item>
 								<item id="stimuli">
 									<rank>80</rank>

@@ -68,9 +68,14 @@ Dict::Add('SV SE', 'Swedish', 'Svenska', array(
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignorera mönster i ämnet (reguljära uttryck, ett per rad)',
 
-	'Class:MailInboxStandard/Attribute:stimuli' => 'Stimuli att tillämpa',
+	'Class:MailInboxStandard/Attribute:stimuli' => 'Stimuli att tillämpa vid uppdatering',
 	'Class:MailInboxStandard/Attribute:stimuli+' => 'Tillämpa en stimulus när ärendet är i ett visst tillstånd',
 	'Class:MailInboxStandard/Attribute:stimuli?' => 'En lista med tillståndskod:stimulikod (en per rad) för att definiera vilken stimulus som ska tillämpas (endast efter uppdatering av ett befintligt ärende), för det givna tillståndet på ärendet. Detta är till exempel användbart för att automatiskt omtilldela ett ärende som är i tillståndet "väntande". Använd formatet <tillståndskod>:<stimulikod>',
+	'Class:MailInboxStandard/Attribute:ticket_update_values' => 'Värden för uppdaterat ärende',
+	'Class:MailInboxStandard/Attribute:ticket_update_values+' => 'Värden som tillämpas på ett befintligt ärende när det uppdateras av ett inkommande e-postmeddelande (en attributkod:värde per rad). Platshållare som $mail->subject$, $sender->name$, $this->ref$ och $current_datetime$ kan användas.',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create' => 'Stimuli att tillämpa vid skapande',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create+' => 'Tillämpa en stimulus direkt efter att ett ärende har skapats, när det är i ett visst tillstånd',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create?' => 'En lista med tillståndskod:stimulikod (en per rad) för att definiera vilken stimulus som ska tillämpas (endast efter att ett nytt ärende skapats), för ärendets givna tillstånd. Användbart t.ex. för att automatiskt tilldela ett nytt ärende. Använd formatet <tillståndskod>:<stimulikod>',
 
 
 	'Class:MailInboxStandard/Attribute:trace' => 'Felsökningsspår',

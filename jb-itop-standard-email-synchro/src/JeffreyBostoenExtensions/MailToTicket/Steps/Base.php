@@ -15,6 +15,9 @@ use JeffreyBostoenExtensions\MailToTicket\{
 };
 
 // iTop.
+use AttributeDate;
+use AttributeDateTime;
+use DateTime;
 use MetaModel;
 use EmailContact;
 use EmailMessage;
@@ -153,6 +156,18 @@ abstract class Base implements iStep {
 		if($oEmail->GetSender() !== null) {
 			$aParams['sender->object()'] = $oEmail->GetSender();
 		}
+
+		// - Date and time parts of the e-mail's own date (formatted as 'Y-m-d H:i:s', see MessageFromMailbox).
+		$aDateParts = explode(' ', $oEmail->sDate, 2);
+		$aParams['mail->date_only'] = $aDateParts[0];
+		$aParams['mail->time_only'] = $aDateParts[1] ?? '';
+
+		// - Date/time of processing, in iTop's internal formats, so they can be used as values of date/datetime attributes.
+		//   Unlike "mail->date", these do not depend on the (sender-controlled) Date header.
+		$oNow = new DateTime();
+		$aParams['current_date'] = $oNow->format(AttributeDate::GetInternalFormat());
+		$aParams['current_time'] = $oNow->format('H:i:s');
+		$aParams['current_datetime'] = $oNow->format(AttributeDateTime::GetInternalFormat());
 
 		$aParams = array_merge($aParams, $aExtraPlaceholders);
 

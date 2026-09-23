@@ -68,9 +68,14 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Muster im Betreff ignorieren (reguläre Ausdrücke, einer pro Zeile)',
 
-	'Class:MailInboxStandard/Attribute:stimuli' => 'Anzuwendende Stimuli',
+	'Class:MailInboxStandard/Attribute:stimuli' => 'Anzuwendende Stimuli bei Aktualisierung',
 	'Class:MailInboxStandard/Attribute:stimuli+' => 'Einen Stimulus anwenden, wenn sich das Ticket in einem bestimmten Zustand befindet',
 	'Class:MailInboxStandard/Attribute:stimuli?' => 'Eine Liste von Zustandscode:Stimuluscode (einer pro Zeile), um den anzuwendenden Stimulus festzulegen (nur nach der Aktualisierung eines bestehenden Tickets) für den jeweiligen Zustand des Tickets. Dies ist zum Beispiel nützlich, um ein Ticket, das sich im Zustand "wartend" befindet, automatisch neu zuzuweisen. Verwenden Sie das Format <zustandscode>:<stimuluscode>',
+	'Class:MailInboxStandard/Attribute:ticket_update_values' => 'Werte für aktualisiertes Ticket',
+	'Class:MailInboxStandard/Attribute:ticket_update_values+' => 'Werte, die auf ein bestehendes Ticket angewendet werden, wenn es durch eine eingehende E-Mail aktualisiert wird (ein Attributcode:Wert pro Zeile). Platzhalter wie $mail->subject$, $sender->name$, $this->ref$ und $current_datetime$ können verwendet werden.',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create' => 'Anzuwendende Stimuli bei Erstellung',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create+' => 'Einen Stimulus direkt nach der Erstellung eines Tickets anwenden, wenn es sich in einem bestimmten Zustand befindet',
+	'Class:MailInboxStandard/Attribute:stimuli_on_create?' => 'Eine Liste von Zustandscode:Stimuluscode (einer pro Zeile), um den anzuwendenden Stimulus festzulegen (nur nach dem Erstellen eines neuen Tickets), für den jeweiligen Zustand des Tickets. Nützlich z. B., um ein neues Ticket automatisch zuzuweisen. Format: <Zustandscode>:<Stimuluscode>',
 
 
 	'Class:MailInboxStandard/Attribute:trace' => 'Debug-Trace',
