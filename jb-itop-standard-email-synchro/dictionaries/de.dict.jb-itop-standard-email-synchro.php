@@ -115,16 +115,23 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'MIME-Typen ausschließen',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Anhänge dieser MIME-Typen werden nicht verarbeitet. Geben Sie einen pro Zeile an.',
 
-	// Richtlinie: DKIM-Prüfung
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior' => 'Verhalten bei Verstoß',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:do_nothing' => 'Nichts tun',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:inactive' => 'Inaktiv',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_notification' => 'Nachricht der Zurückweisung',
+	// Absenderauthentifizierung (SPF/DKIM)
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Als Fehler gewertete Authentifizierungsergebnisse',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Vom empfangenden Mailserver gemeldete Ergebnisse (Authentication-Results), bei denen dem Absender nicht vertraut wird. Wird eines davon erkannt, wird das konfigurierte Verhalten angewendet und kein späterer Schritt vertraut der Absenderadresse (z. B. zum Zuordnen des Anrufers). Gilt nur, wenn diese Richtlinie nicht inaktiv ist.',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_softfail' => 'SPF: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanenter Fehler',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Verhalten bei Verstoß',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Nichts tun',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inaktiv',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Betreff der Zurückweisung',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Nachricht der Zurückweisung',
 
 	// Richtlinie: E-Mail zu groß
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Verhalten bei Verstoß',
@@ -309,7 +316,7 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 
 	// Schritte
 	'MailInbox:StepAttachmentCriteria' => 'Eingebettete E-Mail-Bilder',
-	'MailInbox:PolicyDkimCheck' => 'DKIM-Prüfung',
+	'MailInbox:PolicySenderAuthentication' => 'Absenderauthentifizierung (SPF/DKIM)',
 	'MailInbox:PolicyMailSize' => 'E-Mail-Größe',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Anhang - Verbotener MIME-Typ',
 	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Anhang - Ignorierter MIME-Typ',

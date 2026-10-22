@@ -45,9 +45,7 @@ abstract class NonDeliveryReport extends Base {
 	 */
 	public static function Execute() : void {
 
-		$oMailBox = ProcessingHelper::GetMailBox();
 		$oEmail = ProcessingHelper::GetMail();
-		$oRawEmail = ProcessingHelper::GetRawMail();
 
 		$bMarkAsInactive = (static::GetStepSetting('mark_caller_as_inactive') == 'yes');
 		$sBehavior = static::GetStepSetting('behavior');
@@ -110,16 +108,11 @@ abstract class NonDeliveryReport extends Base {
 
 								if($oTicket !== null) {
 
-									// A matched ticket only proves this message references a Message-ID this
-									// mailbox itself issued for that ticket; it says nothing about whether the
-									// "Final-Recipient" claim below is genuine. Require the outer bounce to have
-									// passed SPF/DKIM too, consistent with the no-ticket branch below.
-									$bTrusted = !$oRawEmail->HasFailedAuthentication($oMailBox->Get('authentication_results_authserv_id'))
-										&& (strcasecmp($sRecipient, (string) $oTicket->Get('caller_id->email')) === 0);
+									$bTrusted = (strcasecmp($sRecipient, (string) $oTicket->Get('caller_id->email')) === 0);
 
 								}
 								else {
-									$bTrusted = static::EmbeddedMessageIsGenuineBounce($oEmail, $oRawEmail);
+									$bTrusted = static::EmbeddedMessageIsGenuineBounce($oEmail);
 								}
 
 								if(!$bTrusted) {
@@ -198,17 +191,9 @@ abstract class NonDeliveryReport extends Base {
 	 * mailbox's own address.
 	 *
 	 * @param EmailMessage $oEmail
-	 * @param RawEmailMessage $oRawEmail The raw, enclosing bounce message (not the embedded part).
 	 * @return bool
 	 */
-	private static function EmbeddedMessageIsGenuineBounce(EmailMessage $oEmail, RawEmailMessage $oRawEmail) : bool {
-
-		// A failed SPF/DKIM check on the enclosing bounce message means it did not genuinely
-		// originate the way it claims to; don't even bother inspecting its embedded content.
-		$oMailBox = ProcessingHelper::GetMailBox();
-		if($oRawEmail->HasFailedAuthentication($oMailBox->Get('authentication_results_authserv_id'))) {
-			return false;
-		}
+	private static function EmbeddedMessageIsGenuineBounce(EmailMessage $oEmail) : bool {
 
 		foreach($oEmail->aAttachments as $aAttachment) {
 

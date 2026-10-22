@@ -8,6 +8,22 @@ Remove all e-mail messages that were already successfully processed from the mai
 Otherwise, it is possible in some situations that they are processed again.  
 This could result in duplicate tickets or log entries in existing tickets.
 
+## Upgrading from 3.2.260915 or earlier?
+
+The mailbox policy "DKIM check" has become "Sender authentication (SPF/DKIM)".  
+Its settings were renamed, so a previously configured behavior, bounce subject and bounce message are not carried over and need to be configured again.  
+The policy was inactive by default.
+
+The policy now evaluates the SPF/DKIM results once, as the first step. Other steps no longer re-check them.  
+The new "Authentication results treated as failure" setting decides which results count as a failure (by default: SPF fail/softfail and DKIM fail/softfail/permanent error).  
+When one of them is detected, the configured behavior is applied and the processing of that message ends.  
+
+The policy remains inactive by default.  
+Previously, several steps (e.g. finding the caller, updating caller attributes, matching contact methods, handling Non-Delivery Reports) always refused to trust a sender with a failed SPF/DKIM result, even if the policy was inactive.  
+Now, when the policy is inactive, SPF/DKIM results are no longer taken into account at all.  
+Set the policy to anything other than inactive to keep rejecting messages that fail authentication.
+
+
 ## Upgrading from before 3.2.241106?
 
 There has been a major change in the internal processing of an e-mail's UIDL.  

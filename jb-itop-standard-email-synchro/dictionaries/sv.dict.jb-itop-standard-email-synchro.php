@@ -115,16 +115,23 @@ Dict::Add('SV SE', 'Swedish', 'Svenska', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Uteslut MIME-typer',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Bilagor av dessa MIME-typer kommer inte att behandlas. Ange en per rad.',
 
-	// Princip: DKIM-kontroll
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior' => 'Beteende vid överträdelse',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:do_nothing' => 'Gör ingenting',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:inactive' => 'Inaktiv',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_notification' => 'Avvisningsmeddelande',
+	// Avsändarautentisering (SPF/DKIM)
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Autentiseringsresultat som räknas som fel',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Resultat som rapporteras av den mottagande e-postservern (Authentication-Results) och där avsändaren inte litas på. Om något av dem upptäcks tillämpas det konfigurerade beteendet och inget senare steg litar på avsändarens adress (t.ex. för att hitta den som ringer). Gäller endast när denna princip inte är inaktiv.',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_softfail' => 'SPF: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanent fel',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Beteende vid överträdelse',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Gör ingenting',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inaktiv',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Avvisningsämne',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Avvisningsmeddelande',
 
 	// Princip: e-postmeddelande för stort
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Beteende vid överträdelse',
@@ -309,7 +316,7 @@ Dict::Add('SV SE', 'Swedish', 'Svenska', array(
 
 	// Steg
 	'MailInbox:StepAttachmentCriteria' => 'Inbäddade e-postbilder',
-	'MailInbox:PolicyDkimCheck' => 'DKIM-kontroll',
+	'MailInbox:PolicySenderAuthentication' => 'Avsändarautentisering (SPF/DKIM)',
 	'MailInbox:PolicyMailSize' => 'E-poststorlek',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Bilaga - Förbjuden MIME-typ',
 	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Bilaga - Ignorerad MIME-typ',

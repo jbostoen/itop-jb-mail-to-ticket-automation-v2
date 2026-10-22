@@ -409,49 +409,27 @@ class RawEmailMessage {
 	}
 
 	/**
-	 * Whether the receiving mail server reported a failed SPF or DKIM check for this message,
-	 * via the 'Authentication-Results' header (RFC 8601). A sender's 'From:' address is not
-	 * authenticated by SMTP itself, so this is the only signal available to distrust it.
+	 * Gets every result state (RFC 8601 §2.7: e.g. 'pass', 'fail', 'softfail', 'none', 'neutral', 'policy',
+	 * 'temperror', 'permerror') reported for an authentication method (e.g. 'spf', 'dkim') for this message,
+	 * from 'Authentication-Results' occurrence(s) trusted per the authserv-id boundary. A message can carry more
+	 * than one result for the same method (e.g. multiple DKIM signatures, or one per mail hop), so all of them
+	 * are returned, instead of collapsing them into a single pass/fail outcome.
+	 * A sender's 'From:' address is not authenticated by SMTP itself, so this is the only signal available to distrust it.
 	 *
+	 * @param string $sMethod The authentication method, e.g. 'spf' or 'dkim' (non case sensitive).
 	 * @param string|null $sExpectedAuthservId Optional authserv-id (typically the receiving mail
 	 *                                          server's own hostname) to restrict which occurrence(s) are trusted.
 	 *
-	 * @return bool True if a trusted 'Authentication-Results' occurrence reports spf=fail, spf=softfail,
-	 *              dkim=fail or dkim=softfail; false otherwise (including when none is found).
+	 * @return string[] Every trusted state found for the method, lower-cased, in the order they appear; empty if none found.
 	 */
-	public function HasFailedAuthentication($sExpectedAuthservId = null) : bool {
-
-		foreach($this->GetTrustedAuthenticationResultsOccurrences($sExpectedAuthservId) as $sOccurrence) {
-
-			if(preg_match('/\b(spf|dkim)=(soft)?fail\b/i', $sOccurrence) === 1) {
-				return true;
-			}
-
-		}
-
-		return false;
-
-	}
-
-	/**
-	 * Gets every DKIM result state (RFC 8601 §2.7.1: 'pass', 'fail', 'none', 'neutral', 'policy',
-	 * 'temperror', 'permerror') reported for this message, from 'Authentication-Results' occurrence(s)
-	 * trusted per the same authserv-id boundary as HasFailedAuthentication(). A message can carry more
-	 * than one 'dkim=' result (e.g. multiple signatures, or one per mail hop), so all of them are returned,
-	 * instead of collapsing them into a single pass/fail outcome.
-	 *
-	 * @param string|null $sExpectedAuthservId Optional authserv-id (typically the receiving mail
-	 *                                          server's own hostname) to restrict which occurrence(s) are trusted.
-	 *
-	 * @return string[] Every trusted 'dkim=' state found, lower-cased, in the order they appear; empty if none found.
-	 */
-	public function GetDkimStates($sExpectedAuthservId = null) : array {
+	public function GetAuthenticationStates(string $sMethod, $sExpectedAuthservId = null) : array {
 
 		$aStates = [];
+		$sPattern = '/\b'.preg_quote($sMethod, '/').'=([a-z]+)\b/i';
 
 		foreach($this->GetTrustedAuthenticationResultsOccurrences($sExpectedAuthservId) as $sOccurrence) {
 
-			if(preg_match_all('/\bdkim=([a-z]+)\b/i', $sOccurrence, $aMatches) > 0) {
+			if(preg_match_all($sPattern, $sOccurrence, $aMatches) > 0) {
 				foreach($aMatches[1] as $sState) {
 					$aStates[] = strtolower($sState);
 				}

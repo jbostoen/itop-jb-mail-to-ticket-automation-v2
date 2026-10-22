@@ -115,16 +115,23 @@ Dict::Add('DA DK', 'Danish', 'Dansk', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Udeluk MIME-typer',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Vedhæftninger af disse MIME-typer behandles ikke. Angiv én pr. linje.',
 
-	// Politik: DKIM-kontrol
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior' => 'Adfærd ved overtrædelse',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:do_nothing' => 'Gør intet',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:inactive' => 'Inaktiv',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_notification' => 'Afvisningsbesked',
+	// Afsenderautentificering (SPF/DKIM)
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Autentificeringsresultater, der regnes som fejl',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Resultater rapporteret af den modtagende mailserver (Authentication-Results), hvor afsenderen ikke stoles på. Hvis et af dem registreres, anvendes den konfigurerede adfærd, og intet senere trin stoler på afsenderens adresse (fx til at finde den, der ringer). Gælder kun, når denne politik ikke er inaktiv.',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_softfail' => 'SPF: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanent fejl',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Adfærd ved overtrædelse',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Gør intet',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inaktiv',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Emne for afvisning',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Afvisningsbesked',
 
 	// Politik: for stor e-mail
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Adfærd ved overtrædelse',
@@ -309,7 +316,7 @@ Dict::Add('DA DK', 'Danish', 'Dansk', array(
 
 	// Trin
 	'MailInbox:StepAttachmentCriteria' => 'Indlejrede billeder i e-mail',
-	'MailInbox:PolicyDkimCheck' => 'DKIM-kontrol',
+	'MailInbox:PolicySenderAuthentication' => 'Afsenderautentificering (SPF/DKIM)',
 	'MailInbox:PolicyMailSize' => 'E-mailstørrelse',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Vedhæftning - Forbudt MIME-type',
 	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Vedhæftning - Ignoreret MIME-type',

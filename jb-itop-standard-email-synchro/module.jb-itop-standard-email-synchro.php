@@ -44,12 +44,12 @@ SetupWebPage::AddModule(
 			// Extra.
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AttachmentForbiddenMimeType.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/AutoReply.php',
-			'src/JeffreyBostoenExtensions/MailToTicket/Steps/DkimVerification.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/LimitMailSize.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/MatchByInReplyToOrReferences.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/NonDeliveryReport.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/NoSubject.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/OtherEmailCallerThanTicketCaller.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Steps/SenderAuthentication.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/OtherRecipients.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/RemoveTitlePatterns.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Steps/SenderEmailAddress.php',

@@ -104,8 +104,6 @@ abstract class StepFindCallerByContactMethod extends Base {
 		/** @var RawEmailMessage $oRawEmail Raw e-mail message. */
 		$oRawEmail = ProcessingHelper::GetRawMail();
 
-		$oMailBox = ProcessingHelper::GetMailBox();
-
 		// Don't even bother if jb-contactmethod is not enabled as an extension.
 		if(!MetaModel::IsValidClass('ContactMethod') && !MetaModel::IsValidClass('EmailAlias')) {
 			static::Trace(". Step not relevant: No relevant classes exist (ContactMethod, EmailAlias).");
@@ -125,11 +123,6 @@ abstract class StepFindCallerByContactMethod extends Base {
 		// depend on the DB's collation being case-insensitive (matches the mb_strtolower()
 		// normalization already used elsewhere in this codebase for comparing e-mail addresses).
 		$sCallerEmail = mb_strtolower(trim($oRawEmail->GetSender()[0]->GetEmailAddress()));
-
-		if($oRawEmail->HasFailedAuthentication($oMailBox->Get('authentication_results_authserv_id'))) {
-			static::Trace("Refusing to trust '{$sCallerEmail}' as a contact method match: the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
-			return;
-		}
 
 		/** @var Person|null $oCaller The related person. */
 		$oPerson = static::FindContactByEmail($sCallerEmail);

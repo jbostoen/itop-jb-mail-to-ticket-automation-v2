@@ -118,16 +118,23 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Exclude MIME types',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Attachments of these MIME types will not be processed. Specify one per line.',
 	
-	// Policy: DKIM check
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior' => 'Behavior on violation',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_delete' => 'Bounce to sender and delete',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_mark_as_undesired' => 'Bounce to sender and mark as undesired',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:delete' => 'Delete the message from the mailbox',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:do_nothing' => 'Do nothing',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:inactive' => 'Inactive',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_subject' => 'Bounce subject',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_notification' => 'Bounce message',
+	// Sender authentication (SPF/DKIM)
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Authentication results treated as failure',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Results reported by the receiving mail server (Authentication-Results) for which the sender is not trusted. When any of these is detected, the configured behavior is applied and no later step trusts the sender\'s address (e.g. to match the caller). Only applies when this policy is not inactive.',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_softfail' => 'SPF: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanent error',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Behavior on violation',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Bounce to sender and delete',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Bounce to sender and mark as undesired',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Delete the message from the mailbox',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Do nothing',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inactive',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Bounce subject',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Bounce message',
 
 	// Policy: mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Behavior on violation',
@@ -312,7 +319,7 @@ Dict::Add('EN US', 'English', 'English', array(
 
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Embedded e-mail images',
-	'MailInbox:PolicyDkimCheck' => 'DKIM check',
+	'MailInbox:PolicySenderAuthentication' => 'Sender authentication (SPF/DKIM)',
 	'MailInbox:PolicyMailSize' => 'Mail Size',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Attachment - Forbidden MIME type',
 	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Attachment - Ignored MIME type',

@@ -116,15 +116,22 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Exclure les types MIME',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Les pièces jointes de ces types MIME ne seront pas traitées. Une par ligne.',
 	
-	// DKIM check
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior' => 'Comportement en cas d\'infraction',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_mark_as_undesired' => 'Renvoyer à l\'expéditeur et marquer comme indésirable',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:delete' => 'Supprimer',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:do_nothing' => 'Ne rien faire',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:mark_as_undesired' => 'Marquer comme indésirable / Garder l\'email temporairement',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_subject' => 'Rejeter l\'objet',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_notification' => 'Rejeter le message',
+	// Authentification de l'expéditeur (SPF/DKIM)
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Résultats d\'authentification considérés comme un échec',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Résultats signalés par le serveur de messagerie destinataire (Authentication-Results) pour lesquels l\'expéditeur n\'est pas considéré comme fiable. Si l\'un d\'eux est détecté, le comportement configuré est appliqué et aucune étape suivante ne fait confiance à l\'adresse de l\'expéditeur (par ex. pour identifier l\'appelant). S\'applique uniquement si cette politique n\'est pas inactive.',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_softfail' => 'SPF: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM : erreur permanente',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Comportement en cas d\'infraction',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Renvoyer à l\'expéditeur et supprimer',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Renvoyer à l\'expéditeur et marquer comme indésirable',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Supprimer',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Ne rien faire',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Marquer comme indésirable / Garder l\'email temporairement',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Rejeter l\'objet',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Rejeter le message',
 
 	// mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportement en cas d\'infraction',
@@ -297,7 +304,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Pièce jointe - criteria',
-	'MailInbox:PolicyDkimCheck' => 'Vérification DKIM',
+	'MailInbox:PolicySenderAuthentication' => 'Authentification de l\'expéditeur (SPF/DKIM)',
 	'MailInbox:PolicyMailSize' => 'Taille de l\'email',
 	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Pièce jointe - type MIME ignoré',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Pièce jointe - type MIME interdit',

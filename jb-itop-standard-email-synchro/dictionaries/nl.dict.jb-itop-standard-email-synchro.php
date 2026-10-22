@@ -115,16 +115,23 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'MIME-types uitsluiten',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Bijlagen van deze MIME-types worden niet verwerkt. Geef er één per regel op.',
 
-	// Beleid: DKIM-controle
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior' => 'Gedrag bij overtreding',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:do_nothing' => 'Niets doen',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:inactive' => 'Inactief',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_notification' => 'Bericht bij terugsturen',
+	// Afzenderauthenticatie (SPF/DKIM)
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Authenticatieresultaten die als mislukt gelden',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Door de ontvangende mailserver gerapporteerde resultaten (Authentication-Results) waarbij de afzender niet wordt vertrouwd. Bij detectie wordt het ingestelde gedrag toegepast en vertrouwt geen enkele latere stap het adres van de afzender (bijv. om de beller te koppelen). Geldt alleen als dit beleid niet inactief is.',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_softfail' => 'SPF: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanente fout',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Gedrag bij overtreding',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Niets doen',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inactief',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Onderwerp van terugsturen',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Bericht bij terugsturen',
 
 	// Beleid: e-mail te groot
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Gedrag bij overtreding',
@@ -309,7 +316,7 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 
 	// Stappen
 	'MailInbox:StepAttachmentCriteria' => 'Ingesloten e-mailafbeeldingen',
-	'MailInbox:PolicyDkimCheck' => 'DKIM-controle',
+	'MailInbox:PolicySenderAuthentication' => 'Afzenderauthenticatie (SPF/DKIM)',
 	'MailInbox:PolicyMailSize' => 'E-mailgrootte',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Bijlage - Verboden MIME-type',
 	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Bijlage - Genegeerd MIME-type',

@@ -115,16 +115,23 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Vyloučit typy MIME',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Přílohy těchto typů MIME nebudou zpracovány. Zadejte jeden na řádek.',
 
-	// Zásada: kontrola DKIM
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior' => 'Chování při porušení',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:delete' => 'Smazat zprávu ze schránky',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:do_nothing' => 'Nedělat nic',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:inactive' => 'Neaktivní',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_notification' => 'Zpráva o odmítnutí',
+	// Ověření odesílatele (SPF/DKIM)
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Výsledky ověření považované za selhání',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Výsledky hlášené přijímajícím poštovním serverem (Authentication-Results), při nichž se odesílateli nedůvěřuje. Pokud je zjištěn některý z nich, použije se nakonfigurované chování a žádný další krok již adrese odesílatele nedůvěřuje (např. při určení volajícího). Platí pouze tehdy, když tato zásada není neaktivní.',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_softfail' => 'SPF: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: trvalá chyba',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Chování při porušení',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Smazat zprávu ze schránky',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Nedělat nic',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Neaktivní',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Předmět odmítnutí',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Zpráva o odmítnutí',
 
 	// Zásada: e-mail je příliš velký
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Chování při porušení',
@@ -309,7 +316,7 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 
 	// Kroky
 	'MailInbox:StepAttachmentCriteria' => 'Vložené obrázky v e-mailu',
-	'MailInbox:PolicyDkimCheck' => 'Kontrola DKIM',
+	'MailInbox:PolicySenderAuthentication' => 'Ověření odesílatele (SPF/DKIM)',
 	'MailInbox:PolicyMailSize' => 'Velikost pošty',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Příloha - zakázaný typ MIME',
 	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Příloha - ignorovaný typ MIME',

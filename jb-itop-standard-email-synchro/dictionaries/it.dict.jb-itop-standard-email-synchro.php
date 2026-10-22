@@ -115,16 +115,23 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Escludi tipi MIME',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Gli allegati di questi tipi MIME non verranno elaborati. Specificarne uno per riga.',
 
-	// Politica: verifica DKIM
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior' => 'Comportamento in caso di violazione',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:do_nothing' => 'Non fare nulla',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:inactive' => 'Inattivo',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_dkim_check_notification' => 'Messaggio di respingimento',
+	// Autenticazione del mittente (SPF/DKIM)
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Risultati di autenticazione considerati un errore',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Risultati segnalati dal server di posta ricevente (Authentication-Results) per cui il mittente non è considerato attendibile. Se ne viene rilevato uno, viene applicato il comportamento configurato e nessun passaggio successivo si fida dell\'indirizzo del mittente (ad es. per individuare il chiamante). Si applica solo se questa politica non è inattiva.',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_softfail' => 'SPF: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: errore permanente',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Comportamento in caso di violazione',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Non fare nulla',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inattivo',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Oggetto del respingimento',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Messaggio di respingimento',
 
 	// Politica: e-mail troppo grande
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportamento in caso di violazione',
@@ -309,7 +316,7 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 
 	// Passi
 	'MailInbox:StepAttachmentCriteria' => 'Immagini incorporate nell\'e-mail',
-	'MailInbox:PolicyDkimCheck' => 'Verifica DKIM',
+	'MailInbox:PolicySenderAuthentication' => 'Autenticazione del mittente (SPF/DKIM)',
 	'MailInbox:PolicyMailSize' => 'Dimensione dell\'e-mail',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Allegato - Tipo MIME vietato',
 	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Allegato - Tipo MIME ignorato',

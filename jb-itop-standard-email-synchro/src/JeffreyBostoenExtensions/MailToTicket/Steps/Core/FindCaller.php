@@ -50,7 +50,6 @@ abstract class FindCaller extends Base {
 	 */
 	public static function Execute() : void {
 		
-		$oMailBox = ProcessingHelper::GetMailBox();
 		$oEmail = ProcessingHelper::GetMail();
 		$oRawEmail = ProcessingHelper::GetRawMail();
 		$oCaller = $oEmail->GetSender();
@@ -80,14 +79,6 @@ abstract class FindCaller extends Base {
 					
 					case 1:
 
-						if($oRawEmail->HasFailedAuthentication($oMailBox->Get('authentication_results_authserv_id'))) {
-
-							static::Trace("Refusing to trust the matched Person for '{$sCallerEmail}' as caller: the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
-							static::HandleViolation();
-							return;
-
-						}
-
 						// Ok, the caller was found in iTop
 						static::Trace("Found person.");
 						$oCaller = $oSet_Person->Fetch();
@@ -109,14 +100,6 @@ abstract class FindCaller extends Base {
 								break;
 
 							case 'fallback_create_person':
-
-								if($oRawEmail->HasFailedAuthentication($oMailBox->Get('authentication_results_authserv_id'))) {
-
-									static::Trace("Refusing to create a Person for '{$sCallerEmail}': the receiving mail server reported a failed SPF/DKIM check (Authentication-Results) for this message.");
-									static::HandleViolation();
-									return;
-
-								}
 
 								static::Trace("Creating a new Person for the email: {$sCallerEmail}");
 								$oCaller = new Person();
