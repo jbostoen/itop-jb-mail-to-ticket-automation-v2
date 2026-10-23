@@ -8,6 +8,7 @@ Adding your own logic to can be done by extending the **Step** class.
 * Specify a ```$iPrecedence``` value.
   * This is the order in which policies are executed. Lower = first, higher  = later. 
   * Not necessary to make this unique. 
+  * See [step order](step%20order.md) for the full list of default steps and their precedence.
   * Some default precedences of importance:
     * ```$iPrecedence = 110``` is used for finding the caller (if not found prior)
     * ```$iPrecedence = 200``` is used for ticket creation/update.
