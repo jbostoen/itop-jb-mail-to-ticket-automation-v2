@@ -167,8 +167,8 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 					//   (PROCESS_MESSAGE/NO_ACTION mean the pipeline ran to completion without any
 					//   policy deciding to skip/undesire/delete/move/abort): an actual, unexpected error.
 					$sUIDL = htmlentities($oEmail->sUIDL, ENT_QUOTES, 'UTF-8');
-					$this->sLastErrorSubject = "Failed to create a ticket for the incoming email ({$sUIDL}) (" . __METHOD__ . "). No Ticket object. ".(is_object($oResult) ? 'Class: '.get_class($oResult): 'No object.');
-					$this->sLastErrorMessage = $oInbox->sLastError;
+					$this->sLastErrorSubject = "Failed to create a ticket for the incoming email ({$sUIDL}). No ticket was created or linked".(is_object($oResult) ? ' (returned class: '.get_class($oResult).')' : '').'.';
+					$this->sLastErrorMessage = trim(($oInbox->sLastError ?? '').' '.ProcessingHelper::GetOutcomeSummary());
 					$sMessage = "Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL})";
 					$aErrors[] = $sMessage;
 					$aErrors[] = $oInbox->sLastError;
@@ -181,12 +181,15 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 					//   skip for now, abort, delete, move): keep that decision instead of overriding
 					//   it with a generic error status.
 					self::Trace("No ticket created for the incoming email $index ({$oEmail->sUIDL}); next action already set by a policy step: ".ProcessingHelper::GetNextAction()->name);
+					$this->sLastErrorSubject = 'No ticket was created or linked (next action: '.ProcessingHelper::GetNextAction()->name.').';
+					$this->sLastErrorMessage = trim(($oInbox->sLastError ?? '').' '.ProcessingHelper::GetOutcomeSummary());
 				}
 			}
 			else {
 
 				// - An old mail is being reprocessed.
 				ProcessingHelper::SetExecutedSteps([]);
+				ProcessingHelper::ResetOutcomeNotes();
 				ProcessingHelper::SetNextAction(eNextAction::NO_ACTION);
 
 			}
@@ -198,7 +201,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 			ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
 			$eNextAction = ProcessingHelper::GetNextAction();
 			$this->sLastErrorSubject = "Failed to process email $index ({$oEmail->sUIDL})";
-			$this->sLastErrorMessage = "Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage();
+			$this->sLastErrorMessage = "Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage().' '.ProcessingHelper::GetOutcomeSummary();
 			$aErrors[] = $this->sLastErrorMessage;
 			self::Trace("Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage()."\n".$e->getTraceAsString());
 		}

@@ -156,6 +156,7 @@ abstract class CreateOrUpdateTicket extends Base {
 		catch(Throwable $e) {
 
 			$oMailBox->sLastError = $e->getMessage();
+			ProcessingHelper::AddOutcomeNote(sprintf('Creating or updating the ticket failed (%1$s): %2$s', get_class($e), $e->getMessage()));
 
 			static::Trace($e->getMessage());
 

@@ -63,7 +63,12 @@ abstract class ProcessingHelper {
 	 * @var string[] $aPreviouslyExecutedSteps Array of steps (class names) which have been executed already.
 	 */
 	private static array $aPreviouslyExecutedSteps = [];
-	
+
+	/**
+	 * @var string[] $aOutcomeNotes Short notes explaining why the processing of the current e-mail ended the way it did.
+	 */
+	private static array $aOutcomeNotes = [];
+
 	/**
 	 * @var EmailMessage $oEmail E-mail message.
 	 */
@@ -323,7 +328,64 @@ abstract class ProcessingHelper {
 	public static function SetExecutedSteps(array $aPreviouslyExecutedSteps) : void {
 		
 		static::$aPreviouslyExecutedSteps = $aPreviouslyExecutedSteps;
-		
+
+	}
+
+	/**
+	 * Adds a note explaining why the processing of the current e-mail ended the way it did.
+	 * These notes are summarized in the error message of the e-mail replica.
+	 *
+	 * @param string $sNote Short note.
+	 *
+	 * @return void
+	 */
+	public static function AddOutcomeNote(string $sNote) : void {
+
+		static::$aOutcomeNotes[] = $sNote;
+
+	}
+
+	/**
+	 * Resets the outcome notes. Called when the processing of an e-mail starts.
+	 *
+	 * @return void
+	 */
+	public static function ResetOutcomeNotes() : void {
+
+		static::$aOutcomeNotes = [];
+
+	}
+
+	/**
+	 * Gets the outcome notes of the current e-mail.
+	 *
+	 * @return string[]
+	 */
+	public static function GetOutcomeNotes() : array {
+
+		return static::$aOutcomeNotes;
+
+	}
+
+	/**
+	 * Gets a summary of the processing of the current e-mail: the outcome notes and the executed steps.
+	 *
+	 * @return string
+	 */
+	public static function GetOutcomeSummary() : string {
+
+		$aLines = static::$aOutcomeNotes;
+
+		$aStepNames = array_map('basename', static::$aPreviouslyExecutedSteps);
+		if(count($aStepNames) > 0) {
+			$aLines[] = 'Executed steps ('.count($aStepNames).'): '.implode(', ', $aStepNames).'.';
+		}
+		else {
+			$aLines[] = 'No steps were executed.';
+		}
+
+		return implode(' ', $aLines);
+
 	}
 
 
@@ -527,6 +589,7 @@ abstract class ProcessingHelper {
 	public static function ProcessNewEmail() : ?Ticket {
 
 		static::SetNextAction(eNextAction::PROCESS_MESSAGE);
+		static::ResetOutcomeNotes();
 
 		$oInbox = static::GetMailBox();
 		$oInbox->sLastError = null;
@@ -619,6 +682,7 @@ abstract class ProcessingHelper {
 			// It either means one of the steps wants to take an action which makes further processing of this particular e-mail not necessary.
 			// The action could be: delete, move, mark as error, mark as undesired, skip for now, abort all further processing, ...
 			if($eNextAction != eNextAction::PROCESS_MESSAGE) {
+				static::AddOutcomeNote(sprintf('Processing was stopped by step "%1$s" (precedence %2$s%3$s), next action: %4$s.', $sShortStep, $sStep::$iPrecedence, $sPolicyInfo, $eNextAction->name));
 				break;
 			}
 			
@@ -795,6 +859,15 @@ abstract class ProcessingHelper {
 			
 		}
 		
+		static::AddOutcomeNote(match($sErrorCode) {
+			'decode_failed' => 'The e-mail could not be decoded.',
+			'failed_to_create_contact' => 'No contact could be created for the caller.',
+			'rejected_attachments' => 'Attachments were rejected: '.$sAdditionalErrorMessage,
+			'undesired_message' => 'The e-mail is considered undesired.',
+			'nothing_to_update' => 'The mailbox only updates tickets (update only), but no related ticket was found.',
+			default => 'Error "'.$sErrorCode.'"'.($sAdditionalErrorMessage !== '' ? ': '.$sAdditionalErrorMessage : '').'.',
+		});
+
 		switch($sErrorCode) {
 
 			case 'decode_failed':
