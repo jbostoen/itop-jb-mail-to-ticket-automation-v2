@@ -32,9 +32,15 @@
 			<fields>
 				<field id="behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>create_only</value>
-						<value>update_only</value>
-						<value>both</value>
+						<value id="create_only">
+							<code>create_only</code>
+						</value>
+						<value id="update_only">
+							<code>update_only</code>
+						</value>
+						<value id="both">
+							<code>both</code>
+						</value>
 					</values>
 					<sql>behavior</sql>
 					<default_value>both</default_value>
@@ -42,13 +48,27 @@
 				</field>
 				<field id="target_class" xsi:type="AttributeEnum">
 					<values>
-						<value>Incident</value>
-						<value>UserRequest</value>
-						<value>Change</value>
-						<value>RoutineChange</value>
-						<value>NormalChange</value>
-						<value>EmergencyChange</value>
-						<value>Problem</value>
+						<value id="Incident">
+							<code>Incident</code>
+						</value>
+						<value id="UserRequest">
+							<code>UserRequest</code>
+						</value>
+						<value id="Change">
+							<code>Change</code>
+						</value>
+						<value id="RoutineChange">
+							<code>RoutineChange</code>
+						</value>
+						<value id="NormalChange">
+							<code>NormalChange</code>
+						</value>
+						<value id="EmergencyChange">
+							<code>EmergencyChange</code>
+						</value>
+						<value id="Problem">
+							<code>Problem</code>
+						</value>
 					</values>
 					<sql>target_class</sql>
 					<default_value>UserRequest</default_value>
@@ -90,8 +110,12 @@ status:assigned]]></default_value>
 				</field>
 				<field id="error_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>delete</value>
-						<value>mark_as_error</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="mark_as_error">
+							<code>mark_as_error</code>
+						</value>
 					</values>
 					<sql>error_behavior</sql>
 					<default_value>mark_as_error</default_value>
@@ -129,9 +153,15 @@ status:assigned]]></default_value>
 				</field>
 				<field id="email_storage" xsi:type="AttributeEnum">
 					<values>
-						<value>keep</value>
-						<value>delete</value>
-						<value>move</value>
+						<value id="keep">
+							<code>keep</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="move">
+							<code>move</code>
+						</value>
 					</values>
 					<sql>email_storage</sql>
 					<default_value>keep</default_value>
@@ -186,10 +216,18 @@ status:assigned]]></default_value>
 				</field>
 				<field id="policy_sender_authentication_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_sender_authentication_behavior</sql>
 					<default_value>inactive</default_value>
@@ -198,12 +236,24 @@ status:assigned]]></default_value>
 				<!-- Mail size (message including attachments) too big? -->
 				<field id="policy_mail_size_too_big_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="bounce_delete">
+							<code>bounce_delete</code>
+						</value>
+						<value id="bounce_mark_as_undesired">
+							<code>bounce_mark_as_undesired</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_mail_size_too_big_behavior</sql>
 					<default_value>inactive</default_value>
@@ -257,13 +307,27 @@ application/x-pkcs7-signature]]></default_value>
 				<!-- Forbidden e-mail attachments -->
 				<field id="policy_attachment_forbidden_mimetype_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>fallback_ignore_forbidden_attachments</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="bounce_delete">
+							<code>bounce_delete</code>
+						</value>
+						<value id="bounce_mark_as_undesired">
+							<code>bounce_mark_as_undesired</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="fallback_ignore_forbidden_attachments">
+							<code>fallback_ignore_forbidden_attachments</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_attachment_forbidden_mimetype_behavior</sql>
 					<default_value>inactive</default_value>
@@ -287,13 +351,27 @@ application/x-pkcs7-signature]]></default_value>
 				<!-- No subject. -->
 				<field id="policy_no_subject_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>fallback_default_subject</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="bounce_delete">
+							<code>bounce_delete</code>
+						</value>
+						<value id="bounce_mark_as_undesired">
+							<code>bounce_mark_as_undesired</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="fallback_default_subject">
+							<code>fallback_default_subject</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_no_subject_behavior</sql>
 					<default_value>inactive</default_value>
@@ -317,11 +395,21 @@ application/x-pkcs7-signature]]></default_value>
 				<!-- Unknown caller -->
 				<field id="policy_unknown_caller_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
-						<value>delete</value>
-						<value>fallback_create_person</value>
-						<value>mark_as_undesired</value>
+						<value id="bounce_delete">
+							<code>bounce_delete</code>
+						</value>
+						<value id="bounce_mark_as_undesired">
+							<code>bounce_mark_as_undesired</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="fallback_create_person">
+							<code>fallback_create_person</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
 					</values>
 					<sql>policy_unknown_caller_behavior</sql>
 					<default_value>mark_as_undesired</default_value>
@@ -348,15 +436,33 @@ name:Unknown caller - $mail->caller_name$]]></default_value>
 				<!-- Additional contacts -->
 				<field id="policy_other_recipients_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>fallback_add_other_contacts</value>
-						<value>fallback_add_existing_other_contacts</value>
-						<value>fallback_ignore_other_contacts</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="bounce_delete">
+							<code>bounce_delete</code>
+						</value>
+						<value id="bounce_mark_as_undesired">
+							<code>bounce_mark_as_undesired</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="fallback_add_other_contacts">
+							<code>fallback_add_other_contacts</code>
+						</value>
+						<value id="fallback_add_existing_other_contacts">
+							<code>fallback_add_existing_other_contacts</code>
+						</value>
+						<value id="fallback_ignore_other_contacts">
+							<code>fallback_ignore_other_contacts</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_other_recipients_behavior</sql>
 					<default_value>inactive</default_value>
@@ -383,13 +489,27 @@ name:Unknown caller]]></default_value>
 				<!-- Reference to closed ticket -->
 				<field id="policy_ticket_closed_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>fallback_reopen</value>
-						<value>mark_as_undesired</value>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="fallback_reopen">
+							<code>fallback_reopen</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="bounce_delete">
+							<code>bounce_delete</code>
+						</value>
+						<value id="bounce_mark_as_undesired">
+							<code>bounce_mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_ticket_closed_behavior</sql>
 					<default_value>inactive</default_value>
@@ -408,13 +528,27 @@ name:Unknown caller]]></default_value>
 				<!-- Reference to resolved ticket -->
 				<field id="policy_ticket_resolved_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>fallback_reopen</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="bounce_delete">
+							<code>bounce_delete</code>
+						</value>
+						<value id="bounce_mark_as_undesired">
+							<code>bounce_mark_as_undesired</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="fallback_reopen">
+							<code>fallback_reopen</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_ticket_resolved_behavior</sql>
 					<default_value>inactive</default_value>
@@ -433,12 +567,24 @@ name:Unknown caller]]></default_value>
 				<!-- Reference to non-existing ticket -->
 				<field id="policy_ticket_unknown_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="bounce_delete">
+							<code>bounce_delete</code>
+						</value>
+						<value id="bounce_mark_as_undesired">
+							<code>bounce_mark_as_undesired</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_ticket_unknown_behavior</sql>
 					<default_value>inactive</default_value>
@@ -457,12 +603,24 @@ name:Unknown caller]]></default_value>
 				<!-- Undesired title pattern, reject entire e-mail -->
 				<field id="policy_undesired_pattern_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="bounce_delete">
+							<code>bounce_delete</code>
+						</value>
+						<value id="bounce_mark_as_undesired">
+							<code>bounce_mark_as_undesired</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_undesired_pattern_behavior</sql>
 					<default_value>inactive</default_value>
@@ -486,9 +644,15 @@ name:Unknown caller]]></default_value>
 				<!-- Avoid title pattern conflicts by removing subject parts -->
 				<field id="policy_remove_pattern_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>do_nothing</value>
-						<value>inactive</value>
-						<value>fallback_remove</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
+						<value id="fallback_remove">
+							<code>fallback_remove</code>
+						</value>
 					</values>
 					<sql>policy_remove_pattern_behavior</sql>
 					<default_value>inactive</default_value>
@@ -502,12 +666,24 @@ name:Unknown caller]]></default_value>
 				<!-- Different e-mail caller than ticket caller -->
 				<field id="policy_other_email_caller_than_ticket_caller_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="bounce_delete">
+							<code>bounce_delete</code>
+						</value>
+						<value id="bounce_mark_as_undesired">
+							<code>bounce_mark_as_undesired</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_other_email_caller_than_ticket_caller_behavior</sql>
 					<default_value>inactive</default_value>
@@ -528,10 +704,18 @@ name:Unknown caller]]></default_value>
 					 reply back to an automated out-of-office sender risks a mail loop with that system. -->
 				<field id="policy_autoreply_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_autoreply_behavior</sql>
 					<default_value>inactive</default_value>
@@ -542,10 +726,18 @@ name:Unknown caller]]></default_value>
 					 reply back to a Non-Delivery-Report is the classic "backscatter" mail loop problem. -->
 				<field id="policy_non_delivery_report_behavior" xsi:type="AttributeEnum" _delta="define">
 					<values>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_non_delivery_report_behavior</sql>
 					<default_value>inactive</default_value>
@@ -565,13 +757,27 @@ name:Unknown caller]]></default_value>
 				</field>
 				<field id="policy_sender_email_address_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value>bounce_delete</value>
-						<value>bounce_mark_as_undesired</value>
-						<value>delete</value>
-						<value>do_nothing</value>
-						<value>fallback_ignore_forbidden_attachments</value>
-						<value>mark_as_undesired</value>
-						<value>inactive</value>
+						<value id="bounce_delete">
+							<code>bounce_delete</code>
+						</value>
+						<value id="bounce_mark_as_undesired">
+							<code>bounce_mark_as_undesired</code>
+						</value>
+						<value id="delete">
+							<code>delete</code>
+						</value>
+						<value id="do_nothing">
+							<code>do_nothing</code>
+						</value>
+						<value id="fallback_ignore_forbidden_attachments">
+							<code>fallback_ignore_forbidden_attachments</code>
+						</value>
+						<value id="mark_as_undesired">
+							<code>mark_as_undesired</code>
+						</value>
+						<value id="inactive">
+							<code>inactive</code>
+						</value>
 					</values>
 					<sql>policy_sender_email_address_behavior</sql>
 					<default_value>inactive</default_value>

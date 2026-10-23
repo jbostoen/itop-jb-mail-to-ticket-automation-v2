@@ -64,7 +64,9 @@
 				</field>
 				<field id="protocol" xsi:type="AttributeEnum">
 					<values>
-						<value>imap</value>
+						<value id="imap">
+							<code>imap</code>
+						</value>
 					</values>
 					<sql>protocol</sql>
 					<default_value>imap</default_value>
@@ -90,9 +92,15 @@ novalidate-cert]]></default_value>
 				</field>
 				<field id="disable_authenticator" xsi:type="AttributeEnumSet">
 					<values>
-						<value id="GSSAPI">GSSAPI</value>
-						<value id="NTLM">NTLM</value>
-						<value id="PLAIN">PLAIN</value>
+						<value id="GSSAPI">
+							<code>GSSAPI</code>
+						</value>
+						<value id="NTLM">
+							<code>NTLM</code>
+						</value>
+						<value id="PLAIN">
+							<code>PLAIN</code>
+						</value>
 					</values>
 					<sql>disable_authenticator</sql>
 					<default_value/>
