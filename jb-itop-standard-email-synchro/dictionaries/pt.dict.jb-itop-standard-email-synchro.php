@@ -130,8 +130,6 @@ Dict::Add('PT PT', 'Portuguese', 'Português', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Não fazer nada',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inativo',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Marcar como indesejado / Manter o e-mail temporariamente',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Assunto da rejeição',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Mensagem de rejeição',
 
 	// Política: e-mail demasiado grande
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportamento em caso de infração',

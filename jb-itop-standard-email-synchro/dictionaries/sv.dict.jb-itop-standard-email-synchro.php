@@ -130,8 +130,6 @@ Dict::Add('SV SE', 'Swedish', 'Svenska', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Avvisningsmeddelande',
 
 	// Princip: e-postmeddelande för stort
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Beteende vid överträdelse',

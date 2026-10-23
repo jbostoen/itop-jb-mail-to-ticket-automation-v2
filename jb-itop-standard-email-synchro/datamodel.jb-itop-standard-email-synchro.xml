@@ -195,16 +195,6 @@ status:assigned]]></default_value>
 					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="policy_sender_authentication_subject" xsi:type="AttributeString">
-					<sql>policy_sender_authentication_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="policy_sender_authentication_notification" xsi:type="AttributeHTML">
-					<sql>policy_sender_authentication_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
 				<!-- Mail size (message including attachments) too big? -->
 				<field id="policy_mail_size_too_big_behavior" xsi:type="AttributeEnum">
 					<values>
@@ -886,12 +876,6 @@ EOF
 										</item>
 										<item id="policy_sender_authentication_failures">
 											<rank>12</rank>
-										</item>
-										<item id="policy_sender_authentication_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_sender_authentication_notification">
-											<rank>20</rank>
 										</item>
 									</items>
 								</item>

@@ -130,8 +130,6 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Nachricht der Zurückweisung',
 
 	// Richtlinie: E-Mail zu groß
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Verhalten bei Verstoß',

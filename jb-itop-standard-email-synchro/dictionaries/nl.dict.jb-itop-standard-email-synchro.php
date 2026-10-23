@@ -130,8 +130,6 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inactief',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Bericht bij terugsturen',
 
 	// Beleid: e-mail te groot
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Gedrag bij overtreding',

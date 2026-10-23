@@ -130,8 +130,6 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inattivo',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Messaggio di respingimento',
 
 	// Politica: e-mail troppo grande
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportamento in caso di violazione',

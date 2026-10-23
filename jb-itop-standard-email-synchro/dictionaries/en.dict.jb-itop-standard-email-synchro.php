@@ -133,8 +133,6 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Do nothing',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inactive',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Mark as Undesired / Temporarily keep the e-mail',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Bounce subject',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Bounce message',
 
 	// Policy: mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Behavior on violation',

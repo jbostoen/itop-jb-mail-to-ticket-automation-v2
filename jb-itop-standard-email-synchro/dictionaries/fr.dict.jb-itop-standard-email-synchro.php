@@ -130,8 +130,6 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Supprimer',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Ne rien faire',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Marquer comme indésirable / Garder l\'email temporairement',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Rejeter l\'objet',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Rejeter le message',
 
 	// mail size too large
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportement en cas d\'infraction',

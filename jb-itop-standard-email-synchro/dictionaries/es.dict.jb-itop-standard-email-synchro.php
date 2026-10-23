@@ -130,8 +130,6 @@ Dict::Add('ES ES', 'Spanish', 'Español', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inactivo',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Marcar como no deseado / Mantener el correo temporalmente',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Mensaje de rechazo',
 
 	// Política: correo demasiado grande
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportamiento en caso de infracción',

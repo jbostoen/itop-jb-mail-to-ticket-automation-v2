@@ -130,8 +130,6 @@ Dict::Add('DA DK', 'Danish', 'Dansk', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Afvisningsbesked',
 
 	// Politik: for stor e-mail
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Adfærd ved overtrædelse',

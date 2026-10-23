@@ -130,8 +130,6 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Neaktivní',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_notification' => 'Zpráva o odmítnutí',
 
 	// Zásada: e-mail je příliš velký
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Chování při porušení',
