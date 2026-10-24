@@ -15,7 +15,7 @@ use JeffreyBostoenExtensions\MailToTicket\{
 
 
 /**
- * Class BounceUndesiredTitlePatterns.  
+ * Class UndesiredTitlePatterns.  
  * A policy to handle undesired title patterns.
  */
 abstract class UndesiredTitlePatterns extends Base {
@@ -56,8 +56,6 @@ abstract class UndesiredTitlePatterns extends Base {
 						elseif(preg_match($sPattern, $sMailSubject)) {
 							
 							switch(static::GetStepSetting('behavior')) { 
-								case PolicyBehavior::BOUNCE_DELETE->value: 
-								case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
 								case PolicyBehavior::DELETE->value:
 								case PolicyBehavior::DO_NOTHING->value:
 								case PolicyBehavior::MARK_AS_UNDESIRED->value:

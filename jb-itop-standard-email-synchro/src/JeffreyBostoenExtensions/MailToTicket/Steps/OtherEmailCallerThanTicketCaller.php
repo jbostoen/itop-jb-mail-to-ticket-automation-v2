@@ -15,7 +15,7 @@ use JeffreyBostoenExtensions\MailToTicket\{
 
 /**
  * Class OtherEmailCallerThanTicketCaller.  
- * Bounce policy in case the email caller is not the ticket caller.
+ * Policy for the case where the email caller is not the ticket caller.
  */
 abstract class OtherEmailCallerThanTicketCaller extends Base {
 	

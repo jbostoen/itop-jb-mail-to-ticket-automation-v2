@@ -8,6 +8,32 @@ Remove all e-mail messages that were already successfully processed from the mai
 Otherwise, it is possible in some situations that they are processed again.  
 This could result in duplicate tickets or log entries in existing tickets.
 
+## Upgrading from 3.2.261023 or earlier?
+
+The "bounce" behaviors of the policies are replaced by **triggers**. See [events and triggers](events%20and%20triggers.md).
+
+| Before | Now |
+|--------|-----|
+| Behavior "Bounce to sender and delete" | Behavior "Delete", with a trigger that sends an e-mail |
+| Behavior "Bounce to sender and mark as undesired" | Behavior "Mark as undesired", with a trigger that sends an e-mail |
+| Settings "Bounce subject" and "Bounce message" | The subject and body of an e-mail action |
+
+The upgrade converts the existing settings. For every mailbox and policy that used a bounce behavior, it creates:
+
+* an action "Send an e-mail (by address)" with the former subject and message, sent to the sender of the message (`$mail->reply_address$`, which is empty for automatically generated messages: nothing is sent then), from the "Mail From Address" of the mailbox;
+* a trigger "Trigger (on mail processing event)", restricted to that mailbox, subscribed to the violation event of the policy, with the original message attached.
+
+Both are named `Bounce - <mailbox> - <policy>`.
+
+Check the result after upgrading:
+
+* The placeholders in the message are replaced by their HTML-escaped variants (e.g. `$mail->subject$` becomes `$mail->html(subject)$`), as the values come from a received e-mail.
+* A mailbox without a "Mail From Address" results in a **disabled** action.
+* The subject and message of other behaviors (which were never used) are not carried over.
+* If the conversion of a mailbox fails, it is logged in the setup log and tried again at the next setup.
+
+The mailbox policies no longer have "Bounce subject" and "Bounce message" fields, and the sender authentication policy never had bounce behaviors.
+
 ## Upgrading from 3.2.260915 or earlier?
 
 The mailbox policy "DKIM check" has become "Sender authentication (SPF/DKIM)".  

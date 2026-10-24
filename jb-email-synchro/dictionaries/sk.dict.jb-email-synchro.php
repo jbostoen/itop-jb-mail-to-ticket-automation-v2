@@ -1,0 +1,126 @@
+<?php
+/**
+ * Localized data
+ *
+ * @copyright Copyright (c) 2010-2026 Combodo SARL
+ * @license	http://opensource.org/licenses/AGPL-3.0
+ *
+ * This file is part of iTop.
+ *
+ * iTop is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * iTop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with iTop. If not, see <http://www.gnu.org/licenses/>
+ */
+
+Dict::Add('SK SK', 'Slovak', 'Slovenčina', array(
+	'Class:TriggerMailToTicketProcessingOnEvent' => 'Spúšťač (pri udalosti spracovania e-mailov)',
+	'Class:TriggerMailToTicketProcessingOnEvent+' => 'Spúšťač aktivovaný udalosťou počas spracovania prichádzajúcich e-mailov (napr. porušenie pravidla, nový tiket, koniec úlohy cron)',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list' => 'Udalosti',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list+' => 'Udalosti, ktoré sa odoberajú',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id' => 'Schránka',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id+' => 'Aktivovať iba pre udalosti tejto schránky. Nechajte prázdne pre všetky schránky.',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message' => 'Zahrnúť pôvodnú správu',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message+' => 'Pripojiť pôvodný e-mail (.eml) k prepojeným akciám a sprístupniť ho ako zástupný symbol "mail->eml_base64"',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:yes' => 'Áno',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:no' => 'Nie',
+	'Class:MailProcessingEvent' => 'Udalosť spracovania e-mailov',
+	'Class:MailProcessingEvent+' => 'Udalosť počas spracovania prichádzajúcich e-mailov, ktorú môže spúšťač odoberať',
+	'Class:MailProcessingEvent/Attribute:category' => 'Kategória',
+	'Class:MailProcessingEvent/Attribute:category+' => 'Kategória udalosti.',
+	'Class:MailProcessingEvent/Attribute:category/Value:cron_task' => 'Úloha cron',
+	'Class:MailProcessingEvent/Attribute:category/Value:mailbox' => 'Schránka',
+	'Class:MailProcessingEvent/Attribute:category/Value:message' => 'Správa',
+	'Class:MailProcessingEvent/Attribute:category/Value:ticket' => 'Tiket',
+	'Class:MailProcessingEvent/Attribute:category/Value:caller' => 'Žiadateľ',
+	'Class:MailProcessingEvent/Attribute:category/Value:policy' => 'Pravidlo',
+	'Class:MailProcessingEvent/Attribute:category/Value:error' => 'Chyba',
+	'Class:MailProcessingEvent/Attribute:code' => 'Udalosť',
+	'Class:MailProcessingEvent/Attribute:code+' => 'Udalosť.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started' => 'Úloha cron spustená',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started+' => 'Spustilo sa jedno vykonanie procesu na pozadí.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished' => 'Úloha cron dokončená',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished+' => 'Jedno vykonanie procesu na pozadí skončilo. K dispozícii je počet správ a trvanie.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started' => 'Schránka spustená',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started+' => 'Začalo sa spracovanie schránky.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished' => 'Schránka dokončená',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished+' => 'Spracovanie schránky skončilo.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed' => 'Pripojenie k schránke zlyhalo',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed+' => 'Pripojenie k schránke zlyhalo.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started' => 'Správa spustená',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started+' => 'Začalo sa spracovanie správy.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished' => 'Správa dokončená',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished+' => 'Spracovanie správy skončilo.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed' => 'Správu sa nepodarilo dekódovať',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed+' => 'Správu sa nepodarilo dekódovať a nebola spracovaná.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted' => 'Správa odstránená',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted+' => 'Správa bola odstránená zo schránky.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved' => 'Správa presunutá',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved+' => 'Správa bola presunutá do iného priečinka.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired' => 'Správa označená ako nežiaduca',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired+' => 'Správa bola označená ako nežiaduca a je dočasne ponechaná v schránke.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error' => 'Správa označená ako chybná',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error+' => 'Správa bola označená ako chybná a je ponechaná v schránke.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket' => 'Žiadny tiket nebol vytvorený ani prepojený',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket+' => 'Spracovanie správy skončilo bez vytvorenia alebo prepojenia tiketu. Súhrn výsledku vysvetľuje prečo.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created' => 'Tiket vytvorený',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created+' => 'Zo správy bol vytvorený tiket.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated' => 'Tiket aktualizovaný',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated+' => 'Tiket bol aktualizovaný na základe správy.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created' => 'Žiadateľ vytvorený',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created+' => 'Pre neznámeho žiadateľa bola vytvorená osoba.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated' => 'Žiadateľ deaktivovaný',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated+' => 'Osoba bola po zlyhaní doručenia označená ako neaktívna.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation' => 'Zakázaný typ prílohy',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation+' => 'Správa obsahuje prílohu zakázaného typu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation' => 'Správa je príliš veľká',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation+' => 'Správa presahuje maximálnu veľkosť.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation' => 'Bez predmetu',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation+' => 'Správa nemá predmet.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation' => 'Iný odosielateľ než žiadateľ tiketu',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation+' => 'Odosielateľ správy nie je žiadateľom tiketu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation' => 'Iní príjemcovia',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation+' => 'Správa má iných príjemcov než schránku.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation' => 'Overenie odosielateľa zlyhalo',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation+' => 'SPF alebo DKIM nahlásilo pri správe chybu. Odosielateľ môže byť sfalšovaný.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation' => 'E-mailová adresa odosielateľa nie je akceptovaná',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation+' => 'E-mailová adresa odosielateľa správy nie je akceptovaná.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation' => 'Tiket uzavretý',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation+' => 'Správa odkazuje na uzavretý tiket.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation' => 'Tiket vyriešený',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation+' => 'Správa odkazuje na vyriešený tiket.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation' => 'Neznámy odkaz na tiket',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation+' => 'Správa odkazuje na tiket, ktorý neexistuje.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation' => 'Nežiaduci vzor názvu',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation+' => 'Predmet správy zodpovedá nežiaducemu vzoru.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation' => 'Neznámy žiadateľ',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation+' => 'Odosielateľ správy je neznámy.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected' => 'Zistená automatická odpoveď',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected+' => 'Správa bola rozpoznaná ako automatická odpoveď.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected' => 'Zistená správa o nedoručení',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected+' => 'Správa bola rozpoznaná ako správa o nedoručení.',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing' => 'Chyba spracovania',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing+' => 'Pri spracovaní správy nastala chyba. K dispozícii je kód a text chyby.',
+	'Class:lnkMailProcessingEventToTrigger' => 'Prepojenie Udalosť spracovania e-mailov / Spúšťač',
+	'Class:lnkMailProcessingEventToTrigger+' => 'Prepojenie medzi udalosťou spracovania e-mailov a spúšťačom, ktorý ju odoberá',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:trigger_id' => 'Spúšťač',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:event_id' => 'Udalosť',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:code' => 'Udalosť',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:category' => 'Kategória',
+	'Class:ActionEmailByAddress' => 'Odoslať e-mail (podľa adresy)',
+	'Class:ActionEmailByAddress+' => 'Rovnaké ako "Odoslať e-mail", ale "Komu"/"Kópia"/"Skrytá kópia" môžu navyše byť (alebo byť doplnené o) jednu či viac e-mailových adries (zástupné symboly sú povolené), pre príjemcov, ktorí nemajú zodpovedajúci objekt v iTop (napr. neidentifikovaný odosielateľ e-mailu)',
+	'Class:ActionEmailByAddress/Attribute:to_address' => 'Komu (adresa)',
+	'Class:ActionEmailByAddress/Attribute:to_address+' => 'E-mailová adresa (adresy) oddelené čiarkami alebo bodkočiarkami; zástupné symboly (napr. "$mail->caller_email$") sa nahradia. Pridajú sa k tomu, čo už nájde "Komu" (OQL).',
+	'Class:ActionEmailByAddress/Attribute:cc_address' => 'Kópia (adresa)',
+	'Class:ActionEmailByAddress/Attribute:cc_address+' => 'E-mailová adresa (adresy) oddelené čiarkami alebo bodkočiarkami; zástupné symboly (napr. "$mail->caller_email$") sa nahradia. Pridajú sa k tomu, čo už nájde "Kópia" (OQL).',
+	'Class:ActionEmailByAddress/Attribute:bcc_address' => 'Skrytá kópia (adresa)',
+	'Class:ActionEmailByAddress/Attribute:bcc_address+' => 'E-mailová adresa (adresy) oddelené čiarkami alebo bodkočiarkami; zástupné symboly (napr. "$mail->caller_email$") sa nahradia. Pridajú sa k tomu, čo už nájde "Skrytá kópia" (OQL).',
+));

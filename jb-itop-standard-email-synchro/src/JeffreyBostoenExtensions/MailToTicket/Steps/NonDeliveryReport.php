@@ -9,6 +9,8 @@
 namespace JeffreyBostoenExtensions\MailToTicket\Steps;
 
 use JeffreyBostoenExtensions\MailToTicket\{
+	eEvent,
+	Events,
 	Helper,
 	ProcessingHelper
 };
@@ -148,6 +150,7 @@ abstract class NonDeliveryReport extends Base {
 											static::Trace('.. Marking Person::'.$oPerson->GetKey().' as "inactive" based on attribute value.');
 											$oPerson->Set('status', 'inactive');
 											$oPerson->DBUpdate();
+											Events::FireEvent(eEvent::CALLER_INACTIVATED, ['caller->object()' => $oPerson]);
 
 										}
 
@@ -160,7 +163,7 @@ abstract class NonDeliveryReport extends Base {
 						}
 
 						// Handle behavior. Return: don't let a second matching delivery-status part in the
-						// same message trigger another (e.g. bounce) violation for it.
+						// same message trigger another violation for it.
 						static::HandleViolation();
 						return;
 

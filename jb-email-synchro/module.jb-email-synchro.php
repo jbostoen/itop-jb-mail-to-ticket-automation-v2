@@ -3,6 +3,8 @@
 // iTop module definition file
 //
 
+use JeffreyBostoenExtensions\MailToTicket\Events;
+
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
 	'jb-email-synchro/3.2.261023',
@@ -23,6 +25,8 @@ SetupWebPage::AddModule(
 			'vendor/autoload.php',
 			'classes/autoload.php',
 			'model.jb-email-synchro.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/PlaceholderValues.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/Events.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Helper.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Logger.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/MessageHandler.php',
@@ -129,6 +133,16 @@ if (!class_exists('EmailSynchroInstaller')) {
 		 * @param $sCurrentVersion string Current version number of the module
 		 */
 		public static function AfterDatabaseCreation(Config $oConfiguration, $sPreviousVersion, $sCurrentVersion) {
+
+			// - New events (reference data) may have been added; existing ones are left untouched.
+
+				try {
+					$iCreated = Events::CreateMissingEventObjects();
+					SetupLog::Info('Mail to Ticket Automation: created '.$iCreated.' missing MailProcessingEvent object(s).');
+				}
+				catch(Exception $e) {
+					SetupLog::Error('Mail to Ticket Automation: unable to create the MailProcessingEvent objects: '.$e->getMessage());
+				}
 
 			if($sPreviousVersion == '' || version_compare($sPreviousVersion, '3.2.241105', '>')) {
 

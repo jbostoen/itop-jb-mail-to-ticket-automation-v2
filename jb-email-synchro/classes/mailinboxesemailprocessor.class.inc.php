@@ -19,7 +19,9 @@
  */
 
 use JeffreyBostoenExtensions\MailToTicket\{
+	eEvent,
 	eNextAction,
+	Events,
 	ProcessingHelper,
 };
 
@@ -175,6 +177,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 					self::Trace($sMessage);
 
 					ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
+					Events::FireEvent(eEvent::MESSAGE_NO_TICKET, ['reason' => $this->sLastErrorMessage]);
 				}
 				else {
 					// - No Ticket, but a Step already decided this e-mail's outcome (e.g. undesired,
@@ -183,6 +186,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 					self::Trace("No ticket created for the incoming email $index ({$oEmail->sUIDL}); next action already set by a policy step: ".ProcessingHelper::GetNextAction()->name);
 					$this->sLastErrorSubject = 'No ticket was created or linked (next action: '.ProcessingHelper::GetNextAction()->name.').';
 					$this->sLastErrorMessage = trim(($oInbox->sLastError ?? '').' '.ProcessingHelper::GetOutcomeSummary());
+					Events::FireEvent(eEvent::MESSAGE_NO_TICKET, ['reason' => $this->sLastErrorMessage]);
 				}
 			}
 			else {
@@ -203,6 +207,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 			$this->sLastErrorSubject = "Failed to process email $index ({$oEmail->sUIDL})";
 			$this->sLastErrorMessage = "Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage().' '.ProcessingHelper::GetOutcomeSummary();
 			$aErrors[] = $this->sLastErrorMessage;
+			Events::FireEvent(eEvent::ERROR_PROCESSING, ['error_code' => get_class($e), 'error_message' => $e->getMessage()]);
 			self::Trace("Failed to create a ticket for the incoming email $index ({$oEmail->sUIDL}), reason: exception: ".$e->getMessage()."\n".$e->getTraceAsString());
 		}
 

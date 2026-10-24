@@ -42,8 +42,6 @@ abstract class TicketClosed extends Base {
 			if($oTicket !== null && $oTicket->Get('status') === 'closed') {
 						
 				switch(static::GetStepSetting('behavior')) { 
-					case PolicyBehavior::BOUNCE_DELETE->value: 
-					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
 					case PolicyBehavior::DELETE->value:
 					case PolicyBehavior::DO_NOTHING->value:
 					case PolicyBehavior::MARK_AS_UNDESIRED->value:

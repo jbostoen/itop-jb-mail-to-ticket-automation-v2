@@ -124,8 +124,6 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanente fout',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Gedrag bij overtreding',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inactief',
@@ -133,52 +131,36 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 
 	// Beleid: e-mail te groot
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Gedrag bij overtreding',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:inactive' => 'Inactief',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_notification' => 'Bericht bij terugsturen',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB' => 'Max. grootte (MB)',
 	'Error:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB+' => 'Maximale grootte van de e-mail en de bijlagen ervan. Grotere e-mails worden niet verwerkt. Zet op 0 om uit te schakelen.',
 
 	// Beleid: bijlage - verboden MIME-type
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior' => 'Gedrag bij overtreding',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:fallback_ignore_forbidden_attachments' => 'Terugvaloptie: verboden bijlagen negeren',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:inactive' => 'Inactief',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_notification' => 'Bericht bij terugsturen',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_mimetypes' => 'MIME-types (één per regel)',
 
 	// Beleid: geen onderwerp
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior' => 'Gedrag bij overtreding',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:fallback_default_subject' => 'Terugvaloptie: standaardonderwerp gebruiken',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:inactive' => 'Inactief',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_notification' => 'Bericht bij terugsturen',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_default_value' => 'Standaardonderwerp',
 
 	// Beleid: onbekende afzender
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior' => 'Gedrag bij overtreding',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:fallback_create_person' => 'Terugvaloptie: persoon aanmaken',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_notification' => 'Bericht bij terugsturen',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_default_values' => 'Standaardwaarden voor nieuwe persoon (één per regel, voorbeeld: org_id:1)',
 
 	// Beleid: andere ontvangers
@@ -186,62 +168,42 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_other_contacts' => 'Terugvaloptie: alleen bestaande contacten koppelen',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_other_contacts' => 'Terugvaloptie: contact altijd koppelen, indien nodig aanmaken',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_ignore_other_contacts' => 'Terugvaloptie: alle andere contacten negeren',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:inactive' => 'Inactief',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_notification' => 'Bericht bij terugsturen',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_default_values' => 'Standaardwaarden voor nieuwe persoon (één per regel, voorbeeld: org_id:1)',
 
 	// Beleid: gesloten ticket
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior' => 'Gedrag bij overtreding',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior+' => 'Let op: standaard kunnen gesloten tickets niet worden heropend. Dit vereist wijzigingen in het datamodel.',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:fallback_reopen' => 'Terugvaloptie: ticket heropenen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:inactive' => 'Inactief',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_notification' => 'Bericht bij terugsturen',
 
 	// Beleid: opgelost ticket
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior' => 'Gedrag bij overtreding',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:fallback_reopen' => 'Terugvaloptie: ticket heropenen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:inactive' => 'Inactief',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_notification' => 'Bericht bij terugsturen',
 
 	// Beleid: onbekend ticket
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior' => 'Gedrag bij overtreding',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:inactive' => 'Inactief',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_notification' => 'Bericht bij terugsturen',
 
 	// Beleid: ongewenste titelpatronen
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior' => 'Gedrag bij overtreding',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:inactive' => 'Inactief',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_notification' => 'Bericht bij terugsturen',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_patterns' => 'Ongewenste patronen in het onderwerp (reguliere expressies, één per regel)',
 
 
@@ -255,13 +217,9 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	// Beleid: afzender moet dezelfde zijn als de oorspronkelijke afzender van het ticket
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior' => 'Gedrag bij overtreding',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:inactive' => 'Inactief',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst / E-mail tijdelijk behouden',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_notification' => 'Bericht bij terugsturen',
 
 	// Beleid: automatisch antwoord
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Gedrag bij overtreding',
@@ -287,14 +245,10 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 
 	// Beleid: e-mailadres van de afzender
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Gedrag bij overtreding',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'Terugsturen naar afzender en verwijderen',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_mark_as_undesired' => 'Terugsturen naar afzender en markeren als ongewenst',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:do_nothing' => 'Niets doen',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:inactive' => 'Inactief',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:mark_as_undesired' => 'Markeren als ongewenst',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_subject' => 'Onderwerp van terugsturen',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_notification' => 'Bericht bij terugsturen',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns' => 'Patronen',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Elke e-mail waarvan het e-mailadres van de afzender overeenkomt met een van de gedefinieerde reguliere expressies (één per regel), wordt beschouwd als een overtreding.',
 
@@ -327,7 +281,7 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'MailInbox:PolicyNoSubject' => 'Geen onderwerp',
 	'MailInbox:PolicyUnknownCaller' => 'Onbekende afzender',
 	'MailInbox:PolicyOtherRecipients' => 'Andere ontvangers opgegeven in Aan: of CC:',
-	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Geaccepteerde e-mailantwoorden beperken tot het e-mailadres van de oorspronkelijke afzender van het ticket',
+	'MailInbox:PolicyOtherEmailCallerThanTicketCaller' => 'Geaccepteerde e-mailantwoorden beperken tot het e-mailadres van de oorspronkelijke afzender van het ticket',
 	'MailInbox:PolicyAutoReply' => 'Automatisch antwoord',
 	'MailInbox:PolicyNonDeliveryReport' => 'Kennisgevingen van niet-bezorging',
 	'MailInbox:StepUpdateCallerAttributes' => 'Attributen van de afzender bijwerken',

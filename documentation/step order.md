@@ -36,7 +36,7 @@ Extensions can add their own steps with any precedence; see [customization](cust
 ## Why the order matters
 
 * Sender authentication runs first. Later steps (such as `NonDeliveryReport`, which can modify a Person) must not act on a message that failed authentication.
-* Because it runs before auto-reply and non-delivery detection, `SenderAuthentication` offers no bounce behaviors. Bouncing a message that turns out to be an auto-reply or a non-delivery report risks a mail loop, and a failed authentication often means a spoofed sender (backscatter). The `NonDeliveryReport` and `AutoReply` policies omit bounce behaviors for the same reason.
+* Because it runs before auto-reply and non-delivery detection, a reply to the sender of a message that failed `SenderAuthentication` (a trigger on its event) should use `$mail->reply_address$`, which is empty for automatically generated messages (see [events and triggers](events%20and%20triggers.md#sender-authentication)). Replying to a message that turns out to be an auto-reply or a non-delivery report risks a mail loop, and a failed authentication often means a spoofed sender (backscatter).
 * Policies (precedence 10 - 20) run before the caller is looked up (110), so a rejected e-mail does not create Persons or tickets.
 * `MatchByInReplyToOrReferences` (9) collects the info that `SaveReferences` (201) stores after the ticket has been created or updated.
 

@@ -21,7 +21,7 @@
  * along with iTop. If not, see <http://www.gnu.org/licenses/>
  */
 
-Dict::Add('ES ES', 'Spanish', 'Español', array(
+Dict::Add('ES CR', 'Spanish', 'Español, Castellano', array(
 
 	// Dictionary entries go here
 	'Class:MailInboxStandard' => 'Buzón de correo IMAP',
@@ -124,8 +124,6 @@ Dict::Add('ES ES', 'Spanish', 'Español', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: error permanente',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Comportamiento en caso de infracción',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inactivo',
@@ -133,52 +131,36 @@ Dict::Add('ES ES', 'Spanish', 'Español', array(
 
 	// Política: correo demasiado grande
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportamiento en caso de infracción',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:inactive' => 'Inactivo',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:mark_as_undesired' => 'Marcar como no deseado / Mantener el correo temporalmente',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_notification' => 'Mensaje de rechazo',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB' => 'Tamaño máx. (MB)',
 	'Error:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB+' => 'Tamaño máximo del correo y sus adjuntos. Los correos más grandes no se procesarán. Ponga 0 para desactivar.',
 
 	// Política: adjunto - tipo MIME prohibido
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior' => 'Comportamiento en caso de infracción',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:fallback_ignore_forbidden_attachments' => 'Alternativa: ignorar adjuntos prohibidos',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:inactive' => 'Inactivo',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:mark_as_undesired' => 'Marcar como no deseado / Mantener el correo temporalmente',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_notification' => 'Mensaje de rechazo',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_mimetypes' => 'Tipos MIME (uno por línea)',
 
 	// Política: sin asunto
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior' => 'Comportamiento en caso de infracción',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:fallback_default_subject' => 'Alternativa: usar asunto por defecto',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:inactive' => 'Inactivo',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:mark_as_undesired' => 'Marcar como no deseado / Mantener el correo temporalmente',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_notification' => 'Mensaje de rechazo',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_default_value' => 'Asunto por defecto',
 
 	// Política: remitente desconocido
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior' => 'Comportamiento en caso de infracción',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:fallback_create_person' => 'Alternativa: crear persona',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:mark_as_undesired' => 'Marcar como no deseado / Mantener el correo temporalmente',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_notification' => 'Mensaje de rechazo',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_default_values' => 'Valores por defecto para la nueva persona (uno por línea, ejemplo: org_id:1)',
 
 	// Política: otros destinatarios
@@ -186,62 +168,42 @@ Dict::Add('ES ES', 'Spanish', 'Español', array(
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_other_contacts' => 'Alternativa: vincular solo contactos existentes',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_other_contacts' => 'Alternativa: vincular siempre el contacto, creándolo si es necesario',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_ignore_other_contacts' => 'Alternativa: ignorar todos los demás contactos',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:inactive' => 'Inactivo',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:mark_as_undesired' => 'Marcar como no deseado / Mantener el correo temporalmente',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_notification' => 'Mensaje de rechazo',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_default_values' => 'Valores por defecto para la nueva persona (uno por línea, ejemplo: org_id:1)',
 
 	// Política: ticket cerrado
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior' => 'Comportamiento en caso de infracción',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior+' => 'Nota: por defecto, los tickets cerrados no se pueden reabrir. Esto requiere cambios en el modelo de datos.',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:fallback_reopen' => 'Alternativa: reabrir ticket',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:inactive' => 'Inactivo',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:mark_as_undesired' => 'Marcar como no deseado / Mantener el correo temporalmente',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_notification' => 'Mensaje de rechazo',
 
 	// Política: ticket resuelto
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior' => 'Comportamiento en caso de infracción',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:fallback_reopen' => 'Alternativa: reabrir ticket',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:inactive' => 'Inactivo',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:mark_as_undesired' => 'Marcar como no deseado / Mantener el correo temporalmente',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_notification' => 'Mensaje de rechazo',
 
 	// Política: ticket desconocido
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior' => 'Comportamiento en caso de infracción',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:inactive' => 'Inactivo',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:mark_as_undesired' => 'Marcar como no deseado / Mantener el correo temporalmente',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_notification' => 'Mensaje de rechazo',
 
 	// Política: patrones de título no deseados
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior' => 'Comportamiento en caso de infracción',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:inactive' => 'Inactivo',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:mark_as_undesired' => 'Marcar como no deseado / Mantener el correo temporalmente',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_notification' => 'Mensaje de rechazo',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_patterns' => 'Patrones no deseados en el asunto (patrones de expresión regular, uno por línea)',
 
 
@@ -255,13 +217,9 @@ Dict::Add('ES ES', 'Spanish', 'Español', array(
 	// Política: el remitente debe coincidir con el del ticket original
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior' => 'Comportamiento en caso de infracción',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:inactive' => 'Inactivo',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:mark_as_undesired' => 'Marcar como no deseado / Mantener el correo temporalmente',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_notification' => 'Mensaje de rechazo',
 
 	// Política: respuesta automática
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Comportamiento en caso de infracción',
@@ -287,14 +245,10 @@ Dict::Add('ES ES', 'Spanish', 'Español', array(
 
 	// Política: dirección de correo del remitente
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Comportamiento en caso de infracción',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'Rechazar al remitente y eliminar',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_mark_as_undesired' => 'Rechazar al remitente y marcar como no deseado',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:delete' => 'Eliminar el mensaje del buzón',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:do_nothing' => 'No hacer nada',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:inactive' => 'Inactivo',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:mark_as_undesired' => 'Marcar como no deseado',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_subject' => 'Asunto del rechazo',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_notification' => 'Mensaje de rechazo',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns' => 'Patrones',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Cualquier correo cuya dirección de remitente coincida con uno de los patrones de expresión regular definidos (uno por línea) se considerará una infracción.',
 
@@ -327,7 +281,7 @@ Dict::Add('ES ES', 'Spanish', 'Español', array(
 	'MailInbox:PolicyNoSubject' => 'Sin asunto',
 	'MailInbox:PolicyUnknownCaller' => 'Remitente desconocido',
 	'MailInbox:PolicyOtherRecipients' => 'Otros destinatarios especificados en Para: o CC:',
-	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Limitar las respuestas aceptadas a la dirección de correo del remitente original del ticket',
+	'MailInbox:PolicyOtherEmailCallerThanTicketCaller' => 'Limitar las respuestas aceptadas a la dirección de correo del remitente original del ticket',
 	'MailInbox:PolicyAutoReply' => 'Respuesta automática',
 	'MailInbox:PolicyNonDeliveryReport' => 'Informes de no entrega',
 	'MailInbox:StepUpdateCallerAttributes' => 'Actualizar atributos del remitente',

@@ -21,7 +21,9 @@
 use Combodo\iTop\Extension\EmailSynchro\Service\IMAPEmailLogger;
 use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
 use JeffreyBostoenExtensions\MailToTicket\{
+	eEvent,
 	eNextAction,
+	Events,
 	ProcessingHelper
 };
 
@@ -161,6 +163,11 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		$iTotalMoved = 0;
         $iTotalUndesired = 0;
 
+		$fStartTime = microtime(true);
+		ProcessingHelper::ClearContext();
+		Events::ResetSubscriptions();
+		Events::FireEvent(eEvent::CRON_TASK_STARTED);
+
 		$this->Trace("-----------------------------------------------------------------------------------------");
 		$this->Trace('. '.count(ProcessingHelper::GetAvailableSteps()).' steps to process.');
 
@@ -189,6 +196,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 				// static singleton shared across every mailbox connection, only updated when a connection
 				// is (re-)established, so it must also be updated here whenever processing switches source.
 				IMAPEmailLogger::$oCurrentMailbox = $oProcessor->GetInboxFromSource($oSource);
+				ProcessingHelper::ClearMessageState();
+				ProcessingHelper::SetMailBox(IMAPEmailLogger::$oCurrentMailbox);
 
 				$this->Trace("-----------------------------------------------------------------------------------------");
 				$this->Trace("Processing Message Source: ".$oSource->GetName());
@@ -197,10 +206,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 				}
 				catch (Exception $e) {
 					$this->LogProcessException($e, $oSource);
+					Events::FireEvent(eEvent::MAILBOX_CONNECTION_FAILED, ['error_message' => $e->getMessage()]);
 					$oSource->Disconnect();
 					continue;
 				}
 				$this->Trace("GetMessagesCount returned: $iMsgCount");
+				Events::FireEvent(eEvent::MAILBOX_STARTED, ['message_count' => $iMsgCount]);
 				
 				
 
@@ -211,6 +222,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					}
 					catch (Exception $e) {
 						$this->LogProcessException($e, $oSource);
+						Events::FireEvent(eEvent::MAILBOX_CONNECTION_FAILED, ['error_message' => $e->getMessage()]);
 						$oSource->Disconnect();
 						continue;
 					}
@@ -286,6 +298,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						// Important: Don't use the \Combodo\iTop\Core\CMDBChange\CMDBChangeOrigin::EMAIL_PROCESSING yet, as it is only available in iTop 3.0+
 						CMDBObject::SetTrackOrigin('email-processing');
 						
+						$bMessageEvents = false;
+						
 						try {
 							
 							$this->InitMessageTrace($oSource, $oMsgHandler);
@@ -351,6 +365,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 										$iTotalDeleted++;
 										$ret = $oMsgHandler->DeleteMessage();
 										$this->Trace("DeleteMessage() returned $ret");
+										Events::FireEvent(eEvent::MESSAGE_DELETED, ['reason' => 'The undesired message exceeded the purge delay.']);
 										if(!$oEmailReplica->IsNew()) {
 										   $aReplicas[$sUIDL] = $oEmailReplica;
 										}
@@ -365,6 +380,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							}
 							
 							$eAction = ProcessingHelper::DispatchEmail($oEmailReplica);
+
+							// - Only messages that are actually handled are reported; not the old ones that are skipped each run.
+							$bMessageEvents = !in_array($eAction, [eNextAction::NO_ACTION], true);
+							if($bMessageEvents) {
+								Events::FireEvent(eEvent::MESSAGE_STARTED);
+							}
 					
 							switch($eAction) {
 								
@@ -372,6 +393,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									$iTotalMarkedAsError++;
 									$this->Trace("Marking the message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
 									$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
+									Events::FireEvent(eEvent::MESSAGE_MARKED_ERROR);
 									break;
 								
 								case eNextAction::DELETE_MESSAGE:
@@ -379,6 +401,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									$this->Trace("Deleting message (replica kept for the retention sweep): uidl={$sUIDL} index={$iMessage}");
 									$ret = $oMsgHandler->DeleteMessage();
 									$this->Trace("DeleteMessage() returned {$ret}");
+									Events::FireEvent(eEvent::MESSAGE_DELETED, ['reason' => 'The message has no (valid) ticket anymore.']);
 									if(!$oEmailReplica->IsNew()) {
 										$aReplicas[$sUIDL] = $oEmailReplica;
 									}
@@ -414,6 +437,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									if(!$oEmail->IsValid()) {
 
 										$eNextAction = $oProcessor->OnDecodeError($oSource, $sUIDL, $oEmail, $oRawEmail);
+										Events::FireEvent(eEvent::MESSAGE_DECODE_FAILED, ['invalid_reasons' => implode(', ', $oEmail->GetInvalidReasons())]);
+										$this->FireOutcomeEvent($eNextAction);
 
 										switch($eNextAction) {
 											case eNextAction::MARK_MESSAGE_AS_ERROR:
@@ -436,6 +461,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									else {
 
 										$eNextAction = $oProcessor->ProcessMessage($oSource, $iMessage, $oEmail, $oEmailReplica);									  
+										$this->FireOutcomeEvent($eNextAction);
 										$this->Trace("EmailReplica ID after ProcessMessage(): ".$oEmailReplica->GetKey());
 						
 										switch($eNextAction) {
@@ -485,6 +511,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 													// target folder would see it as unprocessed and could create a
 													// duplicate ticket for it.
 													$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'ok', $oRawEmail);
+													Events::FireEvent(eEvent::MESSAGE_MOVED, ['target_folder' => $sTargetFolder]);
 												}
 												else {
 													// The move didn't actually happen: don't mark the replica 'ok',
@@ -492,6 +519,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 													// unmoved in its original folder.
 													$this->Trace("Move failed; marking the message (and replica) as in error instead of 'ok'.");
 													$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
+													Events::FireEvent(eEvent::MESSAGE_MARKED_ERROR, ['reason' => 'The message could not be moved.']);
 												}
 												$aReplicas[$sUIDL] = $oEmailReplica;
 												break;
@@ -570,6 +598,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 						}
 						catch(Throwable $e) {
 
+							Events::FireEvent(eEvent::ERROR_PROCESSING, ['error_code' => get_class($e), 'error_message' => $e->getMessage()]);
+
 							if(!empty($oEmailReplica)) {
 								$this->Trace($e->getMessage());
 								$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
@@ -581,6 +611,14 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							// message. The mailbox's IMAP connection is still valid and reused by the rest of
 							// this foreach, so it's not disconnected here (unlike the IMAP-error path above).
 							continue;
+						}
+						finally {
+
+							if($bMessageEvents) {
+								Events::FireEvent(eEvent::MESSAGE_FINISHED);
+							}
+							ProcessingHelper::ClearMessageState();
+
 						}
 						
 					}
@@ -627,6 +665,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					}
 					
 				}
+				ProcessingHelper::ClearMessageState();
+				Events::FireEvent(eEvent::MAILBOX_FINISHED);
 				$oSource->Disconnect();
 			}
 			if (time() > $iTimeLimit) {
@@ -636,6 +676,18 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 				
 			}
 		}
+		ProcessingHelper::ClearContext();
+		Events::FireEvent(eEvent::CRON_TASK_FINISHED, [
+			'message_count' => $iTotalMessages,
+			'processed_count' => $iTotalProcessed,
+			'deleted_count' => $iTotalDeleted,
+			'moved_count' => $iTotalMoved,
+			'marked_as_error_count' => $iTotalMarkedAsError,
+			'undesired_count' => $iTotalUndesired,
+			'skipped_count' => $iTotalSkippedError + $iTotalSkippedIgnored + $iTotalSkippedUndesired,
+			'duration_seconds' => round(microtime(true) - $fStartTime, 2),
+		]);
+
 		return "Message(s) read: $iTotalMessages, message(s) skipped: $iTotalSkippedError in error / $iTotalSkippedIgnored ignored / $iTotalSkippedUndesired undesired, message(s) processed: $iTotalProcessed, message(s) deleted: $iTotalDeleted, message(s) marked as error: $iTotalMarkedAsError, undesired message(s): $iTotalUndesired, message(s) moved: $iTotalMoved";
 	}
 	
@@ -695,6 +747,29 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		
 	}
 	
+	/**
+	 * Fires the event matching the final action that was decided for a message.
+	 * A move is not reported here: that is only known once the message was actually moved.
+	 *
+	 * @param eNextAction $eNextAction Next action.
+	 *
+	 * @return void
+	 */
+	protected function FireOutcomeEvent(eNextAction $eNextAction) : void {
+
+		$eEvent = match($eNextAction) {
+			eNextAction::MARK_MESSAGE_AS_ERROR => eEvent::MESSAGE_MARKED_ERROR,
+			eNextAction::MARK_MESSAGE_AS_UNDESIRED => eEvent::MESSAGE_MARKED_UNDESIRED,
+			eNextAction::DELETE_MESSAGE => eEvent::MESSAGE_DELETED,
+			default => null,
+		};
+
+		if($eEvent !== null) {
+			Events::FireEvent($eEvent, ['next_action' => $eNextAction->name]);
+		}
+
+	}
+
 	private function InitMessageTrace(EmailSource $oSource, MessageHandler $oHandler) {
 		$this->oCurrentSource = $oSource;
 		$this->oCurrentMessageHandler = $oHandler;

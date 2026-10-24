@@ -37,3 +37,14 @@ Check:
 * [steps.php](../jb-itop-standard-email-synchro/core/steps.php) - Actually implemented steps. 
 * [custom_step_example.php](../jb-itop-standard-email-synchro/core/custom_step_example.php) - An very basic unused example and some ideas.
 
+
+**Events**
+
+A policy fires an event when `HandleViolation()` is called, if the code `<settings prefix>_violation` (or `<settings prefix>_detected`) is a case of `eEvent`.  
+To give your own step an event:
+
+* Add a case to `eEvent` (namespace `JeffreyBostoenExtensions\MailToTicket`), starting with a category: `policy_`, `message_`, ...
+* Add the same code to the `code` field of the `MailProcessingEvent` class in the datamodel, and a dictionary entry for its label.
+* New events are created during setup. Fire other events with `Events::FireEvent(eEvent::SOME_CASE, ['name' => 'value'])`.
+
+See [events and triggers](events%20and%20triggers.md).

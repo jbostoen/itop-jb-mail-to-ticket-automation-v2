@@ -189,8 +189,6 @@ abstract class FindAdditionalContacts extends Base {
 				}
 				break;
 				
-			case PolicyBehavior::BOUNCE_DELETE->value:
-			case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
 			case PolicyBehavior::DELETE->value:
 			case PolicyBehavior::DO_NOTHING->value:
 			case PolicyBehavior::MARK_AS_UNDESIRED->value:

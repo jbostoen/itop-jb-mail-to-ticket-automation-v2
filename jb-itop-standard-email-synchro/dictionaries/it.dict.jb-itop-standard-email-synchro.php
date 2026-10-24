@@ -124,8 +124,6 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: errore permanente',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Comportamento in caso di violazione',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inattivo',
@@ -133,52 +131,36 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 
 	// Politica: e-mail troppo grande
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Comportamento in caso di violazione',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:inactive' => 'Inattivo',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_notification' => 'Messaggio di respingimento',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB' => 'Dimensione max. (MB)',
 	'Error:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB+' => 'Dimensione massima dell\'e-mail e dei suoi allegati. Le e-mail più grandi non verranno elaborate. Impostare su 0 per disattivare.',
 
 	// Politica: allegato - tipo MIME vietato
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior' => 'Comportamento in caso di violazione',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:fallback_ignore_forbidden_attachments' => 'Soluzione alternativa: ignorare gli allegati vietati',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:inactive' => 'Inattivo',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_notification' => 'Messaggio di respingimento',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_mimetypes' => 'Tipi MIME (uno per riga)',
 
 	// Politica: nessun oggetto
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior' => 'Comportamento in caso di violazione',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:fallback_default_subject' => 'Soluzione alternativa: usare l\'oggetto predefinito',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:inactive' => 'Inattivo',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_notification' => 'Messaggio di respingimento',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_default_value' => 'Oggetto predefinito',
 
 	// Politica: mittente sconosciuto
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior' => 'Comportamento in caso di violazione',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:fallback_create_person' => 'Soluzione alternativa: creare la persona',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_notification' => 'Messaggio di respingimento',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_default_values' => 'Valori predefiniti per la nuova persona (uno per riga, esempio: org_id:1)',
 
 	// Politica: altri destinatari
@@ -186,62 +168,42 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_other_contacts' => 'Soluzione alternativa: collegare solo i contatti esistenti',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_other_contacts' => 'Soluzione alternativa: collegare sempre il contatto, creandolo se necessario',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_ignore_other_contacts' => 'Soluzione alternativa: ignorare tutti gli altri contatti',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:inactive' => 'Inattivo',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_notification' => 'Messaggio di respingimento',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_default_values' => 'Valori predefiniti per la nuova persona (uno per riga, esempio: org_id:1)',
 
 	// Politica: ticket chiuso
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior' => 'Comportamento in caso di violazione',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior+' => 'Nota: per impostazione predefinita i ticket chiusi non possono essere riaperti. Ciò richiede modifiche al modello dati.',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:fallback_reopen' => 'Soluzione alternativa: riaprire il ticket',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:inactive' => 'Inattivo',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_notification' => 'Messaggio di respingimento',
 
 	// Politica: ticket risolto
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior' => 'Comportamento in caso di violazione',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:fallback_reopen' => 'Soluzione alternativa: riaprire il ticket',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:inactive' => 'Inattivo',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_notification' => 'Messaggio di respingimento',
 
 	// Politica: ticket sconosciuto
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior' => 'Comportamento in caso di violazione',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:inactive' => 'Inattivo',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_notification' => 'Messaggio di respingimento',
 
 	// Politica: pattern del titolo indesiderati
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior' => 'Comportamento in caso di violazione',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:inactive' => 'Inattivo',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_notification' => 'Messaggio di respingimento',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_patterns' => 'Pattern indesiderati nell\'oggetto (pattern di espressione regolare, uno per riga)',
 
 
@@ -255,13 +217,9 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	// Politica: il mittente deve essere lo stesso del ticket originale
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior' => 'Comportamento in caso di violazione',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:inactive' => 'Inattivo',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata / Mantenere l\'e-mail temporaneamente',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_notification' => 'Messaggio di respingimento',
 
 	// Politica: risposta automatica
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Comportamento in caso di violazione',
@@ -287,14 +245,10 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 
 	// Politica: indirizzo e-mail del mittente
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Comportamento in caso di violazione',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'Respingere al mittente ed eliminare',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_mark_as_undesired' => 'Respingere al mittente e contrassegnare come indesiderata',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:do_nothing' => 'Non fare nulla',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:inactive' => 'Inattivo',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:mark_as_undesired' => 'Contrassegnare come indesiderata',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_subject' => 'Oggetto del respingimento',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_notification' => 'Messaggio di respingimento',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns' => 'Pattern',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Qualsiasi e-mail il cui indirizzo del mittente corrisponda a uno dei pattern di espressione regolare definiti (uno per riga) sarà considerata una violazione.',
 
@@ -327,7 +281,7 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	'MailInbox:PolicyNoSubject' => 'Nessun oggetto',
 	'MailInbox:PolicyUnknownCaller' => 'Mittente sconosciuto',
 	'MailInbox:PolicyOtherRecipients' => 'Altri destinatari specificati in A: o CC:',
-	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Limitare le risposte e-mail accettate all\'indirizzo e-mail del mittente originale del ticket',
+	'MailInbox:PolicyOtherEmailCallerThanTicketCaller' => 'Limitare le risposte e-mail accettate all\'indirizzo e-mail del mittente originale del ticket',
 	'MailInbox:PolicyAutoReply' => 'Risposta automatica',
 	'MailInbox:PolicyNonDeliveryReport' => 'Avvisi di mancato recapito',
 	'MailInbox:StepUpdateCallerAttributes' => 'Aggiornare gli attributi del mittente',

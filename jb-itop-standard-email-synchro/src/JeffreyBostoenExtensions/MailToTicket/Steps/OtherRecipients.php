@@ -19,10 +19,10 @@ use JeffreyBostoenExtensions\MailToTicket\{
  * A policy to ensure that the service desk mailbox is the sole recipient (no other recipients in To:, CC:).
  * 
  * @details Does NOT change "related contacts" or create new ones!
- * This step only checks whether the e-mail needs to be bounced.
+ * This step only checks whether the e-mail violates the policy.
  * For the actual creation/linking of contacts, see FindAdditionalContacts.
  * 
- * Reason: The need to 'bounce' just comes way earlier than the handling of iTop person objects.
+ * Reason: The need to refuse the message comes way earlier than the handling of iTop person objects.
  */
 abstract class OtherRecipients extends Base {
 	
@@ -62,8 +62,6 @@ abstract class OtherRecipients extends Base {
 			switch($sPolicyBehavior) {
 
 				// Perform action if:
-				case PolicyBehavior::BOUNCE_DELETE->value:
-				case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
 				case PolicyBehavior::DELETE->value:
 				case PolicyBehavior::MARK_AS_UNDESIRED->value:
 				

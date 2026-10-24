@@ -92,7 +92,7 @@ abstract class ProcessingHelper {
 	/**
 	 * @var MessageHandler $oMessageHandler A handler on the e-mail while processing.
 	 */
-	private static MessageHandler $oMessageHandler;
+	private static ?MessageHandler $oMessageHandler = null;
 
 
 	/**
@@ -180,6 +180,79 @@ abstract class ProcessingHelper {
 		
 	}
 	
+	/**
+	 * Gets the mailbox that's being processed, if any.
+	 *
+	 * @return MailInboxStandard|null
+	 */
+	public static function GetMailBoxOrNull() : ?MailInboxStandard {
+
+		return static::$oMailBox;
+
+	}
+
+	/**
+	 * Gets the e-mail that's being processed, if any.
+	 *
+	 * @return EmailMessage|null
+	 */
+	public static function GetMailOrNull() : ?EmailMessage {
+
+		return static::$oEmail;
+
+	}
+
+	/**
+	 * Gets the e-mail source, if any.
+	 *
+	 * @return EmailSource|null
+	 */
+	public static function GetMailSourceOrNull() : ?EmailSource {
+
+		return static::$oSource;
+
+	}
+
+	/**
+	 * Gets the handler of the e-mail message that is being processed, if any.
+	 *
+	 * @return MessageHandler|null
+	 */
+	public static function GetMessageHandlerOrNull() : ?MessageHandler {
+
+		return static::$oMessageHandler;
+
+	}
+
+	/**
+	 * Forgets everything related to the message that was processed last (e-mail, handler, ticket, steps and outcome notes).
+	 * Used between messages, so events that do not relate to a message do not expose the data of an earlier one.
+	 *
+	 * @return void
+	 */
+	public static function ClearMessageState() : void {
+
+		static::$oEmail = null;
+		static::$oMessageHandler = null;
+		static::$oTicket = null;
+		static::$aPreviouslyExecutedSteps = [];
+		static::ResetOutcomeNotes();
+
+	}
+
+	/**
+	 * Forgets the mailbox, source and message that were processed last.
+	 *
+	 * @return void
+	 */
+	public static function ClearContext() : void {
+
+		static::ClearMessageState();
+		static::$oMailBox = null;
+		static::$oSource = null;
+
+	}
+
 	/**
 	 * Sets the mailbox that's being processed.
 	 *
@@ -867,6 +940,12 @@ abstract class ProcessingHelper {
 			'nothing_to_update' => 'The mailbox only updates tickets (update only), but no related ticket was found.',
 			default => 'Error "'.$sErrorCode.'"'.($sAdditionalErrorMessage !== '' ? ': '.$sAdditionalErrorMessage : '').'.',
 		});
+
+		// - Decode failures and undesired messages have their own events.
+
+		if(!in_array($sErrorCode, ['decode_failed', 'undesired_message'], true)) {
+			Events::FireEvent(eEvent::ERROR_PROCESSING, ['error_code' => $sErrorCode, 'error_message' => $sAdditionalErrorMessage]);
+		}
 
 		switch($sErrorCode) {
 

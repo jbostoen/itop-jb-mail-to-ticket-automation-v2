@@ -13,7 +13,9 @@ use JeffreyBostoenExtensions\MailToTicket\Steps\{
 	Base
 };
 use JeffreyBostoenExtensions\MailToTicket\{
+	eEvent,
 	eNextAction,
+	Events,
 	Helper,
 	ProcessingHelper
 };
@@ -364,7 +366,9 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 			
 		static::AfterInsertTicket();
-		
+
+		Events::FireEvent(eEvent::TICKET_CREATED);
+
 	}
 	
 	/**
@@ -511,6 +515,8 @@ abstract class CreateOrUpdateTicket extends Base {
 			}
 
 			static::AfterUpdateTicket();
+
+			Events::FireEvent(eEvent::TICKET_UPDATED);
 		}
 		finally {
 			// Restore previous change as current change, whether the update succeeded or failed - otherwise

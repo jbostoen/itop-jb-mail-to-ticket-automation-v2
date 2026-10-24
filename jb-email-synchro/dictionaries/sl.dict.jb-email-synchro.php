@@ -1,0 +1,126 @@
+<?php
+/**
+ * Localized data
+ *
+ * @copyright Copyright (c) 2010-2026 Combodo SARL
+ * @license	http://opensource.org/licenses/AGPL-3.0
+ *
+ * This file is part of iTop.
+ *
+ * iTop is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * iTop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with iTop. If not, see <http://www.gnu.org/licenses/>
+ */
+
+Dict::Add('SL SI', 'Slovenian', 'Slovenščina', array(
+	'Class:TriggerMailToTicketProcessingOnEvent' => 'Sprožilec (ob dogodku obdelave e-pošte)',
+	'Class:TriggerMailToTicketProcessingOnEvent+' => 'Sprožilec, ki se aktivira ob dogodku med obdelavo dohodne e-pošte (npr. kršitev pravila, nova prijava, konec naloge cron)',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list' => 'Dogodki',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list+' => 'Dogodki, na katere se naročite',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id' => 'Poštni predal',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id+' => 'Aktiviraj samo za dogodke tega poštnega predala. Pustite prazno za vse poštne predale.',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message' => 'Vključi izvirno sporočilo',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message+' => 'Priloži izvirno e-pošto (.eml) povezanim dejanjem in jo omogoči kot nadomestno oznako "mail->eml_base64"',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:yes' => 'Da',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:no' => 'Ne',
+	'Class:MailProcessingEvent' => 'Dogodek obdelave e-pošte',
+	'Class:MailProcessingEvent+' => 'Dogodek med obdelavo dohodne e-pošte, na katerega se lahko naroči sprožilec',
+	'Class:MailProcessingEvent/Attribute:category' => 'Kategorija',
+	'Class:MailProcessingEvent/Attribute:category+' => 'Kategorija dogodka.',
+	'Class:MailProcessingEvent/Attribute:category/Value:cron_task' => 'Naloga cron',
+	'Class:MailProcessingEvent/Attribute:category/Value:mailbox' => 'Poštni predal',
+	'Class:MailProcessingEvent/Attribute:category/Value:message' => 'Sporočilo',
+	'Class:MailProcessingEvent/Attribute:category/Value:ticket' => 'Prijava',
+	'Class:MailProcessingEvent/Attribute:category/Value:caller' => 'Prijavitelj',
+	'Class:MailProcessingEvent/Attribute:category/Value:policy' => 'Pravilo',
+	'Class:MailProcessingEvent/Attribute:category/Value:error' => 'Napaka',
+	'Class:MailProcessingEvent/Attribute:code' => 'Dogodek',
+	'Class:MailProcessingEvent/Attribute:code+' => 'Dogodek.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started' => 'Naloga cron se je začela',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started+' => 'Začelo se je eno izvajanje procesa v ozadju.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished' => 'Naloga cron je končana',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished+' => 'Eno izvajanje procesa v ozadju se je končalo. Na voljo sta število sporočil in trajanje.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started' => 'Poštni predal se je začel obdelovati',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started+' => 'Začela se je obdelava poštnega predala.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished' => 'Obdelava poštnega predala je končana',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished+' => 'Obdelava poštnega predala se je končala.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed' => 'Povezava s poštnim predalom ni uspela',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed+' => 'Povezava s poštnim predalom ni uspela.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started' => 'Sporočilo se je začelo obdelovati',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started+' => 'Začela se je obdelava sporočila.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished' => 'Obdelava sporočila je končana',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished+' => 'Obdelava sporočila se je končala.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed' => 'Sporočila ni bilo mogoče dekodirati',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed+' => 'Sporočila ni bilo mogoče dekodirati in ni bilo obdelano.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted' => 'Sporočilo izbrisano',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted+' => 'Sporočilo je bilo izbrisano iz poštnega predala.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved' => 'Sporočilo premaknjeno',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved+' => 'Sporočilo je bilo premaknjeno v drugo mapo.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired' => 'Sporočilo označeno kot neželeno',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired+' => 'Sporočilo je bilo označeno kot neželeno in se začasno hrani v poštnem predalu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error' => 'Sporočilo označeno kot napaka',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error+' => 'Sporočilo je bilo označeno kot napaka in ostane v poštnem predalu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket' => 'Nobena prijava ni bila ustvarjena ali povezana',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket+' => 'Obdelava sporočila se je končala, ne da bi bila ustvarjena ali povezana prijava. Povzetek izida pojasni, zakaj.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created' => 'Prijava ustvarjena',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created+' => 'Iz sporočila je bila ustvarjena prijava.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated' => 'Prijava posodobljena',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated+' => 'Prijava je bila posodobljena na podlagi sporočila.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created' => 'Prijavitelj ustvarjen',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created+' => 'Za neznanega prijavitelja je bila ustvarjena oseba.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated' => 'Prijavitelj deaktiviran',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated+' => 'Oseba je bila po napaki pri dostavi označena kot neaktivna.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation' => 'Prepovedana vrsta priloge',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation+' => 'Sporočilo ima prilogo prepovedane vrste.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation' => 'Sporočilo je preveliko',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation+' => 'Sporočilo presega največjo velikost.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation' => 'Brez zadeve',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation+' => 'Sporočilo nima zadeve.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation' => 'Drug pošiljatelj kot prijavitelj prijave',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation+' => 'Pošiljatelj sporočila ni prijavitelj prijave.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation' => 'Drugi prejemniki',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation+' => 'Sporočilo ima druge prejemnike kot poštni predal.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation' => 'Preverjanje pristnosti pošiljatelja ni uspelo',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation+' => 'SPF ali DKIM je za sporočilo sporočil napako. Pošiljatelj je lahko ponarejen.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation' => 'E-poštni naslov pošiljatelja ni sprejet',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation+' => 'E-poštni naslov pošiljatelja sporočila ni sprejet.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation' => 'Prijava zaprta',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation+' => 'Sporočilo se sklicuje na zaprto prijavo.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation' => 'Prijava rešena',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation+' => 'Sporočilo se sklicuje na rešeno prijavo.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation' => 'Neznano sklicevanje na prijavo',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation+' => 'Sporočilo se sklicuje na prijavo, ki ne obstaja.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation' => 'Neželen vzorec naslova',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation+' => 'Zadeva sporočila ustreza neželenemu vzorcu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation' => 'Neznan prijavitelj',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation+' => 'Pošiljatelj sporočila je neznan.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected' => 'Zaznan samodejni odgovor',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected+' => 'Sporočilo je bilo prepoznano kot samodejni odgovor.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected' => 'Zaznano poročilo o nedostavi',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected+' => 'Sporočilo je bilo prepoznano kot poročilo o nedostavi.',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing' => 'Napaka pri obdelavi',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing+' => 'Pri obdelavi sporočila je prišlo do napake. Na voljo sta koda in sporočilo napake.',
+	'Class:lnkMailProcessingEventToTrigger' => 'Povezava Dogodek obdelave e-pošte / Sprožilec',
+	'Class:lnkMailProcessingEventToTrigger+' => 'Povezava med dogodkom obdelave e-pošte in sprožilcem, ki je nanj naročen',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:trigger_id' => 'Sprožilec',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:event_id' => 'Dogodek',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:code' => 'Dogodek',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:category' => 'Kategorija',
+	'Class:ActionEmailByAddress' => 'Pošlji e-pošto (po naslovu)',
+	'Class:ActionEmailByAddress+' => 'Enako kot "Pošlji e-pošto", vendar so "Za"/"Kp"/"Skp" lahko dodatno (ali dopolnjeni z) enim ali več e-poštnimi naslovi (nadomestne oznake so dovoljene), za prejemnike, ki nimajo ustreznega predmeta v iTop (npr. neidentificiran pošiljatelj e-pošte)',
+	'Class:ActionEmailByAddress/Attribute:to_address' => 'Za (naslov)',
+	'Class:ActionEmailByAddress/Attribute:to_address+' => 'E-poštni naslov(i), ločeni z vejicami ali podpičji; nadomestne oznake (npr. "$mail->caller_email$") se razrešijo. Dodani so temu, kar "Za" (OQL) že najde.',
+	'Class:ActionEmailByAddress/Attribute:cc_address' => 'Kp (naslov)',
+	'Class:ActionEmailByAddress/Attribute:cc_address+' => 'E-poštni naslov(i), ločeni z vejicami ali podpičji; nadomestne oznake (npr. "$mail->caller_email$") se razrešijo. Dodani so temu, kar "Kp" (OQL) že najde.',
+	'Class:ActionEmailByAddress/Attribute:bcc_address' => 'Skp (naslov)',
+	'Class:ActionEmailByAddress/Attribute:bcc_address+' => 'E-poštni naslov(i), ločeni z vejicami ali podpičji; nadomestne oznake (npr. "$mail->caller_email$") se razrešijo. Dodani so temu, kar "Skp" (OQL) že najde.',
+));

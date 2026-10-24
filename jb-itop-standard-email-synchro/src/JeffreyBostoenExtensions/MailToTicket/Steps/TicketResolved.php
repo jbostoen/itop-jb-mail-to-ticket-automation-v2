@@ -46,8 +46,6 @@ abstract class TicketResolved extends Base {
 				static::Trace(". Ticket was marked as resolved before.");
 						
 				switch(static::GetStepSetting('behavior')) { 
-					case PolicyBehavior::BOUNCE_DELETE->value: 
-					case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
 					case PolicyBehavior::DELETE->value:
 					case PolicyBehavior::DO_NOTHING->value:
 					case PolicyBehavior::MARK_AS_UNDESIRED->value:

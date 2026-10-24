@@ -14,6 +14,8 @@ use JeffreyBostoenExtensions\MailToTicket\Steps\{
 };
 
 use JeffreyBostoenExtensions\MailToTicket\{
+	eEvent,
+	Events,
 	ProcessingHelper
 };
 
@@ -89,8 +91,6 @@ abstract class FindCaller extends Base {
 						// Caller was not found.
 						switch(static::GetStepSetting('behavior')) {
 							
-							case PolicyBehavior::BOUNCE_DELETE->value:
-							case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
 							case PolicyBehavior::DELETE->value:
 							case PolicyBehavior::MARK_AS_UNDESIRED->value:
 							
@@ -116,7 +116,8 @@ abstract class FindCaller extends Base {
 										ProcessingHelper::InitObjectFromDefaultValues($oCaller, $aDefaultValues);
 										
 										static::Trace("Create user with default values");
-										$oCaller->DBInsert();					
+										$oCaller->DBInsert();
+										Events::FireEvent(eEvent::CALLER_CREATED, ['caller->object()' => $oCaller]);
 									}
 									catch(Exception $e) {
 										// This is an actual error.

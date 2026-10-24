@@ -189,10 +189,8 @@ status:assigned]]></default_value>
 				</field>
 				<!-- All policy options -->
 				<!-- Sender authentication (SPF/DKIM) -->
-				<!-- Intentionally no bounce_delete/bounce_mark_as_undesired here (unlike sibling policies): this
-					 step runs before AutoReply/NonDeliveryReport detection, so bouncing a message that failed
-					 sender authentication and turns out to be an auto-reply or NDR risks the same mail-loop problem
-					 those two policies were already restricted to avoid. -->
+				<!-- Replying to the sender is a deliberate choice (trigger): this step runs before AutoReply/NonDeliveryReport detection,
+					 so a reply to a message that failed sender authentication and turns out to be an auto-reply or NDR risks a mail loop. -->
 				<field id="policy_sender_authentication_failures" xsi:type="AttributeEnumSet">
 					<values>
 						<value id="spf_fail">
@@ -236,12 +234,6 @@ status:assigned]]></default_value>
 				<!-- Mail size (message including attachments) too big? -->
 				<field id="policy_mail_size_too_big_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value id="bounce_delete">
-							<code>bounce_delete</code>
-						</value>
-						<value id="bounce_mark_as_undesired">
-							<code>bounce_mark_as_undesired</code>
-						</value>
 						<value id="delete">
 							<code>delete</code>
 						</value>
@@ -258,11 +250,6 @@ status:assigned]]></default_value>
 					<sql>policy_mail_size_too_big_behavior</sql>
 					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
-				</field>
-				<field id="policy_mail_size_too_big_subject" xsi:type="AttributeString">
-					<sql>policy_mail_size_too_big_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
 				</field>
 				<!-- Attachments - criteria -->
 				<field id="step_attachment_criteria_image_min_width" xsi:type="AttributeInteger">
@@ -294,11 +281,6 @@ application/x-pkcs7-signature]]></default_value>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
 				<!-- Policy: E-mail size. -->
-				<field id="policy_mail_size_too_big_notification" xsi:type="AttributeHTML">
-					<sql>policy_mail_size_too_big_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
 				<field id="policy_mail_size_too_big_max_size_MB" xsi:type="AttributeInteger">
 					<sql>policy_mail_size_too_big_max_size_MB</sql>
 					<default_value>25</default_value>
@@ -307,12 +289,6 @@ application/x-pkcs7-signature]]></default_value>
 				<!-- Forbidden e-mail attachments -->
 				<field id="policy_attachment_forbidden_mimetype_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value id="bounce_delete">
-							<code>bounce_delete</code>
-						</value>
-						<value id="bounce_mark_as_undesired">
-							<code>bounce_mark_as_undesired</code>
-						</value>
 						<value id="delete">
 							<code>delete</code>
 						</value>
@@ -333,16 +309,6 @@ application/x-pkcs7-signature]]></default_value>
 					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="policy_attachment_forbidden_mimetype_subject" xsi:type="AttributeString">
-					<sql>policy_attachment_forbidden_mimetype_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="policy_attachment_forbidden_mimetype_notification" xsi:type="AttributeHTML">
-					<sql>policy_attachment_forbidden_mimetype_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
 				<field id="policy_attachment_forbidden_mimetype_mimetypes" xsi:type="AttributeText">
 					<sql>policy_attachment_forbidden_mimetype_mimetypes</sql>
 					<default_value>application/exe</default_value>
@@ -351,12 +317,6 @@ application/x-pkcs7-signature]]></default_value>
 				<!-- No subject. -->
 				<field id="policy_no_subject_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value id="bounce_delete">
-							<code>bounce_delete</code>
-						</value>
-						<value id="bounce_mark_as_undesired">
-							<code>bounce_mark_as_undesired</code>
-						</value>
 						<value id="delete">
 							<code>delete</code>
 						</value>
@@ -377,16 +337,6 @@ application/x-pkcs7-signature]]></default_value>
 					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="policy_no_subject_subject" xsi:type="AttributeString">
-					<sql>policy_no_subject_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="policy_no_subject_notification" xsi:type="AttributeHTML">
-					<sql>policy_no_subject_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
 				<field id="policy_no_subject_default_value" xsi:type="AttributeString">
 					<sql>policy_no_subject_default_value</sql>
 					<default_value/>
@@ -395,12 +345,6 @@ application/x-pkcs7-signature]]></default_value>
 				<!-- Unknown caller -->
 				<field id="policy_unknown_caller_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value id="bounce_delete">
-							<code>bounce_delete</code>
-						</value>
-						<value id="bounce_mark_as_undesired">
-							<code>bounce_mark_as_undesired</code>
-						</value>
 						<value id="delete">
 							<code>delete</code>
 						</value>
@@ -415,16 +359,6 @@ application/x-pkcs7-signature]]></default_value>
 					<default_value>mark_as_undesired</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="policy_unknown_caller_subject" xsi:type="AttributeString">
-					<sql>policy_unknown_caller_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="policy_unknown_caller_notification" xsi:type="AttributeHTML">
-					<sql>policy_unknown_caller_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
 				<field id="policy_unknown_caller_default_values" xsi:type="AttributeText">
 					<sql>policy_unknown_caller_default_values</sql>
 					<default_value>
@@ -436,12 +370,6 @@ name:Unknown caller - $mail->caller_name$]]></default_value>
 				<!-- Additional contacts -->
 				<field id="policy_other_recipients_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value id="bounce_delete">
-							<code>bounce_delete</code>
-						</value>
-						<value id="bounce_mark_as_undesired">
-							<code>bounce_mark_as_undesired</code>
-						</value>
 						<value id="delete">
 							<code>delete</code>
 						</value>
@@ -468,16 +396,6 @@ name:Unknown caller - $mail->caller_name$]]></default_value>
 					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="policy_other_recipients_subject" xsi:type="AttributeString">
-					<sql>policy_other_recipients_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="policy_other_recipients_notification" xsi:type="AttributeHTML">
-					<sql>policy_other_recipients_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
 				<field id="policy_other_recipients_default_values" xsi:type="AttributeText">
 					<sql>policy_other_recipients_default_values</sql>
 					<default_value>
@@ -501,12 +419,6 @@ name:Unknown caller]]></default_value>
 						<value id="do_nothing">
 							<code>do_nothing</code>
 						</value>
-						<value id="bounce_delete">
-							<code>bounce_delete</code>
-						</value>
-						<value id="bounce_mark_as_undesired">
-							<code>bounce_mark_as_undesired</code>
-						</value>
 						<value id="inactive">
 							<code>inactive</code>
 						</value>
@@ -515,25 +427,9 @@ name:Unknown caller]]></default_value>
 					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="policy_ticket_closed_subject" xsi:type="AttributeString">
-					<sql>policy_ticket_closed_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="policy_ticket_closed_notification" xsi:type="AttributeHTML">
-					<sql>policy_ticket_closed_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
 				<!-- Reference to resolved ticket -->
 				<field id="policy_ticket_resolved_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value id="bounce_delete">
-							<code>bounce_delete</code>
-						</value>
-						<value id="bounce_mark_as_undesired">
-							<code>bounce_mark_as_undesired</code>
-						</value>
 						<value id="delete">
 							<code>delete</code>
 						</value>
@@ -554,25 +450,9 @@ name:Unknown caller]]></default_value>
 					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="policy_ticket_resolved_subject" xsi:type="AttributeString">
-					<sql>policy_ticket_resolved_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="policy_ticket_resolved_notification" xsi:type="AttributeHTML">
-					<sql>policy_ticket_resolved_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
 				<!-- Reference to non-existing ticket -->
 				<field id="policy_ticket_unknown_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value id="bounce_delete">
-							<code>bounce_delete</code>
-						</value>
-						<value id="bounce_mark_as_undesired">
-							<code>bounce_mark_as_undesired</code>
-						</value>
 						<value id="delete">
 							<code>delete</code>
 						</value>
@@ -590,25 +470,9 @@ name:Unknown caller]]></default_value>
 					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="policy_ticket_unknown_subject" xsi:type="AttributeString">
-					<sql>policy_ticket_unknown_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="policy_ticket_unknown_notification" xsi:type="AttributeHTML">
-					<sql>policy_ticket_unknown_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
 				<!-- Undesired title pattern, reject entire e-mail -->
 				<field id="policy_undesired_pattern_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value id="bounce_delete">
-							<code>bounce_delete</code>
-						</value>
-						<value id="bounce_mark_as_undesired">
-							<code>bounce_mark_as_undesired</code>
-						</value>
 						<value id="delete">
 							<code>delete</code>
 						</value>
@@ -625,16 +489,6 @@ name:Unknown caller]]></default_value>
 					<sql>policy_undesired_pattern_behavior</sql>
 					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
-				</field>
-				<field id="policy_undesired_pattern_subject" xsi:type="AttributeString">
-					<sql>policy_undesired_pattern_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="policy_undesired_pattern_notification" xsi:type="AttributeHTML">
-					<sql>policy_undesired_pattern_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
 				</field>
 				<field id="policy_undesired_pattern_patterns" xsi:type="AttributeText">
 					<sql>policy_undesired_pattern_patterns</sql>
@@ -666,12 +520,6 @@ name:Unknown caller]]></default_value>
 				<!-- Different e-mail caller than ticket caller -->
 				<field id="policy_other_email_caller_than_ticket_caller_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value id="bounce_delete">
-							<code>bounce_delete</code>
-						</value>
-						<value id="bounce_mark_as_undesired">
-							<code>bounce_mark_as_undesired</code>
-						</value>
 						<value id="delete">
 							<code>delete</code>
 						</value>
@@ -689,19 +537,8 @@ name:Unknown caller]]></default_value>
 					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="policy_other_email_caller_than_ticket_caller_subject" xsi:type="AttributeString">
-					<sql>policy_other_email_caller_than_ticket_caller_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="policy_other_email_caller_than_ticket_caller_notification" xsi:type="AttributeHTML">
-					<sql>policy_other_email_caller_than_ticket_caller_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
 				<!-- Auto-reply / out-of-office -->
-				<!-- Intentionally no bounce_delete/bounce_mark_as_undesired here (unlike sibling policies): bouncing a
-					 reply back to an automated out-of-office sender risks a mail loop with that system. -->
+				<!-- A reply to an automated out-of-office sender risks a mail loop with that system. -->
 				<field id="policy_autoreply_behavior" xsi:type="AttributeEnum">
 					<values>
 						<value id="delete">
@@ -722,8 +559,7 @@ name:Unknown caller]]></default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<!-- Non Delivery Reports -->
-				<!-- Intentionally no bounce_delete/bounce_mark_as_undesired here (unlike sibling policies): bouncing a
-					 reply back to a Non-Delivery-Report is the classic "backscatter" mail loop problem. -->
+				<!-- A reply to a Non-Delivery-Report is the classic "backscatter" mail loop problem. -->
 				<field id="policy_non_delivery_report_behavior" xsi:type="AttributeEnum" _delta="define">
 					<values>
 						<value id="delete">
@@ -757,12 +593,6 @@ name:Unknown caller]]></default_value>
 				</field>
 				<field id="policy_sender_email_address_behavior" xsi:type="AttributeEnum">
 					<values>
-						<value id="bounce_delete">
-							<code>bounce_delete</code>
-						</value>
-						<value id="bounce_mark_as_undesired">
-							<code>bounce_mark_as_undesired</code>
-						</value>
 						<value id="delete">
 							<code>delete</code>
 						</value>
@@ -782,16 +612,6 @@ name:Unknown caller]]></default_value>
 					<sql>policy_sender_email_address_behavior</sql>
 					<default_value>inactive</default_value>
 					<is_null_allowed>false</is_null_allowed>
-				</field>
-				<field id="policy_sender_email_address_subject" xsi:type="AttributeString">
-					<sql>policy_sender_email_address_subject</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="policy_sender_email_address_notification" xsi:type="AttributeHTML">
-					<sql>policy_sender_email_address_notification</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
 				</field>
 				<field id="policy_sender_email_address_patterns" xsi:type="AttributeText">
 					<sql>policy_sender_email_address_patterns</sql>
@@ -1092,12 +912,6 @@ EOF
 										<item id="policy_mail_size_too_big_behavior">
 											<rank>10</rank>
 										</item>
-										<item id="policy_mail_size_too_big_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_mail_size_too_big_notification">
-											<rank>20</rank>
-										</item>
 										<item id="policy_mail_size_too_big_max_size_MB">
 											<rank>30</rank>
 										</item>
@@ -1109,12 +923,6 @@ EOF
 									<items>
 										<item id="policy_attachment_forbidden_mimetype_behavior">
 											<rank>10</rank>
-										</item>
-										<item id="policy_attachment_forbidden_mimetype_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_attachment_forbidden_mimetype_notification">
-											<rank>20</rank>
 										</item>
 										<item id="policy_attachment_forbidden_mimetype_mimetypes">
 											<rank>30</rank>
@@ -1145,12 +953,6 @@ EOF
 										<item id="policy_no_subject_behavior">
 											<rank>10</rank>
 										</item>
-										<item id="policy_no_subject_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_no_subject_notification">
-											<rank>20</rank>
-										</item>
 										<item id="policy_no_subject_default_value">
 											<rank>30</rank>
 										</item>
@@ -1163,12 +965,6 @@ EOF
 										<item id="policy_ticket_closed_behavior">
 											<rank>10</rank>
 										</item>
-										<item id="policy_ticket_closed_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_ticket_closed_notification">
-											<rank>20</rank>
-										</item>
 									</items>
 								</item>
 								<!-- Resolved ticket -->
@@ -1177,12 +973,6 @@ EOF
 									<items>
 										<item id="policy_ticket_resolved_behavior">
 											<rank>10</rank>
-										</item>
-										<item id="policy_ticket_resolved_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_ticket_resolved_notification">
-											<rank>20</rank>
 										</item>
 									</items>
 								</item>
@@ -1193,12 +983,6 @@ EOF
 										<item id="policy_ticket_unknown_behavior">
 											<rank>10</rank>
 										</item>
-										<item id="policy_ticket_unknown_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_ticket_unknown_notification">
-											<rank>20</rank>
-										</item>
 									</items>
 								</item>
 								<!-- Unknown caller -->
@@ -1207,12 +991,6 @@ EOF
 									<items>
 										<item id="policy_unknown_caller_behavior">
 											<rank>10</rank>
-										</item>
-										<item id="policy_unknown_caller_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_unknown_caller_notification">
-											<rank>20</rank>
 										</item>
 										<item id="policy_unknown_caller_default_values">
 											<rank>30</rank>
@@ -1226,29 +1004,17 @@ EOF
 										<item id="policy_sender_email_address_behavior">
 											<rank>10</rank>
 										</item>
-										<item id="policy_sender_email_address_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_sender_email_address_notification">
-											<rank>20</rank>
-										</item>
 										<item id="policy_sender_email_address_patterns">
 											<rank>30</rank>
 										</item>
 									</items>
 								</item>
 								<!-- Other email caller (in follow up mail) than original ticket caller -->
-								<item id="fieldset:MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller">
+								<item id="fieldset:MailInbox:PolicyOtherEmailCallerThanTicketCaller">
 									<rank>161</rank>
 									<items>
 										<item id="policy_other_email_caller_than_ticket_caller_behavior">
 											<rank>10</rank>
-										</item>
-										<item id="policy_other_email_caller_than_ticket_caller_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_other_email_caller_than_ticket_caller_notification">
-											<rank>20</rank>
 										</item>
 									</items>
 								</item>
@@ -1280,12 +1046,6 @@ EOF
 										<item id="policy_other_recipients_behavior">
 											<rank>10</rank>
 										</item>
-										<item id="policy_other_recipients_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_other_recipients_notification">
-											<rank>20</rank>
-										</item>
 										<item id="policy_other_recipients_default_values">
 											<rank>25</rank>
 										</item>
@@ -1297,12 +1057,6 @@ EOF
 									<items>
 										<item id="policy_undesired_pattern_behavior">
 											<rank>10</rank>
-										</item>
-										<item id="policy_undesired_pattern_subject">
-											<rank>15</rank>
-										</item>
-										<item id="policy_undesired_pattern_notification">
-											<rank>20</rank>
 										</item>
 										<item id="policy_undesired_pattern_patterns">
 											<rank>30</rank>

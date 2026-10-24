@@ -124,8 +124,6 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: trvalá chyba',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Chování při porušení',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Smazat zprávu ze schránky',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Neaktivní',
@@ -133,52 +131,36 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 
 	// Zásada: e-mail je příliš velký
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Chování při porušení',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:delete' => 'Smazat zprávu ze schránky',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:inactive' => 'Neaktivní',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_notification' => 'Zpráva o odmítnutí',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB' => 'Max. velikost (MB)',
 	'Error:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB+' => 'Maximální velikost e-mailu a jeho příloh. Větší e-maily nebudou zpracovány. Nastavte na 0, chcete-li zakázat.',
 
 	// Zásada: příloha - zakázaný typ MIME
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior' => 'Chování při porušení',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:fallback_ignore_forbidden_attachments' => 'Záložní řešení: ignorovat zakázané přílohy',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:delete' => 'Smazat zprávu ze schránky',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:inactive' => 'Neaktivní',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_notification' => 'Zpráva o odmítnutí',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_mimetypes' => 'Typy MIME (jeden na řádek)',
 
 	// Zásada: bez předmětu
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior' => 'Chování při porušení',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:fallback_default_subject' => 'Záložní řešení: použít výchozí předmět',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:delete' => 'Smazat zprávu ze schránky',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:inactive' => 'Neaktivní',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_notification' => 'Zpráva o odmítnutí',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_default_value' => 'Výchozí předmět',
 
 	// Zásada: neznámý odesílatel
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior' => 'Chování při porušení',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:fallback_create_person' => 'Záložní řešení: vytvořit osobu',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:delete' => 'Smazat zprávu ze schránky',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_notification' => 'Zpráva o odmítnutí',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_default_values' => 'Výchozí hodnoty pro novou osobu (jedna na řádek, příklad: org_id:1)',
 
 	// Zásada: ostatní příjemci
@@ -186,62 +168,42 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_other_contacts' => 'Záložní řešení: propojit pouze existující kontakty',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_other_contacts' => 'Záložní řešení: vždy propojit kontakt, v případě potřeby jej vytvořit',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_ignore_other_contacts' => 'Záložní řešení: ignorovat všechny ostatní kontakty',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:delete' => 'Smazat zprávu ze schránky',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:inactive' => 'Neaktivní',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_notification' => 'Zpráva o odmítnutí',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_default_values' => 'Výchozí hodnoty pro novou osobu (jedna na řádek, příklad: org_id:1)',
 
 	// Zásada: uzavřený tiket
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior' => 'Chování při porušení',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior+' => 'Pozn.: uzavřené tikety ve výchozím nastavení nelze znovu otevřít. Vyžaduje to změny v datovém modelu.',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:fallback_reopen' => 'Záložní řešení: znovu otevřít tiket',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:delete' => 'Smazat zprávu ze schránky',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:inactive' => 'Neaktivní',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_notification' => 'Zpráva o odmítnutí',
 
 	// Zásada: vyřešený tiket
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior' => 'Chování při porušení',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:fallback_reopen' => 'Záložní řešení: znovu otevřít tiket',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:delete' => 'Smazat zprávu ze schránky',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:inactive' => 'Neaktivní',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_notification' => 'Zpráva o odmítnutí',
 
 	// Zásada: neznámý tiket
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior' => 'Chování při porušení',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:delete' => 'Smazat zprávu ze schránky',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:inactive' => 'Neaktivní',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_notification' => 'Zpráva o odmítnutí',
 
 	// Zásada: nežádoucí vzory v názvu
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior' => 'Chování při porušení',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:delete' => 'Smazat zprávu ze schránky',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:inactive' => 'Neaktivní',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_notification' => 'Zpráva o odmítnutí',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_patterns' => 'Nežádoucí vzory v předmětu (regulární výrazy, jeden na řádek)',
 
 
@@ -255,13 +217,9 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	// Zásada: odesílatel musí být stejný jako původní odesílatel tiketu
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior' => 'Chování při porušení',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:delete' => 'Smazat zprávu ze schránky',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:inactive' => 'Neaktivní',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí / Dočasně ponechat e-mail',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_notification' => 'Zpráva o odmítnutí',
 
 	// Zásada: automatická odpověď
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Chování při porušení',
@@ -287,14 +245,10 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 
 	// Zásada: e-mailová adresa odesílatele
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Chování při porušení',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'Odmítnout zpět odesílateli a smazat',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_mark_as_undesired' => 'Odmítnout zpět odesílateli a označit jako nežádoucí',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:delete' => 'Smazat zprávu ze schránky',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:do_nothing' => 'Nedělat nic',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:inactive' => 'Neaktivní',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:mark_as_undesired' => 'Označit jako nežádoucí',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_subject' => 'Předmět odmítnutí',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_notification' => 'Zpráva o odmítnutí',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns' => 'Vzory',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Každý e-mail, jehož e-mailová adresa odesílatele odpovídá jednomu z definovaných regulárních výrazů (jeden na řádek), bude považován za porušení.',
 
@@ -327,7 +281,7 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'MailInbox:PolicyNoSubject' => 'Bez předmětu',
 	'MailInbox:PolicyUnknownCaller' => 'Neznámý odesílatel',
 	'MailInbox:PolicyOtherRecipients' => 'Ostatní příjemci uvedení v Komu: nebo Kopie:',
-	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Omezit přijaté odpovědi na e-mailovou adresu původního odesílatele tiketu',
+	'MailInbox:PolicyOtherEmailCallerThanTicketCaller' => 'Omezit přijaté odpovědi na e-mailovou adresu původního odesílatele tiketu',
 	'MailInbox:PolicyAutoReply' => 'Automatická odpověď',
 	'MailInbox:PolicyNonDeliveryReport' => 'Oznámení o nedoručení',
 	'MailInbox:StepUpdateCallerAttributes' => 'Aktualizovat atributy odesílatele',

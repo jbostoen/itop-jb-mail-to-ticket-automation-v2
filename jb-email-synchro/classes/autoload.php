@@ -35,6 +35,8 @@ if(class_exists('DBObject')) {
 	require_once(__DIR__.'/_mailinboxbase.class.inc.php');
 	require_once(__DIR__.'/emailreplica.class.inc.php');
 	require_once(__DIR__.'/triggeronmailupdate.class.inc.php');
+	require_once(__DIR__.'/triggermailtoticketprocessingonevent.class.inc.php');
+	require_once(__DIR__.'/actionemailbyaddress.class.inc.php');
 }
 require_once(__DIR__.'/emailsource.class.inc.php');
 if (file_exists(__DIR__.'/testemailsource.class.inc.php')) {

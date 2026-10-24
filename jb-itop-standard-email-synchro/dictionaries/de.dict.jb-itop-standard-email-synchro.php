@@ -124,8 +124,6 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanenter Fehler',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Verhalten bei Verstoß',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inaktiv',
@@ -133,52 +131,36 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 
 	// Richtlinie: E-Mail zu groß
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Verhalten bei Verstoß',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_notification' => 'Nachricht der Zurückweisung',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB' => 'Max. Größe (MB)',
 	'Error:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB+' => 'Maximale Größe der E-Mail und ihrer Anhänge. Größere E-Mails werden nicht verarbeitet. Auf 0 setzen, um zu deaktivieren.',
 
 	// Richtlinie: Anhang - verbotener MIME-Typ
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior' => 'Verhalten bei Verstoß',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:fallback_ignore_forbidden_attachments' => 'Rückfalllösung: verbotene Anhänge ignorieren',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_notification' => 'Nachricht der Zurückweisung',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_mimetypes' => 'MIME-Typen (einer pro Zeile)',
 
 	// Richtlinie: kein Betreff
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior' => 'Verhalten bei Verstoß',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:fallback_default_subject' => 'Rückfalllösung: Standardbetreff verwenden',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_notification' => 'Nachricht der Zurückweisung',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_default_value' => 'Standardbetreff',
 
 	// Richtlinie: unbekannter Absender
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior' => 'Verhalten bei Verstoß',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:fallback_create_person' => 'Rückfalllösung: Person erstellen',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_notification' => 'Nachricht der Zurückweisung',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_default_values' => 'Standardwerte für neue Person (einer pro Zeile, Beispiel: org_id:1)',
 
 	// Richtlinie: andere Empfänger
@@ -186,62 +168,42 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_other_contacts' => 'Rückfalllösung: nur bestehende Kontakte verknüpfen',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_other_contacts' => 'Rückfalllösung: Kontakt immer verknüpfen, bei Bedarf erstellen',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_ignore_other_contacts' => 'Rückfalllösung: alle anderen Kontakte ignorieren',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_notification' => 'Nachricht der Zurückweisung',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_default_values' => 'Standardwerte für neue Person (einer pro Zeile, Beispiel: org_id:1)',
 
 	// Richtlinie: geschlossenes Ticket
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior' => 'Verhalten bei Verstoß',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior+' => 'Hinweis: standardmäßig können geschlossene Tickets nicht wieder geöffnet werden. Dies erfordert Änderungen am Datenmodell.',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:fallback_reopen' => 'Rückfalllösung: Ticket wieder öffnen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_notification' => 'Nachricht der Zurückweisung',
 
 	// Richtlinie: gelöstes Ticket
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior' => 'Verhalten bei Verstoß',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:fallback_reopen' => 'Rückfalllösung: Ticket wieder öffnen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_notification' => 'Nachricht der Zurückweisung',
 
 	// Richtlinie: unbekanntes Ticket
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior' => 'Verhalten bei Verstoß',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_notification' => 'Nachricht der Zurückweisung',
 
 	// Richtlinie: unerwünschte Titelmuster
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior' => 'Verhalten bei Verstoß',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_notification' => 'Nachricht der Zurückweisung',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_patterns' => 'Unerwünschte Muster im Betreff (reguläre Ausdrücke, einer pro Zeile)',
 
 
@@ -255,13 +217,9 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	// Richtlinie: Absender muss mit dem des ursprünglichen Tickets übereinstimmen
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior' => 'Verhalten bei Verstoß',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren / E-Mail vorübergehend behalten',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_notification' => 'Nachricht der Zurückweisung',
 
 	// Richtlinie: automatische Antwort
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Verhalten bei Verstoß',
@@ -287,14 +245,10 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 
 	// Richtlinie: E-Mail-Adresse des Absenders
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Verhalten bei Verstoß',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'An Absender zurückweisen und löschen',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_mark_as_undesired' => 'An Absender zurückweisen und als unerwünscht markieren',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:do_nothing' => 'Nichts tun',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:mark_as_undesired' => 'Als unerwünscht markieren',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_subject' => 'Betreff der Zurückweisung',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_notification' => 'Nachricht der Zurückweisung',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns' => 'Muster',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Jede E-Mail, deren Absenderadresse mit einem der definierten regulären Ausdrücke (einer pro Zeile) übereinstimmt, wird als Verstoß betrachtet.',
 
@@ -327,7 +281,7 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'MailInbox:PolicyNoSubject' => 'Kein Betreff',
 	'MailInbox:PolicyUnknownCaller' => 'Unbekannter Absender',
 	'MailInbox:PolicyOtherRecipients' => 'Andere Empfänger, die in An: oder CC: angegeben sind',
-	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Akzeptierte E-Mail-Antworten auf die E-Mail-Adresse des ursprünglichen Ticket-Absenders beschränken',
+	'MailInbox:PolicyOtherEmailCallerThanTicketCaller' => 'Akzeptierte E-Mail-Antworten auf die E-Mail-Adresse des ursprünglichen Ticket-Absenders beschränken',
 	'MailInbox:PolicyAutoReply' => 'Automatische Antwort',
 	'MailInbox:PolicyNonDeliveryReport' => 'Unzustellbarkeitsbenachrichtigungen',
 	'MailInbox:StepUpdateCallerAttributes' => 'Attribute des Absenders aktualisieren',

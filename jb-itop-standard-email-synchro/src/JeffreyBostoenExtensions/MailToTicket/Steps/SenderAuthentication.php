@@ -31,6 +31,11 @@ abstract class SenderAuthentication extends Base {
 	private const METHODS = ['spf', 'dkim'];
 
 	/**
+	 * @var string[] $aDetectedStates The authentication results (e.g. "spf=softfail") found for the message that is being processed.
+	 */
+	private static array $aDetectedStates = [];
+
+	/**
 	 * @inheritDoc
 	 */
 	public static int $iPrecedence = -10;
@@ -56,6 +61,7 @@ abstract class SenderAuthentication extends Base {
 		$aConfiguredFailures = $oMailBox->Get(static::GetXMLSettingsPrefix().'_failures')?->GetValues() ?? [];
 		$aDetectedFailures = [];
 		$aDetectedStates = [];
+		static::$aDetectedStates = [];
 
 		foreach(static::METHODS as $sMethod) {
 
@@ -78,12 +84,24 @@ abstract class SenderAuthentication extends Base {
 			return;
 		}
 
+		static::$aDetectedStates = $aDetectedStates;
 		static::Trace('.. Detected authentication result(s): %1$s', implode(', ', $aDetectedStates));
 
 		if(count($aDetectedFailures) > 0) {
 			static::Trace('.. Sender authentication failed (result(s): %1$s).', implode(', ', $aDetectedFailures));
 			static::HandleViolation();
 		}
+
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected static function GetViolationContextArguments(string $sBehavior) : array {
+
+		return array_merge(parent::GetViolationContextArguments($sBehavior), [
+			'authentication_states' => implode(', ', static::$aDetectedStates),
+		]);
 
 	}
 

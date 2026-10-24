@@ -45,8 +45,6 @@ abstract class NoSubject extends Base {
 				
 				switch($sPolicyBehavior) {
 					 // Will use default subject.
-					 case PolicyBehavior::BOUNCE_DELETE->value:
-					 case PolicyBehavior::BOUNCE_MARK_AS_UNDESIRED->value:
 					 case PolicyBehavior::DELETE->value:
 					 case PolicyBehavior::DO_NOTHING->value:
 					 case PolicyBehavior::MARK_AS_UNDESIRED->value:
@@ -68,7 +66,7 @@ abstract class NoSubject extends Base {
 						// Setting the ticket title on the ticket object happens later and not in this policy!
 						$sDefaultTitle = static::GetStepSetting('default_value');
 						
-						// Inproper configuration. Not a policy violation "behavior" (e.g. bounce_delete) that
+						// Inproper configuration. Not a policy violation "behavior" (e.g. delete) that
 						// HandleViolation() knows how to translate into a next action, so it would silently
 						// fall through to eNextAction::NO_ACTION - marking the message as successfully
 						// processed while actually dropping it. Use HandleError() instead, which always

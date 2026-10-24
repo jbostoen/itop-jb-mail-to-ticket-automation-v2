@@ -103,28 +103,26 @@ For instance, a policy could reject messages with an empty subject.
 ## Basics about policies
 
 Common options are:
-* Behavior (on conflict/not compliant with policy)
-  * Bounce and delete (inform the user the message has been rejected, provide some information why)
-  * Delete
-  * Do nothing (can be used for tests and might result in some output, without taking further action)
-  * Inactive (contrary to "Do nothing", the policy is not even processed)
-  * Mark as undesired (keeps the email, but will ignore it in future processing)
-  * Mark as error (keeps the email)
-* Bouncing (sending message to the user telling their email is rejected)
-  * Subject
-  * Message
 
-In the bounce message, some placeholders (variables) can be used in the subject and in the message.  
-In fact, most (all?) strings from the EmailMessage class are supported.  
-So in the bounce subject/message, it's possible to use `$mail->subject$` etc. (list below)
+| Behavior (on conflict/not compliant with policy) | Effect |
+|--------------------------------------------------|--------|
+| Delete | The message is deleted from the mailbox. |
+| Do nothing | For tests. The policy is processed and might result in some output, without taking further action. |
+| Inactive | Contrary to "Do nothing", the policy is not even processed. |
+| Mark as undesired | The message is kept, but ignored in future processing. It is deleted after a while. |
+| Mark as error | The message is kept. |
+
+Informing the sender (or anyone else) that a message was rejected is no longer a setting of the policy.  
+Every policy fires an event when it is violated, and a trigger subscribed to that event can send an e-mail (or do something else).  
+See [events and triggers](events%20and%20triggers.md).
 
 
 ## Available placeholders
 
-Bounce messages are e-mails that can be sent to the sender when an e-mail message does not comply with a certain rule.  
-The bounce messages can make use of variables in their subject and in the body.  
+The actions linked to a trigger (see [events and triggers](events%20and%20triggers.md)) can make use of variables in their subject, body, recipients, ...  
+The full list of values per event is documented there.
 
-The following variables are exposed:
+The following variables are exposed for the e-mail:
 
 * `mail` object.
 * `sender` object (Only after the sender was successfully linked to an iTop person).
@@ -165,6 +163,8 @@ It refers to the ticket as it is right before the values are applied.
 
 
 ## Trigger "When updated by mail"
+
+For triggers on policy violations, cron tasks, messages, ... see [events and triggers](events%20and%20triggers.md).
 
 The trigger is activated after a ticket has been updated by an incoming e-mail.  
 Its notifications can use the following placeholders:
@@ -235,29 +235,21 @@ If it's a common use case, make a pull request to include it.
 
 * Use case: The e-mail size is too big (often related to PHP or MySQL limits).
 * **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
   * Inactive
   * Mark as undesired
-* **Bounce subject**
-* **Bounce message**
 * **Max size (MB)** - The default limit is 10 MB.
  
 ### Attachment - Forbidden mime types
 
 * Use case: You might not want .exe attachments
 * **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
   * Inactive
   * Fallback: ignore forbidden attachments
   * Mark as undesired
-* **Bounce subject**
-* **Bounce message**
 * **MIME Types** - One per line. Example: application/exe
 	
 ### Attachment - image dimensions
@@ -276,14 +268,10 @@ If the e-mail points to external images, they are not processed by this policy.
 
 * Use case: you want to enforce people to at least supply a subject.
 * **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
   * Inactive
   * Fallback: default subject
-* **Bounce subject**	 
-* **Bounce message**
 * **Default subject** - specify a default title. Example: (no subject)
  
 ### Other e-mail caller than original ticket caller
@@ -294,14 +282,10 @@ may trigger a notification with the new log entry to the original ticket caller.
   
 * Use case: block others from replying to a ticket.
 * **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
   * Inactive
   * Fallback: default subject
-* **Bounce subject**	 
-* **Bounce message**
 * **Enabled** - yes/no.
  
 
@@ -309,56 +293,40 @@ may trigger a notification with the new log entry to the original ticket caller.
 
 * Use case: despite very clear warnings a ticket has been closed, user still replies.
 * **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
   * Inactive
   * Fallback: reopen ticket
   * Mark as undesired
-* **Bounce subject**
-* **Bounce message**
 
 ### Resolved tickets
 
 * Use case: despite very clear warnings a ticket has been resolved, user still replies.
 * **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
   * Inactive
   * Fallback: reopen ticket
   * Mark as undesired
-* **Bounce subject**
-* **Bounce message**
 	 
 ### Unknown tickets
 
 * Use case: if the extension (mis)interprets a pattern similar to the ticket reference pattern in the email subject or header and can't find the ticket.
 * **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
   * Inactive
   * Mark as undesired
-* **Bounce subject**
-* **Bounce message**
 
 ### Unknown caller
 
 * Use case: first time caller
 * **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
   * Inactive
   * Fallback: create person (with specified default values)
   * Mark as undesired
-* **Bounce subject**
-* **Bounce message**
 * **Default values for new contact** - see example for minimal configuration
 
 ```
@@ -378,14 +346,10 @@ name:Caller
 * Use case: security measure. Only accept e-mail replies to a ticket if it's from the same e-mail address as the original caller.
   * Limitation: it will still be problematic if the ticket reference pattern is exactly the same!
 * **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
   * Inactive
   * Mark as undesired
-* **Bounce subject**
-* **Bounce message**
 
 ### Non Delivery Reports
 
@@ -404,8 +368,6 @@ name:Caller
   * If other recipients (To: or CC:) to processed inboxes are allowed, it's likely people will reply to the initial email from the caller. 
   * This would lead to multiple new tickets, since there is no ticket reference in the email header or subject.
 * **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
   * Inactive
@@ -413,8 +375,6 @@ name:Caller
   * Fallback: add other contacts, create if necessary
   * Fallback: add other existing contacts
   * Mark as undesired 
-* **Bounce subject**
-* **Bounce message**
 
 The default values work the same as for unknown callers.  
 
@@ -438,14 +398,10 @@ $recipient->name$
 
 * Use case: out-of-office or automatic replies such as 'new ticket created' (in another service desk tool), email should NOT be processed
 * **Policy violation behavior**
-  * Bounce to sender and delete
-  * Bounce to sender and mark as undesired
   * Delete
   * Do nothing
   * Inactive
   * Mark as undesired
-* **Bounce subject**
-* **Bounce message**
 * **Undesired patterns in subject** - (regex patterns, one per line)
 
 ### Patterns to remove from title
@@ -456,8 +412,6 @@ $recipient->name$
   * Fallback - Remove: it's removed completely in the title, even when viewing in iTop.
   * Do nothing
   * Inactive
-* **Bounce subject**
-* **Bounce message**
 * **Patterns to remove from subject** - (regex patterns, one per line)
 
 

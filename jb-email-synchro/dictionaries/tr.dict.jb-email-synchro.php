@@ -1,0 +1,126 @@
+<?php
+/**
+ * Localized data
+ *
+ * @copyright Copyright (c) 2010-2026 Combodo SARL
+ * @license	http://opensource.org/licenses/AGPL-3.0
+ *
+ * This file is part of iTop.
+ *
+ * iTop is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * iTop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with iTop. If not, see <http://www.gnu.org/licenses/>
+ */
+
+Dict::Add('TR TR', 'Turkish', 'Türkçe', array(
+	'Class:TriggerMailToTicketProcessingOnEvent' => 'Tetikleyici (e-posta işleme olayında)',
+	'Class:TriggerMailToTicketProcessingOnEvent+' => 'Gelen e-postaların işlenmesi sırasında bir olayla etkinleştirilen tetikleyici (örneğin bir ilke ihlali, yeni bir talep, bir cron görevinin sonu)',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list' => 'Olaylar',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list+' => 'Abone olunacak olaylar',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id' => 'Posta kutusu',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id+' => 'Yalnızca bu posta kutusunun olayları için etkinleştir. Tüm posta kutuları için boş bırakın.',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message' => 'Özgün iletiyi ekle',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message+' => 'Özgün e-postayı (.eml) bağlı eylemlere ekle ve "mail->eml_base64" yer tutucusu olarak sun',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:yes' => 'Evet',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:no' => 'Hayır',
+	'Class:MailProcessingEvent' => 'E-posta işleme olayı',
+	'Class:MailProcessingEvent+' => 'Gelen e-postaların işlenmesi sırasında bir tetikleyicinin abone olabileceği bir olay',
+	'Class:MailProcessingEvent/Attribute:category' => 'Kategori',
+	'Class:MailProcessingEvent/Attribute:category+' => 'Olayın kategorisi.',
+	'Class:MailProcessingEvent/Attribute:category/Value:cron_task' => 'Cron görevi',
+	'Class:MailProcessingEvent/Attribute:category/Value:mailbox' => 'Posta kutusu',
+	'Class:MailProcessingEvent/Attribute:category/Value:message' => 'İleti',
+	'Class:MailProcessingEvent/Attribute:category/Value:ticket' => 'Talep',
+	'Class:MailProcessingEvent/Attribute:category/Value:caller' => 'Talep eden',
+	'Class:MailProcessingEvent/Attribute:category/Value:policy' => 'İlke',
+	'Class:MailProcessingEvent/Attribute:category/Value:error' => 'Hata',
+	'Class:MailProcessingEvent/Attribute:code' => 'Olay',
+	'Class:MailProcessingEvent/Attribute:code+' => 'Olay.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started' => 'Cron görevi başladı',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started+' => 'Arka plan işleminin bir çalıştırması başladı.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished' => 'Cron görevi tamamlandı',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished+' => 'Arka plan işleminin bir çalıştırması tamamlandı. İleti sayıları ve süre kullanılabilir.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started' => 'Posta kutusu başladı',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started+' => 'Bir posta kutusunun işlenmesi başladı.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished' => 'Posta kutusu tamamlandı',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished+' => 'Bir posta kutusunun işlenmesi tamamlandı.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed' => 'Posta kutusu bağlantısı başarısız oldu',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed+' => 'Bir posta kutusuna bağlantı başarısız oldu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started' => 'İleti başladı',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started+' => 'Bir iletinin işlenmesi başladı.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished' => 'İleti tamamlandı',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished+' => 'Bir iletinin işlenmesi tamamlandı.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed' => 'İletinin kodu çözülemedi',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed+' => 'Bir iletinin kodu çözülemedi ve işlenmedi.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted' => 'İleti silindi',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted+' => 'Bir ileti posta kutusundan silindi.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved' => 'İleti taşındı',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved+' => 'Bir ileti başka bir klasöre taşındı.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired' => 'İleti istenmeyen olarak işaretlendi',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired+' => 'Bir ileti istenmeyen olarak işaretlendi ve posta kutusunda geçici olarak tutuluyor.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error' => 'İleti hata olarak işaretlendi',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error+' => 'Bir ileti hata olarak işaretlendi ve posta kutusunda tutuluyor.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket' => 'Talep oluşturulmadı veya bağlanmadı',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket+' => 'Bir iletinin işlenmesi, talep oluşturulmadan veya bağlanmadan sona erdi. Sonuç özeti nedenini açıklar.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created' => 'Talep oluşturuldu',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created+' => 'Bir iletiden talep oluşturuldu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated' => 'Talep güncellendi',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated+' => 'Bir talep, bir iletiye göre güncellendi.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created' => 'Talep eden oluşturuldu',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created+' => 'Bilinmeyen bir talep eden için kişi oluşturuldu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated' => 'Talep eden devre dışı bırakıldı',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated+' => 'Bir kişi, teslim hatasından sonra etkin değil olarak işaretlendi.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation' => 'Yasaklı ek türü',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation+' => 'Bir iletide yasaklı türde bir ek var.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation' => 'İleti çok büyük',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation+' => 'Bir ileti en büyük boyutu aşıyor.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation' => 'Konu yok',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation+' => 'Bir iletinin konusu yok.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation' => 'Talep edenden farklı gönderen',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation+' => 'Bir iletinin göndereni, talebin talep eden kişisi değil.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation' => 'Diğer alıcılar',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation+' => 'Bir iletide posta kutusundan başka alıcılar var.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation' => 'Gönderen doğrulaması başarısız oldu',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation+' => 'SPF veya DKIM bir ileti için hata bildirdi. Gönderen sahte olabilir.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation' => 'Gönderenin e-posta adresi kabul edilmiyor',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation+' => 'Bir iletinin göndereninin e-posta adresi kabul edilmiyor.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation' => 'Talep kapatıldı',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation+' => 'Bir ileti kapatılmış bir talebe başvuruyor.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation' => 'Talep çözüldü',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation+' => 'Bir ileti çözülmüş bir talebe başvuruyor.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation' => 'Bilinmeyen talep başvurusu',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation+' => 'Bir ileti var olmayan bir talebe başvuruyor.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation' => 'İstenmeyen başlık deseni',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation+' => 'Bir iletinin konusu istenmeyen bir desenle eşleşiyor.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation' => 'Bilinmeyen talep eden',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation+' => 'Bir iletinin göndereni bilinmiyor.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected' => 'Otomatik yanıt algılandı',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected+' => 'Bir ileti otomatik yanıt olarak tanındı.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected' => 'Teslim edilemedi raporu algılandı',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected+' => 'Bir ileti teslim edilemedi raporu olarak tanındı.',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing' => 'İşleme hatası',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing+' => 'Bir ileti işlenirken hata oluştu. Hata kodu ve hata iletisi kullanılabilir.',
+	'Class:lnkMailProcessingEventToTrigger' => 'Bağlantı E-posta işleme olayı / Tetikleyici',
+	'Class:lnkMailProcessingEventToTrigger+' => 'Bir e-posta işleme olayı ile ona abone olan tetikleyici arasındaki bağlantı',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:trigger_id' => 'Tetikleyici',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:event_id' => 'Olay',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:code' => 'Olay',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:category' => 'Kategori',
+	'Class:ActionEmailByAddress' => 'E-posta gönder (adrese göre)',
+	'Class:ActionEmailByAddress+' => '"E-posta gönder" ile aynı, ancak "Kime"/"Bilgi"/"Gizli" ayrıca bir veya daha fazla e-posta adresi olabilir (veya bunlarla tamamlanabilir; yer tutuculara izin verilir). iTop\'ta karşılığı olan bir nesnesi olmayan alıcılar için (örneğin kimliği belirlenmemiş bir e-posta göndereni)',
+	'Class:ActionEmailByAddress/Attribute:to_address' => 'Kime (adres)',
+	'Class:ActionEmailByAddress/Attribute:to_address+' => 'Virgül veya noktalı virgülle ayrılmış e-posta adres(ler)i; yer tutucular (örneğin "$mail->caller_email$") çözümlenir. "Kime" (OQL) tarafından zaten bulunana eklenir.',
+	'Class:ActionEmailByAddress/Attribute:cc_address' => 'Bilgi (adres)',
+	'Class:ActionEmailByAddress/Attribute:cc_address+' => 'Virgül veya noktalı virgülle ayrılmış e-posta adres(ler)i; yer tutucular (örneğin "$mail->caller_email$") çözümlenir. "Bilgi" (OQL) tarafından zaten bulunana eklenir.',
+	'Class:ActionEmailByAddress/Attribute:bcc_address' => 'Gizli (adres)',
+	'Class:ActionEmailByAddress/Attribute:bcc_address+' => 'Virgül veya noktalı virgülle ayrılmış e-posta adres(ler)i; yer tutucular (örneğin "$mail->caller_email$") çözümlenir. "Gizli" (OQL) tarafından zaten bulunana eklenir.',
+));

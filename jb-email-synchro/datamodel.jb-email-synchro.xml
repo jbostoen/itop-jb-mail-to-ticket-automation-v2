@@ -465,6 +465,300 @@ EOF
 				</list>
 			</presentation>
 		</class>
+		<!-- This is a special class. The data is pre-populated upon setup (see Events::CreateMissingEventObjects()) and should never be modified. -->
+		<class id="MailProcessingEvent" _delta="define">
+			<parent>cmdbAbstractObject</parent>
+			<properties>
+				<comment>/**
+ * Class MailProcessingEvent.
+ * A pre-created, reference-data object representing one event that can occur during the processing of incoming e-mails (see eEvent).
+ * These objects are what TriggerMailToTicketProcessingOnEvent subscribes to (see lnkMailProcessingEventToTrigger).
+ *
+ * @package     jb-email-synchro
+ */</comment>
+				<category>grant_by_profile,searchable</category>
+				<abstract>false</abstract>
+				<key_type>autoincrement</key_type>
+				<db_table>mail_processing_event</db_table>
+				<db_key_field>id</db_key_field>
+				<db_final_class_field/>
+				<naming>
+					<attributes>
+						<attribute id="code"/>
+					</attributes>
+				</naming>
+				<display_template/>
+				<reconciliation>
+					<attributes>
+						<attribute id="code"/>
+					</attributes>
+				</reconciliation>
+				<order>
+					<columns>
+						<column id="category" ascending="true"/>
+						<column id="code" ascending="true"/>
+					</columns>
+				</order>
+				<uniqueness_rules>
+					<rule id="code">
+						<attributes>
+							<attribute id="code"/>
+						</attributes>
+						<filter><![CDATA[]]></filter>
+						<disabled>false</disabled>
+						<is_blocking>true</is_blocking>
+					</rule>
+				</uniqueness_rules>
+			</properties>
+			<fields>
+				<!-- The category has no use except for quick filtering. -->
+				<field id="category" xsi:type="AttributeEnum">
+					<sql>category</sql>
+					<sort_type>label</sort_type>
+					<display_style>list</display_style>
+					<values>
+						<value id="cron_task">
+							<code>cron_task</code>
+						</value>
+						<value id="mailbox">
+							<code>mailbox</code>
+						</value>
+						<value id="message">
+							<code>message</code>
+						</value>
+						<value id="ticket">
+							<code>ticket</code>
+						</value>
+						<value id="caller">
+							<code>caller</code>
+						</value>
+						<value id="policy">
+							<code>policy</code>
+						</value>
+						<value id="error">
+							<code>error</code>
+						</value>
+					</values>
+					<default_value>cron_task</default_value>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
+				<!-- The prefix of any code should always match the values in the "category" field. -->
+				<field id="code" xsi:type="AttributeEnum">
+					<sql>code</sql>
+					<sort_type>label</sort_type>
+					<display_style>list</display_style>
+					<values>
+						<value id="cron_task_started">
+							<code>cron_task_started</code>
+						</value>
+						<value id="cron_task_finished">
+							<code>cron_task_finished</code>
+						</value>
+						<value id="mailbox_started">
+							<code>mailbox_started</code>
+						</value>
+						<value id="mailbox_finished">
+							<code>mailbox_finished</code>
+						</value>
+						<value id="mailbox_connection_failed">
+							<code>mailbox_connection_failed</code>
+						</value>
+						<value id="message_started">
+							<code>message_started</code>
+						</value>
+						<value id="message_finished">
+							<code>message_finished</code>
+						</value>
+						<value id="message_decode_failed">
+							<code>message_decode_failed</code>
+						</value>
+						<value id="message_deleted">
+							<code>message_deleted</code>
+						</value>
+						<value id="message_moved">
+							<code>message_moved</code>
+						</value>
+						<value id="message_marked_undesired">
+							<code>message_marked_undesired</code>
+						</value>
+						<value id="message_marked_error">
+							<code>message_marked_error</code>
+						</value>
+						<value id="message_no_ticket">
+							<code>message_no_ticket</code>
+						</value>
+						<value id="ticket_created">
+							<code>ticket_created</code>
+						</value>
+						<value id="ticket_updated">
+							<code>ticket_updated</code>
+						</value>
+						<value id="caller_created">
+							<code>caller_created</code>
+						</value>
+						<value id="caller_inactivated">
+							<code>caller_inactivated</code>
+						</value>
+						<value id="policy_attachment_forbidden_mimetype_violation">
+							<code>policy_attachment_forbidden_mimetype_violation</code>
+						</value>
+						<value id="policy_mail_size_too_big_violation">
+							<code>policy_mail_size_too_big_violation</code>
+						</value>
+						<value id="policy_no_subject_violation">
+							<code>policy_no_subject_violation</code>
+						</value>
+						<value id="policy_other_email_caller_than_ticket_caller_violation">
+							<code>policy_other_email_caller_than_ticket_caller_violation</code>
+						</value>
+						<value id="policy_other_recipients_violation">
+							<code>policy_other_recipients_violation</code>
+						</value>
+						<value id="policy_sender_authentication_violation">
+							<code>policy_sender_authentication_violation</code>
+						</value>
+						<value id="policy_sender_email_address_violation">
+							<code>policy_sender_email_address_violation</code>
+						</value>
+						<value id="policy_ticket_closed_violation">
+							<code>policy_ticket_closed_violation</code>
+						</value>
+						<value id="policy_ticket_resolved_violation">
+							<code>policy_ticket_resolved_violation</code>
+						</value>
+						<value id="policy_ticket_unknown_violation">
+							<code>policy_ticket_unknown_violation</code>
+						</value>
+						<value id="policy_undesired_pattern_violation">
+							<code>policy_undesired_pattern_violation</code>
+						</value>
+						<value id="policy_unknown_caller_violation">
+							<code>policy_unknown_caller_violation</code>
+						</value>
+						<value id="policy_autoreply_detected">
+							<code>policy_autoreply_detected</code>
+						</value>
+						<value id="policy_non_delivery_report_detected">
+							<code>policy_non_delivery_report_detected</code>
+						</value>
+						<value id="error_processing">
+							<code>error_processing</code>
+						</value>
+					</values>
+					<default_value>cron_task_started</default_value>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
+			</fields>
+			<methods/>
+			<presentation>
+				<details>
+					<items>
+						<item id="category">
+							<rank>10</rank>
+						</item>
+						<item id="code">
+							<rank>20</rank>
+						</item>
+					</items>
+				</details>
+				<list>
+					<items>
+						<item id="category">
+							<rank>10</rank>
+						</item>
+						<item id="code">
+							<rank>20</rank>
+						</item>
+					</items>
+				</list>
+				<search>
+					<items>
+						<item id="category">
+							<rank>10</rank>
+						</item>
+						<item id="code">
+							<rank>20</rank>
+						</item>
+					</items>
+				</search>
+			</presentation>
+		</class>
+		<class id="lnkMailProcessingEventToTrigger" _delta="define">
+			<parent>cmdbAbstractObject</parent>
+			<properties>
+				<comment>/**
+ * Class lnkMailProcessingEventToTrigger.
+ * N:N link between a MailProcessingEvent and a TriggerMailToTicketProcessingOnEvent subscribed to it.
+ *
+ * @package     jb-email-synchro
+ */</comment>
+				<is_link>true</is_link>
+				<category>grant_by_profile,searchable</category>
+				<abstract>false</abstract>
+				<key_type>autoincrement</key_type>
+				<db_table>mail_lnk_event_to_trigger</db_table>
+				<db_key_field>id</db_key_field>
+				<db_final_class_field/>
+				<naming>
+					<attributes>
+						<attribute id="trigger_id"/>
+						<attribute id="event_id"/>
+					</attributes>
+				</naming>
+				<display_template/>
+				<reconciliation>
+					<attributes>
+						<attribute id="trigger_id"/>
+						<attribute id="event_id"/>
+					</attributes>
+				</reconciliation>
+			</properties>
+			<fields>
+				<field id="trigger_id" xsi:type="AttributeExternalKey">
+					<sql>trigger_id</sql>
+					<target_class>TriggerMailToTicketProcessingOnEvent</target_class>
+					<is_null_allowed>false</is_null_allowed>
+					<on_target_delete>DEL_AUTO</on_target_delete>
+				</field>
+				<field id="event_id" xsi:type="AttributeExternalKey">
+					<sql>event_id</sql>
+					<target_class>MailProcessingEvent</target_class>
+					<is_null_allowed>false</is_null_allowed>
+					<on_target_delete>DEL_AUTO</on_target_delete>
+				</field>
+				<field id="code" xsi:type="AttributeExternalField">
+					<extkey_attcode>event_id</extkey_attcode>
+					<target_attcode>code</target_attcode>
+				</field>
+				<field id="category" xsi:type="AttributeExternalField">
+					<extkey_attcode>event_id</extkey_attcode>
+					<target_attcode>category</target_attcode>
+				</field>
+			</fields>
+			<methods/>
+			<presentation>
+				<details>
+					<items>
+						<item id="trigger_id">
+							<rank>10</rank>
+						</item>
+						<item id="event_id">
+							<rank>20</rank>
+						</item>
+					</items>
+				</details>
+				<list>
+					<items>
+						<item id="event_id">
+							<rank>10</rank>
+						</item>
+						<item id="category">
+							<rank>20</rank>
+						</item>
+					</items>
+				</list>
+			</presentation>
+		</class>
 	</classes>
 	<user_rights>
 		<groups>

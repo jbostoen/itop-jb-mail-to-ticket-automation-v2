@@ -1,0 +1,126 @@
+<?php
+/**
+ * Localized data
+ *
+ * @copyright Copyright (c) 2010-2026 Combodo SARL
+ * @license	http://opensource.org/licenses/AGPL-3.0
+ *
+ * This file is part of iTop.
+ *
+ * iTop is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * iTop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with iTop. If not, see <http://www.gnu.org/licenses/>
+ */
+
+Dict::Add('NO NO', 'Norwegian', 'Norsk', array(
+	'Class:TriggerMailToTicketProcessingOnEvent' => 'Trigger (ved hendelse i e-postbehandlingen)',
+	'Class:TriggerMailToTicketProcessingOnEvent+' => 'Trigger som aktiveres ved en hendelse under behandlingen av innkommende e-poster (f.eks. et brudd på en policy, en ny sak, slutten på en cron-oppgave)',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list' => 'Hendelser',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list+' => 'Hendelsene det abonneres på',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id' => 'Postboks',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id+' => 'Aktiver bare for hendelser fra denne postboksen. La feltet være tomt for alle postbokser.',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message' => 'Ta med den opprinnelige meldingen',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message+' => 'Legg ved den opprinnelige e-posten (.eml) til de tilknyttede handlingene, og gjør den tilgjengelig som plassholderen "mail->eml_base64"',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:yes' => 'Ja',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:no' => 'Nei',
+	'Class:MailProcessingEvent' => 'Hendelse i e-postbehandlingen',
+	'Class:MailProcessingEvent+' => 'En hendelse under behandlingen av innkommende e-poster som en trigger kan abonnere på',
+	'Class:MailProcessingEvent/Attribute:category' => 'Kategori',
+	'Class:MailProcessingEvent/Attribute:category+' => 'Hendelsens kategori.',
+	'Class:MailProcessingEvent/Attribute:category/Value:cron_task' => 'Cron-oppgave',
+	'Class:MailProcessingEvent/Attribute:category/Value:mailbox' => 'Postboks',
+	'Class:MailProcessingEvent/Attribute:category/Value:message' => 'Melding',
+	'Class:MailProcessingEvent/Attribute:category/Value:ticket' => 'Sak',
+	'Class:MailProcessingEvent/Attribute:category/Value:caller' => 'Innmelder',
+	'Class:MailProcessingEvent/Attribute:category/Value:policy' => 'Policy',
+	'Class:MailProcessingEvent/Attribute:category/Value:error' => 'Feil',
+	'Class:MailProcessingEvent/Attribute:code' => 'Hendelse',
+	'Class:MailProcessingEvent/Attribute:code+' => 'Hendelsen.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started' => 'Cron-oppgave startet',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started+' => 'En kjøring av bakgrunnsprosessen har startet.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished' => 'Cron-oppgave avsluttet',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished+' => 'En kjøring av bakgrunnsprosessen er avsluttet. Antall meldinger og varighet er tilgjengelig.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started' => 'Postboks startet',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started+' => 'Behandlingen av en postboks har startet.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished' => 'Postboks avsluttet',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished+' => 'Behandlingen av en postboks er avsluttet.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed' => 'Tilkobling til postboksen mislyktes',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed+' => 'Tilkoblingen til en postboks mislyktes.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started' => 'Melding startet',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started+' => 'Behandlingen av en melding har startet.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished' => 'Melding avsluttet',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished+' => 'Behandlingen av en melding er avsluttet.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed' => 'Meldingen kunne ikke dekodes',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed+' => 'En melding kunne ikke dekodes og ble ikke behandlet.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted' => 'Melding slettet',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted+' => 'En melding ble slettet fra postboksen.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved' => 'Melding flyttet',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved+' => 'En melding ble flyttet til en annen mappe.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired' => 'Melding merket som uønsket',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired+' => 'En melding ble merket som uønsket og beholdes midlertidig i postboksen.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error' => 'Melding merket som feil',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error+' => 'En melding ble merket som feil og beholdes i postboksen.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket' => 'Ingen sak opprettet eller knyttet',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket+' => 'Behandlingen av en melding ble avsluttet uten at en sak ble opprettet eller knyttet. Oppsummeringen av resultatet forklarer hvorfor.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created' => 'Sak opprettet',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created+' => 'En sak ble opprettet fra en melding.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated' => 'Sak oppdatert',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated+' => 'En sak ble oppdatert fra en melding.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created' => 'Innmelder opprettet',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created+' => 'En person ble opprettet for en ukjent innmelder.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated' => 'Innmelder deaktivert',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated+' => 'En person ble merket som inaktiv etter en leveringsfeil.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation' => 'Forbudt vedleggstype',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation+' => 'En melding har et vedlegg av en forbudt type.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation' => 'Meldingen er for stor',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation+' => 'En melding overskrider maksimal størrelse.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation' => 'Ingen emne',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation+' => 'En melding har ikke noe emne.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation' => 'Annen avsender enn sakens innmelder',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation+' => 'Avsenderen av en melding er ikke sakens innmelder.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation' => 'Andre mottakere',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation+' => 'En melding har andre mottakere enn postboksen.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation' => 'Autentisering av avsender mislyktes',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation+' => 'SPF eller DKIM rapporterte en feil for en melding. Avsenderen kan være forfalsket.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation' => 'Avsenderens e-postadresse godtas ikke',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation+' => 'Avsenderens e-postadresse i en melding godtas ikke.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation' => 'Sak lukket',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation+' => 'En melding refererer til en lukket sak.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation' => 'Sak løst',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation+' => 'En melding refererer til en løst sak.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation' => 'Ukjent saksreferanse',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation+' => 'En melding refererer til en sak som ikke finnes.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation' => 'Uønsket tittelmønster',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation+' => 'Emnet i en melding samsvarer med et uønsket mønster.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation' => 'Ukjent innmelder',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation+' => 'Avsenderen av en melding er ukjent.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected' => 'Automatisk svar oppdaget',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected+' => 'En melding ble gjenkjent som et automatisk svar.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected' => 'Rapport om mislykket levering oppdaget',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected+' => 'En melding ble gjenkjent som en rapport om mislykket levering.',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing' => 'Behandlingsfeil',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing+' => 'Det oppstod en feil under behandlingen av en melding. Feilkoden og feilmeldingen er tilgjengelig.',
+	'Class:lnkMailProcessingEventToTrigger' => 'Kobling Hendelse i e-postbehandlingen / Trigger',
+	'Class:lnkMailProcessingEventToTrigger+' => 'Kobling mellom en hendelse i e-postbehandlingen og en trigger som abonnerer på den',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:trigger_id' => 'Trigger',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:event_id' => 'Hendelse',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:code' => 'Hendelse',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:category' => 'Kategori',
+	'Class:ActionEmailByAddress' => 'Send en e-post (via adresse)',
+	'Class:ActionEmailByAddress+' => 'Som "Send en e-post", men "Til"/"Kopi"/"Blindkopi" kan i tillegg være (eller suppleres med) én eller flere e-postadresser (plassholdere er tillatt), for mottakere som ikke har et tilsvarende objekt i iTop (f.eks. en uidentifisert avsender av e-post)',
+	'Class:ActionEmailByAddress/Attribute:to_address' => 'Til (adresse)',
+	'Class:ActionEmailByAddress/Attribute:to_address+' => 'E-postadresse(r), atskilt med komma eller semikolon; plassholdere (f.eks. "$mail->caller_email$") blir løst opp. Legges til det "Til" (OQL) allerede finner.',
+	'Class:ActionEmailByAddress/Attribute:cc_address' => 'Kopi (adresse)',
+	'Class:ActionEmailByAddress/Attribute:cc_address+' => 'E-postadresse(r), atskilt med komma eller semikolon; plassholdere (f.eks. "$mail->caller_email$") blir løst opp. Legges til det "Kopi" (OQL) allerede finner.',
+	'Class:ActionEmailByAddress/Attribute:bcc_address' => 'Blindkopi (adresse)',
+	'Class:ActionEmailByAddress/Attribute:bcc_address+' => 'E-postadresse(r), atskilt med komma eller semikolon; plassholdere (f.eks. "$mail->caller_email$") blir løst opp. Legges til det "Blindkopi" (OQL) allerede finner.',
+));

@@ -28,8 +28,8 @@ abstract class MatchByInReplyToOrReferences extends Base {
 	/**
 	 * @inheritDoc
 	 *
-	 * @details This must run before policies such as PolicyBounceUnknownTicketReference, PolicyTicketResolved, PolicyTicketClosed
-	 * @todo Re-evaluate PolicyBounceUnknownTicketReference. Should this step be executed before or after?
+	 * @details This must run before policies such as UnknownTicketReference, TicketResolved, TicketClosed
+	 * @todo Re-evaluate UnknownTicketReference. Should this step be executed before or after?
 	 */
 	public static int $iPrecedence = 9;
 	

@@ -21,7 +21,7 @@
  * along with iTop. If not, see <http://www.gnu.org/licenses/>
  */
 
-Dict::Add('DA DK', 'Danish', 'Dansk', array(
+Dict::Add('DA DA', 'Danish', 'Dansk', array(
 
 	// Dictionary entries go here
 	'Class:MailInboxStandard' => 'IMAP-mailboks',
@@ -124,8 +124,6 @@ Dict::Add('DA DK', 'Danish', 'Dansk', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanent fejl',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Adfærd ved overtrædelse',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inaktiv',
@@ -133,52 +131,36 @@ Dict::Add('DA DK', 'Danish', 'Dansk', array(
 
 	// Politik: for stor e-mail
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Adfærd ved overtrædelse',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_notification' => 'Afvisningsbesked',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB' => 'Maks. størrelse (MB)',
 	'Error:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB+' => 'Maksimal størrelse på e-mailen og dens vedhæftninger. Større e-mails behandles ikke. Sæt til 0 for at deaktivere.',
 
 	// Politik: vedhæftning - forbudt MIME-type
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior' => 'Adfærd ved overtrædelse',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:fallback_ignore_forbidden_attachments' => 'Reserveløsning: ignorer forbudte vedhæftninger',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_notification' => 'Afvisningsbesked',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_mimetypes' => 'MIME-typer (én pr. linje)',
 
 	// Politik: intet emne
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior' => 'Adfærd ved overtrædelse',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:fallback_default_subject' => 'Reserveløsning: brug standardemne',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_notification' => 'Afvisningsbesked',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_default_value' => 'Standardemne',
 
 	// Politik: ukendt afsender
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior' => 'Adfærd ved overtrædelse',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:fallback_create_person' => 'Reserveløsning: opret person',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_notification' => 'Afvisningsbesked',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_default_values' => 'Standardværdier for ny person (én pr. linje, eksempel: org_id:1)',
 
 	// Politik: andre modtagere
@@ -186,62 +168,42 @@ Dict::Add('DA DK', 'Danish', 'Dansk', array(
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_other_contacts' => 'Reserveløsning: knyt kun eksisterende kontakter',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_other_contacts' => 'Reserveløsning: knyt altid kontakt, opret kontakt om nødvendigt',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_ignore_other_contacts' => 'Reserveløsning: ignorer alle andre kontakter',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_notification' => 'Afvisningsbesked',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_default_values' => 'Standardværdier for ny person (én pr. linje, eksempel: org_id:1)',
 
 	// Politik: lukket sag
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior' => 'Adfærd ved overtrædelse',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior+' => 'Bemærk: som standard kan lukkede sager ikke genåbnes. Dette kræver ændringer i datamodellen.',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:fallback_reopen' => 'Reserveløsning: genåbn sag',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_notification' => 'Afvisningsbesked',
 
 	// Politik: løst sag
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior' => 'Adfærd ved overtrædelse',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:fallback_reopen' => 'Reserveløsning: genåbn sag',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_notification' => 'Afvisningsbesked',
 
 	// Politik: ukendt sag
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior' => 'Adfærd ved overtrædelse',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_notification' => 'Afvisningsbesked',
 
 	// Politik: uønskede titelmønstre
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior' => 'Adfærd ved overtrædelse',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_notification' => 'Afvisningsbesked',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_patterns' => 'Uønskede mønstre i emnet (regex-mønstre, ét pr. linje)',
 
 
@@ -255,13 +217,9 @@ Dict::Add('DA DK', 'Danish', 'Dansk', array(
 	// Politik: afsender skal være den samme som sagens oprindelige afsender
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior' => 'Adfærd ved overtrædelse',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:mark_as_undesired' => 'Marker som uønsket / Behold e-mailen midlertidigt',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_notification' => 'Afvisningsbesked',
 
 	// Politik: autosvar
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Adfærd ved overtrædelse',
@@ -287,14 +245,10 @@ Dict::Add('DA DK', 'Danish', 'Dansk', array(
 
 	// Politik: afsenderens e-mailadresse
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Adfærd ved overtrædelse',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'Afvis til afsender og slet',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_mark_as_undesired' => 'Afvis til afsender og marker som uønsket',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:do_nothing' => 'Gør intet',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:mark_as_undesired' => 'Marker som uønsket',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_subject' => 'Emne for afvisning',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_notification' => 'Afvisningsbesked',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns' => 'Mønstre',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Enhver e-mail, hvor afsenderens e-mailadresse matcher et af de definerede regex-mønstre (ét pr. linje), betragtes som en overtrædelse.',
 
@@ -327,7 +281,7 @@ Dict::Add('DA DK', 'Danish', 'Dansk', array(
 	'MailInbox:PolicyNoSubject' => 'Intet emne',
 	'MailInbox:PolicyUnknownCaller' => 'Ukendt afsender',
 	'MailInbox:PolicyOtherRecipients' => 'Andre modtagere angivet i Til: eller CC:',
-	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Begræns accepterede e-mailsvar til den oprindelige afsenders e-mailadresse',
+	'MailInbox:PolicyOtherEmailCallerThanTicketCaller' => 'Begræns accepterede e-mailsvar til den oprindelige afsenders e-mailadresse',
 	'MailInbox:PolicyAutoReply' => 'Autosvar',
 	'MailInbox:PolicyNonDeliveryReport' => 'Kvitteringsrapporter for manglende levering',
 	'MailInbox:StepUpdateCallerAttributes' => 'Opdater afsenderens attributter',

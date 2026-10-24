@@ -1,0 +1,126 @@
+<?php
+/**
+ * Localized data
+ *
+ * @copyright Copyright (c) 2010-2026 Combodo SARL
+ * @license	http://opensource.org/licenses/AGPL-3.0
+ *
+ * This file is part of iTop.
+ *
+ * iTop is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * iTop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with iTop. If not, see <http://www.gnu.org/licenses/>
+ */
+
+Dict::Add('PL PL', 'Polish', 'Polski', array(
+	'Class:TriggerMailToTicketProcessingOnEvent' => 'Wyzwalacz (przy zdarzeniu przetwarzania wiadomości e-mail)',
+	'Class:TriggerMailToTicketProcessingOnEvent+' => 'Wyzwalacz aktywowany zdarzeniem podczas przetwarzania przychodzących wiadomości e-mail (np. naruszenie zasady, nowe zgłoszenie, koniec zadania cron)',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list' => 'Zdarzenia',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list+' => 'Zdarzenia, które są subskrybowane',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id' => 'Skrzynka pocztowa',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id+' => 'Aktywuj tylko dla zdarzeń tej skrzynki pocztowej. Pozostaw puste dla wszystkich skrzynek pocztowych.',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message' => 'Dołącz oryginalną wiadomość',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message+' => 'Dołącz oryginalną wiadomość e-mail (.eml) do powiązanych akcji i udostępnij ją jako symbol zastępczy "mail->eml_base64"',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:yes' => 'Tak',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:no' => 'Nie',
+	'Class:MailProcessingEvent' => 'Zdarzenie przetwarzania wiadomości e-mail',
+	'Class:MailProcessingEvent+' => 'Zdarzenie podczas przetwarzania przychodzących wiadomości e-mail, które może subskrybować wyzwalacz',
+	'Class:MailProcessingEvent/Attribute:category' => 'Kategoria',
+	'Class:MailProcessingEvent/Attribute:category+' => 'Kategoria zdarzenia.',
+	'Class:MailProcessingEvent/Attribute:category/Value:cron_task' => 'Zadanie cron',
+	'Class:MailProcessingEvent/Attribute:category/Value:mailbox' => 'Skrzynka pocztowa',
+	'Class:MailProcessingEvent/Attribute:category/Value:message' => 'Wiadomość',
+	'Class:MailProcessingEvent/Attribute:category/Value:ticket' => 'Zgłoszenie',
+	'Class:MailProcessingEvent/Attribute:category/Value:caller' => 'Zgłaszający',
+	'Class:MailProcessingEvent/Attribute:category/Value:policy' => 'Zasada',
+	'Class:MailProcessingEvent/Attribute:category/Value:error' => 'Błąd',
+	'Class:MailProcessingEvent/Attribute:code' => 'Zdarzenie',
+	'Class:MailProcessingEvent/Attribute:code+' => 'Zdarzenie.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started' => 'Zadanie cron rozpoczęte',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started+' => 'Rozpoczęło się jedno uruchomienie procesu w tle.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished' => 'Zadanie cron zakończone',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished+' => 'Jedno uruchomienie procesu w tle zostało zakończone. Dostępna jest liczba wiadomości i czas trwania.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started' => 'Skrzynka pocztowa rozpoczęta',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started+' => 'Rozpoczęło się przetwarzanie skrzynki pocztowej.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished' => 'Skrzynka pocztowa zakończona',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished+' => 'Zakończyło się przetwarzanie skrzynki pocztowej.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed' => 'Połączenie ze skrzynką pocztową nie powiodło się',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed+' => 'Połączenie ze skrzynką pocztową nie powiodło się.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started' => 'Wiadomość rozpoczęta',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started+' => 'Rozpoczęło się przetwarzanie wiadomości.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished' => 'Wiadomość zakończona',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished+' => 'Zakończyło się przetwarzanie wiadomości.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed' => 'Nie można zdekodować wiadomości',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed+' => 'Nie udało się zdekodować wiadomości i nie została ona przetworzona.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted' => 'Wiadomość usunięta',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted+' => 'Wiadomość została usunięta ze skrzynki pocztowej.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved' => 'Wiadomość przeniesiona',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved+' => 'Wiadomość została przeniesiona do innego folderu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired' => 'Wiadomość oznaczona jako niepożądana',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired+' => 'Wiadomość została oznaczona jako niepożądana i jest tymczasowo przechowywana w skrzynce pocztowej.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error' => 'Wiadomość oznaczona jako błąd',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error+' => 'Wiadomość została oznaczona jako błąd i pozostaje w skrzynce pocztowej.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket' => 'Nie utworzono ani nie powiązano zgłoszenia',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket+' => 'Przetwarzanie wiadomości zakończyło się bez utworzenia lub powiązania zgłoszenia. Podsumowanie wyniku wyjaśnia dlaczego.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created' => 'Zgłoszenie utworzone',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created+' => 'Z wiadomości utworzono zgłoszenie.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated' => 'Zgłoszenie zaktualizowane',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated+' => 'Zgłoszenie zostało zaktualizowane na podstawie wiadomości.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created' => 'Zgłaszający utworzony',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created+' => 'Utworzono osobę dla nieznanego zgłaszającego.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated' => 'Zgłaszający dezaktywowany',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated+' => 'Osoba została oznaczona jako nieaktywna po błędzie dostarczenia.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation' => 'Zabroniony typ załącznika',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation+' => 'Wiadomość zawiera załącznik zabronionego typu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation' => 'Wiadomość zbyt duża',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation+' => 'Wiadomość przekracza maksymalny rozmiar.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation' => 'Brak tematu',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation+' => 'Wiadomość nie ma tematu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation' => 'Nadawca inny niż zgłaszający zgłoszenia',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation+' => 'Nadawca wiadomości nie jest zgłaszającym zgłoszenia.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation' => 'Inni odbiorcy',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation+' => 'Wiadomość ma innych odbiorców niż skrzynka pocztowa.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation' => 'Uwierzytelnienie nadawcy nie powiodło się',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation+' => 'SPF lub DKIM zgłosił błąd dla wiadomości. Nadawca może być sfałszowany.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation' => 'Adres e-mail nadawcy nie jest akceptowany',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation+' => 'Adres e-mail nadawcy wiadomości nie jest akceptowany.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation' => 'Zgłoszenie zamknięte',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation+' => 'Wiadomość odwołuje się do zamkniętego zgłoszenia.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation' => 'Zgłoszenie rozwiązane',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation+' => 'Wiadomość odwołuje się do rozwiązanego zgłoszenia.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation' => 'Nieznane odwołanie do zgłoszenia',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation+' => 'Wiadomość odwołuje się do zgłoszenia, które nie istnieje.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation' => 'Niepożądany wzorzec tytułu',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation+' => 'Temat wiadomości pasuje do niepożądanego wzorca.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation' => 'Nieznany zgłaszający',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation+' => 'Nadawca wiadomości jest nieznany.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected' => 'Wykryto automatyczną odpowiedź',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected+' => 'Wiadomość została rozpoznana jako automatyczna odpowiedź.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected' => 'Wykryto raport o niedostarczeniu',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected+' => 'Wiadomość została rozpoznana jako raport o niedostarczeniu.',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing' => 'Błąd przetwarzania',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing+' => 'Podczas przetwarzania wiadomości wystąpił błąd. Dostępny jest kod i komunikat błędu.',
+	'Class:lnkMailProcessingEventToTrigger' => 'Powiązanie Zdarzenie przetwarzania wiadomości e-mail / Wyzwalacz',
+	'Class:lnkMailProcessingEventToTrigger+' => 'Powiązanie między zdarzeniem przetwarzania wiadomości e-mail a wyzwalaczem, który je subskrybuje',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:trigger_id' => 'Wyzwalacz',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:event_id' => 'Zdarzenie',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:code' => 'Zdarzenie',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:category' => 'Kategoria',
+	'Class:ActionEmailByAddress' => 'Wyślij wiadomość e-mail (według adresu)',
+	'Class:ActionEmailByAddress+' => 'Tak samo jak "Wyślij wiadomość e-mail", ale "Do"/"DW"/"UDW" mogą dodatkowo być (lub być uzupełnione o) jeden lub więcej adresów e-mail (symbole zastępcze są dozwolone), dla odbiorców, którzy nie mają odpowiadającego obiektu w iTop (np. niezidentyfikowany nadawca wiadomości e-mail)',
+	'Class:ActionEmailByAddress/Attribute:to_address' => 'Do (adres)',
+	'Class:ActionEmailByAddress/Attribute:to_address+' => 'Adres(y) e-mail oddzielone przecinkami lub średnikami; symbole zastępcze (np. "$mail->caller_email$") są rozwiązywane. Dodawane do tego, co "Do" (OQL) już znajduje.',
+	'Class:ActionEmailByAddress/Attribute:cc_address' => 'DW (adres)',
+	'Class:ActionEmailByAddress/Attribute:cc_address+' => 'Adres(y) e-mail oddzielone przecinkami lub średnikami; symbole zastępcze (np. "$mail->caller_email$") są rozwiązywane. Dodawane do tego, co "DW" (OQL) już znajduje.',
+	'Class:ActionEmailByAddress/Attribute:bcc_address' => 'UDW (adres)',
+	'Class:ActionEmailByAddress/Attribute:bcc_address+' => 'Adres(y) e-mail oddzielone przecinkami lub średnikami; symbole zastępcze (np. "$mail->caller_email$") są rozwiązywane. Dodawane do tego, co "UDW" (OQL) już znajduje.',
+));

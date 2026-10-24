@@ -1,0 +1,126 @@
+<?php
+/**
+ * Localized data
+ *
+ * @copyright Copyright (c) 2010-2026 Combodo SARL
+ * @license	http://opensource.org/licenses/AGPL-3.0
+ *
+ * This file is part of iTop.
+ *
+ * iTop is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * iTop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with iTop. If not, see <http://www.gnu.org/licenses/>
+ */
+
+Dict::Add('EN GB', 'British English', 'British English', array(
+	'Class:TriggerMailToTicketProcessingOnEvent' => 'Trigger (on mail processing event)',
+	'Class:TriggerMailToTicketProcessingOnEvent+' => 'Trigger activated upon an event during the processing of incoming e-mails (e.g. a policy violation, a new ticket, the end of a cron task)',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list' => 'Events',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list+' => 'The events to subscribe to',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id' => 'Mailbox',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id+' => 'Only activate for events of this mailbox. Leave empty for all mailboxes.',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message' => 'Include original message',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message+' => 'Attach the original email (.eml) to the linked actions, and expose it as the "mail->eml_base64" placeholder',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:yes' => 'Yes',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:no' => 'No',
+	'Class:MailProcessingEvent' => 'Mail processing event',
+	'Class:MailProcessingEvent+' => 'An event during the processing of incoming e-mails that a trigger can subscribe to',
+	'Class:MailProcessingEvent/Attribute:category' => 'Category',
+	'Class:MailProcessingEvent/Attribute:category+' => 'Category of the event.',
+	'Class:MailProcessingEvent/Attribute:category/Value:cron_task' => 'Cron task',
+	'Class:MailProcessingEvent/Attribute:category/Value:mailbox' => 'Mailbox',
+	'Class:MailProcessingEvent/Attribute:category/Value:message' => 'Message',
+	'Class:MailProcessingEvent/Attribute:category/Value:ticket' => 'Ticket',
+	'Class:MailProcessingEvent/Attribute:category/Value:caller' => 'Caller',
+	'Class:MailProcessingEvent/Attribute:category/Value:policy' => 'Policy',
+	'Class:MailProcessingEvent/Attribute:category/Value:error' => 'Error',
+	'Class:MailProcessingEvent/Attribute:code' => 'Event',
+	'Class:MailProcessingEvent/Attribute:code+' => 'The event.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started' => 'Cron task started',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started+' => 'A run of the background process started.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished' => 'Cron task finished',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished+' => 'A run of the background process finished. The message counts and the duration are available.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started' => 'Mailbox started',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started+' => 'The processing of a mailbox started.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished' => 'Mailbox finished',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished+' => 'The processing of a mailbox finished.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed' => 'Mailbox connection failed',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed+' => 'The connection to a mailbox failed.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started' => 'Message started',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started+' => 'The processing of a message started.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished' => 'Message finished',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished+' => 'The processing of a message finished.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed' => 'Message could not be decoded',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed+' => 'A message could not be decoded and was not processed.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted' => 'Message deleted',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted+' => 'A message was deleted from the mailbox.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved' => 'Message moved',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved+' => 'A message was moved to another folder.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired' => 'Message marked as undesired',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired+' => 'A message was marked as undesired and is temporarily kept in the mailbox.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error' => 'Message marked as error',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error+' => 'A message was marked as error and is kept in the mailbox.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket' => 'No ticket created or linked',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket+' => 'The processing of a message ended without a ticket being created or linked. The outcome summary explains why.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created' => 'Ticket created',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created+' => 'A ticket was created from a message.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated' => 'Ticket updated',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated+' => 'A ticket was updated from a message.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created' => 'Caller created',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created+' => 'A person was created for an unknown caller.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated' => 'Caller inactivated',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated+' => 'A person was marked as inactive after a delivery failure.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation' => 'Forbidden attachment type',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation+' => 'A message has an attachment with a forbidden type.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation' => 'Message too big',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation+' => 'A message exceeds the maximum size.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation' => 'No subject',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation+' => 'A message has no subject.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation' => 'Other e-mail caller than ticket caller',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation+' => 'The sender of a message is not the caller of the ticket.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation' => 'Other recipients',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation+' => 'A message has other recipients than the mailbox.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation' => 'Sender authentication failed',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation+' => 'SPF or DKIM reported a failure for a message. The sender may be spoofed.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation' => 'Sender e-mail address not accepted',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation+' => 'The sender e-mail address of a message is not accepted.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation' => 'Ticket closed',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation+' => 'A message refers to a closed ticket.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation' => 'Ticket resolved',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation+' => 'A message refers to a resolved ticket.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation' => 'Unknown ticket reference',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation+' => 'A message refers to a ticket that does not exist.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation' => 'Undesired title pattern',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation+' => 'The subject of a message matches an undesired pattern.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation' => 'Unknown caller',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation+' => 'The sender of a message is unknown.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected' => 'Auto-reply detected',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected+' => 'A message was recognised as an auto-reply.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected' => 'Non-delivery report detected',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected+' => 'A message was recognised as a non-delivery report.',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing' => 'Processing error',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing+' => 'An error occurred while processing a message. The error code and message are available.',
+	'Class:lnkMailProcessingEventToTrigger' => 'Link Mail Processing Event / Trigger',
+	'Class:lnkMailProcessingEventToTrigger+' => 'Link between a mail processing event and a trigger subscribed to it',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:trigger_id' => 'Trigger',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:event_id' => 'Event',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:code' => 'Event',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:category' => 'Category',
+	'Class:ActionEmailByAddress' => 'Send an e-mail (by address)',
+	'Class:ActionEmailByAddress+' => 'Same as "Send an e-mail", but "To"/"Cc"/"Bcc" can additionally be (or be completed by) one or more e-mail addresses (placeholders are allowed), for recipients that have no corresponding object in iTop (e.g. an unidentified e-mail sender)',
+	'Class:ActionEmailByAddress/Attribute:to_address' => 'To (address)',
+	'Class:ActionEmailByAddress/Attribute:to_address+' => 'E-mail address(es), separated by commas or semicolons; placeholders (e.g. "$mail->caller_email$") are resolved. Added to whatever "To" (OQL) already finds.',
+	'Class:ActionEmailByAddress/Attribute:cc_address' => 'Cc (address)',
+	'Class:ActionEmailByAddress/Attribute:cc_address+' => 'E-mail address(es), separated by commas or semicolons; placeholders (e.g. "$mail->caller_email$") are resolved. Added to whatever "Cc" (OQL) already finds.',
+	'Class:ActionEmailByAddress/Attribute:bcc_address' => 'Bcc (address)',
+	'Class:ActionEmailByAddress/Attribute:bcc_address+' => 'E-mail address(es), separated by commas or semicolons; placeholders (e.g. "$mail->caller_email$") are resolved. Added to whatever "Bcc" (OQL) already finds.',
+));

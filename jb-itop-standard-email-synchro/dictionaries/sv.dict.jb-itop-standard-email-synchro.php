@@ -21,7 +21,7 @@
  * along with iTop. If not, see <http://www.gnu.org/licenses/>
  */
 
-Dict::Add('SV SE', 'Swedish', 'Svenska', array(
+Dict::Add('SV SV', 'Swedish', 'Svenska', array(
 
 	// Dictionary entries go here
 	'Class:MailInboxStandard' => 'IMAP-brevlåda',
@@ -124,8 +124,6 @@ Dict::Add('SV SE', 'Swedish', 'Svenska', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanent fel',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Beteende vid överträdelse',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:inactive' => 'Inaktiv',
@@ -133,52 +131,36 @@ Dict::Add('SV SE', 'Swedish', 'Svenska', array(
 
 	// Princip: e-postmeddelande för stort
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior' => 'Beteende vid överträdelse',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_notification' => 'Avvisningsmeddelande',
 	'Class:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB' => 'Max. storlek (MB)',
 	'Error:MailInboxStandard/Attribute:policy_mail_size_too_big_max_size_MB+' => 'Maximal storlek på e-postmeddelandet och dess bilagor. Större e-postmeddelanden behandlas inte. Ange 0 för att inaktivera.',
 
 	// Princip: bilaga - förbjuden MIME-typ
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior' => 'Beteende vid överträdelse',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:fallback_ignore_forbidden_attachments' => 'Reservlösning: ignorera förbjudna bilagor',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_notification' => 'Avvisningsmeddelande',
 	'Class:MailInboxStandard/Attribute:policy_attachment_forbidden_mimetype_mimetypes' => 'MIME-typer (en per rad)',
 
 	// Princip: inget ämne
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior' => 'Beteende vid överträdelse',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:fallback_default_subject' => 'Reservlösning: använd standardämne',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_no_subject_notification' => 'Avvisningsmeddelande',
 	'Class:MailInboxStandard/Attribute:policy_no_subject_default_value' => 'Standardämne',
 
 	// Princip: okänd avsändare
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior' => 'Beteende vid överträdelse',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:fallback_create_person' => 'Reservlösning: skapa person',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_unknown_caller_notification' => 'Avvisningsmeddelande',
 	'Class:MailInboxStandard/Attribute:policy_unknown_caller_default_values' => 'Standardvärden för ny person (en per rad, exempel: org_id:1)',
 
 	// Princip: andra mottagare
@@ -186,62 +168,42 @@ Dict::Add('SV SE', 'Swedish', 'Svenska', array(
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_existing_other_contacts' => 'Reservlösning: koppla endast befintliga kontakter',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_add_other_contacts' => 'Reservlösning: koppla alltid kontakt, skapa kontakt vid behov',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:fallback_ignore_other_contacts' => 'Reservlösning: ignorera alla andra kontakter',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_other_recipients_notification' => 'Avvisningsmeddelande',
 	'Class:MailInboxStandard/Attribute:policy_other_recipients_default_values' => 'Standardvärden för ny person (en per rad, exempel: org_id:1)',
 
 	// Princip: stängt ärende
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior' => 'Beteende vid överträdelse',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior+' => 'Obs: som standard kan stängda ärenden inte återöppnas. Detta kräver ändringar i datamodellen.',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:fallback_reopen' => 'Reservlösning: återöppna ärendet',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_ticket_closed_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_ticket_closed_notification' => 'Avvisningsmeddelande',
 
 	// Princip: löst ärende
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior' => 'Beteende vid överträdelse',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:fallback_reopen' => 'Reservlösning: återöppna ärendet',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_ticket_resolved_notification' => 'Avvisningsmeddelande',
 
 	// Princip: okänt ärende
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior' => 'Beteende vid överträdelse',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_ticket_unknown_notification' => 'Avvisningsmeddelande',
 
 	// Princip: oönskade titelmönster
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior' => 'Beteende vid överträdelse',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_notification' => 'Avvisningsmeddelande',
 	'Class:MailInboxStandard/Attribute:policy_undesired_pattern_patterns' => 'Oönskade mönster i ämnet (reguljära uttryck, ett per rad)',
 
 
@@ -255,13 +217,9 @@ Dict::Add('SV SE', 'Swedish', 'Svenska', array(
 	// Princip: avsändaren måste vara densamma som ärendets ursprungliga avsändare
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior' => 'Beteende vid överträdelse',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_behavior/Value:mark_as_undesired' => 'Markera som oönskad / Behåll e-postmeddelandet tillfälligt',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_other_email_caller_than_ticket_caller_notification' => 'Avvisningsmeddelande',
 
 	// Princip: automatiskt svar
 	'Class:MailInboxStandard/Attribute:policy_autoreply_behavior' => 'Beteende vid överträdelse',
@@ -287,14 +245,10 @@ Dict::Add('SV SE', 'Swedish', 'Svenska', array(
 
 	// Princip: avsändarens e-postadress
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior' => 'Beteende vid överträdelse',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_delete' => 'Avvisa till avsändaren och radera',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:bounce_mark_as_undesired' => 'Avvisa till avsändaren och markera som oönskad',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:do_nothing' => 'Gör ingenting',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:inactive' => 'Inaktiv',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_behavior/Value:mark_as_undesired' => 'Markera som oönskad',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_subject' => 'Avvisningsämne',
-	'Class:MailInboxStandard/Attribute:policy_sender_email_address_notification' => 'Avvisningsmeddelande',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns' => 'Mönster',
 	'Class:MailInboxStandard/Attribute:policy_sender_email_address_patterns+' => 'Alla e-postmeddelanden där avsändarens e-postadress matchar ett av de definierade reguljära uttrycken (ett per rad) betraktas som en överträdelse.',
 
@@ -327,7 +281,7 @@ Dict::Add('SV SE', 'Swedish', 'Svenska', array(
 	'MailInbox:PolicyNoSubject' => 'Inget ämne',
 	'MailInbox:PolicyUnknownCaller' => 'Okänd avsändare',
 	'MailInbox:PolicyOtherRecipients' => 'Andra mottagare angivna i Till: eller Kopia:',
-	'MailInbox:PolicyBounceOtherEmailCallerThanTicketCaller' => 'Begränsa accepterade e-postsvar till ärendets ursprungliga avsändares e-postadress',
+	'MailInbox:PolicyOtherEmailCallerThanTicketCaller' => 'Begränsa accepterade e-postsvar till ärendets ursprungliga avsändares e-postadress',
 	'MailInbox:PolicyAutoReply' => 'Automatiskt svar',
 	'MailInbox:PolicyNonDeliveryReport' => 'Kvitton om utebliven leverans',
 	'MailInbox:StepUpdateCallerAttributes' => 'Uppdatera avsändarens attribut',

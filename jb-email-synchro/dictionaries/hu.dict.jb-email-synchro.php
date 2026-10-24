@@ -1,0 +1,126 @@
+<?php
+/**
+ * Localized data
+ *
+ * @copyright Copyright (c) 2010-2026 Combodo SARL
+ * @license	http://opensource.org/licenses/AGPL-3.0
+ *
+ * This file is part of iTop.
+ *
+ * iTop is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * iTop is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with iTop. If not, see <http://www.gnu.org/licenses/>
+ */
+
+Dict::Add('HU HU', 'Hungarian', 'Magyar', array(
+	'Class:TriggerMailToTicketProcessingOnEvent' => 'Eseményindító (e-mail-feldolgozási eseménynél)',
+	'Class:TriggerMailToTicketProcessingOnEvent+' => 'Eseményindító, amely a bejövő e-mailek feldolgozása közben egy esemény hatására aktiválódik (pl. szabálysértés, új jegy, egy cron-feladat vége)',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list' => 'Események',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:events_list+' => 'A feliratkozott események',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id' => 'Postafiók',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:mailbox_id+' => 'Csak ennek a postafióknak az eseményeire aktiválódik. Hagyja üresen az összes postafiókhoz.',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message' => 'Eredeti üzenet csatolása',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message+' => 'Az eredeti e-mail (.eml) csatolása a kapcsolt műveletekhez, és elérhetővé tétele "mail->eml_base64" helyőrzőként',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:yes' => 'Igen',
+	'Class:TriggerMailToTicketProcessingOnEvent/Attribute:include_original_message/Value:no' => 'Nem',
+	'Class:MailProcessingEvent' => 'E-mail-feldolgozási esemény',
+	'Class:MailProcessingEvent+' => 'A bejövő e-mailek feldolgozása közbeni esemény, amelyre egy eseményindító feliratkozhat',
+	'Class:MailProcessingEvent/Attribute:category' => 'Kategória',
+	'Class:MailProcessingEvent/Attribute:category+' => 'Az esemény kategóriája.',
+	'Class:MailProcessingEvent/Attribute:category/Value:cron_task' => 'Cron-feladat',
+	'Class:MailProcessingEvent/Attribute:category/Value:mailbox' => 'Postafiók',
+	'Class:MailProcessingEvent/Attribute:category/Value:message' => 'Üzenet',
+	'Class:MailProcessingEvent/Attribute:category/Value:ticket' => 'Jegy',
+	'Class:MailProcessingEvent/Attribute:category/Value:caller' => 'Bejelentő',
+	'Class:MailProcessingEvent/Attribute:category/Value:policy' => 'Szabály',
+	'Class:MailProcessingEvent/Attribute:category/Value:error' => 'Hiba',
+	'Class:MailProcessingEvent/Attribute:code' => 'Esemény',
+	'Class:MailProcessingEvent/Attribute:code+' => 'Az esemény.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started' => 'Cron-feladat elindult',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_started+' => 'A háttérfolyamat egy futása elindult.',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished' => 'Cron-feladat befejeződött',
+	'Class:MailProcessingEvent/Attribute:code/Value:cron_task_finished+' => 'A háttérfolyamat egy futása befejeződött. Az üzenetek száma és az időtartam elérhető.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started' => 'Postafiók feldolgozása elindult',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_started+' => 'Egy postafiók feldolgozása elindult.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished' => 'Postafiók feldolgozása befejeződött',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_finished+' => 'Egy postafiók feldolgozása befejeződött.',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed' => 'A postafiókhoz való csatlakozás sikertelen',
+	'Class:MailProcessingEvent/Attribute:code/Value:mailbox_connection_failed+' => 'A postafiókhoz való csatlakozás nem sikerült.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started' => 'Üzenet feldolgozása elindult',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_started+' => 'Egy üzenet feldolgozása elindult.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished' => 'Üzenet feldolgozása befejeződött',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_finished+' => 'Egy üzenet feldolgozása befejeződött.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed' => 'Az üzenet nem dekódolható',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_decode_failed+' => 'Egy üzenetet nem sikerült dekódolni, és nem lett feldolgozva.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted' => 'Üzenet törölve',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_deleted+' => 'Egy üzenet törölve lett a postafiókból.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved' => 'Üzenet áthelyezve',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_moved+' => 'Egy üzenet át lett helyezve egy másik mappába.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired' => 'Üzenet nemkívánatosként megjelölve',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_undesired+' => 'Egy üzenet nemkívánatosként lett megjelölve, és ideiglenesen a postafiókban marad.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error' => 'Üzenet hibásként megjelölve',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_marked_error+' => 'Egy üzenet hibásként lett megjelölve, és a postafiókban marad.',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket' => 'Nem jött létre és nem kapcsolódott jegy',
+	'Class:MailProcessingEvent/Attribute:code/Value:message_no_ticket+' => 'Egy üzenet feldolgozása úgy fejeződött be, hogy nem jött létre vagy nem kapcsolódott jegy. Az eredmény összegzése megmagyarázza, miért.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created' => 'Jegy létrehozva',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_created+' => 'Egy üzenetből jegy jött létre.',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated' => 'Jegy frissítve',
+	'Class:MailProcessingEvent/Attribute:code/Value:ticket_updated+' => 'Egy jegy frissült egy üzenet alapján.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created' => 'Bejelentő létrehozva',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_created+' => 'Egy ismeretlen bejelentőhöz személy jött létre.',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated' => 'Bejelentő inaktiválva',
+	'Class:MailProcessingEvent/Attribute:code/Value:caller_inactivated+' => 'Egy személy kézbesítési hiba után inaktívként lett megjelölve.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation' => 'Tiltott melléklettípus',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_attachment_forbidden_mimetype_violation+' => 'Egy üzenet tiltott típusú mellékletet tartalmaz.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation' => 'Az üzenet túl nagy',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_mail_size_too_big_violation+' => 'Egy üzenet meghaladja a maximális méretet.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation' => 'Nincs tárgy',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_no_subject_violation+' => 'Egy üzenetnek nincs tárgya.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation' => 'A jegy bejelentőjétől eltérő feladó',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_email_caller_than_ticket_caller_violation+' => 'Egy üzenet feladója nem a jegy bejelentője.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation' => 'Más címzettek',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_other_recipients_violation+' => 'Egy üzenetnek a postafiókon kívül más címzettjei is vannak.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation' => 'A feladó hitelesítése sikertelen',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_authentication_violation+' => 'Az SPF vagy a DKIM hibát jelzett egy üzenetnél. A feladó lehet hamisított.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation' => 'A feladó e-mail-címe nem elfogadott',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_sender_email_address_violation+' => 'Egy üzenet feladójának e-mail-címe nem elfogadott.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation' => 'Jegy lezárva',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_closed_violation+' => 'Egy üzenet lezárt jegyre hivatkozik.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation' => 'Jegy megoldva',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_resolved_violation+' => 'Egy üzenet megoldott jegyre hivatkozik.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation' => 'Ismeretlen jegyhivatkozás',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_ticket_unknown_violation+' => 'Egy üzenet olyan jegyre hivatkozik, amely nem létezik.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation' => 'Nemkívánatos címminta',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_undesired_pattern_violation+' => 'Egy üzenet tárgya megegyezik egy nemkívánatos mintával.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation' => 'Ismeretlen bejelentő',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_unknown_caller_violation+' => 'Egy üzenet feladója ismeretlen.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected' => 'Automatikus válasz észlelve',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_autoreply_detected+' => 'Egy üzenetet automatikus válaszként ismert fel a rendszer.',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected' => 'Kézbesítési jelentés észlelve',
+	'Class:MailProcessingEvent/Attribute:code/Value:policy_non_delivery_report_detected+' => 'Egy üzenetet kézbesíthetetlenségi jelentésként ismert fel a rendszer.',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing' => 'Feldolgozási hiba',
+	'Class:MailProcessingEvent/Attribute:code/Value:error_processing+' => 'Egy üzenet feldolgozása közben hiba történt. A hibakód és a hibaüzenet elérhető.',
+	'Class:lnkMailProcessingEventToTrigger' => 'Kapcsolat E-mail-feldolgozási esemény / Eseményindító',
+	'Class:lnkMailProcessingEventToTrigger+' => 'Kapcsolat egy e-mail-feldolgozási esemény és az arra feliratkozott eseményindító között',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:trigger_id' => 'Eseményindító',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:event_id' => 'Esemény',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:code' => 'Esemény',
+	'Class:lnkMailProcessingEventToTrigger/Attribute:category' => 'Kategória',
+	'Class:ActionEmailByAddress' => 'E-mail küldése (cím alapján)',
+	'Class:ActionEmailByAddress+' => 'Ugyanaz, mint az "E-mail küldése", de a "Címzett"/"Másolat"/"Titkos másolat" emellett lehet (vagy kiegészülhet) egy vagy több e-mail-címmel (helyőrzők használhatók), olyan címzetteknek, akiknek nincs megfelelő objektumuk az iTopban (pl. egy azonosítatlan e-mail-feladó)',
+	'Class:ActionEmailByAddress/Attribute:to_address' => 'Címzett (cím)',
+	'Class:ActionEmailByAddress/Attribute:to_address+' => 'E-mail-cím(ek), vesszővel vagy pontosvesszővel elválasztva; a helyőrzők (pl. "$mail->caller_email$") feloldásra kerülnek. Hozzáadódik ahhoz, amit a "Címzett" (OQL) már megtalál.',
+	'Class:ActionEmailByAddress/Attribute:cc_address' => 'Másolat (cím)',
+	'Class:ActionEmailByAddress/Attribute:cc_address+' => 'E-mail-cím(ek), vesszővel vagy pontosvesszővel elválasztva; a helyőrzők (pl. "$mail->caller_email$") feloldásra kerülnek. Hozzáadódik ahhoz, amit a "Másolat" (OQL) már megtalál.',
+	'Class:ActionEmailByAddress/Attribute:bcc_address' => 'Titkos másolat (cím)',
+	'Class:ActionEmailByAddress/Attribute:bcc_address+' => 'E-mail-cím(ek), vesszővel vagy pontosvesszővel elválasztva; a helyőrzők (pl. "$mail->caller_email$") feloldásra kerülnek. Hozzáadódik ahhoz, amit a "Titkos másolat" (OQL) már megtalál.',
+));

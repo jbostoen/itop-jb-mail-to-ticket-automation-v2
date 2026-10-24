@@ -51,6 +51,11 @@ Some were implemented at a later point, others not at all.
 Info on settings and default policies
 * See [configuration](documentation/configuration.md)
 
+## Events and triggers
+
+Inform the sender, send a webhook, ... when a policy is violated or something else happens while e-mails are processed.
+* See [events and triggers](documentation/events%20and%20triggers.md)
+
 ## Security recommendations
 
 Highly recommended to read!
