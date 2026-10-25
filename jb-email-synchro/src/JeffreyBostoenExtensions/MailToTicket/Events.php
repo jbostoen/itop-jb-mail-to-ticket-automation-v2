@@ -10,6 +10,7 @@ namespace JeffreyBostoenExtensions\MailToTicket;
 // iTop internals.
 use DBObjectSearch;
 use DBObjectSet;
+use Dict;
 use Exception;
 use MetaModel;
 use ormDocument;
@@ -26,6 +27,7 @@ use Combodo\iTop\Service\Events\Description\{
 	EventDataDescription,
 	EventDescription
 };
+use const EVENT_DB_CHECK_TO_WRITE;
 
 // iTop classes.
 use TriggerMailToTicketProcessingOnEvent;
@@ -360,6 +362,45 @@ class Events implements iEventServiceSetup {
 	 *
 	 * Objects (iTop objects, or PlaceholderValues for text values) are passed as "<name>->object()".
 	 * Text values that were collected under the name of an object (e.g. "mail->subject") are also kept as plain arguments, so they can be used as query arguments (e.g. ":mail->caller_email").
+		EventService::RegisterListener(
+			EVENT_DB_CHECK_TO_WRITE,
+			[$this, 'OnTriggerCheckToWrite'],
+			'TriggerMailToTicketProcessingOnEvent'
+		);
+
+	}
+
+	/**
+	 * Validates that the mailbox query of a trigger is a valid query of MailInboxBase (or a subclass).
+	 *
+	 * @param EventData $oEventData Event data. Contains the object ('object') being checked.
+	 *
+	 * @return void
+	 */
+	public function OnTriggerCheckToWrite(EventData $oEventData) : void {
+
+		/** @var TriggerMailToTicketProcessingOnEvent $oTrigger */
+		$oTrigger = $oEventData->Get('object');
+		$sFieldLabel = MetaModel::GetLabel(get_class($oTrigger), 'mailbox_oql');
+		$sOQL = trim((string)$oTrigger->Get('mailbox_oql'));
+
+		if($sOQL === '') {
+			$oTrigger->AddCheckIssue(Dict::Format('Class:TriggerMailToTicketProcessingOnEvent/Error:MailboxOqlRequired', $sFieldLabel));
+			return;
+		}
+
+		try {
+			$sClass = DBObjectSearch::FromOQL($sOQL)->GetClass();
+		}
+		catch(Exception $e) {
+			$oTrigger->AddCheckIssue(Dict::Format('Class:TriggerMailToTicketProcessingOnEvent/Error:MailboxOqlInvalid', $sFieldLabel, $e->getMessage()));
+			return;
+		}
+
+		if(!MetaModel::IsValidClass($sClass) || !MetaModel::IsParentClass('MailInboxBase', $sClass)) {
+			$oTrigger->AddCheckIssue(Dict::Format('Class:TriggerMailToTicketProcessingOnEvent/Error:MailboxOqlWrongClass', $sFieldLabel, $sClass));
+		}
+
 	 *
 	 * @param string $sEventCode Event code.
 	 *
@@ -537,10 +578,9 @@ class Events implements iEventServiceSetup {
 				continue;
 			}
 
-			// - Restricted to a specific mailbox?
+			// - Restricted to specific mailboxes?
 
-				$iTriggerMailBoxId = (int)$oTrigger->Get('mailbox_id');
-				if($iTriggerMailBoxId > 0 && ($oMailBox === null || $iTriggerMailBoxId !== (int)$oMailBox->GetKey())) {
+				if(!$oTrigger->AppliesToMailbox($oMailBox)) {
 					continue;
 				}
 

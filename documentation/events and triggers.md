@@ -8,7 +8,7 @@ This replaces the "bounce" settings (subject and message) of the policies, and g
 | Part | Class | Purpose |
 |------|-------|---------|
 | Event | Mail processing event | A fixed list of events. Created automatically; not to be modified. |
-| Trigger | Trigger (on mail processing event) | Subscribes to events. Optionally restricted to one mailbox. |
+| Trigger | Trigger (on mail processing event) | Subscribes to events. Optionally restricted to the mailboxes returned by a query (default: all mailboxes). |
 | Action | Any action, such as "Send an e-mail" | What happens when the trigger is activated. |
 
 ## Setting it up

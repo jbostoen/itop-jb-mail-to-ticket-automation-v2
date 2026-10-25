@@ -49,13 +49,13 @@ class TriggerMailToTicketProcessingOnEvent extends Trigger {
 			'always_load_in_tables' => false,
 		]));
 
-		// Optional: only activate for events of this mailbox. Empty: all mailboxes (and events not related to a mailbox).
-		MetaModel::Init_AddAttribute(new AttributeExternalKey('mailbox_id', [
-			'targetclass' => 'MailInboxBase',
+		// Only activate for events of the mailboxes this query returns (a query of MailInboxBase or a subclass).
+		// The default query returns all mailboxes (and also covers events that are not related to a mailbox).
+		MetaModel::Init_AddAttribute(new AttributeOQL('mailbox_oql', [
 			'allowed_values' => null,
-			'sql' => 'mailbox_id',
-			'is_null_allowed' => true,
-			'on_target_delete' => DEL_AUTO,
+			'sql' => 'mailbox_oql',
+			'default_value' => static::DEFAULT_MAILBOX_OQL,
+			'is_null_allowed' => false,
 			'depends_on' => [],
 		]));
 
@@ -70,10 +70,60 @@ class TriggerMailToTicketProcessingOnEvent extends Trigger {
 		]));
 
 		// Display lists
-		MetaModel::Init_SetZListItems('details', ['description', 'mailbox_id', 'events_list', 'include_original_message', 'subscription_policy', 'action_list']);
-		MetaModel::Init_SetZListItems('list', ['description', 'mailbox_id']);
+		MetaModel::Init_SetZListItems('details', ['description', 'mailbox_oql', 'events_list', 'include_original_message', 'subscription_policy', 'action_list']);
+		MetaModel::Init_SetZListItems('list', ['description', 'mailbox_oql']);
 		// Search criteria
-		MetaModel::Init_SetZListItems('standard_search', ['description', 'mailbox_id']);
+		MetaModel::Init_SetZListItems('standard_search', ['description', 'mailbox_oql']);
+
+	}
+
+	/**
+	 * @var string DEFAULT_MAILBOX_OQL The query that returns all mailboxes.
+	 */
+	public const DEFAULT_MAILBOX_OQL = 'SELECT MailInboxBase';
+
+	/**
+	 * @var array<string, bool> $aAppliesToMailbox Results of AppliesToMailbox(), by query and mailbox.
+	 */
+	private static array $aAppliesToMailbox = [];
+
+	/**
+	 * Checks whether this trigger is meant for events of a mailbox: whether the mailbox is part of the result of the mailbox query.
+	 *
+	 * @param DBObject|null $oMailBox The mailbox being processed, if any.
+	 *
+	 * @return bool
+	 */
+	public function AppliesToMailbox(?DBObject $oMailBox) : bool {
+
+		$sOQL = trim((string)$this->Get('mailbox_oql'));
+
+		// - All mailboxes (and events that are not related to a mailbox).
+		if($sOQL === '' || strcasecmp($sOQL, static::DEFAULT_MAILBOX_OQL) === 0) {
+			return true;
+		}
+
+		if($oMailBox === null) {
+			return false;
+		}
+
+		$sCacheKey = $sOQL.'|'.$oMailBox->GetKey();
+
+		if(!isset(static::$aAppliesToMailbox[$sCacheKey])) {
+
+			try {
+				$oSearch = DBObjectSearch::FromOQL($sOQL);
+				$oSearch->AddCondition('id', $oMailBox->GetKey());
+				static::$aAppliesToMailbox[$sCacheKey] = (new DBObjectSet($oSearch))->Count() > 0;
+			}
+			catch(Exception $e) {
+				IssueLog::Warning("TriggerMailToTicketProcessingOnEvent #{$this->GetKey()}: invalid mailbox query, trigger skipped: ".$e->getMessage());
+				static::$aAppliesToMailbox[$sCacheKey] = false;
+			}
+
+		}
+
+		return static::$aAppliesToMailbox[$sCacheKey];
 
 	}
 
