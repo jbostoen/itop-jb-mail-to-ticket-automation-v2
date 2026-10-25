@@ -63,6 +63,16 @@ The extra values are available as `$details->...$`, on top of the [general ones]
 | `message_marked_error` | A message was marked as error. | `reason` (sometimes), `next_action` |
 | `message_no_ticket` | The processing ended without a ticket being created or linked. | `reason` (the cause, see also `outcome_summary`) |
 
+### Step
+
+Fired for every step that is executed for a message (steps that are **Inactive** or not applicable do not run, so they fire nothing).  
+Because of the number of steps, these events are only collected when a trigger is subscribed to them.
+
+| Code | Fires when | Extra values |
+|------|------------|--------------|
+| `step_started` | A step is about to be executed. | `step_id`, `step_class`, `step_precedence` |
+| `step_finished` | A step was executed. `next_action` shows whether further processing is stopped. | `step_id`, `step_class`, `step_precedence` |
+
 ### Ticket and caller
 
 | Code | Fires when | Extra values |
@@ -94,7 +104,7 @@ Policies that are **Inactive** do not run, so they fire nothing.
 | `policy_autoreply_detected` | The message is an auto-reply. |
 | `policy_non_delivery_report_detected` | The message is a non-delivery report. |
 
-Extra values for all of them: `step_id`, `step_class`, `step_precedence`, `behavior` (the configured behavior).  
+Extra values for all of them: `step_id`, `step_class`, `step_precedence` (the step that detected the case), and `behavior` (the configured behavior).  
 Sender authentication adds `authentication_states` (as `$details->authentication_states$`, e.g. `spf=softfail, dkim=pass`).
 
 ### Errors

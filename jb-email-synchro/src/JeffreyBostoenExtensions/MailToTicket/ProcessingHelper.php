@@ -742,7 +742,16 @@ abstract class ProcessingHelper {
 				$sPolicyInfo,
 			);
 			
+			// - The context arguments are only collected when somebody is listening.
+			if(Events::HasSubscribers(eEvent::STEP_STARTED)) {
+				Events::FireEvent(eEvent::STEP_STARTED, $sStep::GetStepContextArguments());
+			}
+
 			$sStep::Execute();
+
+			if(Events::HasSubscribers(eEvent::STEP_FINISHED)) {
+				Events::FireEvent(eEvent::STEP_FINISHED, $sStep::GetStepContextArguments());
+			}
 			
 			// - Keep track.
 				$aPreviouslyExecutedSteps[] = $sStep;

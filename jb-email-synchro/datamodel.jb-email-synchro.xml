@@ -526,6 +526,9 @@ EOF
 						<value id="message">
 							<code>message</code>
 						</value>
+						<value id="step">
+							<code>step</code>
+						</value>
 						<value id="ticket">
 							<code>ticket</code>
 						</value>
@@ -586,6 +589,12 @@ EOF
 						</value>
 						<value id="message_no_ticket">
 							<code>message_no_ticket</code>
+						</value>
+						<value id="step_started">
+							<code>step_started</code>
+						</value>
+						<value id="step_finished">
+							<code>step_finished</code>
 						</value>
 						<value id="ticket_created">
 							<code>ticket_created</code>

@@ -403,11 +403,23 @@ abstract class Base implements iStep {
 	 */
 	protected static function GetViolationContextArguments(string $sBehavior) : array {
 
+		return array_merge(static::GetStepContextArguments(), [
+			'behavior' => $sBehavior,
+		]);
+
+	}
+
+	/**
+	 * Gets the context arguments that identify this step. Passed to every event related to a step.
+	 *
+	 * @return array
+	 */
+	public static function GetStepContextArguments() : array {
+
 		return [
 			'step_id' => static::GetXMLSettingsPrefix(),
 			'step_class' => static::class,
 			'step_precedence' => static::$iPrecedence,
-			'behavior' => $sBehavior,
 		];
 
 	}

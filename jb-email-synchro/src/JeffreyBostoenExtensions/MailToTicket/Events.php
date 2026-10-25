@@ -94,6 +94,12 @@ enum eEvent : string {
 		case MESSAGE_MARKED_ERROR = 'message_marked_error';
 		case MESSAGE_NO_TICKET = 'message_no_ticket'; // No ticket was created or linked. See also: outcome_summary.
 
+	// - Step. Fired for every step that is executed for a message. Context arguments for both: step_id, step_class, step_precedence.
+	//   The next action (see "details->next_action") shows the result so far: after a step, it tells whether processing is stopped.
+
+		case STEP_STARTED = 'step_started';
+		case STEP_FINISHED = 'step_finished';
+
 	// - Ticket.
 
 		case TICKET_CREATED = 'ticket_created'; // ticket->object()
@@ -158,6 +164,7 @@ class Events implements iEventServiceSetup {
 		'cron_task',
 		'mailbox',
 		'message',
+		'step',
 		'ticket',
 		'caller',
 		'policy',
@@ -355,13 +362,6 @@ class Events implements iEventServiceSetup {
 			[$this, 'OnMailProcessingEvent']
 		);
 
-	}
-
-	/**
-	 * Gets the context arguments that are available for every event, as far as the information is known at that point.
-	 *
-	 * Objects (iTop objects, or PlaceholderValues for text values) are passed as "<name>->object()".
-	 * Text values that were collected under the name of an object (e.g. "mail->subject") are also kept as plain arguments, so they can be used as query arguments (e.g. ":mail->caller_email").
 		EventService::RegisterListener(
 			EVENT_DB_CHECK_TO_WRITE,
 			[$this, 'OnTriggerCheckToWrite'],
@@ -401,6 +401,13 @@ class Events implements iEventServiceSetup {
 			$oTrigger->AddCheckIssue(Dict::Format('Class:TriggerMailToTicketProcessingOnEvent/Error:MailboxOqlWrongClass', $sFieldLabel, $sClass));
 		}
 
+	}
+
+	/**
+	 * Gets the context arguments that are available for every event, as far as the information is known at that point.
+	 *
+	 * Objects (iTop objects, or PlaceholderValues for text values) are passed as "<name>->object()".
+	 * Text values that were collected under the name of an object (e.g. "mail->subject") are also kept as plain arguments, so they can be used as query arguments (e.g. ":mail->caller_email").
 	 *
 	 * @param string $sEventCode Event code.
 	 *
