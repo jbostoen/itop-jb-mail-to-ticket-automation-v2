@@ -63,6 +63,7 @@ interface iMailProcessingEventProvider {
  * Other extensions can not add cases: they use iMailProcessingEventProvider.
  *
  * The comment on the right indicates what *extra* values are available as "$details->...$" (besides the general ones, see Events::GetBaseContextArguments()).
+ * The reference that is shown to administrators is kept in PlaceholderReference::GetEventRows(): keep it in line with these comments.
  * Naming of the extra values:
  * - Objects: "name->object()", e.g. "caller->object()".
  * - Counts: "<name>_count".
@@ -72,7 +73,7 @@ enum eEvent : string {
 	// - Cron task (one run of the background process).
 
 		case CRON_TASK_STARTED = 'cron_task_started';
-		case CRON_TASK_FINISHED = 'cron_task_finished'; // message_count, processed_count, created_count, deleted_count, moved_count, marked_as_error_count, undesired_count, skipped_count, duration_seconds
+		case CRON_TASK_FINISHED = 'cron_task_finished'; // message_count, processed_count, deleted_count, moved_count, marked_as_error_count, undesired_count, skipped_count, duration_seconds
 
 	// - Mailbox.
 

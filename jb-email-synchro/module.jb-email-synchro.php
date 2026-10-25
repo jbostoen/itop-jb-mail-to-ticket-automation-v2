@@ -15,7 +15,7 @@ SetupWebPage::AddModule(
 		// Setup
 		'dependencies' => array(
 			'itop-oauth-client/3.2.0',
-			'jb-framework/3.2.260920'
+			'jb-framework/3.2.261024'
 		),
 		'mandatory' => false,
 		'visible' => true,
@@ -27,6 +27,8 @@ SetupWebPage::AddModule(
 			'model.jb-email-synchro.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/PlaceholderValues.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Events.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/PlaceholderReference.php',
+			'src/JeffreyBostoenExtensions/MailToTicket/PlaceholderReferenceUIExtension.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Helper.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/Logger.php',
 			'src/JeffreyBostoenExtensions/MailToTicket/MessageHandler.php',

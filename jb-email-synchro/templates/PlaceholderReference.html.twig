@@ -1,0 +1,24 @@
+{# @copyright   Copyright (c) 2020-2026 Jeffrey Bostoen #}
+
+<div class="jbe-help-container jbe-help-container--full-width">
+	<p>{{ sIntro }}</p>
+	{% for aSection in aSections %}
+		<h4>{{ aSection.sTitle }}</h4>
+		<table>
+			<thead>
+				<tr>
+					<th>{{ sPlaceholderLabel }}</th>
+					<th>{{ sDescriptionLabel }}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for aRow in aSection.aRows %}
+					<tr>
+						<td>{% for sPlaceholder in aRow.aPlaceholders %}<code>{{ sPlaceholder }}</code>{% if not loop.last %}<br>{% endif %}{% endfor %}</td>
+						<td>{{ aRow.sDescription }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endfor %}
+</div>

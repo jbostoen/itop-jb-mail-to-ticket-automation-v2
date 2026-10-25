@@ -105,6 +105,10 @@ Sender authentication adds `authentication_states` (as `$details->authentication
 
 ## Available placeholders
 
+The same reference is shown in iTop, collapsed above the form:  
+* On a **trigger**: the general placeholders, and the extra values of the events it is subscribed to. In edit mode, and without events, the complete reference.
+* On an **action** that is linked to such a trigger (and always on *Send an e-mail (by address)*): the placeholders per event of the linked triggers. In edit mode, the complete reference.
+
 The values are filled in as far as they are known at that point.  
 A cron task event has no message, so there are no `mail` or `message` values.
 
