@@ -20,7 +20,7 @@ use Dict;
  * The values are filled in as far as they are known at that point; the scope of an event decides which groups can be available:
  * - cron: the event and the date and time only.
  * - mailbox: also the mailbox.
- * - message: also the message and the mailbox source. The e-mail itself is not decoded (yet).
+ * - message: also the message (the internal message handler). The e-mail itself is not decoded (yet).
  * - mail: everything.
  */
 abstract class PlaceholderReference {
@@ -49,7 +49,7 @@ abstract class PlaceholderReference {
 				[['mail->reply_address'], 'MailReplyAddress'],
 				[['mail->recipient'], 'MailRecipient'],
 				[['mail->to_addresses', 'mail->cc_addresses'], 'MailAddresses'],
-				[['mail->date', 'mail->date_only', 'mail->time_only'], 'MailDate'],
+				[['mail->date', 'mail->timestamp'], 'MailDate'],
 				[['mail->body_text', 'mail->body_text_plain', 'mail->body_format'], 'MailBody'],
 				[['mail->uidl', 'mail->message_id'], 'MailIdentifiers'],
 				[['mail->eml_base64'], 'MailEml'],
@@ -61,8 +61,6 @@ abstract class PlaceholderReference {
 				[['message->index'], 'MessageIndex'],
 				[['message->uid'], 'MessageUid'],
 				[['message->internal_identifier', 'message->message_id'], 'MessageIdentifiers'],
-				[['message->timestamp', 'message->timestamp_full'], 'MessageTimestamp'],
-				[['source->name', 'source->mailbox_path'], 'SourceName'],
 			],
 		],
 		'Objects' => [
@@ -73,12 +71,12 @@ abstract class PlaceholderReference {
 				[['sender->...'], 'Sender', 'mail'],
 			],
 		],
-		'Details' => [
+		'Outcome' => [
 			'scope' => 'mail',
 			'rows' => [
-				[['details->next_action'], 'NextAction'],
-				[['details->outcome_summary'], 'OutcomeSummary'],
-				[['details->executed_steps'], 'ExecutedSteps'],
+				[['outcome->next_action'], 'NextAction'],
+				[['outcome->summary'], 'OutcomeSummary'],
+				[['outcome->executed_steps'], 'ExecutedSteps'],
 			],
 		],
 	];
@@ -92,6 +90,16 @@ abstract class PlaceholderReference {
 		[['action->...'], 'BuiltInAction'],
 		[['current_contact->...', 'current_user->...', 'current_contact_id'], 'BuiltInCurrentUser'],
 		[['APP_URL', 'MODULES_URL'], 'BuiltInUrls'],
+	];
+
+	/**
+	 * @var array<int, array{0: string[], 1: string}> VERBS The verbs that are available for the plain values ("mail", "message", "step", "step_details", "outcome" and "details"). See PlaceholderValues.
+	 * The iTop objects offer the verbs of iTop instead (e.g. "html()"). The date and time of processing (e.g. "current_date") are no plain values of a group: no verbs apply.
+	 */
+	private const VERBS = [
+		[['mail->html_escape(subject)'], 'VerbHtmlEscape'],
+		[['mail->date_only(date)'], 'VerbDateOnly'],
+		[['mail->time_only(date)'], 'VerbTimeOnly'],
 	];
 
 	/**
@@ -163,7 +171,7 @@ abstract class PlaceholderReference {
 	public static function GetStepRows() : array {
 
 		return [
-			[['details->step_id', 'details->step_class', 'details->step_precedence'], 'StepInfo'],
+			[['step->id', 'step->class', 'step->precedence'], 'StepInfo'],
 		];
 
 	}
@@ -176,7 +184,7 @@ abstract class PlaceholderReference {
 	public static function GetPolicyRows() : array {
 
 		return [
-			[['details->behavior'], 'Behavior'],
+			[['step_details->behavior'], 'Behavior'],
 		];
 
 	}
@@ -223,7 +231,7 @@ abstract class PlaceholderReference {
 				[['details->error_message'], 'ErrorMessage'],
 			],
 			eEvent::POLICY_SENDER_AUTHENTICATION_VIOLATION->value => [
-				[['details->authentication_states'], 'AuthenticationStates'],
+				[['step_details->authentication_states'], 'AuthenticationStates'],
 			],
 			default => [],
 		};
@@ -304,11 +312,15 @@ abstract class PlaceholderReference {
 	 */
 	public static function BuildSections(array $aEventCodes, bool $bPerEvent = false) : array {
 
-		// - The built-in placeholders of iTop come first.
+		// - The built-in placeholders of iTop come first, then the verbs.
 		$aSections = [
 			[
 				'sTitle' => Dict::S('MailProcessingEvent:Placeholder:GroupBuiltIn'),
 				'aRows' => static::Translate(static::BUILT_IN),
+			],
+			[
+				'sTitle' => Dict::S('MailProcessingEvent:Placeholder:GroupVerbs'),
+				'aRows' => static::Translate(static::VERBS),
 			],
 		];
 
@@ -399,9 +411,9 @@ abstract class PlaceholderReference {
 	 */
 	public static function GetAllDescriptionKeys() : array {
 
-		$aKeys = ['GroupBuiltIn', 'GroupStep', 'GroupPolicy'];
+		$aKeys = ['GroupBuiltIn', 'GroupVerbs', 'GroupStep', 'GroupPolicy'];
 
-		foreach(static::BUILT_IN as $aRow) {
+		foreach(array_merge(static::BUILT_IN, static::VERBS) as $aRow) {
 			$aKeys[] = $aRow[1];
 		}
 

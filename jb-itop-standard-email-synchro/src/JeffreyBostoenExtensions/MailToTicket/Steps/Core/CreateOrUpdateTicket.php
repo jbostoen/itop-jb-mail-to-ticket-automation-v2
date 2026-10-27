@@ -798,11 +798,13 @@ abstract class CreateOrUpdateTicket extends Base {
 
 		// - The raw "mail->..." placeholders are passed: they are used as-is in the trigger's OQL filter,
 		//   and escaped by TriggerOnMailUpdate::DoActivate() before being passed to the actions.
+		//   The "mail" object offers the same values with verbs (e.g. "$mail->html_escape(subject)$").
 		$aContext = [
 			'this->object()' => $oTicket,
 			'sender->object()' => $oEmail->GetSender(),
 			...static::GetMailPlaceholders($oEmail),
 			...static::GetDateTimePlaceholders(),
+			'mail->object()' => static::GetMailPlaceholderValues($oEmail),
 		];
 
 		/** @var Trigger $oTrigger iTop Trigger. */

@@ -226,7 +226,7 @@ if (!class_exists('StandardEmailSynchroInstaller')) {
 
 					// - The placeholders used in the (HTML) message must be HTML-escaped, as the values come from the received e-mail.
 					$sSubject = trim((string)$aRow['subject']) !== '' ? $aRow['subject'] : 'Message bounced - not compliant with an enforced policy.';
-					$sBody = preg_replace_callback('/\$mail->([a-z_]+)\$/', fn(array $aMatch) => '$mail->html('.$aMatch[1].')$', (string)$aRow['notification']);
+					$sBody = preg_replace_callback('/\$mail->([a-z_]+)\$/', fn(array $aMatch) => '$mail->html_escape('.$aMatch[1].')$', (string)$aRow['notification']);
 					$sFrom = trim((string)$aRow['notify_from']);
 
 					/** @var ActionEmailByAddress $oAction */

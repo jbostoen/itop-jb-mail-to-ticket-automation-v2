@@ -765,7 +765,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		};
 
 		if($eEvent !== null) {
-			Events::FireEvent($eEvent, ['next_action' => $eNextAction->name]);
+			Events::FireEvent($eEvent, ['outcome->next_action' => $eNextAction->name]);
 		}
 
 	}

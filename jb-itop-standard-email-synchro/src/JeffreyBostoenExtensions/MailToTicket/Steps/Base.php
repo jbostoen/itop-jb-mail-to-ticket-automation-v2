@@ -13,6 +13,7 @@ use JeffreyBostoenExtensions\MailToTicket\{
 	eNextAction,
 	Events,
 	Helper,
+	PlaceholderValues,
 	ProcessingHelper
 };
 
@@ -136,8 +137,7 @@ abstract class Base implements iStep {
 		'to_addresses',
 		'cc_addresses',
 		'date',
-		'date_only',
-		'time_only',
+		'timestamp',
 		'body_text_plain',
 		'body_text',
 		'body_format',
@@ -153,9 +153,6 @@ abstract class Base implements iStep {
 	 */
 	public static function GetMailPlaceholders(EmailMessage $oEmail) : array {
 
-		// - Date and time parts of the e-mail's own date (formatted as 'Y-m-d H:i:s', see MessageFromMailbox).
-		$aDateParts = explode(' ', $oEmail->sDate, 2);
-
 		return [
 			'mail->uidl' => $oEmail->sUIDL,
 			'mail->message_id' => $oEmail->sMessageId,
@@ -168,12 +165,30 @@ abstract class Base implements iStep {
 			'mail->to_addresses' => static::ImplodeContactAddresses($oEmail->aTos),
 			'mail->cc_addresses' => static::ImplodeContactAddresses($oEmail->aCCs),
 			'mail->date' => $oEmail->sDate,
-			'mail->date_only' => $aDateParts[0],
-			'mail->time_only' => $aDateParts[1] ?? '',
+			'mail->timestamp' => (string)strtotime($oEmail->sDate),
 			'mail->body_text_plain' => strip_tags($oEmail->sBodyText),
 			'mail->body_text' => $oEmail->sBodyText,
 			'mail->body_format' => $oEmail->sBodyFormat,
 		];
+
+	}
+
+	/**
+	 * Returns the "mail->..." placeholders of the e-mail message as one object, so verbs can be used (e.g. "$mail->html_escape(subject)$", "$mail->date_only(date)$").
+	 * Passed as "mail->object()" in the context arguments.
+	 *
+	 * @param EmailMessage $oEmail The e-mail message.
+	 *
+	 * @return PlaceholderValues
+	 */
+	public static function GetMailPlaceholderValues(EmailMessage $oEmail) : PlaceholderValues {
+
+		$aValues = [];
+		foreach(static::GetMailPlaceholders($oEmail) as $sPlaceholder => $sValue) {
+			$aValues[substr($sPlaceholder, strlen('mail->'))] = $sValue;
+		}
+
+		return new PlaceholderValues($aValues);
 
 	}
 
@@ -239,34 +254,22 @@ abstract class Base implements iStep {
 	 *
 	 * @param string $sString Input string.
 	 * @param array $aExtraPlaceholders Optional: extra place holders.
-	 * @param bool $bEscapeHtml Optional: HTML-escape placeholder values (e.g. caller-controlled subject/body) before
-	 *   substitution. Required whenever $sString will be sent/rendered as HTML (e.g. the body of an e-mail),
-	 *   so attacker-controlled e-mail content can't inject markup. Leave false for non-HTML substitutions, such as
-	 *   ticket attribute default values, where the raw value must be preserved.
 	 *
-	 * @details Also exposes some properties which are not likely to be useful (body_format) at any time, but who knows?
+	 * @details The values are raw. To escape one for HTML, use the verb "html_escape" (e.g. "$mail->html_escape(subject)$").
 	 *
 	 * @return String String where the placeholders are filled in.
 	 */
-	public static function ReplaceMailPlaceholders(string $sString, array $aExtraPlaceholders = [], bool $bEscapeHtml = false) {
+	public static function ReplaceMailPlaceholders(string $sString, array $aExtraPlaceholders = []) {
 
 		$oEmail = ProcessingHelper::GetMail();
 
-		$aParams = array_merge(static::GetMailPlaceholders($oEmail), static::GetDateTimePlaceholders());
+		$aParams = array_merge(static::GetMailPlaceholders($oEmail), static::GetDateTimePlaceholders(), ['mail->object()' => static::GetMailPlaceholderValues($oEmail)]);
 
 		if($oEmail->GetSender() !== null) {
 			$aParams['sender->object()'] = $oEmail->GetSender();
 		}
 
 		$aParams = array_merge($aParams, $aExtraPlaceholders);
-
-		if($bEscapeHtml) {
-			foreach($aParams as $sParam => $sValue) {
-				if(is_string($sValue)) {
-					$aParams[$sParam] = htmlspecialchars($sValue, ENT_QUOTES, 'UTF-8');
-				}
-			}
-		}
 
 		// Extend. This is to allow for both the original parameter and the HTML-encoded version of it.
 		$aParamsExtended = [];
@@ -404,7 +407,7 @@ abstract class Base implements iStep {
 	protected static function GetViolationContextArguments(string $sBehavior) : array {
 
 		return array_merge(static::GetStepContextArguments(), [
-			'behavior' => $sBehavior,
+			'step_details->behavior' => $sBehavior,
 		]);
 
 	}
@@ -417,9 +420,9 @@ abstract class Base implements iStep {
 	public static function GetStepContextArguments() : array {
 
 		return [
-			'step_id' => static::GetXMLSettingsPrefix(),
-			'step_class' => static::class,
-			'step_precedence' => static::$iPrecedence,
+			'step->id' => static::GetXMLSettingsPrefix(),
+			'step->class' => static::class,
+			'step->precedence' => static::$iPrecedence,
 		];
 
 	}

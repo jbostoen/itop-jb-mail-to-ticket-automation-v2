@@ -142,15 +142,16 @@ caller_email
 caller_email_suffix
 caller_name
 date (formatted as Y-m-d H:i:s)
-date_only (the date part of "date": Y-m-d)
 message_id
 recipient
 subject
-time_only (the time part of "date": H:i:s)
+timestamp (the Unix timestamp of "date")
 uidl
 ```
 
-Note: `mail->date` is based on the e-mail's Date header, which is set by the sender.
+Note: `mail->date` is based on the e-mail's Date header, which is set by the sender.  
+For the date or the time only, use the verbs `date_only()` and `time_only()`: `$mail->date_only(date)$` (Y-m-d), `$mail->time_only(date)$` (H:i:s).  
+To escape a value for an HTML body, use `html_escape()`: `$mail->html_escape(subject)$`.
 
 The date and time of processing are also available, in iTop's internal formats (so they can be used as values of date/datetime attributes):
 

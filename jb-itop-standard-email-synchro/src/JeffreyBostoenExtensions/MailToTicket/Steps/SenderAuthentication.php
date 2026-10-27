@@ -100,7 +100,7 @@ abstract class SenderAuthentication extends Base {
 	protected static function GetViolationContextArguments(string $sBehavior) : array {
 
 		return array_merge(parent::GetViolationContextArguments($sBehavior), [
-			'authentication_states' => implode(', ', static::$aDetectedStates),
+			'step_details->authentication_states' => implode(', ', static::$aDetectedStates),
 		]);
 
 	}

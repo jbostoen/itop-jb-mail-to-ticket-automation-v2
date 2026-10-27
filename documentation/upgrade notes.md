@@ -27,7 +27,7 @@ Both are named `Bounce - <mailbox> - <policy>`.
 
 Check the result after upgrading:
 
-* The placeholders in the message are replaced by their HTML-escaped variants (e.g. `$mail->subject$` becomes `$mail->html(subject)$`), as the values come from a received e-mail.
+* The placeholders in the message are replaced by their HTML-escaped variants (e.g. `$mail->subject$` becomes `$mail->html_escape(subject)$`), as the values come from a received e-mail.
 * A mailbox without a "Mail From Address" results in a **disabled** action.
 * The subject and message of other behaviors (which were never used) are not carried over.
 * If the conversion of a mailbox fails, it is logged in the setup log and tried again at the next setup.

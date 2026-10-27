@@ -29,7 +29,7 @@ Example: reply to the sender when a message is refused because the ticket is clo
 | From | `helpdesk@example.com` |
 | To (address) | `$mail->reply_address$` |
 | Subject | `Re: $mail->subject$` |
-| Body | `The ticket for your message "$mail->html(subject)$" is closed. Please create a new request.` |
+| Body | `The ticket for your message "$mail->html_escape(subject)$" is closed. Please create a new request.` |
 | Trigger events | Ticket closed |
 | Trigger | Include original message: yes |
 
@@ -38,7 +38,8 @@ The policy itself keeps its **Policy violation behavior** (e.g. delete or mark a
 ## Events
 
 The category is the first part of the code.  
-The extra values are available as `$details->...$`, on top of the [general ones](#available-placeholders). Example: `$details->error_message$`.
+The extra values of an event are available as `$details->...$`, on top of the [general ones](#available-placeholders). Example: `$details->error_message$`.  
+The values that belong to a step are in the groups `$step->...$` and `$step_details->...$` instead, see [the step](#the-step).
 
 ### Cron task and mailbox
 
@@ -57,11 +58,11 @@ The extra values are available as `$details->...$`, on top of the [general ones]
 | `message_started` | The processing of a message starts (only for messages that are actually handled, not for old messages that are skipped each run). The message is not decoded yet: the `mail` placeholders are not available. | |
 | `message_finished` | The processing of such a message ends. | |
 | `message_decode_failed` | A message could not be decoded. | `invalid_reasons` |
-| `message_deleted` | A message was deleted from the mailbox. | `reason` (sometimes), `next_action` |
+| `message_deleted` | A message was deleted from the mailbox. | `reason` (sometimes) |
 | `message_moved` | A message was moved to another folder. | `target_folder` |
-| `message_marked_undesired` | A message was marked as undesired. | `next_action` |
-| `message_marked_error` | A message was marked as error. | `reason` (sometimes), `next_action` |
-| `message_no_ticket` | The processing ended without a ticket being created or linked. | `reason` (the cause, see also `outcome_summary`) |
+| `message_marked_undesired` | A message was marked as undesired. | |
+| `message_marked_error` | A message was marked as error. | `reason` (sometimes) |
+| `message_no_ticket` | The processing ended without a ticket being created or linked. | `reason` (the cause, see also `$outcome->summary$`) |
 
 ### Step
 
@@ -70,8 +71,8 @@ Because of the number of steps, these events are only collected when a trigger i
 
 | Code | Fires when | Extra values |
 |------|------------|--------------|
-| `step_started` | A step is about to be executed. | `step_id`, `step_class`, `step_precedence` |
-| `step_finished` | A step was executed. `next_action` shows whether further processing is stopped. | `step_id`, `step_class`, `step_precedence` |
+| `step_started` | A step is about to be executed. | `$step->...$` |
+| `step_finished` | A step was executed. `$outcome->next_action$` shows whether further processing is stopped. | `$step->...$` |
 
 ### Ticket and caller
 
@@ -104,8 +105,8 @@ Policies that are **Inactive** do not run, so they fire nothing.
 | `policy_autoreply_detected` | The message is an auto-reply. |
 | `policy_non_delivery_report_detected` | The message is a non-delivery report. |
 
-Extra values for all of them: `step_id`, `step_class`, `step_precedence` (the step that detected the case), and `behavior` (the configured behavior).  
-Sender authentication adds `authentication_states` (as `$details->authentication_states$`, e.g. `spf=softfail, dkim=pass`).
+Values for all of them: `$step->...$` (the step that detected the case), and `$step_details->behavior$` (the configured behavior).  
+Sender authentication adds `$step_details->authentication_states$` (e.g. `spf=softfail, dkim=pass`).
 
 ### Errors
 
@@ -125,7 +126,7 @@ A cron task event has no message, so there are no `mail` or `message` values.
 ### iTop objects and plain values
 
 Some placeholders are **iTop objects**: every attribute of the object can be used, as in any iTop notification, and the usual verbs work (`$ticket->label(status)$`, `$ticket->html(title)$`, `$ticket->hyperlink()$`, ...).  
-The others are **plain values**: a fixed list of text values. They only offer the properties listed below.
+The others are **plain values**: a fixed list of text values. They only offer the properties listed below, and a small set of verbs (see [verbs for plain values](#verbs-for-plain-values)).
 
 | Placeholder | Kind | iTop class | Notes |
 |-------------|------|------------|-------|
@@ -135,19 +136,56 @@ The others are **plain values**: a fixed list of text values. They only offer th
 | `$sender->...$` | iTop object | `Person` | Only when the sender is known. |
 | `$caller->...$` | iTop object | `Person` | Only for the events *caller created* and *caller inactivated*. |
 | `$mail->...$` | plain values | - | The received e-mail. See [the e-mail](#the-e-mail). |
-| `$message->...$` | plain values | - | The message in the mailbox. See [the message and the mailbox source](#the-message-and-the-mailbox-source). |
-| `$source->...$` | plain values | - | The mailbox source. |
-| `$details->...$` | plain values | - | The outcome of the processing, and the extra values of the event. See [details](#details). |
+| `$message->...$` | plain values | - | The internal message handler. See [the message](#the-message). Prefer `$mail->...$` where it offers the same. |
+| `$step->...$` | plain values | - | What applies to every step. See [the step](#the-step). |
+| `$step_details->...$` | plain values | - | What is specific to a step, or a kind of step. See [the step](#the-step). |
+| `$outcome->...$` | plain values | - | The outcome of the processing so far. See [the outcome](#the-outcome). |
+| `$details->...$` | plain values | - | The extra values of the event itself. See [details](#details). |
 | `$current_date$`, `$current_time$`, `$current_datetime$` | plain value | - | Date and time of processing (in the internal formats of iTop). |
 
-The e-mail itself (`$mail->...$`) is **not** an iTop object: only the properties listed below exist, and verbs such as `label()` or `hyperlink()` do not apply. The one exception is `html()`, see below.
+The e-mail itself (`$mail->...$`) is **not** an iTop object: only the properties listed below exist, and verbs such as `label()` or `hyperlink()` do not apply.
+
+### Verbs
+
+A verb changes the representation of a value: `$<name>->verb(<property>)$`, e.g. `$ticket->html(title)$`. Without a verb, the value is used as it is.
+
+#### Verbs for iTop objects
+
+The verbs are handled by the attribute of the object, so what they return depends on the type of the attribute:
+
+* `html()` generates the **HTML representation** of the attribute, as shown in iTop. It is not just an escape function:
+  * Text (string): the text, HTML-escaped.
+  * Long text: the text, escaped, with wiki formatting rendered and line breaks converted, in a `div`.
+  * HTML: the markup, in a `div`.
+  * E-mail address: a `mailto:` link.
+  * Date, enumeration, external key: the formatted representation (e.g. the label of an enumeration value).
+  * Case log: the entries, as in an e-mail notification.
+  * Link set: a list (`ul`).
+* Without a verb (or `text()`): the plain text value.
+* `label()`: the value as shown in a form (e.g. the label of an enumeration value).
+* Other verbs exist for some types, e.g. `hyperlink()` and `url()` for the object itself.
+
+Use `html()` in an HTML body for attributes of an object that can hold text from the e-mail, and be aware that it can generate markup.
+
+#### Verbs for plain values
+
+| Verb | Result |
+|------|--------|
+| `html_escape(x)` | The value, escaped for use in an HTML body: `$mail->html_escape(subject)$` instead of `$mail->subject$`. |
+| `date_only(x)` | The date part of a value that holds a date and time (Y-m-d): `$mail->date_only(date)$`. |
+| `time_only(x)` | The time part of a value that holds a date and time (H:i:s): `$mail->time_only(date)$`. |
+
+`date_only()` and `time_only()` only change a value that is a valid date and time (Y-m-d H:i:s). Any other value (a text, a time for `date_only()`, a date for `time_only()`) is returned as it is.  
+The verbs work for the plain-value groups only (`$mail->...$`, `$message->...$`, `$step->...$`, `$step_details->...$`, `$outcome->...$`, `$details->...$`). They do not apply to iTop objects (`$mailbox->...$`, `$ticket->...$`, ...), nor to `$current_date$`, `$current_time$` and `$current_datetime$`.  
+The name is `html_escape` on purpose: for iTop objects, `html()` generates HTML, which is not the same as escaping a text value.
 
 ### Escaping for HTML
 
 The values of a received e-mail may contain anything, including markup.  
-For **plain values**, use the `html()` verb in an HTML body: `$mail->html(subject)$` instead of `$mail->subject$`. It works for every plain value (`$mail->...$`, `$message->...$`, `$source->...$`, `$details->...$`).  
-This is the same verb iTop offers for its objects: `$ticket->html(title)$` also escapes. Use it for any attribute of an object that can hold text from the e-mail.  
+In an HTML body, use `html_escape()` for plain values (`$mail->html_escape(subject)$`) and `html()` for attributes of iTop objects that can hold text from the e-mail (`$ticket->html(title)$`).  
 In a subject or a recipient, use the value as it is.
+
+Where the placeholders are used for ticket values (default values of a mailbox), the values are raw as well. Use `html_escape()` there only for an HTML attribute.
 
 An unknown name or verb is not replaced: the placeholder stays visible in the e-mail and iTop logs it.
 
@@ -168,15 +206,18 @@ An unknown name or verb is not replaced: the placeholder stays visible in the e-
 | `$mail->reply_address$` | The address to reply to: the sender, or **empty** when the message was generated automatically (e.g. an out-of-office reply). |
 | `$mail->recipient$` | The recipient. |
 | `$mail->to_addresses$`, `$mail->cc_addresses$` | All addresses in To and Cc, comma-separated. |
-| `$mail->date$`, `$mail->date_only$`, `$mail->time_only$` | The Date header of the message (set by the sender). |
-| `$mail->body_text$`, `$mail->body_text_plain$`, `$mail->body_format$` | The body. `body_text` is HTML when `body_format` says so; `html()` then shows the markup as text. For an HTML body, use `$mail->html(body_text_plain)$`. |
+| `$mail->date$`, `$mail->timestamp$` | The Date header of the message (set by the sender): as Y-m-d H:i:s, and as a Unix timestamp. When the header is missing or can not be read, the time of processing is used. For the parts, use `$mail->date_only(date)$` and `$mail->time_only(date)$`. |
+| `$mail->body_text$`, `$mail->body_text_plain$`, `$mail->body_format$` | The body. `body_text` is HTML when `body_format` says so; `html_escape()` then shows the markup as text. For an HTML body, use `$mail->html_escape(body_text_plain)$`. |
 | `$mail->uidl$`, `$mail->message_id$` | Identifiers of the message. |
 | `$mail->eml_base64$` | The original message, base64 encoded (only when **Include original message** is set). |
 
 The sender as an iTop object is `$sender->...$` (a person): `$sender->first_name$`, `$sender->name$`, `$sender->email$`, `$sender->org_name$`, ...  
 It does not exist for an unknown sender: use `$mail->caller_name$` and `$mail->caller_email$` then.
 
-### The message and the mailbox source
+### The message
+
+`$message->...$` is the internal message handler of the extension. What it holds depends on the configuration of the mailbox (e.g. how the identifier is built), and it is available earlier than the e-mail: it is also there when the message could not be decoded.  
+Use `$mail->...$` where it offers the same information (e.g. `$mail->message_id$`).
 
 | Placeholder | Description |
 |-------------|-------------|
@@ -184,17 +225,34 @@ It does not exist for an unknown sender: use `$mail->caller_name$` and `$mail->c
 | `$message->uid$` | The IMAP UID. |
 | `$message->internal_identifier$` | The identifier used by the extension. |
 | `$message->message_id$` | The Message-ID. |
-| `$message->timestamp$`, `$message->timestamp_full$` | When the message was received (Unix timestamp, and Y-m-d H:i:s). |
-| `$source->name$`, `$source->mailbox_path$` | The mailbox source and its folder. |
 
-### Details
+The mailbox the message was read from is `$mailbox->...$`.
+
+### The step
+
+For the events of a step, and the policy events (a step detected the case).
 
 | Placeholder | Description |
 |-------------|-------------|
-| `$details->next_action$` | What will happen to the message (e.g. `DELETE_MESSAGE`). |
-| `$details->outcome_summary$` | A summary of why the processing ended as it did: notes of the steps and the list of executed steps. |
-| `$details->executed_steps$` | The steps that were executed, comma-separated. |
-| `$details->...$` | The extra values of the [event](#events), e.g. `$details->reason$`, `$details->error_message$`, `$details->message_count$`. |
+| `$step->id$`, `$step->class$`, `$step->precedence$` | The step: identifier, class and precedence. Applies to every step. |
+| `$step_details->behavior$` | The configured behavior. Only for policy events. |
+| `$step_details->authentication_states$` | The SPF/DKIM results (e.g. `spf=softfail, dkim=pass`). Only for the event *sender authentication violation*. |
+
+### The outcome
+
+The outcome of the processing, at the moment the event is fired.  
+`$outcome->next_action$` is updated after every executed step: for a *step finished* event it shows whether further processing is stopped, for the final events the end result.
+
+| Placeholder | Description |
+|-------------|-------------|
+| `$outcome->next_action$` | What will happen to the message (e.g. `DELETE_MESSAGE`). |
+| `$outcome->summary$` | A summary of why the processing ended as it did: notes of the steps and the list of executed steps. |
+| `$outcome->executed_steps$` | The steps that were executed, comma-separated. |
+
+### Details
+
+The extra values of the [event](#events) itself, as listed with the event: `$details->reason$`, `$details->error_message$`, `$details->message_count$`, ...  
+What is specific to a step is in `$step_details->...$`.
 
 Values that hold several items are one comma-separated text. There are no lists.
 
@@ -207,7 +265,7 @@ An e-mail action without a "To" recipient is not sent (Cc and Bcc are ignored th
 ## Sender authentication
 
 The sender of a message that fails the SPF/DKIM check may be spoofed, so a reply can reach someone who sent nothing (backscatter).  
-The event `policy_sender_authentication_violation` has `$details->authentication_states$` (e.g. `spf=softfail, dkim=pass`).  
+The event `policy_sender_authentication_violation` has `$step_details->authentication_states$` (e.g. `spf=softfail, dkim=pass`).  
 An internal alert is usually a better choice than a reply to the sender.
 
 The policy runs before the auto-reply and non-delivery detection. When replying anyway, use `$mail->reply_address$` to avoid mail loops.

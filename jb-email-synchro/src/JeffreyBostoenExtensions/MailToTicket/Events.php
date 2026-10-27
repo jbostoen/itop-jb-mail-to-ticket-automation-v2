@@ -68,6 +68,8 @@ interface iMailProcessingEventProvider {
  * The reference that is shown to administrators is kept in PlaceholderReference::GetEventRows(): keep it in line with these comments.
  * Naming of the extra values:
  * - Objects: "name->object()", e.g. "caller->object()".
+ * - Values of a group: "<group>-><name>", e.g. "step_details->behavior". The groups are Events::VALUE_GROUPS.
+ * - Anything else (e.g. "reason"): "$details->...$".
  * - Counts: "<name>_count".
  */
 enum eEvent : string {
@@ -92,10 +94,10 @@ enum eEvent : string {
 		case MESSAGE_MOVED = 'message_moved';
 		case MESSAGE_MARKED_UNDESIRED = 'message_marked_undesired';
 		case MESSAGE_MARKED_ERROR = 'message_marked_error';
-		case MESSAGE_NO_TICKET = 'message_no_ticket'; // No ticket was created or linked. See also: outcome_summary.
+		case MESSAGE_NO_TICKET = 'message_no_ticket'; // No ticket was created or linked. See also: outcome->summary.
 
-	// - Step. Fired for every step that is executed for a message. Context arguments for both: step_id, step_class, step_precedence.
-	//   The next action (see "details->next_action") shows the result so far: after a step, it tells whether processing is stopped.
+	// - Step. Fired for every step that is executed for a message. Context arguments for both: step->id, step->class, step->precedence.
+	//   The next action (see "outcome->next_action") shows the result so far: after a step, it tells whether processing is stopped.
 
 		case STEP_STARTED = 'step_started';
 		case STEP_FINISHED = 'step_finished';
@@ -110,15 +112,15 @@ enum eEvent : string {
 		case CALLER_CREATED = 'caller_created'; // caller->object()
 		case CALLER_INACTIVATED = 'caller_inactivated'; // caller->object()
 
-	// - Policies. Violations always fire, regardless of the configured behavior (see "behavior").
-	//   Context arguments for all of them: step_id, step_class, step_precedence, behavior.
+	// - Policies. Violations always fire, regardless of the configured behavior (see "step_details->behavior").
+	//   Context arguments for all of them: step->id, step->class, step->precedence, step_details->behavior.
 
 		case POLICY_ATTACHMENT_FORBIDDEN_MIMETYPE_VIOLATION = 'policy_attachment_forbidden_mimetype_violation';
 		case POLICY_MAIL_SIZE_TOO_BIG_VIOLATION = 'policy_mail_size_too_big_violation';
 		case POLICY_NO_SUBJECT_VIOLATION = 'policy_no_subject_violation';
 		case POLICY_OTHER_EMAIL_CALLER_THAN_TICKET_CALLER_VIOLATION = 'policy_other_email_caller_than_ticket_caller_violation';
 		case POLICY_OTHER_RECIPIENTS_VIOLATION = 'policy_other_recipients_violation';
-		case POLICY_SENDER_AUTHENTICATION_VIOLATION = 'policy_sender_authentication_violation'; // authentication_states
+		case POLICY_SENDER_AUTHENTICATION_VIOLATION = 'policy_sender_authentication_violation'; // step_details->authentication_states
 		case POLICY_SENDER_EMAIL_ADDRESS_VIOLATION = 'policy_sender_email_address_violation';
 		case POLICY_TICKET_CLOSED_VIOLATION = 'policy_ticket_closed_violation';
 		case POLICY_TICKET_RESOLVED_VIOLATION = 'policy_ticket_resolved_violation';
@@ -449,7 +451,7 @@ class Events implements iEventServiceSetup {
 				$aArgs['mailbox->object()'] = $oMailBox;
 			}
 
-		// - Message handler and source.
+		// - Message handler.
 
 			$oHandler = ProcessingHelper::GetMessageHandlerOrNull();
 			if($oHandler !== null) {
@@ -457,14 +459,6 @@ class Events implements iEventServiceSetup {
 				$aArgs['message->uid'] = $oHandler->GetUid();
 				$aArgs['message->internal_identifier'] = $oHandler->GetInternalIdentifier();
 				$aArgs['message->message_id'] = $oHandler->GetMessageId();
-				$aArgs['message->timestamp'] = $oHandler->GetTimestamp();
-				$aArgs['message->timestamp_full'] = date('Y-m-d H:i:s', $oHandler->GetTimestamp());
-			}
-
-			$oSource = ProcessingHelper::GetMailSourceOrNull();
-			if($oSource !== null) {
-				$aArgs['source->name'] = $oSource->GetName();
-				$aArgs['source->mailbox_path'] = $oSource->GetMailbox();
 			}
 
 		// - Ticket and outcome of the processing so far.
@@ -475,9 +469,9 @@ class Events implements iEventServiceSetup {
 			}
 
 			if($oMail !== null) {
-				$aArgs['next_action'] = ProcessingHelper::GetNextAction()->name;
-				$aArgs['outcome_summary'] = ProcessingHelper::GetOutcomeSummary();
-				$aArgs['executed_steps'] = implode(', ', array_map('basename', ProcessingHelper::GetExecutedSteps()));
+				$aArgs['outcome->next_action'] = ProcessingHelper::GetNextAction()->name;
+				$aArgs['outcome->summary'] = ProcessingHelper::GetOutcomeSummary();
+				$aArgs['outcome->executed_steps'] = implode(', ', array_map('basename', ProcessingHelper::GetExecutedSteps()));
 			}
 
 		return $aArgs;
@@ -485,20 +479,20 @@ class Events implements iEventServiceSetup {
 	}
 
 	/**
-	 * Names of the context arguments that are always part of the details of an event, next to the extra values passed when the event was fired.
-	 */
-	private const DETAIL_ARGUMENTS = ['next_action', 'outcome_summary', 'executed_steps'];
-
-	/**
 	 * Names of the text value groups ("<name>->...") that become one PlaceholderValues object.
+	 * - mail: the e-mail.
+	 * - message: the internal message handler. Prefer "mail" where it holds the same information.
+	 * - step: what applies to every step.
+	 * - step_details: what is specific to a step, or a kind of step.
+	 * - outcome: the outcome of the processing, at the moment the event is fired.
 	 */
-	private const VALUE_GROUPS = ['mail', 'message', 'source'];
+	private const VALUE_GROUPS = ['mail', 'message', 'step', 'step_details', 'outcome'];
 
 	/**
-	 * Moves text values to PlaceholderValues objects, so they can be used with a verb, e.g. "$mail->html(subject)$" to escape the value for an HTML body.
+	 * Moves text values to PlaceholderValues objects, so they can be used with a verb, e.g. "$mail->html_escape(subject)$" to escape the value for an HTML body.
 	 *
-	 * - "mail", "message" and "source": the values with that prefix (e.g. "mail->subject"). The plain arguments are kept as well.
-	 * - "details": the outcome of the processing, and the extra values passed when the event was fired (e.g. "reason", "error_message").
+	 * - The groups of VALUE_GROUPS: the values with that prefix (e.g. "mail->subject"). The plain arguments are kept as well.
+	 * - "details": the extra values passed when the event was fired that do not belong to a group (e.g. "reason", "error_message").
 	 *
 	 * @param array $aArgs Context arguments.
 	 * @param array $aExtraArgs Extra context arguments passed when the event was fired. Already part of $aArgs.
@@ -532,7 +526,7 @@ class Events implements iEventServiceSetup {
 		// - Details. Moved: these are only available through the object.
 
 			$aDetails = [];
-			foreach(array_merge(static::DETAIL_ARGUMENTS, array_keys($aExtraArgs)) as $sKey) {
+			foreach(array_keys($aExtraArgs) as $sKey) {
 
 				$sKey = (string)$sKey;
 				if(array_key_exists($sKey, $aArgs) && !str_contains($sKey, '->') && (is_scalar($aArgs[$sKey]) || $aArgs[$sKey] === null)) {

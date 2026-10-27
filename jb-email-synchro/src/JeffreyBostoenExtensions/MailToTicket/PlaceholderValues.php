@@ -7,6 +7,7 @@
 
 namespace JeffreyBostoenExtensions\MailToTicket;
 
+use DateTime;
 use Exception;
 
 /**
@@ -14,8 +15,10 @@ use Exception;
  *
  * Passed as "<name>->object()" in the context arguments of an action. iTop then resolves "$<name>->...$" through GetForTemplate():
  * - "$mail->subject$": the value as it is.
- * - "$mail->html(subject)$": the value, escaped for use in an HTML body. Same verb as for iTop objects (e.g. "$ticket->html(title)$").
+ * - "$mail->html_escape(subject)$": the value, escaped for use in an HTML body.
+ * - "$mail->date_only(date)$", "$mail->time_only(date)$": the date or the time part of a value that holds a date and time (Y-m-d H:i:s). A value that is already a date (Y-m-d, for "date_only") or a time (H:i:s, for "time_only") is returned as it is, and so is any other value.
  *
+ * The verb to escape is not called "html" on purpose: for iTop objects, "html()" generates the HTML representation of an attribute (e.g. "$ticket->html(description)$"), which is not the same as escaping a text value.
  * The values may come from a received e-mail, so they may contain anything.
  */
 class PlaceholderValues {
@@ -61,9 +64,29 @@ class PlaceholderValues {
 	}
 
 	/**
+	 * Gets the date part or the time part of a value that holds a date and time.
+	 * A value that is already (only) that part, or that is not a valid date and time, is returned as it is.
+	 *
+	 * @param string $sValue Value, e.g. "2026-01-02 03:04:05".
+	 * @param string $sFormat Format of the part: "Y-m-d" or "H:i:s".
+	 *
+	 * @return string
+	 */
+	private static function GetPart(string $sValue, string $sFormat) : string {
+
+		$oDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $sValue);
+		if($oDateTime !== false && $oDateTime->format('Y-m-d H:i:s') === $sValue) {
+			return $oDateTime->format($sFormat);
+		}
+
+		return $sValue;
+
+	}
+
+	/**
 	 * Resolves a placeholder. Called by iTop (MetaModel::ApplyParams()).
 	 *
-	 * @param string $sPlaceholder Name of the value, or "verb(name)". Supported verb: "html".
+	 * @param string $sPlaceholder Name of the value, or "verb(name)". Supported verbs: "html_escape", "date_only", "time_only".
 	 *
 	 * @return string
 	 *
@@ -85,7 +108,9 @@ class PlaceholderValues {
 
 		return match($sVerb) {
 			'' => $this->aValues[$sName],
-			'html' => htmlspecialchars($this->aValues[$sName], ENT_QUOTES, 'UTF-8'),
+			'html_escape' => htmlspecialchars($this->aValues[$sName], ENT_QUOTES, 'UTF-8'),
+			'date_only' => static::GetPart($this->aValues[$sName], 'Y-m-d'),
+			'time_only' => static::GetPart($this->aValues[$sName], 'H:i:s'),
 			default => throw new Exception("Unknown verb '$sVerb' in placeholder '$sPlaceholder'."),
 		};
 
