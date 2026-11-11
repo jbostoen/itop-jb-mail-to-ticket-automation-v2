@@ -244,7 +244,8 @@ function GetMailboxContent($oPage, $oInbox) {
 							'error' => htmlentities($sErrorMsg, ENT_QUOTES, 'UTF-8'),
 							'details' => $sDetailsLink,
 							'uid' => $oMsgHandler->GetUid(),
-							'internalId' => $oMsgHandler->GetInternalIdentifier(),
+							// The internal identifier is usually the Message-ID header, which is controlled by the sender.
+							'internalId' => htmlentities($oMsgHandler->GetInternalIdentifier(), ENT_QUOTES, 'UTF-8'),
 							'replicaLink' => $sReplicaLink,
 						];
 						
