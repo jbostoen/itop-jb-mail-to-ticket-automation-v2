@@ -1238,7 +1238,7 @@ abstract class CreateOrUpdateTicket extends Base {
 					// The ticket does not have its real key yet: recording the change-history entry now
 					// would permanently store the ticket's temporary key. Defer it to UpdateAttachments(),
 					// which runs after the ticket has actually been inserted.
-					static::$aPendingAttachmentChangeOpDescriptions[] = Dict::Format('Attachments:History_File_Added', $aAttachment['filename']);
+					static::$aPendingAttachmentChangeOpDescriptions[] = Dict::Format('Attachments:History_File_Added', utils::EscapeHtml($aAttachment['filename']));
 				}
 				else {
 					$oMyChangeOp = MetaModel::NewObject('CMDBChangeOpPlugin');
@@ -1246,7 +1246,7 @@ abstract class CreateOrUpdateTicket extends Base {
 					$oMyChangeOp->Set('change', $oMyChange->GetKey());
 					$oMyChangeOp->Set('objclass', get_class($oTicket));
 					$oMyChangeOp->Set('objkey', $oTicket->GetKey());
-					$oMyChangeOp->Set('description', Dict::Format('Attachments:History_File_Added', $aAttachment['filename']));
+					$oMyChangeOp->Set('description', Dict::Format('Attachments:History_File_Added', utils::EscapeHtml($aAttachment['filename'])));
 					$oMyChangeOp->DBInsertNoReload();
 				}
 
