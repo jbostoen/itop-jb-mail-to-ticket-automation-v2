@@ -184,4 +184,5 @@ Dict::Add('EN GB', 'British English', 'British English', array(
 	'MailProcessingEvent:Placeholder:StepInfo' => 'The step: identifier, class and precedence.',
 	'MailProcessingEvent:Placeholder:Behavior' => 'The configured behavior of the policy.',
 	'MailProcessingEvent:Placeholder:AuthenticationStates' => 'The SPF/DKIM results, for example spf=softfail, dkim=pass.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP options, one per line. Common options: "ssl" (encrypted connection), "tls" (STARTTLS) and "novalidate-cert" (do not validate the server certificate). Without "ssl" or "tls", credentials and mail content are sent unprotected. Only use "novalidate-cert" for a server with a self-signed or otherwise untrusted certificate: credentials and mail content are then exposed to man-in-the-middle attacks. Default: "imap" and "ssl".',
 ));

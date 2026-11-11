@@ -184,4 +184,5 @@ Dict::Add('HU HU', 'Hungarian', 'Magyar', array(
 	'MailProcessingEvent:Placeholder:StepInfo' => 'A lépés: azonosító, osztály és sorrend.',
 	'MailProcessingEvent:Placeholder:Behavior' => 'A szabályzat beállított viselkedése.',
 	'MailProcessingEvent:Placeholder:AuthenticationStates' => 'Az SPF/DKIM eredmények, például spf=softfail, dkim=pass.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP-beállítások, soronként egy. Gyakori beállítások: "ssl" (titkosított kapcsolat), "tls" (STARTTLS) és "novalidate-cert" (a kiszolgáló tanúsítványának nem ellenőrzése). "ssl" vagy "tls" nélkül a hitelesítő adatok és a levelek tartalma védelem nélkül kerül elküldésre. A "novalidate-cert" beállítást csak önaláírt vagy más módon nem megbízható tanúsítványú kiszolgálóhoz használja: a hitelesítő adatok és a levelek tartalma ilyenkor man-in-the-middle támadásoknak van kitéve. Alapértelmezett: "imap" és "ssl".',
 ));

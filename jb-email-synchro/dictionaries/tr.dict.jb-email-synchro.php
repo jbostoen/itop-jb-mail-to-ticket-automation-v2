@@ -184,4 +184,5 @@ Dict::Add('TR TR', 'Turkish', 'Türkçe', array(
 	'MailProcessingEvent:Placeholder:StepInfo' => 'Adım: tanımlayıcı, sınıf ve öncelik.',
 	'MailProcessingEvent:Placeholder:Behavior' => 'İlkenin yapılandırılmış davranışı.',
 	'MailProcessingEvent:Placeholder:AuthenticationStates' => 'SPF/DKIM sonuçları, örneğin spf=softfail, dkim=pass.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP seçenekleri, satır başına bir tane. Yaygın seçenekler: "ssl" (şifreli bağlantı), "tls" (STARTTLS) ve "novalidate-cert" (sunucu sertifikasını doğrulama). "ssl" veya "tls" olmadan kimlik bilgileri ve e-posta içeriği korumasız gönderilir. "novalidate-cert" seçeneğini yalnızca kendinden imzalı veya güvenilmeyen sertifikası olan bir sunucu için kullanın: kimlik bilgileri ve e-posta içeriği bu durumda ortadaki adam (man-in-the-middle) saldırılarına açık olur. Varsayılan: "imap" ve "ssl".',
 ));

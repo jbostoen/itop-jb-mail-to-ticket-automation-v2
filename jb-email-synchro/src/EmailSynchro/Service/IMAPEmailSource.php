@@ -13,6 +13,7 @@ use EmailSource;
 use Exception;
 use IssueLog;
 use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 use MailInboxBase;
 use MessageFromMailbox;
 
@@ -94,19 +95,29 @@ class IMAPEmailSource extends EmailSource {
 			'debug' => static::CONFIG_DEBUG_LOGGER,
 		];
 
-		// - The certificate is validated unless explicitly disabled ("novalidate-cert"). Without validation, credentials and mail content are exposed to man-in-the-middle attacks.
-		//   "validate_cert" is still accepted, but redundant.
-		if(in_array('novalidate-cert', $aImapOptions) && !in_array('validate_cert', $aImapOptions)) {
-			IssueLog::Warning("IMAPEmailSource - SSL certificate validation is disabled for $this->sServer", static::LOG_CHANNEL);
-			$aOptions['validate_cert'] = false;
+		// - Only these options are interpreted. Their names originate from the flags of the c-client library (PHP's imap_open). Other lines are ignored.
+		//   The certificate is validated unless "novalidate-cert" is set. Without validation, credentials and mail content are exposed to man-in-the-middle attacks.
+		//   An explicit "validate-cert" (or "validate_cert") takes precedence.
+		$aKnownOptions = ['imap', 'ssl', 'tls', 'novalidate-cert', 'validate-cert', 'validate_cert'];
+
+		foreach($aImapOptions as $sOption) {
+			if($sOption !== '' && !in_array($sOption, $aKnownOptions, true)) {
+				ProcessingHelper::Trace('IMAPEmailSource - Ignored IMAP option "%1$s": not supported.', $sOption);
+			}
+		}
+
+		$bValidateCert = !in_array('novalidate-cert', $aImapOptions, true) || in_array('validate-cert', $aImapOptions, true) || in_array('validate_cert', $aImapOptions, true);
+		$aOptions['validate_cert'] = $bValidateCert;
+
+		if($bValidateCert) {
+			ProcessingHelper::Trace('IMAPEmailSource - SSL certificate validation enabled for %1$s.', $this->sServer);
 		}
 		else {
-			IssueLog::Debug("IMAPEmailSource - SSL certificate validation enabled", static::LOG_CHANNEL);
-			$aOptions['validate_cert'] = true;
+			ProcessingHelper::Trace('IMAPEmailSource - Warning: SSL certificate validation is disabled for %1$s.', $this->sServer);
 		}
 
 		if($sSSL === null) {
-			IssueLog::Warning("IMAPEmailSource - No encryption (ssl or tls) configured for $this->sServer. Credentials and mail content are sent unprotected.", static::LOG_CHANNEL);
+			ProcessingHelper::Trace('IMAPEmailSource - Warning: no encryption (ssl or tls) configured for %1$s. Credentials and mail content are sent unprotected.', $this->sServer);
 		}
 
 		// The IMAP engine instantiates the "debug" logger itself (with no constructor arguments), so hand

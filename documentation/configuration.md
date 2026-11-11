@@ -45,6 +45,7 @@ ssl
 
 * `ssl` or `tls` (STARTTLS) enables encryption. Without one of them, credentials and mail content are sent unprotected (a warning is logged).
 * The server certificate is validated. Only add `novalidate-cert` if the server uses a self-signed or otherwise untrusted certificate, and be aware this exposes credentials and mail content to man-in-the-middle attacks.
+* Only `ssl`, `tls`, `novalidate-cert` and `validate-cert` are interpreted (the names come from the flags of PHP's `imap_open`). `imap` is accepted but has no effect. Any other line is ignored and a trace line is written to `mailtoticket.log`.
 * Existing mailboxes keep their stored options. Mailboxes that still contain `novalidate-cert` continue to skip certificate validation until the line is removed.
 
 ### Office 365 / OAuth 2.0

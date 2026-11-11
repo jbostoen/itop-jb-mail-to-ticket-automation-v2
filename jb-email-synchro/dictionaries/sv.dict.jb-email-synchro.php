@@ -42,7 +42,7 @@ Dict::Add('SV SV', 'Swedish', 'Svenska', array(
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Ja',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Nej',
 	'Class:MailInboxBase/Attribute:imap_options' => 'IMAP-inställningar',
-	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP-inställningar kan anges rad för rad. De behandlas i den ordningen.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP-alternativ, ett per rad. Vanliga alternativ: "ssl" (krypterad anslutning), "tls" (STARTTLS) och "novalidate-cert" (validera inte serverns certifikat). Utan "ssl" eller "tls" skickas inloggningsuppgifter och e-postinnehåll oskyddat. Använd bara "novalidate-cert" för en server med självsignerat eller på annat sätt obetrott certifikat: inloggningsuppgifter och e-postinnehåll är då utsatta för man-in-the-middle-attacker. Standard: "imap" och "ssl".',
 	'Class:MailInboxBase/Attribute:disable_authenticator' => 'Inaktivera autentisering',
 	'Class:MailInboxBase/Attribute:disable_authenticator+' => 'I den äldre implementeringen är det möjligt att inaktivera vissa autentiseringsmekanismer. Lämna vanligtvis detta tomt.',
 	'Class:MailInboxBase/Attribute:disable_authenticator/Value:GSSAPI' => 'GSSAPI',

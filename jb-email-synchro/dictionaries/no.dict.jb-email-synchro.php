@@ -184,4 +184,5 @@ Dict::Add('NO NO', 'Norwegian', 'Norsk', array(
 	'MailProcessingEvent:Placeholder:StepInfo' => 'Trinnet: identifikator, klasse og prioritet.',
 	'MailProcessingEvent:Placeholder:Behavior' => 'Policyens konfigurerte oppførsel.',
 	'MailProcessingEvent:Placeholder:AuthenticationStates' => 'SPF/DKIM-resultatene, for eksempel spf=softfail, dkim=pass.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP-alternativer, ett per linje. Vanlige alternativer: "ssl" (kryptert tilkobling), "tls" (STARTTLS) og "novalidate-cert" (ikke valider serverens sertifikat). Uten "ssl" eller "tls" sendes påloggingsinformasjon og e-postinnhold ubeskyttet. Bruk bare "novalidate-cert" for en server med selvsignert eller på annen måte ikke-klarert sertifikat: påloggingsinformasjon og e-postinnhold er da utsatt for man-in-the-middle-angrep. Standard: "imap" og "ssl".',
 ));
