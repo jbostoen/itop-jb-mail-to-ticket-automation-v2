@@ -20,6 +20,7 @@ use JeffreyBostoenExtensions\MailToTicket\{
 
 // iTop internals.
 use SetupUtils;
+use utils;
 
 
 /**
@@ -144,9 +145,19 @@ abstract class AttachmentCriteria extends Base {
 							// Image too large?
 							if($bDoCheckIfImageDimensionTooLarge && ($iWidth > $iEffectiveMaxWidth || $iHeight > $iEffectiveMaxHeight)) {
 
-								// Resize
-								static::Trace('Resize image (dimensions too large).');
-								$aAttachment = static::ResizeImageToFit($aAttachment, $iWidth, $iHeight, $iEffectiveMaxWidth, $iEffectiveMaxHeight);
+								if(static::HasMemoryToResize($iWidth, $iHeight)) {
+
+									// Resize
+									static::Trace('Resize image (dimensions too large).');
+									$aAttachment = static::ResizeImageToFit($aAttachment, $iWidth, $iHeight, $iEffectiveMaxWidth, $iEffectiveMaxHeight);
+
+								}
+								else {
+
+									// Decoding would exceed the memory limit, which is a fatal error that can not be caught and would block every run.
+									static::Trace('Not enough memory to resize this image (%1$sx%2$s). The original image will be used.', $iWidth, $iHeight);
+
+								}
 
 							}
 						
@@ -183,6 +194,35 @@ abstract class AttachmentCriteria extends Base {
 	
 
 	
+	/**
+	 * Checks whether an image of the given dimensions can be decoded and resized without exceeding PHP's memory limit.
+	 *
+	 * @param int $iWidth Image width (pixels).
+	 * @param int $iHeight Image height (pixels).
+	 *
+	 * @return bool True if there is enough memory (or no limit).
+	 */
+	public static function HasMemoryToResize(int $iWidth, int $iHeight) : bool {
+
+		$sLimit = (string) ini_get('memory_limit');
+
+		if($sLimit === '' || $sLimit === '-1') {
+			return true;
+		}
+
+		$iLimit = (int) utils::ConvertToBytes($sLimit);
+
+		if($iLimit <= 0) {
+			return true;
+		}
+
+		// - GD keeps 4 bytes per pixel for the decoded image. The factor 2 leaves room for the resized copy and for overhead.
+		$iRequired = $iWidth * $iHeight * 4 * 2;
+
+		return (memory_get_usage(true) + $iRequired) < $iLimit;
+
+	}
+
 	/*
 	 * Resize an image attachment so that it fits in the given dimensions.
 	 *
