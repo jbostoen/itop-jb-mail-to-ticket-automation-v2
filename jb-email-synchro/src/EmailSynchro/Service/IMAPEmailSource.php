@@ -94,9 +94,19 @@ class IMAPEmailSource extends EmailSource {
 			'debug' => static::CONFIG_DEBUG_LOGGER,
 		];
 
-		if(in_array('validate_cert', $aImapOptions)) {
+		// - The certificate is validated unless explicitly disabled ("novalidate-cert"). Without validation, credentials and mail content are exposed to man-in-the-middle attacks.
+		//   "validate_cert" is still accepted, but redundant.
+		if(in_array('novalidate-cert', $aImapOptions) && !in_array('validate_cert', $aImapOptions)) {
+			IssueLog::Warning("IMAPEmailSource - SSL certificate validation is disabled for $this->sServer", static::LOG_CHANNEL);
+			$aOptions['validate_cert'] = false;
+		}
+		else {
 			IssueLog::Debug("IMAPEmailSource - SSL certificate validation enabled", static::LOG_CHANNEL);
 			$aOptions['validate_cert'] = true;
+		}
+
+		if($sSSL === null) {
+			IssueLog::Warning("IMAPEmailSource - No encryption (ssl or tls) configured for $this->sServer. Credentials and mail content are sent unprotected.", static::LOG_CHANNEL);
 		}
 
 		// The IMAP engine instantiates the "debug" logger itself (with no constructor arguments), so hand

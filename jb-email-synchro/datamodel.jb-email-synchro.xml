@@ -86,8 +86,7 @@
 					<sql>imap_options</sql>
 					<default_value>
 						<![CDATA[imap
-ssl
-novalidate-cert]]></default_value>
+ssl]]></default_value>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
 				<field id="disable_authenticator" xsi:type="AttributeEnumSet">

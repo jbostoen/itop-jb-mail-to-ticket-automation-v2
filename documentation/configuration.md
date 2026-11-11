@@ -36,13 +36,16 @@ Mind that especially when processing lots of new e-mails, it may be important to
 
 ### IMAP options
 
-By default, it will usually look like this:
+By default, it will look like this:
 
 ```
 imap
 ssl
-novalidate-cert
 ```
+
+* `ssl` or `tls` (STARTTLS) enables encryption. Without one of them, credentials and mail content are sent unprotected (a warning is logged).
+* The server certificate is validated. Only add `novalidate-cert` if the server uses a self-signed or otherwise untrusted certificate, and be aware this exposes credentials and mail content to man-in-the-middle attacks.
+* Existing mailboxes keep their stored options. Mailboxes that still contain `novalidate-cert` continue to skip certificate validation until the line is removed.
 
 ### Office 365 / OAuth 2.0
 
