@@ -7,7 +7,7 @@ use JeffreyBostoenExtensions\MailToTicket\Events;
 
 SetupWebPage::AddModule(
 	__FILE__, // Path to the current file, all other file names are relative to the directory containing this file
-	'jb-email-synchro/3.2.261023',
+	'jb-email-synchro/3.2.261111',
 	array(
 		// Identification
 		'label' => 'Mail to Ticket Automation (core)',
@@ -129,6 +129,68 @@ if (!class_exists('EmailSynchroInstaller')) {
 		}
 		
 		/**
+		 * Converts the former free text "imap_options" of every mailbox to the "encryption" and "validate_cert" settings.
+		 * The behavior that was effective before the upgrade is preserved: the server certificate was always validated
+		 * (the "novalidate-cert" line was never interpreted), "ssl" meant implicit TLS, "tls" meant STARTTLS and
+		 * anything else meant no encryption.
+		 *
+		 * @return void
+		 */
+		protected static function MigrateImapOptions() : void {
+
+			try {
+
+				$sTable = MetaModel::DBGetTable('MailInboxBase');
+				$sKeyColumn = MetaModel::DBGetKey('MailInboxBase');
+
+				// - The attribute no longer exists in the datamodel, but the column is kept by the setup.
+
+				$oColumns = CMDBSource::Query('SHOW COLUMNS FROM `'.$sTable.'` LIKE '.CMDBSource::Quote('imap_options'));
+				if(CMDBSource::NbRows($oColumns) === 0) {
+					return;
+				}
+
+				$aStoredOptions = [];
+				$oRows = CMDBSource::Query('SELECT `'.$sKeyColumn.'` AS id, `imap_options` AS stored_options FROM `'.$sTable.'`');
+				while($aRow = CMDBSource::FetchArray($oRows)) {
+					$aStoredOptions[(int) $aRow['id']] = (string) $aRow['stored_options'];
+				}
+
+				$oSet = new DBObjectSet(new DBObjectSearch('MailInboxBase'));
+				while($oInbox = $oSet->Fetch()) {
+
+					$aOptions = array_filter(array_map(fn($sLine) => strtolower(trim($sLine)), preg_split('/\R/', $aStoredOptions[(int) $oInbox->GetKey()] ?? '')), fn($sLine) => $sLine !== '');
+
+					$sEncryption = match(true) {
+						in_array('ssl', $aOptions, true) => 'ssl',
+						in_array('tls', $aOptions, true) => 'starttls',
+						default => 'none',
+					};
+
+					$oInbox->Set('encryption', $sEncryption);
+					$oInbox->Set('validate_cert', 'yes');
+					$oInbox->DBUpdate();
+
+					SetupLog::Info('Mail to Ticket Automation: mailbox '.$oInbox->GetKey().': encryption set to "'.$sEncryption.'", certificate validation enabled.');
+
+					if(in_array('novalidate-cert', $aOptions, true)) {
+						SetupLog::Warning('Mail to Ticket Automation: mailbox '.$oInbox->GetKey().' had "novalidate-cert", which was never applied: the certificate was already validated. Disable "Validate certificate" on the mailbox if the server certificate is untrusted.');
+					}
+
+					if($sEncryption === 'none') {
+						SetupLog::Warning('Mail to Ticket Automation: mailbox '.$oInbox->GetKey().' has no encryption configured.');
+					}
+
+				}
+
+			}
+			catch(Exception $e) {
+				SetupLog::Error('Mail to Ticket Automation: unable to migrate the IMAP options: '.$e->getMessage());
+			}
+
+		}
+
+		/**
 		 * Handler called after the creation/update of the database schema
 		 * @param $oConfiguration Config The new configuration of the application
 		 * @param $sPreviousVersion string Previous version number of the module (empty string in case of first install)
@@ -145,6 +207,12 @@ if (!class_exists('EmailSynchroInstaller')) {
 				catch(Exception $e) {
 					SetupLog::Error('Mail to Ticket Automation: unable to create the MailProcessingEvent objects: '.$e->getMessage());
 				}
+
+			// - The IMAP options were replaced by dedicated settings.
+
+			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '3.2.261111', '<')) {
+				static::MigrateImapOptions();
+			}
 
 			if($sPreviousVersion == '' || version_compare($sPreviousVersion, '3.2.241105', '>')) {
 
@@ -168,9 +236,6 @@ if (!class_exists('EmailSynchroInstaller')) {
 
 			if($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.201029', '<=')) {
 				
-				// 2020-10-29: IMAP options were moved to individual mailbox settings and will always be prefilled
-				$bUpgradeOptionsIMAP = ($sPreviousVersion != '' && version_compare($sPreviousVersion, '2.6.201029', '<'));
-				
 				// Looping over inboxes to update the related email replicas.
 				$oSet->Rewind();
 				while($oInbox = $oSet->Fetch()) {
@@ -182,12 +247,6 @@ if (!class_exists('EmailSynchroInstaller')) {
 						AND $sMailboxPathColName IS NULL";
 					
 					$iRet = CMDBSource::Query($sUpdateQuery); // Throws an exception in case of error
-					
-					if($bUpgradeOptionsIMAP && trim((string) $oInbox->Get('imap_options')) === '') {
-						$aOptionsIMAP = MetaModel::GetModuleSetting('jb-email-synchro', 'imap_options', array('imap', 'ssl', 'novalidate-cert'));
-						$oInbox->Set('imap_options', implode(PHP_EOL, $aOptionsIMAP));
-						$oInbox->DBUpdate();
-					}
 					
 				}
 

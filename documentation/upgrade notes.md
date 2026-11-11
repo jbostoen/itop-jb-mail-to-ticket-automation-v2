@@ -8,6 +8,18 @@ Remove all e-mail messages that were already successfully processed from the mai
 Otherwise, it is possible in some situations that they are processed again.  
 This could result in duplicate tickets or log entries in existing tickets.
 
+## Upgrading from before 3.2.261111?
+
+The free text setting "IMAP options" is replaced by two settings: **Encryption** and **Validate certificate**.  
+The setting "Disable authenticator" is removed: it only applied to the legacy implementation.
+
+| Before ("IMAP options") | Now |
+|--------|-----|
+| Line `ssl` | Encryption "SSL/TLS" |
+| Line `tls` | Encryption "STARTTLS" |
+| Neither of both | Encryption "None" (a warning is written to the setup log) |
+| Line `novalidate-cert`, or no line | Validate certificate "Yes" |
+
 ## Upgrading from 3.2.261023 or earlier?
 
 The "bounce" behaviors of the policies are replaced by **triggers**. See [events and triggers](events%20and%20triggers.md).

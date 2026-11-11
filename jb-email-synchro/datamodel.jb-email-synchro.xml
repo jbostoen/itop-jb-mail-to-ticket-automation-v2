@@ -82,29 +82,26 @@
 					<default_value>yes</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
-				<field id="imap_options" xsi:type="AttributeText">
-					<sql>imap_options</sql>
-					<default_value>
-						<![CDATA[imap
-ssl
-novalidate-cert]]></default_value>
-					<is_null_allowed>true</is_null_allowed>
-				</field>
-				<field id="disable_authenticator" xsi:type="AttributeEnumSet">
+				<field id="encryption" xsi:type="AttributeEnum">
 					<values>
-						<value id="GSSAPI">
-							<code>GSSAPI</code>
+						<value id="ssl">
+							<code>ssl</code>
 						</value>
-						<value id="NTLM">
-							<code>NTLM</code>
+						<value id="starttls">
+							<code>starttls</code>
 						</value>
-						<value id="PLAIN">
-							<code>PLAIN</code>
+						<value id="none">
+							<code>none</code>
 						</value>
 					</values>
-					<sql>disable_authenticator</sql>
-					<default_value/>
-					<is_null_allowed>true</is_null_allowed>
+					<sql>encryption</sql>
+					<default_value>ssl</default_value>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
+				<field id="validate_cert" xsi:type="AttributeYesNo">
+					<sql>validate_cert</sql>
+					<default_value>yes</default_value>
+					<is_null_allowed>false</is_null_allowed>
 				</field>
 				<field id="folder_delimiter" xsi:type="AttributeString">
 					<sql>folder_delimiter</sql>
@@ -442,8 +439,11 @@ EOF
 						<item id="port">
 							<rank>60</rank>
 						</item>
-						<item id="imap_options">
+						<item id="encryption">
 							<rank>70</rank>
+						</item>
+						<item id="validate_cert">
+							<rank>75</rank>
 						</item>
 						<item id="folder_delimiter">
 							<rank>80</rank>

@@ -3,6 +3,7 @@
 namespace Combodo\iTop\Extension\EmailSynchro\Service;
 
 use JeffreyBostoenExtensions\MailToTicket\Helper;
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 
 use DirectoryTree\ImapEngine\Enums\ImapFetchIdentifier;
 use DirectoryTree\ImapEngine\FolderInterface;
@@ -76,27 +77,29 @@ class IMAPEmailSource extends EmailSource {
 		$this->sPassword = $this->sAccessToken ?? $oMailbox->Get('password');
 
 		IssueLog::Debug("IMAPEmailSource Start for $this->sServer", static::LOG_CHANNEL);
-		$aImapOptions = Helper::SplitByLine($oMailbox->Get('imap_options'));
-
-		$sSSL = match(true) {
-			in_array('ssl', $aImapOptions) => 'ssl',
-			in_array('tls', $aImapOptions) => 'starttls',
+		$sEncryption = match((string) $oMailbox->Get('encryption')) {
+			'ssl' => 'ssl',
+			'starttls' => 'starttls',
 			default => null,
 		};
+		$bValidateCert = $oMailbox->Get('validate_cert') === 'yes';
 
 		$aOptions = [
 			'port' => $this->iPort,
 			'username' => $this->sLogin,
 			'password' => $this->sPassword,
-			'encryption' => $sSSL,
+			'encryption' => $sEncryption,
+			'validate_cert' => $bValidateCert,
 			'authentication' => static::CONFIG_AUTHENTICATION,
 			'host' => $this->sServer,
 			'debug' => static::CONFIG_DEBUG_LOGGER,
 		];
 
-		if(in_array('validate_cert', $aImapOptions)) {
-			IssueLog::Debug("IMAPEmailSource - SSL certificate validation enabled", static::LOG_CHANNEL);
-			$aOptions['validate_cert'] = true;
+		if($sEncryption === null) {
+			ProcessingHelper::Trace('IMAPEmailSource - Warning: no encryption configured for %1$s. Credentials and mail content are sent unprotected.', $this->sServer);
+		}
+		elseif(!$bValidateCert) {
+			ProcessingHelper::Trace('IMAPEmailSource - Warning: certificate validation is disabled for %1$s. Credentials and mail content are exposed to man-in-the-middle attacks.', $this->sServer);
 		}
 
 		// The IMAP engine instantiates the "debug" logger itself (with no constructor arguments), so hand

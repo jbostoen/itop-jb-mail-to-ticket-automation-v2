@@ -804,10 +804,10 @@ EOF
 								<item id="mail_aliases">
 									<rank>100</rank>
 								</item>
-								<item id="imap_options">
+								<item id="encryption">
 									<rank>110</rank>
 								</item>
-								<item id="disable_authenticator">
+								<item id="validate_cert">
 									<rank>120</rank>
 								</item>
 								<item id="folder_delimiter">

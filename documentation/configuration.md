@@ -28,21 +28,11 @@ Mind that especially when processing lots of new e-mails, it may be important to
 * **Active** - Check mailbox.
 * **Debug trace** - Debug log.
 * **Mail Aliases** - One per line. Regex patterns allowed. List each email address (minimum 1)
-* **IMAP options** - One per line. Warning: overrides global (configuration file) IMAP options completely! Currently not available when using OAuth2.
-* **Disable authenticator** - Legacy implementation. Disable one or more authenticators: GSSAPI, NTLM, PLAIN. None specified by default. This may be necessary in rare use cases when Kerberos issues arise.
+* **Encryption** - How the connection to the server is secured: SSL/TLS (implicit TLS, usually port 993; default and recommended), STARTTLS (usually port 143) or none. Without encryption, credentials and mail content are sent unprotected.
+* **Validate certificate** - Validate the certificate of the server (default: yes). Only disable this for a server with a self-signed or otherwise untrusted certificate: credentials and mail content are then exposed to man-in-the-middle attacks. A warning is written to the log (mailtoticket.log) each time such a mailbox is processed.
 
 ## Hints
 
-
-### IMAP options
-
-By default, it will usually look like this:
-
-```
-imap
-ssl
-novalidate-cert
-```
 
 ### Office 365 / OAuth 2.0
 
@@ -69,19 +59,9 @@ Failed to initialize the mailbox: xxx@xxx.org. Reason: cannot change folder, may
 * Verify if the mailbox folder name is fully correct. It may appear with a different/localized name in Microsoft Outlook.
 
 
-### Office 365 with shared mailbox
+### Microsoft Office 365 (Exchange Online)
 
-* Option 1: Enable the account and set a password.
- 
-* Option 2: With the legacy implementation (non OAuth), it was possible to use these IMAP options:
-
-```
-imap
-ssl
-novalidate-cert
-authuser=some@mailbox.org
-user=shared@mailbox.org
-```
+Enable the account, and set a password if needed.
 
 ### GMail - enabling IMAP
 
