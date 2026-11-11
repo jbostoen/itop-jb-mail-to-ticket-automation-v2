@@ -159,22 +159,22 @@ class EmailMessage {
 		
 		// Completely remove the <head>...</head> tags, including their contents
 		$sStyleExpr = '|<head>(.*)</head>|iUs';
-		$sBodyText = preg_replace($sStyleExpr, '', $sText);
+		$sBodyText = $this->SafePregReplace($sStyleExpr, '', $sText);
 		
 		// Completely remove the <style>...</style> tags, including their contents
 		$sStyleExpr = '|<style>(.*)</style>|iUs';
-		$sBodyText = preg_replace($sStyleExpr, '', $sBodyText);
+		$sBodyText = $this->SafePregReplace($sStyleExpr, '', $sBodyText);
 		
 		// Preserve hyperlinks <pre>...</pre> tags
-		$sBodyText = preg_replace_callback('|<a([^>]*)>(.*)</a>|isU', array($this, 'AnchorsReplaceCallback'), $sBodyText);
+		$sBodyText = $this->SafePregReplace('|<a([^>]*)>(.*)</a>|isU', array($this, 'AnchorsReplaceCallback'), $sBodyText);
 		
 		// Preserve new lines inside <pre>...</pre> tags
-		$sBodyText = preg_replace_callback('|<pre>(.*)</pre>|isU', array($this, 'PregReplaceCallback'), $sBodyText);
+		$sBodyText = $this->SafePregReplace('|<pre>(.*)</pre>|isU', array($this, 'PregReplaceCallback'), $sBodyText);
 
 		// Process line breaks: remove carriage returns / line feeds that have no meaning in HTML => replace them by a plain space
 		$sBodyText = str_ireplace(array("\n", "\r"), ' ',$sBodyText);
 		// Replace <p...>...</p> and <br/> by a carriage return
-		$sBodyText = preg_replace('/<p[^>]*>/i', '', $sBodyText);
+		$sBodyText = $this->SafePregReplace('/<p[^>]*>/i', '', $sBodyText);
 		$sBodyText = str_ireplace(array('</br>', '<br/>', '<br>', '</p>'), self::NEW_LINE_MARKER, $sBodyText);
 		
 		// <tr> tags usually start a "new line"
@@ -188,7 +188,7 @@ class EmailMessage {
 		$sBodyText = html_entity_decode($sBodyText, ENT_QUOTES, 'UTF-8');
 		
 		// Remove consecutive line breaks
-		$sBodyText = preg_replace("/".self::NEW_LINE_MARKER."(".self::NEW_LINE_MARKER.")+/", self::NEW_LINE_MARKER, $sBodyText);
+		$sBodyText = $this->SafePregReplace("/".self::NEW_LINE_MARKER."(".self::NEW_LINE_MARKER.")+/", self::NEW_LINE_MARKER, $sBodyText);
 
 		// restore remaining line breaks
 		$sBodyText = str_replace(self::NEW_LINE_MARKER, "\n", $sBodyText);
@@ -196,6 +196,30 @@ class EmailMessage {
 		return trim($sBodyText, " \r\n\t".chr(0xC2).chr(0xA0)); // c2a0 is the UTF-8 non-breaking space character
 	}
 	
+	/**
+	 * Runs a regular expression replacement, but keeps the text as-is if the regular expression fails.
+	 * A crafted body (e.g. many unclosed tags) can exhaust the PCRE backtrack limit, in which case PHP returns null
+	 * and the whole message would be turned into an empty string.
+	 *
+	 * @param string $sPattern Pattern.
+	 * @param string|callable|array $mReplacement Replacement string, or a callback.
+	 * @param string $sSubject Text to process.
+	 *
+	 * @return string The processed text, or the original text if the regular expression failed.
+	 */
+	protected function SafePregReplace(string $sPattern, $mReplacement, string $sSubject) : string {
+
+		$sResult = !is_string($mReplacement) ? preg_replace_callback($sPattern, $mReplacement, $sSubject) : preg_replace($sPattern, $mReplacement, $sSubject);
+
+		if($sResult === null) {
+			$this->sTrace .= 'The pattern "'.$sPattern.'" failed (errCode = '.preg_last_error().'). The text is left unchanged.'."\n";
+			return $sSubject;
+		}
+
+		return $sResult;
+
+	}
+
 	/**
 	 * Function used with preg_replace_callback to replace the anchors/hyperlinks tags <a ...>...</a>
 	 * @param array $aMatches
@@ -377,7 +401,7 @@ class EmailMessage {
 		if($sBodyFormat == 'text/html') {
 			// In HTML the "quoted" text is supposed to be inside "<blockquote....>.....</blockquote>"
 			$this->sTrace .= 'Processing the HTML body (removing blockquotes)'."\n";
-			$sBodyText = preg_replace("|<blockquote.+</blockquote>|iUms", '', $sBodyText);
+			$sBodyText = $this->SafePregReplace("|<blockquote.+</blockquote>|iUms", '', $sBodyText);
 			$this->sTrace .= 'Converting the HTML body to plain text'."\n";
 			$sBodyText = $this->StripTags($sBodyText);
 		}
