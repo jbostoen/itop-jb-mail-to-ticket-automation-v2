@@ -649,6 +649,61 @@ name:Unknown caller]]></default_value>
 				</field>
 			</fields>
 			<methods>
+				<method id="DisplayBareProperties">
+					<comment>/**
+	 * Shows an introduction above each group (fieldset) of mailbox settings.
+	 * @see cmdbAbstractObject::DisplayBareProperties()
+	 */</comment>
+					<static>false</static>
+					<access>public</access>
+					<type>Overload-DBObject</type>
+					<code><![CDATA[
+						public function DisplayBareProperties(Combodo\iTop\Application\WebPage\WebPage $oPage, $bEditMode = false, $sPrefix = '', $aExtraParams = []) {
+
+							$aFieldsMap = parent::DisplayBareProperties($oPage, $bEditMode, $sPrefix, $aExtraParams);
+
+							// - Dictionary key of the group (the description is the same key with a "+" suffix) => first setting of the group.
+							//   The introduction is positioned above that setting. Groups without a description are skipped.
+							$aIntroductions = [
+								'MailInbox:Server' => 'server',
+								'MailInbox:StepAttachmentCriteria' => 'step_attachment_criteria_image_min_width',
+								'MailInbox:PolicySenderAuthentication' => 'policy_sender_authentication_behavior',
+								'MailInbox:PolicyMailSize' => 'policy_mail_size_too_big_behavior',
+								'MailInbox:PolicyAttachmentForbiddenMimeType' => 'policy_attachment_forbidden_mimetype_behavior',
+								'MailInbox:PolicyAttachmentIgnoredMimeType' => 'step_attachment_criteria_exclude_mimetypes',
+								'MailInbox:PolicyAutoReply' => 'policy_autoreply_behavior',
+								'MailInbox:PolicyNoSubject' => 'policy_no_subject_behavior',
+								'MailInbox:PolicyClosedTicket' => 'policy_ticket_closed_behavior',
+								'MailInbox:PolicyResolvedTicket' => 'policy_ticket_resolved_behavior',
+								'MailInbox:PolicyUnknownTicket' => 'policy_ticket_unknown_behavior',
+								'MailInbox:PolicyUnknownCaller' => 'policy_unknown_caller_behavior',
+								'MailInbox:PolicySenderEmailAddress' => 'policy_sender_email_address_behavior',
+								'MailInbox:PolicyOtherEmailCallerThanTicketCaller' => 'policy_other_email_caller_than_ticket_caller_behavior',
+								'MailInbox:PolicyNonDeliveryReport' => 'policy_non_delivery_report_behavior',
+								'MailInbox:StepUpdateCallerAttributes' => 'step_update_caller_attributes',
+								'MailInbox:PolicyOtherRecipients' => 'policy_other_recipients_behavior',
+								'MailInbox:PolicyUndesiredPattern' => 'policy_undesired_pattern_behavior',
+								'MailInbox:PolicyIgnorePattern' => 'title_pattern_ignore_patterns',
+								'MailInbox:PolicyRemovePattern' => 'policy_remove_pattern_behavior',
+							];
+
+							foreach($aIntroductions as $sDictKey => $sAttCode) {
+
+								$sHelpText = Dict::S($sDictKey.'+', '');
+
+								if($sHelpText === '' || !MetaModel::IsValidAttCode(get_class($this), $sAttCode)) {
+									continue;
+								}
+
+								JeffreyBostoenExtensions\Framework\HelpContainer::AddFullWidth($oPage, $this, $sAttCode, $sHelpText);
+
+							}
+
+							return $aFieldsMap;
+
+						}
+					]]></code>
+				</method>
 				<method id="DisplayBareRelations">
 					<comment>/**
 	 * Add an extra tab showing the debug trace
