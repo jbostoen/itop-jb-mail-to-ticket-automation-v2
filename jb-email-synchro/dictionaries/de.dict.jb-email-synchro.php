@@ -42,7 +42,7 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Ja',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Nein',
 	'Class:MailInboxBase/Attribute:imap_options' => 'IMAP-Optionen',
-	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP-Optionen können zeilenweise angegeben werden. Sie werden in dieser Reihenfolge verarbeitet.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP-Optionen, eine pro Zeile. Gängige Optionen: "ssl" (verschlüsselte Verbindung), "tls" (STARTTLS) und "novalidate-cert" (das Serverzertifikat nicht prüfen). Ohne "ssl" oder "tls" werden Zugangsdaten und Mailinhalte ungeschützt übertragen. "novalidate-cert" nur für einen Server mit selbstsigniertem oder anderweitig nicht vertrauenswürdigem Zertifikat verwenden: Zugangsdaten und Mailinhalte sind dann Man-in-the-Middle-Angriffen ausgesetzt. Standard: "imap" und "ssl".',
 	'Class:MailInboxBase/Attribute:disable_authenticator' => 'Authentifikator deaktivieren',
 	'Class:MailInboxBase/Attribute:disable_authenticator+' => 'In der Legacy-Implementierung ist es möglich, bestimmte Authentifizierungsmechanismen zu deaktivieren. In den meisten Fällen leer lassen.',
 	'Class:MailInboxBase/Attribute:disable_authenticator/Value:GSSAPI' => 'GSSAPI',

@@ -184,4 +184,5 @@ Dict::Add('SL SI', 'Slovenian', 'Slovenščina', array(
 	'MailProcessingEvent:Placeholder:StepInfo' => 'Korak: identifikator, razred in prednost.',
 	'MailProcessingEvent:Placeholder:Behavior' => 'Nastavljeno vedenje pravilnika.',
 	'MailProcessingEvent:Placeholder:AuthenticationStates' => 'Rezultati SPF/DKIM, na primer spf=softfail, dkim=pass.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'Možnosti IMAP, ena na vrstico. Običajne možnosti: "ssl" (šifrirana povezava), "tls" (STARTTLS) in "novalidate-cert" (ne preverjaj potrdila strežnika). Brez "ssl" ali "tls" se prijavni podatki in vsebina e-pošte pošiljajo nezaščiteno. Možnost "novalidate-cert" uporabite samo za strežnik s samopodpisanim ali drugače nezaupanja vrednim potrdilom: prijavni podatki in vsebina e-pošte so tako izpostavljeni napadom man-in-the-middle. Privzeto: "imap" in "ssl".',
 ));

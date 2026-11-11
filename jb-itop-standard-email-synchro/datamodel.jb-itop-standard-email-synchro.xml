@@ -649,6 +649,103 @@ name:Unknown caller]]></default_value>
 				</field>
 			</fields>
 			<methods>
+				<method id="DisplayBareProperties">
+					<comment>/**
+	 * Shows the description of each mailbox setting next to it, while editing.
+	 * @see cmdbAbstractObject::DisplayBareProperties()
+	 */</comment>
+					<static>false</static>
+					<access>public</access>
+					<type>Overload-DBObject</type>
+					<code><![CDATA[
+						public function DisplayBareProperties(Combodo\iTop\Application\WebPage\WebPage $oPage, $bEditMode = false, $sPrefix = '', $aExtraParams = []) {
+
+							$aFieldsMap = parent::DisplayBareProperties($oPage, $bEditMode, $sPrefix, $aExtraParams);
+
+							if($bEditMode) {
+
+								$sClass = get_class($this);
+
+								// - The IMAP options, and the settings on the "Settings" tab. Settings without a description (or an unknown attribute) are skipped.
+								$aAttCodes = [
+									'imap_options',
+									'step_attachment_criteria_image_min_width',
+									'step_attachment_criteria_image_max_width',
+									'step_attachment_criteria_image_min_height',
+									'step_attachment_criteria_image_max_height',
+									'policy_sender_authentication_behavior',
+									'policy_sender_authentication_failures',
+									'policy_mail_size_too_big_behavior',
+									'policy_mail_size_too_big_max_size_MB',
+									'policy_attachment_forbidden_mimetype_behavior',
+									'policy_attachment_forbidden_mimetype_mimetypes',
+									'step_attachment_criteria_exclude_mimetypes',
+									'policy_autoreply_behavior',
+									'policy_no_subject_behavior',
+									'policy_no_subject_default_value',
+									'policy_ticket_closed_behavior',
+									'policy_ticket_resolved_behavior',
+									'policy_ticket_unknown_behavior',
+									'policy_unknown_caller_behavior',
+									'policy_unknown_caller_default_values',
+									'policy_sender_email_address_behavior',
+									'policy_sender_email_address_patterns',
+									'policy_other_email_caller_than_ticket_caller_behavior',
+									'policy_non_delivery_report_behavior',
+									'policy_non_delivery_report_mark_caller_as_inactive',
+									'step_update_caller_attributes',
+									'policy_other_recipients_behavior',
+									'policy_other_recipients_default_values',
+									'policy_undesired_pattern_behavior',
+									'policy_undesired_pattern_patterns',
+									'title_pattern_ignore_patterns',
+									'policy_remove_pattern_behavior',
+									'policy_remove_pattern_patterns',
+								];
+
+								foreach($aAttCodes as $sAttCode) {
+
+									if(!MetaModel::IsValidAttCode($sClass, $sAttCode)) {
+										continue;
+									}
+
+									$sDictKey = 'Class:'.MetaModel::GetAttributeOrigin($sClass, $sAttCode).'/Attribute:'.$sAttCode;
+
+									if(Dict::S($sDictKey.'+', '') === '') {
+										continue;
+									}
+
+									// - The help container of an enum also lists the description of each value: only show it when all of them are available.
+									$oAttDef = MetaModel::GetAttributeDef($sClass, $sAttCode);
+
+									if($oAttDef instanceof AttributeEnum) {
+
+										$bComplete = true;
+
+										foreach(array_keys($oAttDef->GetAllowedValues()) as $sValue) {
+											if(Dict::S($sDictKey.'/Value:'.$sValue.'+', '') === '') {
+												$bComplete = false;
+												break;
+											}
+										}
+
+										if(!$bComplete) {
+											continue;
+										}
+
+									}
+
+									JeffreyBostoenExtensions\Framework\HelpContainer::AddForAttCode($oPage, $this, $sAttCode);
+
+								}
+
+							}
+
+							return $aFieldsMap;
+
+						}
+					]]></code>
+				</method>
 				<method id="DisplayBareRelations">
 					<comment>/**
 	 * Add an extra tab showing the debug trace

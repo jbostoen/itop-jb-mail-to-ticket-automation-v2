@@ -184,4 +184,5 @@ Dict::Add('SK SK', 'Slovak', 'Slovenčina', array(
 	'MailProcessingEvent:Placeholder:StepInfo' => 'Krok: identifikátor, trieda a priorita.',
 	'MailProcessingEvent:Placeholder:Behavior' => 'Nastavené správanie politiky.',
 	'MailProcessingEvent:Placeholder:AuthenticationStates' => 'Výsledky SPF/DKIM, napríklad spf=softfail, dkim=pass.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'Možnosti IMAP, jedna na riadok. Bežné možnosti: "ssl" (šifrované pripojenie), "tls" (STARTTLS) a "novalidate-cert" (neoverovať certifikát servera). Bez "ssl" alebo "tls" sa prihlasovacie údaje a obsah e-mailov odosielajú nechránene. Možnosť "novalidate-cert" používajte iba pre server s certifikátom podpísaným sebou samým alebo inak nedôveryhodným: prihlasovacie údaje a obsah e-mailov sú potom vystavené útokom typu man-in-the-middle. Predvolené: "imap" a "ssl".',
 ));

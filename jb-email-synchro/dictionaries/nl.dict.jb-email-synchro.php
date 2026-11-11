@@ -42,7 +42,7 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Ja',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Nee',
 	'Class:MailInboxBase/Attribute:imap_options' => 'IMAP-opties',
-	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP-opties kunnen regel per regel worden opgegeven. Ze worden in die volgorde verwerkt.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP-opties, één per regel. Gangbare opties: "ssl" (versleutelde verbinding), "tls" (STARTTLS) en "novalidate-cert" (het servercertificaat niet valideren). Zonder "ssl" of "tls" worden aanmeldgegevens en mailinhoud onbeveiligd verstuurd. Gebruik "novalidate-cert" alleen voor een server met een zelfondertekend of anderszins niet-vertrouwd certificaat: aanmeldgegevens en mailinhoud zijn dan blootgesteld aan man-in-the-middle-aanvallen. Standaard: "imap" en "ssl".',
 	'Class:MailInboxBase/Attribute:disable_authenticator' => 'Authenticator uitschakelen',
 	'Class:MailInboxBase/Attribute:disable_authenticator+' => 'In de legacy-implementatie is het mogelijk bepaalde authenticatiemechanismen uit te schakelen. Laat dit in de meeste gevallen leeg.',
 	'Class:MailInboxBase/Attribute:disable_authenticator/Value:GSSAPI' => 'GSSAPI',

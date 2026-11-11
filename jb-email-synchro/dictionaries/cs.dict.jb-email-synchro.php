@@ -42,7 +42,7 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Ano',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Ne',
 	'Class:MailInboxBase/Attribute:imap_options' => 'Možnosti IMAP',
-	'Class:MailInboxBase/Attribute:imap_options+' => 'Možnosti IMAP lze zadat řádek po řádku. Zpracovávají se v tomto pořadí.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'Možnosti IMAP, jedna na řádek. Běžné možnosti: "ssl" (šifrované připojení), "tls" (STARTTLS) a "novalidate-cert" (neověřovat certifikát serveru). Bez "ssl" nebo "tls" se přihlašovací údaje a obsah e-mailů odesílají nechráněně. Možnost "novalidate-cert" používejte pouze pro server s certifikátem podepsaným svým držitelem nebo jinak nedůvěryhodným: přihlašovací údaje a obsah e-mailů jsou pak vystaveny útokům typu man-in-the-middle. Výchozí: "imap" a "ssl".',
 	'Class:MailInboxBase/Attribute:disable_authenticator' => 'Zakázat autentizátor',
 	'Class:MailInboxBase/Attribute:disable_authenticator+' => 'Ve starší implementaci je možné zakázat určité mechanismy ověřování. Ve většině případů ponechte prázdné.',
 	'Class:MailInboxBase/Attribute:disable_authenticator/Value:GSSAPI' => 'GSSAPI',

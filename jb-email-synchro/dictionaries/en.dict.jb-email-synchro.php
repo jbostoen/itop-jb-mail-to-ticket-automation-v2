@@ -42,7 +42,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Yes',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'No',
 	'Class:MailInboxBase/Attribute:imap_options' => 'IMAP options',
-	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP options can be specified, line by line. They are processed in that order.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP options, one per line. Common options: "ssl" (encrypted connection), "tls" (STARTTLS) and "novalidate-cert" (do not validate the server certificate). Without "ssl" or "tls", credentials and mail content are sent unprotected. Only use "novalidate-cert" for a server with a self-signed or otherwise untrusted certificate: credentials and mail content are then exposed to man-in-the-middle attacks. Default: "imap" and "ssl".',
 	'Class:MailInboxBase/Attribute:disable_authenticator' => 'Disable authenticator',
 	'Class:MailInboxBase/Attribute:disable_authenticator+' => 'In the legacy implementation, it is possible to disable certain authentication mechanisms. In most cases, leave this empty.',
 	'Class:MailInboxBase/Attribute:disable_authenticator/Value:GSSAPI' => 'GSSAPI',

@@ -184,4 +184,5 @@ Dict::Add('PL PL', 'Polish', 'Polski', array(
 	'MailProcessingEvent:Placeholder:StepInfo' => 'Etap: identyfikator, klasa i kolejność.',
 	'MailProcessingEvent:Placeholder:Behavior' => 'Skonfigurowane zachowanie polityki.',
 	'MailProcessingEvent:Placeholder:AuthenticationStates' => 'Wyniki SPF/DKIM, na przykład spf=softfail, dkim=pass.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'Opcje IMAP, po jednej w wierszu. Typowe opcje: "ssl" (połączenie szyfrowane), "tls" (STARTTLS) i "novalidate-cert" (nie sprawdzaj certyfikatu serwera). Bez "ssl" lub "tls" dane logowania i treść wiadomości są wysyłane bez ochrony. Opcji "novalidate-cert" używaj tylko dla serwera z certyfikatem z podpisem własnym lub w inny sposób niezaufanym: dane logowania i treść wiadomości są wtedy narażone na ataki typu man-in-the-middle. Domyślnie: "imap" i "ssl".',
 ));

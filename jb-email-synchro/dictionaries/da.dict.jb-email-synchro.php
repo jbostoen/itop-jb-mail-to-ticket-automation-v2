@@ -42,7 +42,7 @@ Dict::Add('DA DA', 'Danish', 'Dansk', array(
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Ja',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Nej',
 	'Class:MailInboxBase/Attribute:imap_options' => 'IMAP-indstillinger',
-	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP-indstillinger kan angives linje for linje. De behandles i den rækkefølge.',
+	'Class:MailInboxBase/Attribute:imap_options+' => 'IMAP-indstillinger, én pr. linje. Almindelige indstillinger: "ssl" (krypteret forbindelse), "tls" (STARTTLS) og "novalidate-cert" (valider ikke serverens certifikat). Uden "ssl" eller "tls" sendes loginoplysninger og mailindhold ubeskyttet. Brug kun "novalidate-cert" til en server med et selvsigneret eller på anden måde ikke-betroet certifikat: loginoplysninger og mailindhold er så udsat for man-in-the-middle-angreb. Standard: "imap" og "ssl".',
 	'Class:MailInboxBase/Attribute:disable_authenticator' => 'Deaktiver autentificering',
 	'Class:MailInboxBase/Attribute:disable_authenticator+' => 'I den ældre implementering er det muligt at deaktivere visse autentificeringsmekanismer. Lad som regel dette felt være tomt.',
 	'Class:MailInboxBase/Attribute:disable_authenticator/Value:GSSAPI' => 'GSSAPI',
