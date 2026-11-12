@@ -65,6 +65,7 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Vzor, který se má hledat v předmětu',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Vzor názvu',
 	'Class:MailInboxStandard/Attribute:title_pattern?' => 'Použijte syntaxi PCRE včetně počátečních a koncových oddělovačů, abyste určili, jak vypadá odkaz na tiket (vzor), aby bylo možné e-maily propojit s tikety.',
+	'MailInbox:TitlePatternWarning' => 'Spoléhejte pouze na vzor, který odpovídá náhodnému, neuhodnutelnému identifikátoru: kdokoli, kdo může poslat e-mail do této schránky a uhodne odpovídající odkaz, může do tiketu přidat zprávu. Sekvenční odkaz, například R-123456, je předvídatelný.',
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignorovat vzory v předmětu (regulární výrazy, jeden na řádek)',
 

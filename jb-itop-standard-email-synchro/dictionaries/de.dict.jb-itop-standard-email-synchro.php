@@ -65,6 +65,7 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Im Betreff zu suchendes Muster',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Titelmuster',
 	'Class:MailInboxStandard/Attribute:title_pattern?' => 'Verwenden Sie PCRE-Syntax einschließlich Start- und End-Trennzeichen, um festzulegen, wie die Ticketreferenz (Muster) aussieht, damit E-Mails mit Tickets verknüpft werden können.',
+	'MailInbox:TitlePatternWarning' => 'Verlassen Sie sich nur auf ein Muster, das einer zufälligen, nicht erratbaren Kennung entspricht: Wer eine E-Mail an dieses Postfach senden kann und eine passende Referenz errät, kann dem Ticket eine Nachricht hinzufügen. Eine fortlaufende Referenz wie R-123456 ist vorhersehbar.',
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Muster im Betreff ignorieren (reguläre Ausdrücke, einer pro Zeile)',
 

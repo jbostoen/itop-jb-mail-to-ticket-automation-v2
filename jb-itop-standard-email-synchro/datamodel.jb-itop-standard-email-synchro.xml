@@ -699,6 +699,22 @@ name:Unknown caller]]></default_value>
 
 							}
 
+							// - A warning near the title pattern: replies are linked to a ticket by this pattern, without verifying the sender.
+							$sTitlePatternWarning = Dict::S('MailInbox:TitlePatternWarning', '');
+
+							if($sTitlePatternWarning !== '') {
+
+								JeffreyBostoenExtensions\Framework\HelpContainer::Add(
+									$oPage,
+									'jb-framework',
+									'HelpContainer.html',
+									sprintf('[data-object-class="%1$s"][data-object-id="%2$s"] [data-role="ibo-field"][data-attribute-code="title_pattern"]', get_class($this), $this->GetKey()),
+									JeffreyBostoenExtensions\Framework\eContainerPosition::After,
+									['sHelpText' => $sTitlePatternWarning]
+								);
+
+							}
+
 							return $aFieldsMap;
 
 						}

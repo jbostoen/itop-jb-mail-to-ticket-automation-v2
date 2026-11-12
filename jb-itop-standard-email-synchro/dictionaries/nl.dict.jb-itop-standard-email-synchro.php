@@ -65,6 +65,7 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Patroon om te zoeken in het onderwerp',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Titelpatroon',
 	'Class:MailInboxStandard/Attribute:title_pattern?' => 'Gebruik PCRE-syntaxis, inclusief begin- en eindafbakeningen, om aan te geven hoe de ticketreferentie (patroon) eruitziet, zodat e-mails aan tickets kunnen worden gekoppeld.',
+	'MailInbox:TitlePatternWarning' => 'Vertrouw alleen op een patroon dat overeenkomt met een willekeurige, onvoorspelbare identificatie: iedereen die een e-mail naar deze mailbox kan sturen en een passende referentie raadt, kan een bericht aan dat ticket toevoegen. Een opeenvolgende referentie zoals R-123456 is voorspelbaar.',
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Patronen negeren in het onderwerp (reguliere expressies, één per regel)',
 

@@ -65,6 +65,7 @@ Dict::Add('DA DA', 'Danish', 'Dansk', array(
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Mønster, der skal matches i emnet',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Titelmønster',
 	'Class:MailInboxStandard/Attribute:title_pattern?' => 'Brug PCRE-syntaks, inklusive start- og slutafgrænsere, for at angive hvordan sagsreferencen (mønsteret) ser ud, så e-mails kan knyttes til sager.',
+	'MailInbox:TitlePatternWarning' => 'Stol kun på et mønster, der matcher en tilfældig identifikator, som ikke kan gættes: enhver, der kan sende en e-mail til denne postkasse og gætter en matchende reference, kan tilføje en besked til sagen. En fortløbende reference som R-123456 er forudsigelig.',
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignorer mønstre i emnet (regex-mønstre, ét pr. linje)',
 

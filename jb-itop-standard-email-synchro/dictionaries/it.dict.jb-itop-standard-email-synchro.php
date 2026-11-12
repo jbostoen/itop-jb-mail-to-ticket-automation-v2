@@ -65,6 +65,7 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Pattern da cercare nell\'oggetto',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Pattern del titolo',
 	'Class:MailInboxStandard/Attribute:title_pattern?' => 'Usare la sintassi PCRE, inclusi i delimitatori di inizio e fine, per specificare l\'aspetto del riferimento al ticket (pattern), in modo che le e-mail possano essere collegate ai ticket.',
+	'MailInbox:TitlePatternWarning' => 'Affidarsi solo a un pattern che corrisponde a un identificativo casuale e non indovinabile: chiunque possa inviare un\'e-mail a questa casella e indovini un riferimento valido può aggiungere un messaggio al ticket. Un riferimento sequenziale come R-123456 è prevedibile.',
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignora pattern nell\'oggetto (pattern di espressione regolare, uno per riga)',
 

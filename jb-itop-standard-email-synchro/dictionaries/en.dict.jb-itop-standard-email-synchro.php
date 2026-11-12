@@ -67,6 +67,7 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Pattern to match in the subject',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Title Pattern',
 	'Class:MailInboxStandard/Attribute:title_pattern?' => 'Use PCRE syntax, including starting and ending delimiters to specify what the ticket reference (pattern) looks like so e-mails can be linked to tickets.',
+	'MailInbox:TitlePatternWarning' => 'Only rely on a pattern that matches a random, unguessable identifier: anyone who can send an e-mail to this mailbox and guesses a matching reference can add a message to that ticket. A sequential reference such as R-123456 is predictable.',
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignore patterns in subject (regex patterns, one per line)', 
 	

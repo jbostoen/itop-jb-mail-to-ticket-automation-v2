@@ -65,6 +65,7 @@ Dict::Add('ES CR', 'Spanish', 'Español, Castellano', array(
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Patrón a buscar en el asunto',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Patrón del título',
 	'Class:MailInboxStandard/Attribute:title_pattern?' => 'Use sintaxis PCRE, incluyendo los delimitadores de inicio y fin, para especificar el aspecto de la referencia del ticket (patrón), de modo que los correos puedan vincularse a los tickets.',
+	'MailInbox:TitlePatternWarning' => 'Confíe solo en un patrón que coincida con un identificador aleatorio e imposible de adivinar: cualquiera que pueda enviar un correo a este buzón y adivine una referencia válida puede añadir un mensaje al ticket. Una referencia secuencial como R-123456 es predecible.',
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignorar patrones en el asunto (patrones de expresión regular, uno por línea)',
 

@@ -65,6 +65,7 @@ Dict::Add('SV SV', 'Swedish', 'Svenska', array(
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Mönster att matcha i ämnet',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Titelmönster',
 	'Class:MailInboxStandard/Attribute:title_pattern?' => 'Använd PCRE-syntax, inklusive start- och slutavgränsare, för att ange hur ärendereferensen (mönstret) ser ut så att e-postmeddelanden kan kopplas till ärenden.',
+	'MailInbox:TitlePatternWarning' => 'Förlita dig bara på ett mönster som matchar en slumpmässig identifierare som inte går att gissa: den som kan skicka e-post till den här brevlådan och gissar en matchande referens kan lägga till ett meddelande i ärendet. En löpande referens som R-123456 är förutsägbar.',
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Ignorera mönster i ämnet (reguljära uttryck, ett per rad)',
 

@@ -67,6 +67,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:title_pattern+' => 'Expression régulière à rechercher dans l\'objet de l\'eMail',
 	'Class:MailInboxStandard/Attribute:title_pattern' => 'Recherche dans l\'objet du mail (RegExp)',
 	'Class:MailInboxStandard/Attribute:title_pattern?' => 'Utilisez la syntaxe PCRE avec les délimiteurs de début et de fin',
+	'MailInbox:TitlePatternWarning' => 'Ne vous fiez qu\'à un motif qui correspond à un identifiant aléatoire et impossible à deviner : toute personne pouvant envoyer un e-mail à cette boîte et devinant une référence valide peut ajouter un message à ce ticket. Une référence séquentielle comme R-123456 est prévisible.',
 
 	'Class:MailInboxStandard/Attribute:title_pattern_ignore_patterns' => 'Schémas à ignorer dans l\'objet (Schémas en exp. rég., un par ligne)',
 	
