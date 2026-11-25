@@ -116,7 +116,7 @@ Dict::Add('SV SV', 'Swedish', 'Svenska', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Uteslut MIME-typer',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Bilagor av dessa MIME-typer kommer inte att behandlas. Ange en per rad.',
 
-	// Avsändarautentisering (SPF/DKIM)
+	// Avsändarautentisering (SPF/DKIM/DMARC)
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Autentiseringsresultat som räknas som fel',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Resultat som rapporteras av den mottagande e-postservern (Authentication-Results) och där avsändaren inte litas på. Om något av dem upptäcks tillämpas det konfigurerade beteendet och inget senare steg litar på avsändarens adress (t.ex. för att hitta den som ringer). Gäller endast när denna princip inte är inaktiv.',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
@@ -124,6 +124,7 @@ Dict::Add('SV SV', 'Swedish', 'Svenska', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanent fel',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dmarc_fail' => 'DMARC: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Beteende vid överträdelse',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Radera meddelandet från brevlådan',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Gör ingenting',
@@ -271,8 +272,8 @@ Dict::Add('SV SV', 'Swedish', 'Svenska', array(
 	// Steg
 	'MailInbox:StepAttachmentCriteria' => 'Inbäddade e-postbilder',
 	'MailInbox:StepAttachmentCriteria+' => 'Regler för bilder i inkommande e-post: för små bilder (som logotyper i signaturer) ignoreras; för stora bilder ändras i storlek om php-gd finns.',
-	'MailInbox:PolicySenderAuthentication' => 'Avsändarautentisering (SPF/DKIM)',
-	'MailInbox:PolicySenderAuthentication+' => 'Misstror avsändare utifrån SPF- och DKIM-resultaten som den mottagande e-postservern rapporterar. Fungerar bara om servern lägger till en Authentication-Results-header.',
+	'MailInbox:PolicySenderAuthentication' => 'Avsändarautentisering (SPF/DKIM/DMARC)',
+	'MailInbox:PolicySenderAuthentication+' => 'Misstror avsändare utifrån SPF-, DKIM- och DMARC-resultaten som den mottagande e-postservern rapporterar. Fungerar bara om servern lägger till en Authentication-Results-header.',
 	'MailInbox:PolicyMailSize' => 'E-poststorlek',
 	'MailInbox:PolicyMailSize+' => 'Hanterar e-post (inklusive bilagor) som är större än maxstorleken.',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Bilaga - Förbjuden MIME-typ',

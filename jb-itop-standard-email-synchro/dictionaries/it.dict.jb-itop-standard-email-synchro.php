@@ -116,7 +116,7 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Escludi tipi MIME',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Gli allegati di questi tipi MIME non verranno elaborati. Specificarne uno per riga.',
 
-	// Autenticazione del mittente (SPF/DKIM)
+	// Autenticazione del mittente (SPF/DKIM/DMARC)
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Risultati di autenticazione considerati un errore',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Risultati segnalati dal server di posta ricevente (Authentication-Results) per cui il mittente non è considerato attendibile. Se ne viene rilevato uno, viene applicato il comportamento configurato e nessun passaggio successivo si fida dell\'indirizzo del mittente (ad es. per individuare il chiamante). Si applica solo se questa politica non è inattiva.',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
@@ -124,6 +124,7 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: errore permanente',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dmarc_fail' => 'DMARC: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Comportamento in caso di violazione',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Eliminare il messaggio dalla casella di posta',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Non fare nulla',
@@ -271,8 +272,8 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	// Passi
 	'MailInbox:StepAttachmentCriteria' => 'Immagini incorporate nell\'e-mail',
 	'MailInbox:StepAttachmentCriteria+' => 'Regole per le immagini nelle e-mail in arrivo: le immagini troppo piccole (come i loghi nelle firme) vengono ignorate; quelle troppo grandi vengono ridimensionate se php-gd è disponibile.',
-	'MailInbox:PolicySenderAuthentication' => 'Autenticazione del mittente (SPF/DKIM)',
-	'MailInbox:PolicySenderAuthentication+' => 'Diffida dei mittenti in base ai risultati SPF e DKIM segnalati dal server di posta ricevente. Funziona solo se tale server aggiunge un\'intestazione Authentication-Results.',
+	'MailInbox:PolicySenderAuthentication' => 'Autenticazione del mittente (SPF/DKIM/DMARC)',
+	'MailInbox:PolicySenderAuthentication+' => 'Diffida dei mittenti in base ai risultati SPF, DKIM e DMARC segnalati dal server di posta ricevente. Funziona solo se tale server aggiunge un\'intestazione Authentication-Results.',
 	'MailInbox:PolicyMailSize' => 'Dimensione dell\'e-mail',
 	'MailInbox:PolicyMailSize+' => 'Gestisce le e-mail (allegati inclusi) più grandi della dimensione massima.',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Allegato - Tipo MIME vietato',

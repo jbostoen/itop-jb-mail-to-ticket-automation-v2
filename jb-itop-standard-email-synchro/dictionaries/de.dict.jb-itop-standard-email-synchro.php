@@ -116,7 +116,7 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'MIME-Typen ausschließen',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Anhänge dieser MIME-Typen werden nicht verarbeitet. Geben Sie einen pro Zeile an.',
 
-	// Absenderauthentifizierung (SPF/DKIM)
+	// Absenderauthentifizierung (SPF/DKIM/DMARC)
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Als Fehler gewertete Authentifizierungsergebnisse',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Vom empfangenden Mailserver gemeldete Ergebnisse (Authentication-Results), bei denen dem Absender nicht vertraut wird. Wird eines davon erkannt, wird das konfigurierte Verhalten angewendet und kein späterer Schritt vertraut der Absenderadresse (z. B. zum Zuordnen des Anrufers). Gilt nur, wenn diese Richtlinie nicht inaktiv ist.',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
@@ -124,6 +124,7 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanenter Fehler',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dmarc_fail' => 'DMARC: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Verhalten bei Verstoß',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Die Nachricht aus dem Postfach löschen',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Nichts tun',
@@ -271,8 +272,8 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	// Schritte
 	'MailInbox:StepAttachmentCriteria' => 'Eingebettete E-Mail-Bilder',
 	'MailInbox:StepAttachmentCriteria+' => 'Regeln für Bilder in eingehenden E-Mails: zu kleine Bilder (z. B. Logos in Signaturen) werden ignoriert; zu große Bilder werden verkleinert, wenn php-gd verfügbar ist.',
-	'MailInbox:PolicySenderAuthentication' => 'Absenderauthentifizierung (SPF/DKIM)',
-	'MailInbox:PolicySenderAuthentication+' => 'Misstraut Absendern anhand der SPF- und DKIM-Ergebnisse, die der empfangende Mailserver meldet. Funktioniert nur, wenn dieser Server einen Authentication-Results-Header hinzufügt.',
+	'MailInbox:PolicySenderAuthentication' => 'Absenderauthentifizierung (SPF/DKIM/DMARC)',
+	'MailInbox:PolicySenderAuthentication+' => 'Misstraut Absendern anhand der SPF-, DKIM- und DMARC-Ergebnisse, die der empfangende Mailserver meldet. Funktioniert nur, wenn dieser Server einen Authentication-Results-Header hinzufügt.',
 	'MailInbox:PolicyMailSize' => 'E-Mail-Größe',
 	'MailInbox:PolicyMailSize+' => 'Behandelt E-Mails (einschließlich Anhängen), die größer als die maximale Größe sind.',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Anhang - Verbotener MIME-Typ',

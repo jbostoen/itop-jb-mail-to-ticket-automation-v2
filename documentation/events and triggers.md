@@ -236,7 +236,7 @@ For the events of a step, and the policy events (a step detected the case).
 |-------------|-------------|
 | `$step->id$`, `$step->class$`, `$step->precedence$` | The step: identifier, class and precedence. Applies to every step. |
 | `$step_details->behavior$` | The configured behavior. Only for policy events. |
-| `$step_details->authentication_states$` | The SPF/DKIM results (e.g. `spf=softfail, dkim=pass`). Only for the event *sender authentication violation*. |
+| `$step_details->authentication_states$` | The SPF/DKIM/DMARC results (e.g. `spf=softfail, dkim=pass`). Only for the event *sender authentication violation*. |
 
 ### The outcome
 
@@ -264,7 +264,7 @@ An e-mail action without a "To" recipient is not sent (Cc and Bcc are ignored th
 
 ## Sender authentication
 
-The sender of a message that fails the SPF/DKIM check may be spoofed, so a reply can reach someone who sent nothing (backscatter).  
+The sender of a message that fails the SPF/DKIM/DMARC check may be spoofed, so a reply can reach someone who sent nothing (backscatter).  
 The event `policy_sender_authentication_violation` has `$step_details->authentication_states$` (e.g. `spf=softfail, dkim=pass`).  
 An internal alert is usually a better choice than a reply to the sender.
 

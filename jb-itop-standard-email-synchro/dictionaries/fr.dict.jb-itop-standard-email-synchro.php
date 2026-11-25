@@ -117,7 +117,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Exclure les types MIME',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Les pièces jointes de ces types MIME ne seront pas traitées. Une par ligne.',
 	
-	// Authentification de l'expéditeur (SPF/DKIM)
+	// Authentification de l'expéditeur (SPF/DKIM/DMARC)
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Résultats d\'authentification considérés comme un échec',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Résultats signalés par le serveur de messagerie destinataire (Authentication-Results) pour lesquels l\'expéditeur n\'est pas considéré comme fiable. Si l\'un d\'eux est détecté, le comportement configuré est appliqué et aucune étape suivante ne fait confiance à l\'adresse de l\'expéditeur (par ex. pour identifier l\'appelant). S\'applique uniquement si cette politique n\'est pas inactive.',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
@@ -125,6 +125,7 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM : erreur permanente',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dmarc_fail' => 'DMARC : fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Comportement en cas d\'infraction',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Supprimer',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Ne rien faire',
@@ -259,8 +260,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	// Steps
 	'MailInbox:StepAttachmentCriteria' => 'Pièce jointe - criteria',
 	'MailInbox:StepAttachmentCriteria+' => 'Règles pour les images des e-mails entrants : les images trop petites (comme les logos de signature) sont ignorées ; les images trop grandes sont redimensionnées si php-gd est disponible.',
-	'MailInbox:PolicySenderAuthentication' => 'Authentification de l\'expéditeur (SPF/DKIM)',
-	'MailInbox:PolicySenderAuthentication+' => 'Se méfie des expéditeurs selon les résultats SPF et DKIM signalés par le serveur de messagerie destinataire. Ne fonctionne que si ce serveur ajoute un en-tête Authentication-Results.',
+	'MailInbox:PolicySenderAuthentication' => 'Authentification de l\'expéditeur (SPF/DKIM/DMARC)',
+	'MailInbox:PolicySenderAuthentication+' => 'Se méfie des expéditeurs selon les résultats SPF, DKIM et DMARC signalés par le serveur de messagerie destinataire. Ne fonctionne que si ce serveur ajoute un en-tête Authentication-Results.',
 	'MailInbox:PolicyMailSize' => 'Taille de l\'email',
 	'MailInbox:PolicyMailSize+' => 'Traite les e-mails (pièces jointes comprises) dépassant la taille maximale.',
 	'MailInbox:PolicyAttachmentIgnoredMimeType' => 'Pièce jointe - type MIME ignoré',

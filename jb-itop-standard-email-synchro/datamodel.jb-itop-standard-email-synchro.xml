@@ -188,7 +188,7 @@ status:assigned]]></default_value>
 					<is_null_allowed>true</is_null_allowed>
 				</field>
 				<!-- All policy options -->
-				<!-- Sender authentication (SPF/DKIM) -->
+				<!-- Sender authentication (SPF/DKIM/DMARC) -->
 				<!-- Replying to the sender is a deliberate choice (trigger): this step runs before AutoReply/NonDeliveryReport detection,
 					 so a reply to a message that failed sender authentication and turns out to be an auto-reply or NDR risks a mail loop. -->
 				<field id="policy_sender_authentication_failures" xsi:type="AttributeEnumSet">
@@ -207,6 +207,9 @@ status:assigned]]></default_value>
 						</value>
 						<value id="dkim_permerror">
 							<code>dkim_permerror</code>
+						</value>
+						<value id="dmarc_fail">
+							<code>dmarc_fail</code>
 						</value>
 					</values>
 					<sql>policy_sender_authentication_failures</sql>
@@ -964,7 +967,7 @@ EOF
 										</item>
 									</items>
 								</item>
-								<!-- Sender authentication (SPF/DKIM) -->
+								<!-- Sender authentication (SPF/DKIM/DMARC) -->
 								<item id="fieldset:MailInbox:PolicySenderAuthentication">
 									<rank>115</rank>
 									<items>

@@ -116,7 +116,7 @@ Dict::Add('PT BR', 'Brazilian', 'Brazilian', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Excluir tipos MIME',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Os anexos destes tipos MIME não serão processados. Especifique um por linha.',
 
-	// Autenticação do remetente (SPF/DKIM)
+	// Autenticação do remetente (SPF/DKIM/DMARC)
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Resultados de autenticação considerados falha',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Resultados comunicados pelo servidor de correio recetor (Authentication-Results) pelos quais não se confia no remetente. Se algum for detetado, é aplicado o comportamento configurado e nenhum passo seguinte confia no endereço do remetente (p. ex. para identificar o requerente). Aplica-se apenas se esta política não estiver inativa.',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
@@ -124,6 +124,7 @@ Dict::Add('PT BR', 'Brazilian', 'Brazilian', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: erro permanente',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dmarc_fail' => 'DMARC: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Comportamento em caso de infração',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Eliminar a mensagem da caixa de correio',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Não fazer nada',
@@ -271,8 +272,8 @@ Dict::Add('PT BR', 'Brazilian', 'Brazilian', array(
 	// Passos
 	'MailInbox:StepAttachmentCriteria' => 'Imagens de e-mail incorporadas',
 	'MailInbox:StepAttachmentCriteria+' => 'Regras para imagens nos e-mails recebidos: imagens muito pequenas (como logotipos em assinaturas) são ignoradas; imagens muito grandes são redimensionadas se o php-gd estiver disponível.',
-	'MailInbox:PolicySenderAuthentication' => 'Autenticação do remetente (SPF/DKIM)',
-	'MailInbox:PolicySenderAuthentication+' => 'Desconfia dos remetentes com base nos resultados SPF e DKIM informados pelo servidor de e-mail receptor. Só funciona se esse servidor adicionar um cabeçalho Authentication-Results.',
+	'MailInbox:PolicySenderAuthentication' => 'Autenticação do remetente (SPF/DKIM/DMARC)',
+	'MailInbox:PolicySenderAuthentication+' => 'Desconfia dos remetentes com base nos resultados SPF, DKIM e DMARC informados pelo servidor de e-mail receptor. Só funciona se esse servidor adicionar um cabeçalho Authentication-Results.',
 	'MailInbox:PolicyMailSize' => 'Tamanho do e-mail',
 	'MailInbox:PolicyMailSize+' => 'Trata e-mails (incluindo anexos) maiores que o tamanho máximo.',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Anexo - Tipo MIME proibido',

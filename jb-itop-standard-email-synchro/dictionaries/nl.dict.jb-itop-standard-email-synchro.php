@@ -116,7 +116,7 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'MIME-types uitsluiten',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Bijlagen van deze MIME-types worden niet verwerkt. Geef er één per regel op.',
 
-	// Afzenderauthenticatie (SPF/DKIM)
+	// Afzenderauthenticatie (SPF/DKIM/DMARC)
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Authenticatieresultaten die als mislukt gelden',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Door de ontvangende mailserver gerapporteerde resultaten (Authentication-Results) waarbij de afzender niet wordt vertrouwd. Bij detectie wordt het ingestelde gedrag toegepast en vertrouwt geen enkele latere stap het adres van de afzender (bijv. om de beller te koppelen). Geldt alleen als dit beleid niet inactief is.',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
@@ -124,6 +124,7 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanente fout',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dmarc_fail' => 'DMARC: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Gedrag bij overtreding',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Het bericht uit de mailbox verwijderen',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Niets doen',
@@ -271,8 +272,8 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	// Stappen
 	'MailInbox:StepAttachmentCriteria' => 'Ingesloten e-mailafbeeldingen',
 	'MailInbox:StepAttachmentCriteria+' => 'Regels voor afbeeldingen in inkomende e-mails: te kleine afbeeldingen (zoals logo\'s in handtekeningen) worden genegeerd; te grote afbeeldingen worden verkleind als php-gd beschikbaar is.',
-	'MailInbox:PolicySenderAuthentication' => 'Afzenderauthenticatie (SPF/DKIM)',
-	'MailInbox:PolicySenderAuthentication+' => 'Wantrouwt afzenders op basis van de SPF- en DKIM-resultaten die de ontvangende mailserver rapporteert. Werkt alleen als die server een Authentication-Results-header toevoegt.',
+	'MailInbox:PolicySenderAuthentication' => 'Afzenderauthenticatie (SPF/DKIM/DMARC)',
+	'MailInbox:PolicySenderAuthentication+' => 'Wantrouwt afzenders op basis van de SPF-, DKIM- en DMARC-resultaten die de ontvangende mailserver rapporteert. Werkt alleen als die server een Authentication-Results-header toevoegt.',
 	'MailInbox:PolicyMailSize' => 'E-mailgrootte',
 	'MailInbox:PolicyMailSize+' => 'Behandelt e-mails (inclusief bijlagen) die groter zijn dan de maximale grootte.',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Bijlage - Verboden MIME-type',

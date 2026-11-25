@@ -40,16 +40,17 @@ The `From` header of an e-mail is not authenticated by SMTP, so it can be forged
 Verifying the sender belongs on the mail server or mail gateway that receives the e-mail: it sees the SMTP session (connecting IP address, envelope, DKIM signature) which this extension never sees, since it only fetches the stored message over IMAP afterwards.
 
 * **On the mail server or gateway (primary):** enforce SPF, DKIM and DMARC, and reject or quarantine messages that fail. DMARC is the check that ties the result to the `From` header (alignment).
-* **In this extension (second layer):** the policy "Sender authentication (SPF/DKIM)" reads the verdict that the mail server wrote in the `Authentication-Results` header (RFC 8601). It does not verify anything itself.
+* **In this extension (second layer):** the policy "Sender authentication (SPF/DKIM/DMARC)" reads the verdict that the mail server wrote in the `Authentication-Results` header (RFC 8601). It does not verify anything itself.
 
 To use the policy:
 
-* Make sure the receiving mail server adds an `Authentication-Results` header with the SPF and DKIM results.
+* Make sure the receiving mail server adds an `Authentication-Results` header with the SPF, DKIM and DMARC results.
 * Set "Trusted Authentication-Results server ID" to the hostname (authserv-id) of that server. When empty, the first occurrence of the header is trusted, which a sender can forge by adding its own.
-* Set the behavior of the policy to anything other than "Inactive" (for example "Mark as Undesired / Temporarily keep the e-mail"). Review the results that are treated as a failure.
+* Set the behavior of the policy to anything other than "Inactive" (for example "Mark as Undesired / Temporarily keep the e-mail"). Review the results that are treated as a failure. Add "DMARC: fail" to also reject messages whose `From` header is not aligned with the authenticated domain (the DMARC verdict is read from the same trusted `Authentication-Results` header).
 * See [events and triggers](events%20and%20triggers.md#sender-authentication) to be notified instead of replying to the sender.
 
 Limitations of the policy:
 
 * Only the configured failure results are rejected. A message without an `Authentication-Results` header, or with the result `none`, is accepted.
-* An SPF or DKIM `pass` is not tied to the `From` header (no alignment). A sender can pass with its own domain while forging the `From` header of another one. This is why DMARC should be enforced on the mail server.
+* An SPF or DKIM `pass` is not tied to the `From` header (no alignment). A sender can pass with its own domain while forging the `From` header of another one. The DMARC result adds this alignment, but only when the mail server evaluates DMARC and reports it as `dmarc=...` in the `Authentication-Results` header. A message without a `dmarc=` result is accepted. Enforcing DMARC on the mail server remains the more reliable layer.
+* The policy does not require a `pass`: a missing header or result is always accepted.

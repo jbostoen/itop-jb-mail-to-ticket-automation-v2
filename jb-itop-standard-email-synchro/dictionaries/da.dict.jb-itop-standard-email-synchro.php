@@ -116,7 +116,7 @@ Dict::Add('DA DA', 'Danish', 'Dansk', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Udeluk MIME-typer',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Vedhæftninger af disse MIME-typer behandles ikke. Angiv én pr. linje.',
 
-	// Afsenderautentificering (SPF/DKIM)
+	// Afsenderautentificering (SPF/DKIM/DMARC)
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Autentificeringsresultater, der regnes som fejl',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Resultater rapporteret af den modtagende mailserver (Authentication-Results), hvor afsenderen ikke stoles på. Hvis et af dem registreres, anvendes den konfigurerede adfærd, og intet senere trin stoler på afsenderens adresse (fx til at finde den, der ringer). Gælder kun, når denne politik ikke er inaktiv.',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
@@ -124,6 +124,7 @@ Dict::Add('DA DA', 'Danish', 'Dansk', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: permanent fejl',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dmarc_fail' => 'DMARC: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Adfærd ved overtrædelse',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Slet beskeden fra mailboksen',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Gør intet',
@@ -271,8 +272,8 @@ Dict::Add('DA DA', 'Danish', 'Dansk', array(
 	// Trin
 	'MailInbox:StepAttachmentCriteria' => 'Indlejrede billeder i e-mail',
 	'MailInbox:StepAttachmentCriteria+' => 'Regler for billeder i indgående mails: for små billeder (som logoer i signaturer) ignoreres; for store billeder skaleres ned, hvis php-gd er tilgængelig.',
-	'MailInbox:PolicySenderAuthentication' => 'Afsenderautentificering (SPF/DKIM)',
-	'MailInbox:PolicySenderAuthentication+' => 'Mistror afsendere ud fra de SPF- og DKIM-resultater, som den modtagende mailserver rapporterer. Virker kun, hvis serveren tilføjer en Authentication-Results-header.',
+	'MailInbox:PolicySenderAuthentication' => 'Afsenderautentificering (SPF/DKIM/DMARC)',
+	'MailInbox:PolicySenderAuthentication+' => 'Mistror afsendere ud fra de SPF-, DKIM- og DMARC-resultater, som den modtagende mailserver rapporterer. Virker kun, hvis serveren tilføjer en Authentication-Results-header.',
 	'MailInbox:PolicyMailSize' => 'E-mailstørrelse',
 	'MailInbox:PolicyMailSize+' => 'Håndterer mails (inklusive vedhæftede filer), der er større end den maksimale størrelse.',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Vedhæftning - Forbudt MIME-type',

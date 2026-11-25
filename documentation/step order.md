@@ -8,7 +8,7 @@ The namespace of all steps is `JeffreyBostoenExtensions\MailToTicket\Steps`.
 
 | Precedence | Step | Purpose |
 |-----------:|------|---------|
-| -10 | `SenderAuthentication` | Evaluates the SPF/DKIM results (RFC 8601) reported by the receiving mail server. |
+| -10 | `SenderAuthentication` | Evaluates the SPF/DKIM/DMARC results (RFC 8601) reported by the receiving mail server. |
 | 0 | `NonDeliveryReport` | Ignores delivery failure messages and can mark a person as inactive. |
 | 9 | `MatchByInReplyToOrReferences` | Finds a related ticket based on the In-Reply-To or References headers. |
 | 10 | `AttachmentForbiddenMimeType` | Enforces rules on attachment types. |

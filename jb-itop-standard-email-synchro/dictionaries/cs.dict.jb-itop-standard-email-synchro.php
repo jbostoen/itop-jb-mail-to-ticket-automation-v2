@@ -116,7 +116,7 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes' => 'Vyloučit typy MIME',
 	'Class:MailInboxStandard/Attribute:step_attachment_criteria_exclude_mimetypes+' => 'Přílohy těchto typů MIME nebudou zpracovány. Zadejte jeden na řádek.',
 
-	// Ověření odesílatele (SPF/DKIM)
+	// Ověření odesílatele (SPF/DKIM/DMARC)
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures' => 'Výsledky ověření považované za selhání',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures+' => 'Výsledky hlášené přijímajícím poštovním serverem (Authentication-Results), při nichž se odesílateli nedůvěřuje. Pokud je zjištěn některý z nich, použije se nakonfigurované chování a žádný další krok již adrese odesílatele nedůvěřuje (např. při určení volajícího). Platí pouze tehdy, když tato zásada není neaktivní.',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:spf_fail' => 'SPF: fail',
@@ -124,6 +124,7 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_fail' => 'DKIM: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_softfail' => 'DKIM: softfail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dkim_permerror' => 'DKIM: trvalá chyba',
+	'Class:MailInboxStandard/Attribute:policy_sender_authentication_failures/Value:dmarc_fail' => 'DMARC: fail',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior' => 'Chování při porušení',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:delete' => 'Smazat zprávu ze schránky',
 	'Class:MailInboxStandard/Attribute:policy_sender_authentication_behavior/Value:do_nothing' => 'Nedělat nic',
@@ -271,8 +272,8 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	// Kroky
 	'MailInbox:StepAttachmentCriteria' => 'Vložené obrázky v e-mailu',
 	'MailInbox:StepAttachmentCriteria+' => 'Pravidla pro obrázky v příchozích e-mailech: příliš malé obrázky (například loga v podpisech) se ignorují; příliš velké obrázky se zmenší, pokud je k dispozici php-gd.',
-	'MailInbox:PolicySenderAuthentication' => 'Ověření odesílatele (SPF/DKIM)',
-	'MailInbox:PolicySenderAuthentication+' => 'Nedůvěřuje odesílatelům na základě výsledků SPF a DKIM, které hlásí přijímající poštovní server. Funguje jen tehdy, když tento server přidává hlavičku Authentication-Results.',
+	'MailInbox:PolicySenderAuthentication' => 'Ověření odesílatele (SPF/DKIM/DMARC)',
+	'MailInbox:PolicySenderAuthentication+' => 'Nedůvěřuje odesílatelům na základě výsledků SPF, DKIM a DMARC, které hlásí přijímající poštovní server. Funguje jen tehdy, když tento server přidává hlavičku Authentication-Results.',
 	'MailInbox:PolicyMailSize' => 'Velikost pošty',
 	'MailInbox:PolicyMailSize+' => 'Zpracovává e-maily (včetně příloh), které jsou větší než maximální velikost.',
 	'MailInbox:PolicyAttachmentForbiddenMimeType' => 'Příloha - zakázaný typ MIME',

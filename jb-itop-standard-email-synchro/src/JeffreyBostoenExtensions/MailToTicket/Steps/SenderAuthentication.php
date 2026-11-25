@@ -17,7 +17,7 @@ use RawEmailMessage;
 
 /**
  * Class SenderAuthentication.
- * A policy, running before any other step, to evaluate the SPF/DKIM result(s) (RFC 8601) reported by the
+ * A policy, running before any other step, to evaluate the SPF/DKIM/DMARC result(s) (RFC 8601) reported by the
  * receiving mail server for this message exactly once.
  * Any configured behavior ends the processing of the message (see ProcessingHelper::ProcessSteps()), so later steps
  * never run for a message that failed authentication and do not evaluate the header themselves.
@@ -28,7 +28,7 @@ abstract class SenderAuthentication extends Base {
 	/**
 	 * Authentication methods (RFC 8601) that can be configured as failures.
 	 */
-	private const METHODS = ['spf', 'dkim'];
+	private const METHODS = ['spf', 'dkim', 'dmarc'];
 
 	/**
 	 * @var string[] $aDetectedStates The authentication results (e.g. "spf=softfail") found for the message that is being processed.
@@ -57,7 +57,7 @@ abstract class SenderAuthentication extends Base {
 
 		$sAuthservId = $oMailBox->Get('authentication_results_authserv_id');
 
-		// - Each configured failure is "<method>_<state>", e.g. "spf_softfail" or "dkim_permerror".
+		// - Each configured failure is "<method>_<state>", e.g. "spf_softfail", "dkim_permerror" or "dmarc_fail".
 		$aConfiguredFailures = $oMailBox->Get(static::GetXMLSettingsPrefix().'_failures')?->GetValues() ?? [];
 		$aDetectedFailures = [];
 		$aDetectedStates = [];
@@ -80,7 +80,7 @@ abstract class SenderAuthentication extends Base {
 		}
 
 		if(count($aDetectedStates) === 0) {
-			static::Trace('.. No SPF/DKIM result found for this message.');
+			static::Trace('.. No SPF/DKIM/DMARC result found for this message.');
 			return;
 		}
 
