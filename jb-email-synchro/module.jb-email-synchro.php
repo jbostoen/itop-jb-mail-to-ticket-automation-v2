@@ -159,26 +159,34 @@ if (!class_exists('EmailSynchroInstaller')) {
 				$oSet = new DBObjectSet(new DBObjectSearch('MailInboxBase'));
 				while($oInbox = $oSet->Fetch()) {
 
-					$aOptions = array_filter(array_map(fn($sLine) => strtolower(trim($sLine)), preg_split('/\R/', $aStoredOptions[(int) $oInbox->GetKey()] ?? '')), fn($sLine) => $sLine !== '');
+					// - A mailbox that can not be saved must not prevent the migration of the other mailboxes.
+					try {
 
-					$sEncryption = match(true) {
-						in_array('ssl', $aOptions, true) => 'ssl',
-						in_array('tls', $aOptions, true) => 'starttls',
-						default => 'none',
-					};
+						$aOptions = array_filter(array_map(fn($sLine) => strtolower(trim($sLine)), preg_split('/\R/', $aStoredOptions[(int) $oInbox->GetKey()] ?? '')), fn($sLine) => $sLine !== '');
 
-					$oInbox->Set('encryption', $sEncryption);
-					$oInbox->Set('validate_cert', 'yes');
-					$oInbox->DBUpdate();
+						$sEncryption = match(true) {
+							in_array('ssl', $aOptions, true) => 'ssl',
+							in_array('tls', $aOptions, true) => 'starttls',
+							default => 'none',
+						};
 
-					SetupLog::Info('Mail to Ticket Automation: mailbox '.$oInbox->GetKey().': encryption set to "'.$sEncryption.'", certificate validation enabled.');
+						$oInbox->Set('encryption', $sEncryption);
+						$oInbox->Set('validate_cert', 'yes');
+						$oInbox->DBUpdate();
 
-					if(in_array('novalidate-cert', $aOptions, true)) {
-						SetupLog::Warning('Mail to Ticket Automation: mailbox '.$oInbox->GetKey().' had "novalidate-cert", which was never applied: the certificate was already validated. Disable "Validate certificate" on the mailbox if the server certificate is untrusted.');
+						SetupLog::Info('Mail to Ticket Automation: mailbox '.$oInbox->GetKey().': encryption set to "'.$sEncryption.'", certificate validation enabled.');
+
+						if(in_array('novalidate-cert', $aOptions, true)) {
+							SetupLog::Warning('Mail to Ticket Automation: mailbox '.$oInbox->GetKey().' had "novalidate-cert", which was never applied: the certificate was already validated. Disable "Validate certificate" on the mailbox if the server certificate is untrusted.');
+						}
+
+						if($sEncryption === 'none') {
+							SetupLog::Warning('Mail to Ticket Automation: mailbox '.$oInbox->GetKey().' has no encryption configured.');
+						}
+
 					}
-
-					if($sEncryption === 'none') {
-						SetupLog::Warning('Mail to Ticket Automation: mailbox '.$oInbox->GetKey().' has no encryption configured.');
+					catch(Throwable $e) {
+						SetupLog::Error('Mail to Ticket Automation: mailbox '.$oInbox->GetKey().': unable to migrate the IMAP options: '.$e->getMessage());
 					}
 
 				}
