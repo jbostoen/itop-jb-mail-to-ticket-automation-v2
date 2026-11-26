@@ -1119,41 +1119,30 @@ abstract class CreateOrUpdateTicket extends Base {
 		
 		// Build a list of Attachments already present in this ticket.
 		// This includes both Attachment and InlineImage classes.
-		if($bNoDuplicates ) {
+		// - Only needed when the e-mail has attachments itself (most replies have none).
+		// - Only the name and type are kept: the size and checksum are determined when a candidate matches.
+		if($bNoDuplicates && count($oEmail->aAttachments) > 0) {
 			
-			$sOQL = 'SELECT Attachment WHERE item_class = :class AND item_id = :id';
-			$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
-			while($oPrevAttachment = $oAttachments->Fetch()) {
-				$oDoc = $oPrevAttachment->Get('contents');
-				$data = $oDoc->GetData();
-				$aPreviousAttachments[] = [
-					'class' => 'Attachment',
-					'filename' => $oDoc->GetFileName(),
-					'mimeType' => $oDoc->GetMimeType(),
-					'size' => strlen($data),
-					'md5' => md5($data),
-					'object' => $oPrevAttachment,
-				];
+			$aClasses = ['Attachment'];
+			if(class_exists('InlineImage')) {
+				$aClasses[] = 'InlineImage';
 			}
 			
-			// same processing for InlineImages
-			if(class_exists('InlineImage')) {
-
-				$sOQL = 'SELECT InlineImage WHERE item_class = :class AND item_id = :id';
-				$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL_AllData($sOQL), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
+			foreach($aClasses as $sAttachmentClass) {
+				
+				$oAttachments = new DBObjectSet(DBObjectSearch::FromOQL_AllData("SELECT {$sAttachmentClass} WHERE item_class = :class AND item_id = :id"), [], ['class' => get_class($oTicket), 'id' => $oTicket->GetKey()]);
 				while($oPrevAttachment = $oAttachments->Fetch()) {
 					$oDoc = $oPrevAttachment->Get('contents');
-					$data = $oDoc->GetData();
 					$aPreviousAttachments[] = [
-						'class' => 'InlineImage',
+						'class' => $sAttachmentClass,
 						'filename' => $oDoc->GetFileName(),
 						'mimeType' => $oDoc->GetMimeType(),
-						'size' => strlen($data),
-						'md5' => md5($data),
+						'size' => null,
+						'md5' => null,
 						'object' => $oPrevAttachment,
 					];
 				}
-
+				
 			}
 		}
 		
@@ -1180,14 +1169,24 @@ abstract class CreateOrUpdateTicket extends Base {
 
 				// Check if an attachment with the same name/type/size/md5 already exists
 				$iSize = strlen($aAttachment['content']);
-				$sMd5 = md5($aAttachment['content']);
-				foreach($aPreviousAttachments as $aPrevious) {
-					if (
-						($aAttachment['filename'] === $aPrevious['filename']) &&
-						($aAttachment['mimeType'] === $aPrevious['mimeType']) &&
-						($iSize === $aPrevious['size']) &&
-						($sMd5 === $aPrevious['md5']) )
-					{
+				$sMd5 = null;
+				foreach($aPreviousAttachments as $iPreviousIndex => $aPrevious) {
+					
+					if(($aAttachment['filename'] !== $aPrevious['filename']) || ($aAttachment['mimeType'] !== $aPrevious['mimeType'])) {
+						continue;
+					}
+					
+					// - The size and checksum of the existing attachment are only needed for a candidate.
+					if($aPrevious['size'] === null) {
+						$sPreviousData = $aPrevious['object']->Get('contents')->GetData();
+						$aPreviousAttachments[$iPreviousIndex]['size'] = strlen($sPreviousData);
+						$aPreviousAttachments[$iPreviousIndex]['md5'] = md5($sPreviousData);
+						$aPrevious = $aPreviousAttachments[$iPreviousIndex];
+					}
+					
+					$sMd5 ??= md5($aAttachment['content']);
+					
+					if(($iSize === $aPrevious['size']) && ($sMd5 === $aPrevious['md5'])) {
 						// Skip this attachment
 						static::Trace("Attachment {$aAttachment['filename']} skipped, already attached to the ticket.");
 						static::$aAddedAttachments[$sAddedAttachmentKey] = $aPrevious['object']; // Still remember it for processing inline images
@@ -1254,6 +1253,18 @@ abstract class CreateOrUpdateTicket extends Base {
 
 				static::Trace("Attachment {$aAttachment['filename']} added to the ticket.");
 				static::$aAddedAttachments[$sAddedAttachmentKey] = $oAttachment;
+
+				// - Also detect a duplicate within the same e-mail.
+				if($bNoDuplicates) {
+					$aPreviousAttachments[] = [
+						'class' => get_class($oAttachment),
+						'filename' => $aAttachment['filename'],
+						'mimeType' => $aAttachment['mimeType'],
+						'size' => strlen($aAttachment['content']),
+						'md5' => md5($aAttachment['content']),
+						'object' => $oAttachment,
+					];
+				}
 			}
 		}
 		
