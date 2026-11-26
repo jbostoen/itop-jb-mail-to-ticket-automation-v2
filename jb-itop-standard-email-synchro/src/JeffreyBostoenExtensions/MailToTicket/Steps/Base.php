@@ -53,6 +53,26 @@ enum PolicyBehavior : string {
 	case SKIP_FOR_NOW = 'skip_for_now';
 	case ABORT_ALL_FURTHER_PROCESSING = 'abort_all_further_processing';
 
+	/**
+	 * Gets the next action that belongs to this behavior.
+	 * "Do nothing" keeps the processing going: the policy is evaluated, but has no influence on the outcome.
+	 *
+	 * @return eNextAction
+	 */
+	public function GetNextAction() : eNextAction {
+
+		return match($this) {
+			self::DELETE => eNextAction::DELETE_MESSAGE,
+			self::MOVE => eNextAction::MOVE_MESSAGE,
+			self::MARK_AS_ERROR => eNextAction::MARK_MESSAGE_AS_ERROR,
+			self::MARK_AS_UNDESIRED => eNextAction::MARK_MESSAGE_AS_UNDESIRED,
+			self::SKIP_FOR_NOW => eNextAction::SKIP_FOR_NOW,
+			self::ABORT_ALL_FURTHER_PROCESSING => eNextAction::ABORT_ALL_FURTHER_PROCESSING,
+			self::DO_NOTHING => eNextAction::PROCESS_MESSAGE,
+		};
+
+	}
+
 }
 
 
@@ -457,7 +477,7 @@ abstract class Base implements iStep {
 		// Policy violations have a typical way of handling.
 		// The behavior is - besides some feature-specific fallbacks - usually one of the following:
 		// - delete -> delete the message
-		// - PolicyBehavior::DO_NOTHING->value -> great, lazy. For testing purposes. To actually see if policies are processed or log additional info without doing anything in the end.
+		// - PolicyBehavior::DO_NOTHING->value -> the processing continues. For testing purposes: policies are evaluated and traced, without influencing the outcome.
 		// - mark_as_undesired -> stays in the mailbox for a few days
 		// - some sort of fallback -> doesn't matter here
 
@@ -471,19 +491,11 @@ abstract class Base implements iStep {
 
 		// - Set the next action for the mail processor.
 
-			$iNextAction = match($sBehavior) {
-				PolicyBehavior::DELETE->value => eNextAction::DELETE_MESSAGE,
-				PolicyBehavior::MOVE->value => eNextAction::MOVE_MESSAGE,
-				PolicyBehavior::MARK_AS_ERROR->value => eNextAction::MARK_MESSAGE_AS_ERROR,
-				PolicyBehavior::MARK_AS_UNDESIRED->value => eNextAction::MARK_MESSAGE_AS_UNDESIRED,
-				PolicyBehavior::SKIP_FOR_NOW->value => eNextAction::SKIP_FOR_NOW,
-				PolicyBehavior::ABORT_ALL_FURTHER_PROCESSING->value => eNextAction::ABORT_ALL_FURTHER_PROCESSING,
-				PolicyBehavior::DO_NOTHING->value => eNextAction::NO_ACTION,
-				default => eNextAction::NO_ACTION
-			};
+			// - An unknown behavior (e.g. a fallback that was not handled by the step) stops the processing without any action.
+			$eNextAction = PolicyBehavior::tryFrom($sBehavior)?->GetNextAction() ?? eNextAction::NO_ACTION;
 
-			static::Trace('Set next action for EmailProcessor to %1$s', $iNextAction->name);
-			ProcessingHelper::SetNextAction($iNextAction);
+			static::Trace('Set next action for EmailProcessor to %1$s', $eNextAction->name);
+			ProcessingHelper::SetNextAction($eNextAction);
 
 	}
 
