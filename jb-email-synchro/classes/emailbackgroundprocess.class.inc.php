@@ -224,6 +224,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					catch (Throwable $e) {
 						$this->LogProcessException($e, $oSource);
 						Events::FireEvent(eEvent::MAILBOX_CONNECTION_FAILED, ['error_message' => $e->getMessage()]);
+						Events::FireEvent(eEvent::MAILBOX_FINISHED);
 						$oSource->Disconnect();
 						continue;
 					}
@@ -232,6 +233,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 					if($iMsgCount == 0) {
 						$this->Trace("Unexpected: listing of e-mail messages returned 0 messages.");
+						Events::FireEvent(eEvent::MAILBOX_FINISHED);
+						$oSource->Disconnect();
 						continue;
 					}
 					
@@ -363,10 +366,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									if($iDelay <= 0) {
 										$iDelay = MetaModel::GetModuleSetting('jb-email-synchro', 'undesired_purge_delay', 7);
 										$this->Trace("\nDeleting undesired message (replica kept for the retention sweep) due to purge delay threshold ({$iDelay}): uidl={$sUIDL} index={$iMessage}");
-										$iTotalDeleted++;
-										$ret = $oMsgHandler->DeleteMessage();
-										$this->Trace("DeleteMessage() returned $ret");
-										Events::FireEvent(eEvent::MESSAGE_DELETED, ['reason' => 'The undesired message exceeded the purge delay.']);
+										$bDeleted = $oMsgHandler->DeleteMessage();
+										$this->Trace('DeleteMessage() returned '.($bDeleted ? 'true' : 'false'));
+										if($bDeleted) {
+											$iTotalDeleted++;
+											Events::FireEvent(eEvent::MESSAGE_DELETED, ['reason' => 'The undesired message exceeded the purge delay.']);
+										}
 										if(!$oEmailReplica->IsNew()) {
 										   $aReplicas[$sUIDL] = $oEmailReplica;
 										}
@@ -398,11 +403,13 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									break;
 								
 								case eNextAction::DELETE_MESSAGE:
-									$iTotalDeleted++;
 									$this->Trace("Deleting message (replica kept for the retention sweep): uidl={$sUIDL} index={$iMessage}");
-									$ret = $oMsgHandler->DeleteMessage();
-									$this->Trace("DeleteMessage() returned {$ret}");
-									Events::FireEvent(eEvent::MESSAGE_DELETED, ['reason' => 'The message has no (valid) ticket anymore.']);
+									$bDeleted = $oMsgHandler->DeleteMessage();
+									$this->Trace('DeleteMessage() returned '.($bDeleted ? 'true' : 'false'));
+									if($bDeleted) {
+										$iTotalDeleted++;
+										Events::FireEvent(eEvent::MESSAGE_DELETED, ['reason' => 'The message has no (valid) ticket anymore.']);
+									}
 									if(!$oEmailReplica->IsNew()) {
 										$aReplicas[$sUIDL] = $oEmailReplica;
 									}
@@ -450,9 +457,13 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												break;
 								
 											case eNextAction::DELETE_MESSAGE:
-												$iTotalDeleted++;
 												$this->Trace("Failed to decode the message, deleting it (and its replica): {$sUIDL}");
-												$oMsgHandler->DeleteMessage();
+												if($oMsgHandler->DeleteMessage()) {
+													$iTotalDeleted++;
+												}
+												else {
+													$this->Trace("Failed to delete the message: {$sUIDL}");
+												}
 												if(!$oEmailReplica->IsNew()) {
 													$aReplicas[$sUIDL] = $oEmailReplica;
 												}
@@ -485,9 +496,13 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 	 
 											case eNextAction::DELETE_MESSAGE:
 
-												$iTotalDeleted++;
 												$this->Trace("Deleting message (marked as DELETE_MESSAGE) (but not replica): {$sUIDL}");
-												$oMsgHandler->DeleteMessage();
+												if($oMsgHandler->DeleteMessage()) {
+													$iTotalDeleted++;
+												}
+												else {
+													$this->Trace("Failed to delete the message: {$sUIDL}");
+												}
 												if(!$oEmailReplica->IsNew()) { 
 													$aReplicas[$sUIDL] = $oEmailReplica;
 												}
@@ -531,9 +546,13 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 												$sSubject = $oProcessor->GetLastErrorSubject();
 												$sMessage = $oProcessor->GetLastErrorMessage();
 												EmailBackgroundProcess::ReportError($sSubject, $sMessage, $oRawEmail);
-												$iTotalDeleted++;
 												$this->Trace("Deleting message (but not replica) due to process error: {$sUIDL}");
-												$oMsgHandler->DeleteMessage();
+												if($oMsgHandler->DeleteMessage()) {
+													$iTotalDeleted++;
+												}
+												else {
+													$this->Trace("Failed to delete the message: {$sUIDL}");
+												}
 												if(!$oEmailReplica->IsNew()) {								
 													$aReplicas[$sUIDL] = $oEmailReplica;
 												}
