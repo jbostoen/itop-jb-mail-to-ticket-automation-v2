@@ -51,6 +51,7 @@ To use the policy:
 
 Limitations of the policy:
 
+* A message with more than one `From`, `Sender`, `Reply-To` or `Message-ID` header is treated as a failure of this policy as well: the first occurrence is used for the sender, while a DKIM check may have covered another one. The policy must not be inactive for this check to run.
 * Only the configured failure results are rejected. A message without an `Authentication-Results` header, or with the result `none`, is accepted.
 * An SPF or DKIM `pass` is not tied to the `From` header (no alignment). A sender can pass with its own domain while forging the `From` header of another one. The DMARC result adds this alignment, but only when the mail server evaluates DMARC and reports it as `dmarc=...` in the `Authentication-Results` header. A message without a `dmarc=` result is accepted. Enforcing DMARC on the mail server remains the more reliable layer.
 * The policy does not require a `pass`: a missing header or result is always accepted.

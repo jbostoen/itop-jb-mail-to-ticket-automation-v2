@@ -79,6 +79,12 @@ abstract class SenderAuthentication extends Base {
 
 		}
 
+		// - A duplicate identity header (e.g. two "From" headers) is ambiguous: the first one is used for the sender, while the authentication may have covered the last one.
+		foreach($oRawEmail->GetDuplicateIdentityHeaders() as $sHeader) {
+			$aDetectedStates[] = "duplicate_header={$sHeader}";
+			$aDetectedFailures[] = "duplicate_header={$sHeader}";
+		}
+
 		if(count($aDetectedStates) === 0) {
 			static::Trace('.. No SPF/DKIM/DMARC result found for this message.');
 			return;

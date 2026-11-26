@@ -55,6 +55,16 @@ class RawEmailMessage {
 	 *      header_code => array of values, in the order they appear in the message.
 	 */
 	protected $aHeaderOccurrences;
+
+	/**
+	 * @var string[] $aDuplicateIdentityHeaders Names (lowercase) of the identity headers that occur more than once at the top level of the message.
+	 */
+	protected array $aDuplicateIdentityHeaders = [];
+
+	/**
+	 * @var string[] IDENTITY_HEADERS Headers that identify the sender or the message. A duplicate is ambiguous: parsers disagree on which occurrence applies.
+	 */
+	protected const IDENTITY_HEADERS = ['from', 'sender', 'reply-to', 'message-id'];
 	/**
 	 * @var array of parts for a multiparts message
 	 */
@@ -93,6 +103,7 @@ class RawEmailMessage {
 		
 		$this->aHeaders = $aData['headers'];
 		$this->aHeaderOccurrences = $aData['header_occurrences'];
+		$this->aDuplicateIdentityHeaders = $aData['duplicate_identity_headers'];
 		$this->aParts = $this->ExtractParts($aData['headers'], $aData['body'], 0);
 	}
 	
@@ -352,6 +363,18 @@ class RawEmailMessage {
 	 */
 	public function GetHeaders() {
 		return $aHeaders = $this->aHeaders;
+	}
+
+	/**
+	 * Gets the identity headers (From, Sender, Reply-To, Message-ID) that occur more than once at the top level of the message.
+	 * Only the first occurrence is used for the sender, while an authentication check (DKIM) may have evaluated another one.
+	 *
+	 * @return string[] Header names (lowercase).
+	 */
+	public function GetDuplicateIdentityHeaders() : array {
+
+		return $this->aDuplicateIdentityHeaders;
+
 	}
 
 	/**
@@ -631,6 +654,7 @@ class RawEmailMessage {
 		$aRepeatableHeaders = ['authentication-results'];
 		$aRawFieldsAll = array();
 		$sCurrentHeaderAll = '';
+		$aDuplicateIdentityHeaders = [];
 
 		$idx = 0;
 		$aRawBody = array();
@@ -660,6 +684,10 @@ class RawEmailMessage {
 						// malformed input is properly a mail server's job; this is just a defensive,
 						// deterministic fallback for whatever already reached this parser.
 						$sCurrentHeader = '';
+
+						if(in_array($sNewHeader, self::IDENTITY_HEADERS, true)) {
+							$aDuplicateIdentityHeaders[$sNewHeader] = $sNewHeader;
+						}
 					}
 					else {
 						$aRawFields[$sNewHeader] = $sValue;
@@ -700,7 +728,7 @@ class RawEmailMessage {
 			$aHeaderOccurrences[$sKey] = array_map([self::class, 'DecodeHeaderString'], $aValues);
 		}
 
-		return array('headers' => $aHeaders, 'body' => $aRawBody, 'header_occurrences' => $aHeaderOccurrences);
+		return array('headers' => $aHeaders, 'body' => $aRawBody, 'header_occurrences' => $aHeaderOccurrences, 'duplicate_identity_headers' => array_values($aDuplicateIdentityHeaders));
 	}
 
 	/**
