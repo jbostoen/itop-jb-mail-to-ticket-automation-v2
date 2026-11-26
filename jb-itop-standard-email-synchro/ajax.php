@@ -65,6 +65,6 @@ catch(Throwable $e) {
 
 	$oPage = new AjaxPage('');
 	$oPage->SetContentType('text/html');
-	$oPage->add($e->getMessage());
+	$oPage->add(htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));
 	$oPage->output();
 }

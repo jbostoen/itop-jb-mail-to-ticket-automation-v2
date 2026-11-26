@@ -87,7 +87,7 @@ function GetMailboxContent($oPage, $oInbox) {
 		}
 		catch(Throwable $e) {
 			$oInbox->Trace('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
-			$oPage->p('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
+			$oPage->p(htmlspecialchars('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage(), ENT_QUOTES, 'UTF-8'));
 			if(isset($oSource)) {
 				$oSource->Disconnect();
 			}
@@ -400,7 +400,7 @@ try {
 						// brand-new (and potentially recreate a ticket) on the next cron run.
 						$sMessage = "Could not delete message from the mailbox: {$sUIDL}. The replica was kept.";
 						$oInbox->Trace($sMessage);
-						$oPage->add($sMessage);
+						$oPage->add(htmlspecialchars($sMessage, ENT_QUOTES, 'UTF-8').'<br/>');
 						continue;
 					}
 					if(array_key_exists($sUIDL, $aReplicas)) {
@@ -480,7 +480,7 @@ try {
 				if($aNotFound !== []) {
 					$sMessage = 'Could not ignore '.count($aNotFound).' message(s), no longer found in the mailbox listing: '.implode(', ', $aNotFound);
 					$oInbox->Trace($sMessage);
-					$oPage->add($sMessage);
+					$oPage->add(htmlspecialchars($sMessage, ENT_QUOTES, 'UTF-8').'<br/>');
 				}
 
 				/** @var EmailSource $oSource */
@@ -494,6 +494,6 @@ try {
 }
 catch(Throwable $e) {
 	$oPage->SetContentType('text/html');
-	$oPage->add($e->getMessage());
+	$oPage->add(htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));
 	$oPage->output();
 }
