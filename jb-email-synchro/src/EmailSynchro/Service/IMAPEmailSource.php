@@ -12,6 +12,7 @@ use DirectoryTree\ImapEngine\MailboxInterface;
 use DirectoryTree\ImapEngine\Message;
 use EmailSource;
 use Exception;
+use Throwable;
 use IssueLog;
 use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
 use MailInboxBase;
@@ -153,8 +154,14 @@ class IMAPEmailSource extends EmailSource {
 		}
 
 		if($sLastUidValidity !== $sCurrentUidValidity) {
-			$this->oMailboxObject->Set('last_uidvalidity', $sCurrentUidValidity);
-			$this->oMailboxObject->DBUpdate();
+			// - A mailbox that can not be saved (e.g. it fails its write validation) must still be polled.
+			try {
+				$this->oMailboxObject->Set('last_uidvalidity', $sCurrentUidValidity);
+				$this->oMailboxObject->DBUpdate();
+			}
+			catch(Throwable $e) {
+				ProcessingHelper::Trace('IMAPEmailSource - Warning: unable to store the IMAP UIDVALIDITY for mailbox %1$s/%2$s: %3$s', $this->sServer, $this->sMailbox, $e->getMessage());
+			}
 		}
 
 	}
