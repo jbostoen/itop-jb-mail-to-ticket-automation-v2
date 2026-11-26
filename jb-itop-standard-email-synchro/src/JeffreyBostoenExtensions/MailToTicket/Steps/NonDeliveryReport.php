@@ -108,13 +108,15 @@ abstract class NonDeliveryReport extends Base {
 
 								$oTicket = ProcessingHelper::GetTicket();
 
-								if($oTicket !== null) {
+								// - The report must always embed a message that was sent by this installation (signed Message-ID).
+								//   A matched ticket is not proof: it can be matched by a guessable reference in the subject.
+								$bTrusted = static::EmbeddedMessageIsGenuineBounce($oEmail);
+
+								// - With a matched ticket, the recipient must also be the caller of that ticket.
+								if($bTrusted && $oTicket !== null) {
 
 									$bTrusted = (strcasecmp($sRecipient, (string) $oTicket->Get('caller_id->email')) === 0);
 
-								}
-								else {
-									$bTrusted = static::EmbeddedMessageIsGenuineBounce($oEmail);
 								}
 
 								if(!$bTrusted) {
