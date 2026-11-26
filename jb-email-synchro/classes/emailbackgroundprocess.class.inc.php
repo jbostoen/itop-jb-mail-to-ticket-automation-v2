@@ -110,7 +110,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 			$iMaxSize = MetaModel::GetAttributeDef('EmailReplica', 'error_message')->GetMaxSize();
 			$sErrorMessage = $oProcessor->GetLastErrorSubject()." - ".$oProcessor->GetLastErrorMessage();
-			$sErrorMessage = substr($sErrorMessage, 0, $iMaxSize);
+			// - The limit is in bytes; a multibyte character must not be cut in half.
+			$sErrorMessage = mb_strcut($sErrorMessage, 0, $iMaxSize, 'UTF-8');
 			$oEmailReplica->Set('error_message', $sErrorMessage);
 
             $sDate = $oEmailReplica->Get('message_date');
@@ -127,7 +128,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 			$sMessage = $e->getMessage();
 			if(strlen($sMessage) > 10*1024) {
-				$sMessage = "Truncated message: \n".substr($sMessage, 0, 8*1024)."\n[...]\n".substr($sMessage, -2*1024);
+				$sMessage = "Truncated message: \n".mb_strcut($sMessage, 0, 8*1024, 'UTF-8')."\n[...]\n".mb_strcut($sMessage, strlen($sMessage) - 2*1024, null, 'UTF-8');
 			}
 			$this->Trace($sMessage);
 
