@@ -428,13 +428,32 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 			
 									$oRawEmail = $oSource->GetMessage($oMsgHandler);
 
-									// IMAP error occurred? Skip the rest of this mailbox (the connection may no longer be
-									// reliable) rather than aborting Process() entirely: every other configured mailbox
-									// still deserves a chance to be processed in this cron run.
+									// The message could not be fetched.
 									if(is_null($oRawEmail)) {
-										$this->Trace("Could not get message (raw email): {$sUIDL}. Skipping the rest of this mailbox due to a (possibly temporary) IMAP error.");
-										$oSource->Disconnect();
-										continue 3;
+
+										// - GetMessage() returns null both when this one message is broken and when the whole connection dropped.
+										//   A cheap call on the same connection (the message count) tells them apart: when it fails, the connection is dead.
+										//   Marking every remaining message as error would then be wrong, so the rest of this mailbox is skipped.
+										//   Only this mailbox is skipped: every other configured mailbox still deserves a chance in this cron run.
+										try {
+											$oSource->GetMessagesCount();
+										}
+										catch(Throwable $e) {
+											$this->Trace("Could not get message (raw email): {$sUIDL}. Skipping the rest of this mailbox due to an IMAP error: ".$e->getMessage());
+											Events::FireEvent(eEvent::MAILBOX_CONNECTION_FAILED, ['error_message' => $e->getMessage()]);
+											$oSource->Disconnect();
+											continue 3;
+										}
+
+										// - The connection works: this message is the problem. It is marked as error, so it does not block the other messages in every run.
+										$iTotalMarkedAsError++;
+										$this->Trace("Could not get message (raw email): {$sUIDL}. The connection still works; marking the message (and replica) as in error.");
+										$oProcessor->SetLastError("Failed to fetch the message ({$sUIDL})", 'The message could not be fetched from the mailbox.');
+										$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
+										$aReplicas[$sUIDL] = $oEmailReplica;
+										Events::FireEvent(eEvent::MESSAGE_MARKED_ERROR, ['reason' => 'The message could not be fetched.']);
+										break;
+
 									}
 
 

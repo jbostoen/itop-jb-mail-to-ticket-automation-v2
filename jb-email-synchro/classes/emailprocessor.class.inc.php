@@ -88,6 +88,19 @@ abstract class EmailProcessor {
 	protected $sLastErrorMessage;
 	 
 	/**
+	 * Sets the subject and the message of the last error.
+	 *
+	 * @param string $sSubject The subject for the error.
+	 * @param string $sMessage The message for the error.
+	 *
+	 * @return void
+	 */
+	public function SetLastError(string $sSubject, string $sMessage) : void {
+		$this->sLastErrorSubject = $sSubject;
+		$this->sLastErrorMessage = $sMessage;
+	}
+	
+	/**
 	 * Returns the subject for the last error when process ProcessMessage returns PROCESS_ERROR
 	 * @return string The subject for the error message email
 	 */
