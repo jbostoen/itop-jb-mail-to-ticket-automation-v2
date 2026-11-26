@@ -201,7 +201,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 			$sAction = $eNextAction->name;
 			self::Trace("End of processing of the new message $index ({$oEmail->sUIDL}) retCode: $sAction");
 		}
-		catch(Exception $e) {
+		catch(Throwable $e) {
 			ProcessingHelper::SetNextAction(eNextAction::MARK_MESSAGE_AS_ERROR);
 			$eNextAction = ProcessingHelper::GetNextAction();
 			$this->sLastErrorSubject = "Failed to process email $index ({$oEmail->sUIDL})";

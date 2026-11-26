@@ -324,7 +324,7 @@ class Events implements iEventServiceSetup {
 				])->DBInsert();
 				$iCreated++;
 			}
-			catch(Exception $e) {
+			catch(Throwable $e) {
 				// Most likely this errors because the code already exists.
 			}
 
@@ -394,7 +394,7 @@ class Events implements iEventServiceSetup {
 		try {
 			$sClass = DBObjectSearch::FromOQL($sOQL)->GetClass();
 		}
-		catch(Exception $e) {
+		catch(Throwable $e) {
 			$oTrigger->AddCheckIssue(Dict::Format('Class:TriggerMailToTicketProcessingOnEvent/Error:MailboxOqlInvalid', $sFieldLabel, $e->getMessage()));
 			return;
 		}

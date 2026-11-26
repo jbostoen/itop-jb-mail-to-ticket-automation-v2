@@ -132,7 +132,7 @@ class IMAPEmailSource extends EmailSource {
 		try {
 			$sCurrentUidValidity = (string) ($this->GetFolder()->status()['UIDVALIDITY'] ?? '');
 		}
-		catch(Exception $e) {
+		catch(Throwable $e) {
 			// Can't determine it right now (e.g. folder not resolvable yet); nothing to compare against.
 			return;
 		}
@@ -214,7 +214,7 @@ class IMAPEmailSource extends EmailSource {
 				return null;
 			}
 
-		} catch(Exception $e) {
+		} catch(Throwable $e) {
 
 			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
 				'exception.message' => $e->getMessage(),
@@ -247,7 +247,7 @@ class IMAPEmailSource extends EmailSource {
 			$this->bMessagesDeleted = true;
 
 
-		} catch(Exception $e) {
+		} catch(Throwable $e) {
 			IssueLog::Error(__METHOD__."  for $this->sServer throws an exception", static::LOG_CHANNEL, [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
@@ -280,7 +280,7 @@ class IMAPEmailSource extends EmailSource {
 			$oMessage->restore();
 
 		}
-		catch(Exception $e) {
+		catch(Throwable $e) {
 			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
 				'exception.message' => $e->getMessage(),
 				'exception.stack' => $e->getTraceAsString(),
@@ -369,7 +369,7 @@ class IMAPEmailSource extends EmailSource {
 			$oMessage->delete();
 			$this->bMessagesDeleted = true;
 
-		} catch(Exception $e) {
+		} catch(Throwable $e) {
 			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
@@ -397,7 +397,7 @@ class IMAPEmailSource extends EmailSource {
 
 			$oMessage->copy($sTargetFolder);
 
-		} catch(Exception $e) {
+		} catch(Throwable $e) {
 			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
@@ -425,7 +425,7 @@ class IMAPEmailSource extends EmailSource {
 			$oMessage->markSeen();
 			
 
-		} catch(Exception $e) {
+		} catch(Throwable $e) {
 			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
@@ -454,7 +454,7 @@ class IMAPEmailSource extends EmailSource {
 
 			$this->oMailbox->disconnect();
 
-		} catch(Exception $e) {
+		} catch(Throwable $e) {
 			// A dropped connection here (e.g. between expunge() and disconnect()) must not abort the whole
 			// cron run: every caller of Disconnect() runs it unguarded inside a loop over all mailboxes.
 			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [

@@ -205,7 +205,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 				try {
 					$iMsgCount = $oSource->GetMessagesCount();
 				}
-				catch (Exception $e) {
+				catch (Throwable $e) {
 					$this->LogProcessException($e, $oSource);
 					Events::FireEvent(eEvent::MAILBOX_CONNECTION_FAILED, ['error_message' => $e->getMessage()]);
 					$oSource->Disconnect();
@@ -221,7 +221,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					try {
 						$aMessages = $oSource->GetListing();
 					}
-					catch (Exception $e) {
+					catch (Throwable $e) {
 						$this->LogProcessException($e, $oSource);
 						Events::FireEvent(eEvent::MAILBOX_CONNECTION_FAILED, ['error_message' => $e->getMessage()]);
 						$oSource->Disconnect();
@@ -502,8 +502,8 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 													$sTargetFolder = $oInbox->Get('target_folder');
 													$bMoved = (bool) $oSource->MoveMessage($oMsgHandler, $sTargetFolder);
 												}
-												catch(Exception $e) {
-													$this->Trace("Unable to move message");
+												catch(Throwable $e) {
+													$this->Trace("Unable to move message: ".$e->getMessage());
 												}
 												if($bMoved) {
 													// Persist the replica even for a brand-new message: the moved

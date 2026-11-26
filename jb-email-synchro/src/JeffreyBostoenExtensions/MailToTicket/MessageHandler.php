@@ -14,6 +14,7 @@ use EmailSource;
 
 // Generic.
 use Exception;
+use Throwable;
 
 /**
  * Class MessageHandler. A helper class to keep track of some information related to an e-mail message that is being processed.  
@@ -278,7 +279,7 @@ class MessageHandler {
 			$oSource->InitMessage($this);
 
 		}
-		catch(Exception $e) {
+		catch(Throwable $e) {
 			return false;
 		}
 
@@ -301,7 +302,7 @@ class MessageHandler {
 			return $oSource->DeleteMessage($this);
 
 		}
-		catch(Exception $e) {
+		catch(Throwable $e) {
 			return false;
 		}
 
@@ -322,7 +323,7 @@ class MessageHandler {
 			return $oSource->MoveMessage($this, $sTargetFolder);
 
 		}
-		catch(Exception $e) {
+		catch(Throwable $e) {
 			return false;
 		}
 
@@ -343,7 +344,7 @@ class MessageHandler {
 			return $oSource->CopyMessage($this, $sTargetFolder);
 
 		}
-		catch(Exception $e) {
+		catch(Throwable $e) {
 			return false;
 		}
 
@@ -362,7 +363,7 @@ class MessageHandler {
 			return $oSource->MarkAsSeen($this);
 
 		}
-		catch(Exception $e) {
+		catch(Throwable $e) {
 			return false;
 		}
 

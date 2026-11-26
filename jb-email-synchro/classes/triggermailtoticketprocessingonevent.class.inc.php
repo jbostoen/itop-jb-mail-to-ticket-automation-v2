@@ -116,7 +116,7 @@ class TriggerMailToTicketProcessingOnEvent extends Trigger {
 				$oSearch->AddCondition('id', $oMailBox->GetKey());
 				static::$aAppliesToMailbox[$sCacheKey] = (new DBObjectSet($oSearch))->Count() > 0;
 			}
-			catch(Exception $e) {
+			catch(Throwable $e) {
 				IssueLog::Warning("TriggerMailToTicketProcessingOnEvent #{$this->GetKey()}: invalid mailbox query, trigger skipped: ".$e->getMessage());
 				static::$aAppliesToMailbox[$sCacheKey] = false;
 			}

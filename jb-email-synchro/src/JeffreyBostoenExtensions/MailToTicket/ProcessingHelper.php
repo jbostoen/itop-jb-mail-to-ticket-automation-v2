@@ -19,6 +19,7 @@ use DBObjectSearch;
 use DBSearch;
 use Email;
 use Exception;
+use Throwable;
 use utils;
 
 // iTop email processing.
@@ -919,7 +920,7 @@ abstract class ProcessingHelper {
 				$sTo = implode(',', $aRecipients);
 
 			}
-			catch(Exception $e) {
+			catch(Throwable $e) {
 
 				$oInbox->Trace('HandleError: Invalid OQL in notify_errors_to (%1$s): %2$s', $sNotifyErrorsToOQL, $e->getMessage());
 
