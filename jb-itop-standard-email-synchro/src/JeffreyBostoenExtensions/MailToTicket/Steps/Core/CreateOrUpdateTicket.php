@@ -824,7 +824,13 @@ abstract class CreateOrUpdateTicket extends Base {
 		}
 
 		// Apply a stimulus if needed, will write the ticket to the database, may launch triggers, etc...
-		static::ApplyConfiguredStimulus();
+		// - The ticket update has already been committed: a failure here must not be mistaken for a failed update.
+		try {
+			static::ApplyConfiguredStimulus();
+		}
+		catch(Throwable $e) {
+			static::Trace('.. Stimulus on update failed: %1$s', $e->getMessage());
+		}
 		
 		// No error occurred
 		ProcessingHelper::SetNextAction(eNextAction::PROCESS_MESSAGE);
@@ -927,7 +933,7 @@ abstract class CreateOrUpdateTicket extends Base {
 					static::Trace("Actually applying the stimulus: {$sStimulusCode} for the ticket in state: {$oTicket->GetState()}");
 					$oTicket->ApplyStimulus($sStimulusCode);
 				}
-				catch(Exception $e) {
+				catch(Throwable $e) {
 					static::Trace("ApplyStimulus failed: {$e->getMessage()}");
 				}
 			}
@@ -1287,9 +1293,17 @@ abstract class CreateOrUpdateTicket extends Base {
 
 		$oTicket = ProcessingHelper::GetTicket();
 
-		foreach(static::$aAddedAttachments as $oAttachment) {
-			$oAttachment->SetItem($oTicket);
-			$oAttachment->DBUpdate();
+		// - The ticket already exists at this point: one attachment that can not be linked must not prevent the others from being linked.
+		foreach(static::$aAddedAttachments as $sKey => $oAttachment) {
+
+			try {
+				$oAttachment->SetItem($oTicket);
+				$oAttachment->DBUpdate();
+			}
+			catch(Throwable $e) {
+				static::Trace('.. Unable to link attachment "%1$s" to the ticket: %2$s', $sKey, $e->getMessage());
+			}
+
 		}
 
 		// Record the "attachment added" change-history entries that could not be recorded during
