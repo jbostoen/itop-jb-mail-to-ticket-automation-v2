@@ -434,76 +434,78 @@ abstract class CreateOrUpdateTicket extends Base {
 			}
 		}
 
-		// Process attachments.
-		static::AddAttachments(true);
-		
-		$sCaseLogEntry = static::BuildCaseLogEntry();
-		
-		// - Note: The trace is mainly set in GetNewPart().
-		if($oEmail->sTrace !== '') {
-			static::Trace('Email trace: %1$s', $oEmail->sTrace);
-		}
-		
-		// Write the log on behalf of the caller.
-		// Fallback to e-mail address if name is unknown.
-		$sCallerName = $oEmail->sCallerName;
-		$iCallerUserId = null;
-		if($oCaller === null) {
-			$sCallerName = $oEmail->sCallerEmail;
-			// $iCallerUserId remains null
-		}
-		else {
-			
-			$sCallerName = $oCaller->GetName(); // Derive name from Person
-
-			// Only first user will be matched. Multiple accounts could theoretically be linked to 1 Person.
-			$oUser = UserRights::GetUserFromPerson($oCaller, false);
-			
-			if($oUser !== null) {
-				$iCallerUserId = $oUser->GetKey();
-			}
-			
-		}
-					
-		// Determine which field to update
-		$sAttCode = static::GetCaseLogAttCode(get_class($oTicket));
-
-		$oCaseLog = $oTicket->Get($sAttCode);
-		$oAttributeValue = new ormCustomCaseLog();
-		$oAttributeValue->AddLogEntriesFromCaseLog($oCaseLog);
-		
-		// New entry from current email
-		if($bInsertChangeUserId){
-			/** @var User $oUser */
-			$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $oUser->GetKey());
-		}
-		else{
-			$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $iCallerUserId, '');
-		}
-		
-		// Sort chronologically: ascending (true), descending (false = most recent on top)!
-		// This ensures that log entries are ordered chronologically, even if the e-mails were processed in the wrong order.
-		// However, it can not prevent a ticket (with description) being initially created from the chronologically speaking 'second' e-mail.
-		// That issue should be fixed now in newer versions of this extension which order the incoming e-mails first.
-		// This line still matters though, because agents might also have added logs in between.
-		$oAttributeValue = $oAttributeValue->ToSortedCaseLog(false);
-		
-		$oTicket->Set($sAttCode, $oAttributeValue);
-		
-		// Policy has already removed unwanted contacts
-		static::AddAdditionalContacts();
-
-		// Update values.
-		// - Applied before DBUpdate(), so there is only one write and the update triggers see the new values.
-		// - $this->...$ refers to the ticket as it is at this point (including the new case log entry, excluding these values).
-		$sUpdateValues = $oMailBox->Get('ticket_update_values') ?? '';
-		$aUpdateValues = static::ParseAttributeValues($sUpdateValues, ['this->object()' => $oTicket]);
-
-		ProcessingHelper::InitObjectFromDefaultValues($oTicket, $aUpdateValues);
-
-		static::BeforeUpdateTicket();
-
+		// - The author of the change is restored whatever happens from here on.
 		try {
+
+			// Process attachments.
+			static::AddAttachments(true);
+		
+			$sCaseLogEntry = static::BuildCaseLogEntry();
+		
+			// - Note: The trace is mainly set in GetNewPart().
+			if($oEmail->sTrace !== '') {
+				static::Trace('Email trace: %1$s', $oEmail->sTrace);
+			}
+		
+			// Write the log on behalf of the caller.
+			// Fallback to e-mail address if name is unknown.
+			$sCallerName = $oEmail->sCallerName;
+			$iCallerUserId = null;
+			if($oCaller === null) {
+				$sCallerName = $oEmail->sCallerEmail;
+				// $iCallerUserId remains null
+			}
+			else {
+			
+				$sCallerName = $oCaller->GetName(); // Derive name from Person
+
+				// Only first user will be matched. Multiple accounts could theoretically be linked to 1 Person.
+				$oUser = UserRights::GetUserFromPerson($oCaller, false);
+			
+				if($oUser !== null) {
+					$iCallerUserId = $oUser->GetKey();
+				}
+			
+			}
+					
+			// Determine which field to update
+			$sAttCode = static::GetCaseLogAttCode(get_class($oTicket));
+
+			$oCaseLog = $oTicket->Get($sAttCode);
+			$oAttributeValue = new ormCustomCaseLog();
+			$oAttributeValue->AddLogEntriesFromCaseLog($oCaseLog);
+		
+			// New entry from current email
+			if($bInsertChangeUserId){
+				/** @var User $oUser */
+				$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $oUser->GetKey());
+			}
+			else{
+				$oAttributeValue->AddLogEntry($sCaseLogEntry, $sCallerName, $iCallerUserId, '');
+			}
+		
+			// Sort chronologically: ascending (true), descending (false = most recent on top)!
+			// This ensures that log entries are ordered chronologically, even if the e-mails were processed in the wrong order.
+			// However, it can not prevent a ticket (with description) being initially created from the chronologically speaking 'second' e-mail.
+			// That issue should be fixed now in newer versions of this extension which order the incoming e-mails first.
+			// This line still matters though, because agents might also have added logs in between.
+			$oAttributeValue = $oAttributeValue->ToSortedCaseLog(false);
+		
+			$oTicket->Set($sAttCode, $oAttributeValue);
+		
+			// Policy has already removed unwanted contacts
+			static::AddAdditionalContacts();
+
+			// Update values.
+			// - Applied before DBUpdate(), so there is only one write and the update triggers see the new values.
+			// - $this->...$ refers to the ticket as it is at this point (including the new case log entry, excluding these values).
+			$sUpdateValues = $oMailBox->Get('ticket_update_values') ?? '';
+			$aUpdateValues = static::ParseAttributeValues($sUpdateValues, ['this->object()' => $oTicket]);
+
+			ProcessingHelper::InitObjectFromDefaultValues($oTicket, $aUpdateValues);
+
+			static::BeforeUpdateTicket();
+
 			try {
 				$oTicket->DBUpdate();
 				static::Trace("Ticket '{$oTicket->GetName()}' has been updated.");
