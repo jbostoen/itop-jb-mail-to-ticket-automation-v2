@@ -815,7 +815,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 		$this->Trace($sDetailedErrorMessage);
 
 		// LogAPI
-		IssueLog::Error($sDetailedErrorMessage, 'CLI'); // \LogChannels::CLI isn't available in iTop < 3.0.0
+		ProcessingHelper::ErrorChannel('CLI', $sDetailedErrorMessage);
 		
 	}
 	

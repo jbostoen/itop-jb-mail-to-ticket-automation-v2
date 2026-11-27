@@ -2,11 +2,11 @@
 
 namespace Combodo\iTop\Extension\EmailSynchro\Service;
 
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 use Combodo\iTop\Extension\EmailSynchro\Helper\ProviderHelper;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
 // iTop internals.
-use IssueLog;
 
 // iTop classes.
 use MailInboxBase;
@@ -52,7 +52,7 @@ class IMAPOAuthEmailSource extends IMAPEmailSource {
 			// information throws a plain RuntimeException (AccessToken::hasExpired()), and a network
 			// failure reaching the token endpoint throws a Guzzle transfer exception - neither extends
 			// IdentityProviderException, so both would otherwise escape uncaught from here.
-			IssueLog::Error('Failed to get IMAP oAuth credentials for incoming mails for provider '.$sVendorName, static::LOG_CHANNEL, [
+			ProcessingHelper::ErrorChannel(static::LOG_CHANNEL, 'Failed to get IMAP oAuth credentials for incoming mails for provider '.$sVendorName, [
 				'exception.message' => $e->getMessage(),
 				'exception.stack' => $e->getTraceAsString(),
 			]);

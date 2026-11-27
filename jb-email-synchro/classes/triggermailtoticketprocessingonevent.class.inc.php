@@ -5,6 +5,8 @@
  * @version     3.2.261023
  */
 
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
+
 /**
  * Class TriggerMailToTicketProcessingOnEvent.
  * A trigger that is activated upon an event during the processing of incoming e-mails (see JeffreyBostoenExtensions\MailToTicket\eEvent),
@@ -117,7 +119,7 @@ class TriggerMailToTicketProcessingOnEvent extends Trigger {
 				static::$aAppliesToMailbox[$sCacheKey] = (new DBObjectSet($oSearch))->Count() > 0;
 			}
 			catch(Throwable $e) {
-				IssueLog::Warning("TriggerMailToTicketProcessingOnEvent #{$this->GetKey()}: invalid mailbox query, trigger skipped: ".$e->getMessage());
+				ProcessingHelper::Warning("TriggerMailToTicketProcessingOnEvent #{$this->GetKey()}: invalid mailbox query, trigger skipped: ".$e->getMessage());
 				static::$aAppliesToMailbox[$sCacheKey] = false;
 			}
 

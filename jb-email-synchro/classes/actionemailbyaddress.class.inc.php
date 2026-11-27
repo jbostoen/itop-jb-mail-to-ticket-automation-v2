@@ -5,6 +5,8 @@
  * @version     3.2.260711
  */
 
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
+
 /**
  * Class ActionEmailByAddress.
  * An ActionEmail that can additionally reach recipients that have no corresponding Person/Contact record in iTop
@@ -114,7 +116,7 @@ class ActionEmailByAddress extends ActionEmail {
 				}
 
 				if(!filter_var($sAddress, FILTER_VALIDATE_EMAIL)) {
-					IssueLog::Warning("ActionEmailByAddress #{$this->GetKey()}: '$sRecipAttCode' address resolved to an invalid e-mail address (\"$sAddress\"), skipped.");
+					ProcessingHelper::Warning("ActionEmailByAddress #{$this->GetKey()}: '$sRecipAttCode' address resolved to an invalid e-mail address (\"$sAddress\"), skipped.");
 					continue;
 				}
 

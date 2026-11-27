@@ -146,6 +146,68 @@ abstract class ProcessingHelper {
 	}
 
 	/**
+	 * Logs a warning to the dedicated mail-to-ticket log.
+	 *
+	 * @param string $sMessage The message.
+	 * @param mixed ...$args Optional sprintf() arguments.
+	 *
+	 * @return void
+	 */
+	public static function Warning($sMessage, ...$args) : void {
+
+		$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
+
+		Logger::Warning($sMessage, Logger::CHANNEL_DEFAULT);
+
+	}
+
+	/**
+	 * Logs a warning to the dedicated mail-to-ticket log, tagged with a specific log channel.
+	 *
+	 * @param string $sChannel The log channel to tag this message with.
+	 * @param string $sMessage The message (used as-is, no sprintf() formatting).
+	 * @param array $aContext Optional context data.
+	 *
+	 * @return void
+	 */
+	public static function WarningChannel(string $sChannel, string $sMessage, array $aContext = []) : void {
+
+		Logger::Warning($sMessage, $sChannel, $aContext);
+
+	}
+
+	/**
+	 * Logs an error to the dedicated mail-to-ticket log.
+	 *
+	 * @param string $sMessage The message.
+	 * @param mixed ...$args Optional sprintf() arguments.
+	 *
+	 * @return void
+	 */
+	public static function Error($sMessage, ...$args) : void {
+
+		$sMessage = (count($args) > 0) ? sprintf($sMessage, ...$args) : $sMessage;
+
+		Logger::Error($sMessage, Logger::CHANNEL_DEFAULT);
+
+	}
+
+	/**
+	 * Logs an error to the dedicated mail-to-ticket log, tagged with a specific log channel.
+	 *
+	 * @param string $sChannel The log channel to tag this message with.
+	 * @param string $sMessage The message (used as-is, no sprintf() formatting).
+	 * @param array $aContext Optional context data, e.g. exception details.
+	 *
+	 * @return void
+	 */
+	public static function ErrorChannel(string $sChannel, string $sMessage, array $aContext = []) : void {
+
+		Logger::Error($sMessage, $sChannel, $aContext);
+
+	}
+
+	/**
 	 * Trace function used for debugging during a cron run.
 	 * Echoes the message when the module's 'debug' setting is enabled (matching the existing
 	 * cron-visible tracing behavior), and always logs it to the 'cron' channel.

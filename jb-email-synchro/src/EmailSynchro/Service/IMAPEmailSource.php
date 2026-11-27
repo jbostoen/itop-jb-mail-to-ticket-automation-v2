@@ -13,7 +13,6 @@ use DirectoryTree\ImapEngine\Message;
 use EmailSource;
 use Exception;
 use Throwable;
-use IssueLog;
 use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
 use MailInboxBase;
 use MessageFromMailbox;
@@ -77,7 +76,7 @@ class IMAPEmailSource extends EmailSource {
 		$this->sTargetFolder = $oMailbox->Get('target_folder');
 		$this->sPassword = $this->sAccessToken ?? $oMailbox->Get('password');
 
-		IssueLog::Debug("IMAPEmailSource Start for $this->sServer", static::LOG_CHANNEL);
+		ProcessingHelper::TraceChannel(static::LOG_CHANNEL, "IMAPEmailSource Start for $this->sServer");
 		$sEncryption = match((string) $oMailbox->Get('encryption')) {
 			'ssl' => 'ssl',
 			'starttls' => 'starttls',
@@ -148,7 +147,7 @@ class IMAPEmailSource extends EmailSource {
 			$sMessage = "IMAP UIDVALIDITY changed for mailbox '{$this->sServer}/{$this->sMailbox}' (was {$sLastUidValidity}, now {$sCurrentUidValidity}). ".
 				"Previously-recorded IMAP UIDs for this mailbox may now refer to different messages than before. ".
 				"If 'Use Message-ID as UID' is disabled for this mailbox, verify its EmailReplica entries.";
-			IssueLog::Warning($sMessage, static::LOG_CHANNEL);
+			ProcessingHelper::WarningChannel(static::LOG_CHANNEL, $sMessage);
 			$this->oMailboxObject->Trace($sMessage);
 
 		}
@@ -187,9 +186,9 @@ class IMAPEmailSource extends EmailSource {
 	 */
 	public function GetMessagesCount() : int {
 
-		IssueLog::Debug(static::LOG_DEBUG_CLASS." Start GetMessagesCount for $this->sServer", static::LOG_CHANNEL);
+		ProcessingHelper::TraceChannel(static::LOG_CHANNEL, static::LOG_DEBUG_CLASS." Start GetMessagesCount for $this->sServer");
 		$iCount = $this->GetFolder()->status()['MESSAGES'] ?? 0;
-		IssueLog::Debug(static::LOG_DEBUG_CLASS." $iCount message(s) found for $this->sServer", static::LOG_CHANNEL);
+		ProcessingHelper::TraceChannel(static::LOG_CHANNEL, static::LOG_DEBUG_CLASS." $iCount message(s) found for $this->sServer");
 
 		return $iCount;
 	}
@@ -200,7 +199,7 @@ class IMAPEmailSource extends EmailSource {
 	 */
 	public function GetMessage(MessageHandler $oMsgHandler) : ?MessageFromMailbox {
 
-		IssueLog::Debug(__METHOD__." for $this->sServer", static::LOG_CHANNEL);
+		ProcessingHelper::TraceChannel(static::LOG_CHANNEL, __METHOD__." for $this->sServer");
 		try {
 
 			/** @var Message $oMessage */
@@ -216,7 +215,7 @@ class IMAPEmailSource extends EmailSource {
 
 		} catch(Throwable $e) {
 
-			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
+			ProcessingHelper::ErrorChannel(static::LOG_CHANNEL, __METHOD__." for $this->sServer throws an exception", [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
 			]);
@@ -248,7 +247,7 @@ class IMAPEmailSource extends EmailSource {
 
 
 		} catch(Throwable $e) {
-			IssueLog::Error(__METHOD__."  for $this->sServer throws an exception", static::LOG_CHANNEL, [
+			ProcessingHelper::ErrorChannel(static::LOG_CHANNEL, __METHOD__."  for $this->sServer throws an exception", [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
 			]);
@@ -281,7 +280,7 @@ class IMAPEmailSource extends EmailSource {
 
 		}
 		catch(Throwable $e) {
-			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
+			ProcessingHelper::ErrorChannel(static::LOG_CHANNEL, __METHOD__." for $this->sServer throws an exception", [
 				'exception.message' => $e->getMessage(),
 				'exception.stack' => $e->getTraceAsString(),
 			]);
@@ -370,7 +369,7 @@ class IMAPEmailSource extends EmailSource {
 			$this->bMessagesDeleted = true;
 
 		} catch(Throwable $e) {
-			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
+			ProcessingHelper::ErrorChannel(static::LOG_CHANNEL, __METHOD__." for $this->sServer throws an exception", [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
 			]);
@@ -398,7 +397,7 @@ class IMAPEmailSource extends EmailSource {
 			$oMessage->copy($sTargetFolder);
 
 		} catch(Throwable $e) {
-			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
+			ProcessingHelper::ErrorChannel(static::LOG_CHANNEL, __METHOD__." for $this->sServer throws an exception", [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
 			]);
@@ -426,7 +425,7 @@ class IMAPEmailSource extends EmailSource {
 			
 
 		} catch(Throwable $e) {
-			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
+			ProcessingHelper::ErrorChannel(static::LOG_CHANNEL, __METHOD__." for $this->sServer throws an exception", [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
 			]);
@@ -448,7 +447,7 @@ class IMAPEmailSource extends EmailSource {
 
 			// Expunge deleted messages before disconnecting.
 			if($this->bMessagesDeleted) {
-				IssueLog::Debug(__METHOD__." Expunging deleted messages for $this->sServer", static::LOG_CHANNEL);
+				ProcessingHelper::TraceChannel(static::LOG_CHANNEL, __METHOD__." Expunging deleted messages for $this->sServer");
 				$this->GetFolder()->expunge();
 			}
 
@@ -457,7 +456,7 @@ class IMAPEmailSource extends EmailSource {
 		} catch(Throwable $e) {
 			// A dropped connection here (e.g. between expunge() and disconnect()) must not abort the whole
 			// cron run: every caller of Disconnect() runs it unguarded inside a loop over all mailboxes.
-			IssueLog::Error(__METHOD__." for $this->sServer throws an exception", static::LOG_CHANNEL, [
+			ProcessingHelper::ErrorChannel(static::LOG_CHANNEL, __METHOD__." for $this->sServer throws an exception", [
 				'exception.message' => $e->getMessage(),
 				'exception.stack'   => $e->getTraceAsString(),
 			]);

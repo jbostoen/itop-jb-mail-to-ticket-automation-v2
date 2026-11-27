@@ -1,4 +1,7 @@
 <?php
+
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
+
 // Copyright (C) 2019 Combodo SARL
 //
 //   This program is free software; you can redistribute it and/or modify
@@ -102,7 +105,7 @@ class EmailReplica extends DBObject {
 		$sKey = MetaModel::GetConfig()->GetEncryptionKey();
 
 		if($sKey === DEFAULT_ENCRYPTION_KEY) {
-			IssueLog::Warning('Message-ID signing is using the hardcoded default encryption key (no Sodium, OpenSSL or Mcrypt available); this is a publicly known secret and defeats the purpose of signing Message-IDs.', 'jb-email-synchro');
+			ProcessingHelper::WarningChannel('jb-email-synchro', 'Message-ID signing is using the hardcoded default encryption key (no Sodium, OpenSSL or Mcrypt available); this is a publicly known secret and defeats the purpose of signing Message-IDs.');
 		}
 
 		return $sKey;

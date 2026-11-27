@@ -1,4 +1,7 @@
 <?php
+
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
+
 // Copyright (C) 2012-2019 Combodo SARL
 //
 //   This program is free software; you can redistribute it and/or modify
@@ -86,7 +89,7 @@ class MessageFromMailbox extends RawEmailMessage {
 		$oRelatedObject = $this->GetRelatedObject();
 		$iTime = strtotime($this->GetHeader('date'), 0); // Parse the RFC822 date format
 		if($iTime === false) {
-			IssueLog::Trace("Missing or unparsable Date header for message '{$this->sUIDL}', falling back to the current time.", 'jb-email-synchro');
+			ProcessingHelper::TraceChannel('jb-email-synchro', "Missing or unparsable Date header for message '{$this->sUIDL}', falling back to the current time.");
 			$iTime = time();
 		}
  		$sDate = date('Y-m-d H:i:s', $iTime);

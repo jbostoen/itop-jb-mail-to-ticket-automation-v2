@@ -2,8 +2,8 @@
 
 namespace Combodo\iTop\Extension\EmailSynchro\Service;
 
+use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 use DirectoryTree\ImapEngine\Connection\Loggers\LoggerInterface;
-use IssueLog;
 use MailInboxBase;
 
 class IMAPEmailLogger implements LoggerInterface {
@@ -61,7 +61,7 @@ class IMAPEmailLogger implements LoggerInterface {
 			static::$oCurrentMailbox->Trace($sMessage);
 		}
 		else {
-			IssueLog::Debug($sMessage, static::LOG_CHANNEL);
+			ProcessingHelper::TraceChannel(static::LOG_CHANNEL, $sMessage);
 		}
 
 	}
