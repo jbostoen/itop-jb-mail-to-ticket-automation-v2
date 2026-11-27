@@ -2,7 +2,6 @@
 
 namespace Combodo\iTop\Extension\EmailSynchro\Service;
 
-use JeffreyBostoenExtensions\MailToTicket\Helper;
 use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 
 use DirectoryTree\ImapEngine\Enums\ImapFetchIdentifier;
@@ -673,43 +672,6 @@ class IMAPEmailSource extends EmailSource {
 
 		return $this->oMailbox;
 		
-	}
-
-
-	/**
-	 * Returns a Message (DirectoryTree\ImapEngine\Message) object based on the given message data.
-	 *
-	 * @param array $aMessage Message data
-	 * @return Message|null
-	 */
-	private function GetMessageFromData(array $aMessage) : ?Message {
-
-		if(Helper::UseMessageIdAsUid()) {
-
-			// - Current version of this extension 
-			//   will use the current uid (= the one that is currently returned from the mail server through the GetListing() method.).
-
-				$iIndex = $aMessage['uid'];
-				$identifier = ImapFetchIdentifier::Uid;
-
-
-				// Note: This might also work, but if a copy of the same message (same Message-ID) is present, it gets more tricky to process.
-				// $message = $inbox->messages()->whereHeader('Message-ID', '<unique-id@example.com>')->first();
-
-		} else {
-
-			$iIndex = $aMessage['original_number_in_listing'] + 1;
-			$identifier = ImapFetchIdentifier::MessageNumber;
-
-		}
-
-		/** @var Message $oMessage */
-		$oMessage = $this->GetFolder()
-			->messages()
-			->find($iIndex, $identifier);
-
-		return $oMessage;
-
 	}
 
 
