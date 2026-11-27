@@ -407,7 +407,7 @@ class IMAPEmailSource extends EmailSource {
 			}
 		}
 
-		return $this->GetFolder()->messages()->uids()->all();
+		return $this->GetFolder()->messages()->oldest()->uids()->all();
 
 	}
 
