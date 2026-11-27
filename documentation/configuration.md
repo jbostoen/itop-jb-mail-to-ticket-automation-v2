@@ -27,6 +27,7 @@ Mind that especially when processing lots of new e-mails, it may be important to
 * **Mail From Address** - The e-mail address shown as "Sender" for any error/bounce e-mails that are sent
 * **Active** - Check mailbox.
 * **Simulation mode** - E-mails are processed and traced, but nothing is changed: no tickets, contacts, attachments or references are created or updated, no e-mails are deleted, moved or marked, no replicas are written, and no event triggers or notifications are sent. The outcome that would have happened is traced. Messages are processed again in every run, so turn it off once the configuration is validated.
+* **Maximum messages per run** - The maximum number of new messages that is processed per run for this mailbox (default: 1000). The remaining messages are processed in the next runs. Messages that were processed before, or that are skipped (error, ignored, undesired), do not count. Use 0 for no limit. In simulation mode, the same messages are processed again in every run, so the limit also applies to the simulated messages.
 * **Debug trace** - Debug log.
 * **Mail Aliases** - One per line. Regex patterns allowed. List each email address (minimum 1)
 * **Encryption** - How the connection to the server is secured: SSL/TLS (implicit TLS, usually port 993; default and recommended), STARTTLS (usually port 143) or none. Without encryption, credentials and mail content are sent unprotected.

@@ -43,6 +43,8 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'No',
 	'Class:MailInboxBase/Attribute:simulation_mode' => 'Modalità simulazione',
 	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Solo se impostato su "Sì", le e-mail vengono elaborate e tracciate, ma nulla viene modificato: non vengono creati o aggiornati ticket, contatti o allegati, le e-mail non vengono eliminate, spostate o contrassegnate e non vengono inviate notifiche né trigger di eventi. I messaggi vengono elaborati di nuovo a ogni esecuzione.',
+	'Class:MailInboxBase/Attribute:max_messages_per_run' => 'Numero massimo di messaggi per esecuzione',
+	'Class:MailInboxBase/Attribute:max_messages_per_run+' => 'Numero massimo di nuovi messaggi elaborati per esecuzione per questa casella di posta. I messaggi rimanenti vengono elaborati nelle esecuzioni successive. Usare 0 per nessun limite.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Crittografia',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Come viene protetta la connessione al server di posta.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

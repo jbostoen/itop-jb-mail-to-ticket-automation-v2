@@ -43,6 +43,8 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Nein',
 	'Class:MailInboxBase/Attribute:simulation_mode' => 'Simulationsmodus',
 	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Nur wenn auf "Ja" gesetzt, werden E-Mails verarbeitet und protokolliert, aber nichts wird geändert: Es werden keine Tickets, Kontakte oder Anhänge erstellt oder aktualisiert, E-Mails werden nicht gelöscht, verschoben oder markiert, und es werden keine Benachrichtigungen oder Ereignis-Trigger gesendet. Nachrichten werden bei jedem Lauf erneut verarbeitet.',
+	'Class:MailInboxBase/Attribute:max_messages_per_run' => 'Maximale Nachrichten pro Durchlauf',
+	'Class:MailInboxBase/Attribute:max_messages_per_run+' => 'Maximale Anzahl neuer Nachrichten, die pro Durchlauf für dieses Postfach verarbeitet werden. Die übrigen Nachrichten werden in den nächsten Durchläufen verarbeitet. 0 bedeutet keine Begrenzung.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Verschlüsselung',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Wie die Verbindung zum Mailserver gesichert wird.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

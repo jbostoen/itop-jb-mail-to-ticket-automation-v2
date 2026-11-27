@@ -875,6 +875,9 @@ EOF
 								<item id="simulation_mode">
 									<rank>85</rank>
 								</item>
+								<item id="max_messages_per_run">
+									<rank>86</rank>
+								</item>
 								<item id="trace">
 									<rank>90</rank>
 								</item>

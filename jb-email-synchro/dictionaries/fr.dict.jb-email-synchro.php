@@ -43,6 +43,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Non',
 	'Class:MailInboxBase/Attribute:simulation_mode' => 'Mode simulation',
 	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Uniquement si "Oui", les e-mails sont traités et tracés, mais rien n\'est modifié : aucun ticket, contact ou pièce jointe n\'est créé ou mis à jour, aucun e-mail n\'est supprimé, déplacé ou marqué, et aucune notification ni aucun déclencheur d\'événement n\'est envoyé. Les messages sont traités à nouveau à chaque exécution.',
+	'Class:MailInboxBase/Attribute:max_messages_per_run' => 'Nombre maximum de messages par exécution',
+	'Class:MailInboxBase/Attribute:max_messages_per_run+' => 'Nombre maximum de nouveaux messages traités par exécution pour cette boîte. Les messages restants sont traités lors des exécutions suivantes. Utiliser 0 pour ne pas avoir de limite.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Chiffrement',
 	'Class:MailInboxBase/Attribute:encryption+' => 'La manière dont la connexion au serveur de messagerie est sécurisée.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

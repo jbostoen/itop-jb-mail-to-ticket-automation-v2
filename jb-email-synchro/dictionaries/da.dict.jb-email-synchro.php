@@ -43,6 +43,8 @@ Dict::Add('DA DA', 'Danish', 'Dansk', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Nej',
 	'Class:MailInboxBase/Attribute:simulation_mode' => 'Simuleringstilstand',
 	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Kun hvis sat til "Ja" behandles og logges e-mails, men intet ændres: der oprettes eller opdateres ingen sager, kontakter eller vedhæftede filer, e-mails slettes, flyttes eller markeres ikke, og der sendes ingen notifikationer eller hændelsestriggere. Beskeder behandles igen ved hver kørsel.',
+	'Class:MailInboxBase/Attribute:max_messages_per_run' => 'Maksimalt antal beskeder pr. kørsel',
+	'Class:MailInboxBase/Attribute:max_messages_per_run+' => 'Maksimalt antal nye beskeder, der behandles pr. kørsel for denne mailboks. De resterende beskeder behandles i de næste kørsler. Brug 0 for ingen grænse.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Kryptering',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Hvordan forbindelsen til mailserveren sikres.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

@@ -43,6 +43,8 @@ Dict::Add('SV SV', 'Swedish', 'Svenska', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Nej',
 	'Class:MailInboxBase/Attribute:simulation_mode' => 'Simuleringsläge',
 	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Endast om det är satt till "Ja" bearbetas och loggas e-postmeddelanden, men inget ändras: inga ärenden, kontakter eller bilagor skapas eller uppdateras, e-postmeddelanden raderas, flyttas eller markeras inte och inga aviseringar eller händelsetriggers skickas. Meddelanden bearbetas igen vid varje körning.',
+	'Class:MailInboxBase/Attribute:max_messages_per_run' => 'Maximalt antal meddelanden per körning',
+	'Class:MailInboxBase/Attribute:max_messages_per_run+' => 'Maximalt antal nya meddelanden som behandlas per körning för den här brevlådan. De återstående meddelandena behandlas i nästa körningar. Använd 0 för ingen gräns.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Kryptering',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Hur anslutningen till e-postservern skyddas.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

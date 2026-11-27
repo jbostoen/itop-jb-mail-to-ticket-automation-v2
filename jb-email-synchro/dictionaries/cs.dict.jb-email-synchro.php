@@ -43,6 +43,8 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Ne',
 	'Class:MailInboxBase/Attribute:simulation_mode' => 'Simulační režim',
 	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Pouze pokud je nastaveno na "Ano", jsou e-maily zpracovány a zaznamenány, ale nic se nemění: nevytvářejí se ani neaktualizují tikety, kontakty ani přílohy, e-maily se nemažou, nepřesouvají ani neoznačují a neodesílají se žádná oznámení ani spouštěče událostí. Zprávy se zpracovávají znovu při každém spuštění.',
+	'Class:MailInboxBase/Attribute:max_messages_per_run' => 'Maximální počet zpráv na běh',
+	'Class:MailInboxBase/Attribute:max_messages_per_run+' => 'Maximální počet nových zpráv zpracovaných v jednom běhu pro tuto schránku. Zbývající zprávy se zpracují v dalších bězích. Hodnota 0 znamená bez omezení.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Šifrování',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Způsob zabezpečení připojení k poštovnímu serveru.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

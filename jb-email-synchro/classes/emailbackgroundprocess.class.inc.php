@@ -246,6 +246,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					$iListedMessages = 0;
 					/** @var bool $bInBatch Whether a batch is being handled (as opposed to a batch being read from the mail server). */
 					$bInBatch = false;
+					/** @var int $iMaxMessages The maximum number of new messages to process per run for this mailbox. 0 means no limit. */
+					$iMaxMessages = max(0, (int)$oInbox->Get('max_messages_per_run'));
+					/** @var int $iMailboxProcessed The number of new messages processed during this run for this mailbox. */
+					$iMailboxProcessed = 0;
+					/** @var bool $bMaxMessagesReached Whether the maximum number of messages per run was reached. */
+					$bMaxMessagesReached = false;
 					/** @var int $iBatchSize The number of messages that is read from the mail server at once. */
 					$iBatchSize = max(1, (int)MetaModel::GetModuleSetting('jb-email-synchro', 'listing_batch_size', 100));
 
@@ -442,6 +448,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									case eNextAction::PROCESS_MESSAGE:
 								
 										$iTotalProcessed++;
+										$iMailboxProcessed++;
 										if($oEmailReplica->IsNew()) {
 											$this->Trace("Processing new message: {$sUIDL}");
 										}
@@ -663,9 +670,17 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								
 									$this->Trace(self::CRON_TIME_LIMIT_REACHED_MESSAGE);
 									break; // We'll do the rest later
-								
+
 								}
-							
+
+								if($iMaxMessages > 0 && $iMailboxProcessed >= $iMaxMessages) {
+
+									$this->Trace("Maximum number of messages per run ({$iMaxMessages}) reached for this mailbox: the rest is processed later.");
+									$bMaxMessagesReached = true;
+									break; // We'll do the rest later
+
+								}
+
 							
 							
 							}
@@ -704,7 +719,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								}
 							}
 
-							if($bAbortAllProcessing || time() > $iTimeLimit) {
+							if($bAbortAllProcessing || $bMaxMessagesReached || time() > $iTimeLimit) {
 								// The rest of the messages is processed later: not all messages of the listing were reached.
 								$bListingComplete = false;
 								break;

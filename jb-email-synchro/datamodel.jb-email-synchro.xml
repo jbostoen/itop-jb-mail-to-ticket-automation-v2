@@ -87,6 +87,11 @@
 					<default_value>no</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
+				<field id="max_messages_per_run" xsi:type="AttributeInteger">
+					<sql>max_messages_per_run</sql>
+					<default_value>1000</default_value>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
 				<field id="encryption" xsi:type="AttributeEnum">
 					<values>
 						<value id="ssl">

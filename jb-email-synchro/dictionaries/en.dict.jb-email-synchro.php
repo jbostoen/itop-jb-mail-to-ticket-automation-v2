@@ -43,6 +43,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'No',
 	'Class:MailInboxBase/Attribute:simulation_mode' => 'Simulation mode',
 	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Only if set to "Yes", e-mails are processed and traced, but nothing is changed: no tickets, contacts or attachments are created or updated, no e-mails are deleted, moved or marked, and no notifications or event triggers are sent. Messages are processed again in every run.',
+	'Class:MailInboxBase/Attribute:max_messages_per_run' => 'Maximum messages per run',
+	'Class:MailInboxBase/Attribute:max_messages_per_run+' => 'Maximum number of new messages that are processed per run for this mailbox. The remaining messages are processed in the next runs. Use 0 for no limit.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Encryption',
 	'Class:MailInboxBase/Attribute:encryption+' => 'How the connection to the mail server is secured.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

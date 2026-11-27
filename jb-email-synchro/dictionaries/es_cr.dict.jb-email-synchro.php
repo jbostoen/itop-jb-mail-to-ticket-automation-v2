@@ -43,6 +43,8 @@ Dict::Add('ES CR', 'Spanish', 'Español, Castellano', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'No',
 	'Class:MailInboxBase/Attribute:simulation_mode' => 'Modo de simulación',
 	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Solo si está en "Sí", los correos se procesan y se registran, pero no se modifica nada: no se crean ni actualizan tickets, contactos ni adjuntos, los correos no se eliminan, mueven ni marcan, y no se envían notificaciones ni disparadores de eventos. Los mensajes se procesan de nuevo en cada ejecución.',
+	'Class:MailInboxBase/Attribute:max_messages_per_run' => 'Máximo de mensajes por ejecución',
+	'Class:MailInboxBase/Attribute:max_messages_per_run+' => 'Número máximo de mensajes nuevos que se procesan por ejecución para este buzón. Los mensajes restantes se procesan en las siguientes ejecuciones. Use 0 para no tener límite.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Cifrado',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Cómo se protege la conexión con el servidor de correo.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

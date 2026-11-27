@@ -43,6 +43,8 @@ Dict::Add('PT BR', 'Brazilian', 'Brazilian', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Não',
 	'Class:MailInboxBase/Attribute:simulation_mode' => 'Modo de simulação',
 	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Somente se definido como "Sim", os e-mails são processados e registrados, mas nada é alterado: nenhum ticket, contato ou anexo é criado ou atualizado, os e-mails não são excluídos, movidos ou marcados, e nenhuma notificação ou gatilho de evento é enviado. As mensagens são processadas novamente a cada execução.',
+	'Class:MailInboxBase/Attribute:max_messages_per_run' => 'Máximo de mensagens por execução',
+	'Class:MailInboxBase/Attribute:max_messages_per_run+' => 'Número máximo de mensagens novas processadas por execução para esta caixa de correio. As restantes são processadas nas execuções seguintes. Use 0 para não ter limite.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Criptografia',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Como a conexão com o servidor de e-mail é protegida.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

@@ -43,6 +43,8 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Nee',
 	'Class:MailInboxBase/Attribute:simulation_mode' => 'Simulatiemodus',
 	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Alleen als dit op "Ja" staat, worden e-mails verwerkt en gelogd, maar wordt er niets gewijzigd: er worden geen tickets, contacten of bijlagen aangemaakt of bijgewerkt, e-mails worden niet verwijderd, verplaatst of gemarkeerd en er worden geen notificaties of gebeurtenistriggers verzonden. Berichten worden bij elke uitvoering opnieuw verwerkt.',
+	'Class:MailInboxBase/Attribute:max_messages_per_run' => 'Maximaal aantal berichten per uitvoering',
+	'Class:MailInboxBase/Attribute:max_messages_per_run+' => 'Maximaal aantal nieuwe berichten dat per uitvoering voor deze mailbox wordt verwerkt. De resterende berichten worden in de volgende uitvoeringen verwerkt. Gebruik 0 voor geen limiet.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Versleuteling',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Hoe de verbinding met de mailserver wordt beveiligd.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',
