@@ -33,6 +33,7 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         ),
         'S' => 
         array (
+            'Symfony\\Polyfill\\Time\\' => 22,
             'Symfony\\Polyfill\\Php85\\' => 23,
             'Symfony\\Polyfill\\Php84\\' => 23,
             'Symfony\\Polyfill\\Php83\\' => 23,
@@ -98,6 +99,10 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         'ZBateson\\MailMimeParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src',
+        ),
+        'Symfony\\Polyfill\\Time\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-time',
         ),
         'Symfony\\Polyfill\\Php85\\' => 
         array (
@@ -250,6 +255,8 @@ class ComposerStaticInitc8f3e702c8c4d5107e361f5644d678f8
         'RoundingMode' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/RoundingMode.php',
         'SQLite3Exception' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/SQLite3Exception.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
+        'Time\\Duration' => __DIR__ . '/..' . '/symfony/polyfill-time/Resources/stubs/Time/Duration.php',
+        'Time\\TimeException' => __DIR__ . '/..' . '/symfony/polyfill-time/Resources/stubs/Time/TimeException.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
     );
