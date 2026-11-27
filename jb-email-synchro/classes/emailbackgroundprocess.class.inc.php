@@ -305,409 +305,409 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							/** @var MessageHandler $oMsgHandler */
 							foreach($aBatch as $iMessage => $oMsgHandler) {
 
-							$oEmailReplica = null;
+								$oEmailReplica = null;
 
-							ProcessingHelper::SetMessageHandler($oMsgHandler);
+								ProcessingHelper::SetMessageHandler($oMsgHandler);
 
-							// - New e-mail; this no ticket object.
-							ProcessingHelper::SetTicket(null);
+								// - New e-mail; this no ticket object.
+								ProcessingHelper::SetTicket(null);
 						
-							// N°3218 initialize a new CMDBChange for each message
-							// we cannot use \CMDBObject::SetCurrentChange($oChange) as this would force to persist our change for each message
-							// even if no CMDBChangeOp is created during the message processing !
-							// By doing so we lose the ability to set the CMDBChange date
-							CMDBObject::SetCurrentChange(null);
-							CMDBObject::SetTrackInfo('Mail to ticket automation (background process)');
-							// Important: Don't use the \Combodo\iTop\Core\CMDBChange\CMDBChangeOrigin::EMAIL_PROCESSING yet, as it is only available in iTop 3.0+
-							CMDBObject::SetTrackOrigin('email-processing');
+								// N°3218 initialize a new CMDBChange for each message
+								// we cannot use \CMDBObject::SetCurrentChange($oChange) as this would force to persist our change for each message
+								// even if no CMDBChangeOp is created during the message processing !
+								// By doing so we lose the ability to set the CMDBChange date
+								CMDBObject::SetCurrentChange(null);
+								CMDBObject::SetTrackInfo('Mail to ticket automation (background process)');
+								// Important: Don't use the \Combodo\iTop\Core\CMDBChange\CMDBChangeOrigin::EMAIL_PROCESSING yet, as it is only available in iTop 3.0+
+								CMDBObject::SetTrackOrigin('email-processing');
 						
-							$bMessageEvents = false;
+								$bMessageEvents = false;
 						
-							try {
+								try {
 							
-								$this->InitMessageTrace($oSource, $oMsgHandler);
+									$this->InitMessageTrace($oSource, $oMsgHandler);
 							
-								$iTotalMessages++;
+									$iTotalMessages++;
 
-								$sUIDL = $oMsgHandler->GetInternalIdentifier();
+									$sUIDL = $oMsgHandler->GetInternalIdentifier();
 
-								/** @var EmailReplica|null $oEmailReplica */
-								$oEmailReplica = $aReplicas[$sUIDL] ?? null;
+									/** @var EmailReplica|null $oEmailReplica */
+									$oEmailReplica = $aReplicas[$sUIDL] ?? null;
 							
-								if($oEmailReplica === null) {
+									if($oEmailReplica === null) {
 								
-									$this->Trace("\nDispatching new message: uidl=$sUIDL index=$iMessage");
-									// Create a replica to keep track that we've processed this email
-									$oEmailReplica = new EmailReplica();
-									$oEmailReplica->Set('mailbox_id', $oInbox->GetKey());
-									$oEmailReplica->Set('uidl', $sUIDL);
-									$oEmailReplica->Set('mailbox_path', $oInbox->Get('mailbox')); // This is *still* here, in case the folder setting got updated on the mailbox (same ID).
-									$oEmailReplica->Set('message_id', $iMessage); // This will be set to the actual Message-ID/UIDL in ProcessMessage().
-									$oEmailReplica->Set('last_seen', date('Y-m-d H:i:s'));
+										$this->Trace("\nDispatching new message: uidl=$sUIDL index=$iMessage");
+										// Create a replica to keep track that we've processed this email
+										$oEmailReplica = new EmailReplica();
+										$oEmailReplica->Set('mailbox_id', $oInbox->GetKey());
+										$oEmailReplica->Set('uidl', $sUIDL);
+										$oEmailReplica->Set('mailbox_path', $oInbox->Get('mailbox')); // This is *still* here, in case the folder setting got updated on the mailbox (same ID).
+										$oEmailReplica->Set('message_id', $iMessage); // This will be set to the actual Message-ID/UIDL in ProcessMessage().
+										$oEmailReplica->Set('last_seen', date('Y-m-d H:i:s'));
 								
-									// Initialize e-mail for which there is currently no replica (yet, or anymore).
-									if(!$bSimulation && !$oMsgHandler->InitMessage()) {
-										$this->Trace("Failed to initialize message: uidl=$sUIDL index=$iMessage. The 'marked for removal' IMAP flag (if any) may not have been cleared.");
+										// Initialize e-mail for which there is currently no replica (yet, or anymore).
+										if(!$bSimulation && !$oMsgHandler->InitMessage()) {
+											$this->Trace("Failed to initialize message: uidl=$sUIDL index=$iMessage. The 'marked for removal' IMAP flag (if any) may not have been cleared.");
+										}
+								
 									}
+									else {
 								
-								}
-								else {
-								
-									if($oEmailReplica->Get('status') === 'error') {
-										$this->Trace("\nSkipping old (already processed) message: uidl=$sUIDL index=$iMessage marked as 'error'");
-										$iTotalSkippedError++;
-										continue;
-									}
-									elseif($oEmailReplica->Get('status') === 'ignored') {
-										$this->Trace("\nSkipping old (already processed) message: uidl=$sUIDL index=$iMessage marked as 'ignored'");
-										$iTotalSkippedIgnored++;
-										continue;
-									}
-									elseif($oEmailReplica->Get('status') === 'undesired') {
-										if($bSimulation) {
-											$this->Trace("Simulation: undesired message: uidl=$sUIDL index=$iMessage. It is not purged.");
+										if($oEmailReplica->Get('status') === 'error') {
+											$this->Trace("\nSkipping old (already processed) message: uidl=$sUIDL index=$iMessage marked as 'error'");
+											$iTotalSkippedError++;
+											continue;
+										}
+										elseif($oEmailReplica->Get('status') === 'ignored') {
+											$this->Trace("\nSkipping old (already processed) message: uidl=$sUIDL index=$iMessage marked as 'ignored'");
+											$iTotalSkippedIgnored++;
+											continue;
+										}
+										elseif($oEmailReplica->Get('status') === 'undesired') {
+											if($bSimulation) {
+												$this->Trace("Simulation: undesired message: uidl=$sUIDL index=$iMessage. It is not purged.");
+												$iTotalSkippedUndesired++;
+												continue;
+											}
+											$this->Trace("\nUndesired message: uidl=$sUIDL index=$iMessage");
+											$iDelay = MetaModel::GetModuleSetting('jb-email-synchro', 'undesired_purge_delay', 7) * 86400;
+											if($iDelay > 0) {
+												$sDate = $oEmailReplica->Get('message_date');
+												$oDate = DateTime::createFromFormat('Y-m-d H:i:s', $sDate);
+												if($oDate !== false) {
+													$iDate = $oDate->getTimestamp();
+													$iDelay -= time() - $iDate;
+												}
+												else {
+													// No usable message_date to measure elapsed time against: back-fill it
+													// with the current time so the delay can start decaying from the next
+													// run onward, instead of being recomputed from the full configured
+													// delay indefinitely (which would stall the purge forever).
+													$oEmailReplica->SetCurrentDate('message_date');
+													$oEmailReplica->DBWrite();
+												}
+											}
+											if($iDelay <= 0) {
+												$iDelay = MetaModel::GetModuleSetting('jb-email-synchro', 'undesired_purge_delay', 7);
+												$this->Trace("\nDeleting undesired message (replica kept for the retention sweep) due to purge delay threshold ({$iDelay}): uidl={$sUIDL} index={$iMessage}");
+												$bDeleted = $oMsgHandler->DeleteMessage();
+												$this->Trace('DeleteMessage() returned '.($bDeleted ? 'true' : 'false'));
+												if($bDeleted) {
+													$iTotalDeleted++;
+													Events::FireEvent(eEvent::MESSAGE_DELETED, ['reason' => 'The undesired message exceeded the purge delay.']);
+												}
+												if(!$oEmailReplica->IsNew()) {
+												   $aReplicas[$sUIDL] = $oEmailReplica;
+												}
+												continue;
+											}
 											$iTotalSkippedUndesired++;
 											continue;
 										}
-										$this->Trace("\nUndesired message: uidl=$sUIDL index=$iMessage");
-										$iDelay = MetaModel::GetModuleSetting('jb-email-synchro', 'undesired_purge_delay', 7) * 86400;
-										if($iDelay > 0) {
-											$sDate = $oEmailReplica->Get('message_date');
-											$oDate = DateTime::createFromFormat('Y-m-d H:i:s', $sDate);
-											if($oDate !== false) {
-												$iDate = $oDate->getTimestamp();
-												$iDelay -= time() - $iDate;
-											}
-											else {
-												// No usable message_date to measure elapsed time against: back-fill it
-												// with the current time so the delay can start decaying from the next
-												// run onward, instead of being recomputed from the full configured
-												// delay indefinitely (which would stall the purge forever).
-												$oEmailReplica->SetCurrentDate('message_date');
-												$oEmailReplica->DBWrite();
-											}
+										else {
+											$this->Trace("\nDispatching old (already read) message: uidl={$sUIDL} index={$iMessage}");						
 										}
-										if($iDelay <= 0) {
-											$iDelay = MetaModel::GetModuleSetting('jb-email-synchro', 'undesired_purge_delay', 7);
-											$this->Trace("\nDeleting undesired message (replica kept for the retention sweep) due to purge delay threshold ({$iDelay}): uidl={$sUIDL} index={$iMessage}");
+									}
+							
+									$eAction = ProcessingHelper::DispatchEmail($oEmailReplica);
+
+									// - Only a message that would be processed is simulated.
+									if($bSimulation && $eAction !== eNextAction::PROCESS_MESSAGE) {
+										$this->Trace("Simulation: uidl={$sUIDL} index={$iMessage}: the action would be {$eAction->name}.");
+										continue;
+									}
+
+									// - Only messages that are actually handled are reported; not the old ones that are skipped each run.
+									$bMessageEvents = !in_array($eAction, [eNextAction::NO_ACTION], true);
+									if($bMessageEvents) {
+										Events::FireEvent(eEvent::MESSAGE_STARTED);
+									}
+					
+									switch($eAction) {
+								
+										case eNextAction::MARK_MESSAGE_AS_ERROR:
+											$iTotalMarkedAsError++;
+											$this->Trace("Marking the message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
+											$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
+											Events::FireEvent(eEvent::MESSAGE_MARKED_ERROR);
+											break;
+								
+										case eNextAction::DELETE_MESSAGE:
+											$this->Trace("Deleting message (replica kept for the retention sweep): uidl={$sUIDL} index={$iMessage}");
 											$bDeleted = $oMsgHandler->DeleteMessage();
 											$this->Trace('DeleteMessage() returned '.($bDeleted ? 'true' : 'false'));
 											if($bDeleted) {
 												$iTotalDeleted++;
-												Events::FireEvent(eEvent::MESSAGE_DELETED, ['reason' => 'The undesired message exceeded the purge delay.']);
+												Events::FireEvent(eEvent::MESSAGE_DELETED, ['reason' => 'The message has no (valid) ticket anymore.']);
 											}
 											if(!$oEmailReplica->IsNew()) {
-											   $aReplicas[$sUIDL] = $oEmailReplica;
+												$aReplicas[$sUIDL] = $oEmailReplica;
 											}
-											continue;
-										}
-										$iTotalSkippedUndesired++;
-										continue;
-									}
-									else {
-										$this->Trace("\nDispatching old (already read) message: uidl={$sUIDL} index={$iMessage}");						
-									}
-								}
-							
-								$eAction = ProcessingHelper::DispatchEmail($oEmailReplica);
+											break;
+								
+										case eNextAction::PROCESS_MESSAGE:
+								
+											$iTotalProcessed++;
+											$iMailboxProcessed++;
+											if($oEmailReplica->IsNew()) {
+												$this->Trace("Processing new message: {$sUIDL}");
+											}
+											else {
+												$this->Trace("Processing old (already read) message: {$sUIDL}");
+											}
+			
+			
+											$oRawEmail = $oSource->GetMessage($oMsgHandler);
 
-								// - Only a message that would be processed is simulated.
-								if($bSimulation && $eAction !== eNextAction::PROCESS_MESSAGE) {
-									$this->Trace("Simulation: uidl={$sUIDL} index={$iMessage}: the action would be {$eAction->name}.");
+											// The message could not be fetched.
+											if(is_null($oRawEmail)) {
+
+												// - GetMessage() returns null both when this one message is broken and when the whole connection dropped.
+												//   A cheap call on the same connection (the message count) tells them apart: when it fails, the connection is dead.
+												//   Marking every remaining message as error would then be wrong, so the rest of this mailbox is skipped.
+												//   Only this mailbox is skipped: every other configured mailbox still deserves a chance in this cron run.
+												try {
+													$oSource->GetMessagesCount();
+												}
+												catch(Throwable $e) {
+													$this->Trace("Could not get message (raw email): {$sUIDL}. Skipping the rest of this mailbox due to an IMAP error: ".$e->getMessage());
+													Events::FireEvent(eEvent::MAILBOX_CONNECTION_FAILED, ['error_message' => $e->getMessage()]);
+													$oSource->Disconnect();
+													continue 4;
+												}
+
+												// - The connection works: this message is the problem. It is marked as error, so it does not block the other messages in every run.
+												$iTotalMarkedAsError++;
+												$this->Trace("Could not get message (raw email): {$sUIDL}. The connection still works; marking the message (and replica) as in error.");
+												$oProcessor->SetLastError("Failed to fetch the message ({$sUIDL})", 'The message could not be fetched from the mailbox.');
+												$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
+												$aReplicas[$sUIDL] = $oEmailReplica;
+												Events::FireEvent(eEvent::MESSAGE_MARKED_ERROR, ['reason' => 'The message could not be fetched.']);
+												break;
+
+											}
+
+
+											$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
+											ProcessingHelper::SetMail($oEmail);
+									
+											// Checks for valid caller (name, email), UIDL and attachments
+											if(!$oEmail->IsValid()) {
+
+												$eNextAction = $oProcessor->OnDecodeError($oSource, $sUIDL, $oEmail, $oRawEmail);
+												Events::FireEvent(eEvent::MESSAGE_DECODE_FAILED, ['invalid_reasons' => implode(', ', $oEmail->GetInvalidReasons())]);
+												$this->FireOutcomeEvent($eNextAction);
+
+												if($bSimulation) {
+													$this->Trace("Simulation: uidl={$sUIDL} index={$iMessage}: the action would be {$eNextAction->name}.");
+													$eNextAction = eNextAction::SKIP_FOR_NOW;
+												}
+
+												switch($eNextAction) {
+													case eNextAction::MARK_MESSAGE_AS_ERROR:
+														$iTotalMarkedAsError++;
+														$this->Trace("Failed to decode the message, marking the message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
+														$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
+														$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
+														break;
+								
+													case eNextAction::DELETE_MESSAGE:
+														$this->Trace("Failed to decode the message, deleting it (and its replica): {$sUIDL}");
+														if($oMsgHandler->DeleteMessage()) {
+															$iTotalDeleted++;
+														}
+														else {
+															$this->Trace("Failed to delete the message: {$sUIDL}");
+														}
+														if(!$oEmailReplica->IsNew()) {
+															$aReplicas[$sUIDL] = $oEmailReplica;
+														}
+												}
+											}
+									 
+											else {
+
+												$eNextAction = $oProcessor->ProcessMessage($oSource, $iMessage, $oEmail, $oEmailReplica);									  
+												$this->FireOutcomeEvent($eNextAction);
+												$this->Trace("EmailReplica ID after ProcessMessage(): ".$oEmailReplica->GetKey());
+						
+												if($bSimulation) {
+													$this->Trace("Simulation: uidl={$sUIDL} index={$iMessage}: the action would be {$eNextAction->name}.");
+													$eNextAction = eNextAction::SKIP_FOR_NOW;
+												}
+
+												switch($eNextAction) {
+											
+													case eNextAction::MARK_MESSAGE_AS_ERROR:
+
+														$iTotalMarkedAsError++;
+														$this->Trace("Marking the valid message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
+														$this->UpdateEmailReplica($oEmailReplica, $oProcessor);							
+														$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
+														break;
+	 
+													case eNextAction::MARK_MESSAGE_AS_UNDESIRED:
+
+														$iTotalUndesired++;
+														$this->Trace("Marking the message (and replica): uidl={$sUIDL} index={$iMessage} as undesired.");
+														$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'undesired');
+														$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
+														break;
+	 
+													case eNextAction::DELETE_MESSAGE:
+
+														$this->Trace("Deleting message (marked as DELETE_MESSAGE) (but not replica): {$sUIDL}");
+														if($oMsgHandler->DeleteMessage()) {
+															$iTotalDeleted++;
+														}
+														else {
+															$this->Trace("Failed to delete the message: {$sUIDL}");
+														}
+														if(!$oEmailReplica->IsNew()) { 
+															$aReplicas[$sUIDL] = $oEmailReplica;
+														}
+														break;
+											
+													case eNextAction::MOVE_MESSAGE:
+
+														$iTotalMoved++;
+														$this->Trace("Move message (and replica): $sUIDL / index $iMessage");
+														$bMoved = false;
+														try {
+															$sTargetFolder = $oInbox->Get('target_folder');
+															$bMoved = (bool) $oSource->MoveMessage($oMsgHandler, $sTargetFolder);
+														}
+														catch(Throwable $e) {
+															$this->Trace("Unable to move message: ".$e->getMessage());
+														}
+														if($bMoved) {
+															// Persist the replica even for a brand-new message: the moved
+															// message still physically exists (just in another folder), so
+															// without a replica row, a mailbox config also watching the
+															// target folder would see it as unprocessed and could create a
+															// duplicate ticket for it.
+															$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'ok', $oRawEmail);
+															Events::FireEvent(eEvent::MESSAGE_MOVED, ['target_folder' => $sTargetFolder]);
+														}
+														else {
+															// The move didn't actually happen: don't mark the replica 'ok',
+															// that would claim success for a message that's still sitting
+															// unmoved in its original folder.
+															$this->Trace("Move failed; marking the message (and replica) as in error instead of 'ok'.");
+															$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
+															Events::FireEvent(eEvent::MESSAGE_MARKED_ERROR, ['reason' => 'The message could not be moved.']);
+														}
+														$aReplicas[$sUIDL] = $oEmailReplica;
+														break;
+											
+													// @todo Seems to be unused in this fork. Clean up?
+													case eNextAction::PROCESS_ERROR:
+											
+														$sSubject = $oProcessor->GetLastErrorSubject();
+														$sMessage = $oProcessor->GetLastErrorMessage();
+														EmailBackgroundProcess::ReportError($sSubject, $sMessage, $oRawEmail);
+														$this->Trace("Deleting message (but not replica) due to process error: {$sUIDL}");
+														if($oMsgHandler->DeleteMessage()) {
+															$iTotalDeleted++;
+														}
+														else {
+															$this->Trace("Failed to delete the message: {$sUIDL}");
+														}
+														if(!$oEmailReplica->IsNew()) {								
+															$aReplicas[$sUIDL] = $oEmailReplica;
+														}
+														break;
+			
+											
+												
+													case eNextAction::SKIP_FOR_NOW:
+											
+														// Keep an already-persisted replica's existing row untouched: deleting it
+														// here would make the still-present message look brand new on the next
+														// poll (and could result in a duplicate ticket) instead of genuinely skipped.
+														$this->Trace('Skip for now.');
+														if(!$oEmailReplica->IsNew()) {
+															$aReplicas[$sUIDL] = $oEmailReplica;
+														}
+														break 2;
+												
+													case eNextAction::ABORT_ALL_FURTHER_PROCESSING:
+
+														// Keep an already-persisted replica's existing row untouched: deleting it
+														// here would make the still-present message look brand new on the next
+														// poll (and could result in a duplicate ticket) instead of genuinely skipped.
+														$this->Trace('Abort all further processing.');
+														if(!$oEmailReplica->IsNew()) {
+															$aReplicas[$sUIDL] = $oEmailReplica;
+														}
+														$bAbortAllProcessing = true;
+														break 3;
+												
+													default:
+													case eNextAction::NO_ACTION:
+											
+														$this->Trace("No more action for EmailReplica ID: ".$oEmailReplica->GetKey());
+														$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'ok', $oRawEmail);
+														$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
+														break;
+												
+												}
+
+											}
+									
+
+											break;
+					
+										case eNextAction::NO_ACTION:
+										default:
+											$this->Trace("No action for message (and replica): {$sUIDL}");
+											$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
+											break;
+									
+									}
+
+									if(time() > $iTimeLimit) {
+								
+										$this->Trace(self::CRON_TIME_LIMIT_REACHED_MESSAGE);
+										break; // We'll do the rest later
+
+									}
+
+									if($iMaxMessages > 0 && $iMailboxProcessed >= $iMaxMessages) {
+
+										$this->Trace("Maximum number of messages per run ({$iMaxMessages}) reached for this mailbox: the rest is processed later.");
+										$bMaxMessagesReached = true;
+										break; // We'll do the rest later
+
+									}
+
+							
+							
+								}
+								catch(Throwable $e) {
+
+									Events::FireEvent(eEvent::ERROR_PROCESSING, ['error_code' => get_class($e), 'error_message' => $e->getMessage()]);
+
+									if(!empty($oEmailReplica)) {
+										$this->Trace($e->getMessage());
+										$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
+									}
+
+									$this->LogProcessException($e, $oSource);
+
+									// Don't let one message's failure abort the entire cron run: move on to the next
+									// message. The mailbox's IMAP connection is still valid and reused by the rest of
+									// this foreach, so it's not disconnected here (unlike the IMAP-error path above).
 									continue;
 								}
+								finally {
 
-								// - Only messages that are actually handled are reported; not the old ones that are skipped each run.
-								$bMessageEvents = !in_array($eAction, [eNextAction::NO_ACTION], true);
-								if($bMessageEvents) {
-									Events::FireEvent(eEvent::MESSAGE_STARTED);
-								}
-					
-								switch($eAction) {
-								
-									case eNextAction::MARK_MESSAGE_AS_ERROR:
-										$iTotalMarkedAsError++;
-										$this->Trace("Marking the message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
-										$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
-										Events::FireEvent(eEvent::MESSAGE_MARKED_ERROR);
-										break;
-								
-									case eNextAction::DELETE_MESSAGE:
-										$this->Trace("Deleting message (replica kept for the retention sweep): uidl={$sUIDL} index={$iMessage}");
-										$bDeleted = $oMsgHandler->DeleteMessage();
-										$this->Trace('DeleteMessage() returned '.($bDeleted ? 'true' : 'false'));
-										if($bDeleted) {
-											$iTotalDeleted++;
-											Events::FireEvent(eEvent::MESSAGE_DELETED, ['reason' => 'The message has no (valid) ticket anymore.']);
-										}
-										if(!$oEmailReplica->IsNew()) {
-											$aReplicas[$sUIDL] = $oEmailReplica;
-										}
-										break;
-								
-									case eNextAction::PROCESS_MESSAGE:
-								
-										$iTotalProcessed++;
-										$iMailboxProcessed++;
-										if($oEmailReplica->IsNew()) {
-											$this->Trace("Processing new message: {$sUIDL}");
-										}
-										else {
-											$this->Trace("Processing old (already read) message: {$sUIDL}");
-										}
-			
-			
-										$oRawEmail = $oSource->GetMessage($oMsgHandler);
-
-										// The message could not be fetched.
-										if(is_null($oRawEmail)) {
-
-											// - GetMessage() returns null both when this one message is broken and when the whole connection dropped.
-											//   A cheap call on the same connection (the message count) tells them apart: when it fails, the connection is dead.
-											//   Marking every remaining message as error would then be wrong, so the rest of this mailbox is skipped.
-											//   Only this mailbox is skipped: every other configured mailbox still deserves a chance in this cron run.
-											try {
-												$oSource->GetMessagesCount();
-											}
-											catch(Throwable $e) {
-												$this->Trace("Could not get message (raw email): {$sUIDL}. Skipping the rest of this mailbox due to an IMAP error: ".$e->getMessage());
-												Events::FireEvent(eEvent::MAILBOX_CONNECTION_FAILED, ['error_message' => $e->getMessage()]);
-												$oSource->Disconnect();
-												continue 4;
-											}
-
-											// - The connection works: this message is the problem. It is marked as error, so it does not block the other messages in every run.
-											$iTotalMarkedAsError++;
-											$this->Trace("Could not get message (raw email): {$sUIDL}. The connection still works; marking the message (and replica) as in error.");
-											$oProcessor->SetLastError("Failed to fetch the message ({$sUIDL})", 'The message could not be fetched from the mailbox.');
-											$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
-											$aReplicas[$sUIDL] = $oEmailReplica;
-											Events::FireEvent(eEvent::MESSAGE_MARKED_ERROR, ['reason' => 'The message could not be fetched.']);
-											break;
-
-										}
-
-
-										$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
-										ProcessingHelper::SetMail($oEmail);
-									
-										// Checks for valid caller (name, email), UIDL and attachments
-										if(!$oEmail->IsValid()) {
-
-											$eNextAction = $oProcessor->OnDecodeError($oSource, $sUIDL, $oEmail, $oRawEmail);
-											Events::FireEvent(eEvent::MESSAGE_DECODE_FAILED, ['invalid_reasons' => implode(', ', $oEmail->GetInvalidReasons())]);
-											$this->FireOutcomeEvent($eNextAction);
-
-											if($bSimulation) {
-												$this->Trace("Simulation: uidl={$sUIDL} index={$iMessage}: the action would be {$eNextAction->name}.");
-												$eNextAction = eNextAction::SKIP_FOR_NOW;
-											}
-
-											switch($eNextAction) {
-												case eNextAction::MARK_MESSAGE_AS_ERROR:
-													$iTotalMarkedAsError++;
-													$this->Trace("Failed to decode the message, marking the message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
-													$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
-													$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
-													break;
-								
-												case eNextAction::DELETE_MESSAGE:
-													$this->Trace("Failed to decode the message, deleting it (and its replica): {$sUIDL}");
-													if($oMsgHandler->DeleteMessage()) {
-														$iTotalDeleted++;
-													}
-													else {
-														$this->Trace("Failed to delete the message: {$sUIDL}");
-													}
-													if(!$oEmailReplica->IsNew()) {
-														$aReplicas[$sUIDL] = $oEmailReplica;
-													}
-											}
-										}
-									 
-										else {
-
-											$eNextAction = $oProcessor->ProcessMessage($oSource, $iMessage, $oEmail, $oEmailReplica);									  
-											$this->FireOutcomeEvent($eNextAction);
-											$this->Trace("EmailReplica ID after ProcessMessage(): ".$oEmailReplica->GetKey());
-						
-											if($bSimulation) {
-												$this->Trace("Simulation: uidl={$sUIDL} index={$iMessage}: the action would be {$eNextAction->name}.");
-												$eNextAction = eNextAction::SKIP_FOR_NOW;
-											}
-
-											switch($eNextAction) {
-											
-												case eNextAction::MARK_MESSAGE_AS_ERROR:
-
-													$iTotalMarkedAsError++;
-													$this->Trace("Marking the valid message (and replica): uidl={$sUIDL} index={$iMessage} as in error.");
-													$this->UpdateEmailReplica($oEmailReplica, $oProcessor);							
-													$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
-													break;
-	 
-												case eNextAction::MARK_MESSAGE_AS_UNDESIRED:
-
-													$iTotalUndesired++;
-													$this->Trace("Marking the message (and replica): uidl={$sUIDL} index={$iMessage} as undesired.");
-													$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'undesired');
-													$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
-													break;
-	 
-												case eNextAction::DELETE_MESSAGE:
-
-													$this->Trace("Deleting message (marked as DELETE_MESSAGE) (but not replica): {$sUIDL}");
-													if($oMsgHandler->DeleteMessage()) {
-														$iTotalDeleted++;
-													}
-													else {
-														$this->Trace("Failed to delete the message: {$sUIDL}");
-													}
-													if(!$oEmailReplica->IsNew()) { 
-														$aReplicas[$sUIDL] = $oEmailReplica;
-													}
-													break;
-											
-												case eNextAction::MOVE_MESSAGE:
-
-													$iTotalMoved++;
-													$this->Trace("Move message (and replica): $sUIDL / index $iMessage");
-													$bMoved = false;
-													try {
-														$sTargetFolder = $oInbox->Get('target_folder');
-														$bMoved = (bool) $oSource->MoveMessage($oMsgHandler, $sTargetFolder);
-													}
-													catch(Throwable $e) {
-														$this->Trace("Unable to move message: ".$e->getMessage());
-													}
-													if($bMoved) {
-														// Persist the replica even for a brand-new message: the moved
-														// message still physically exists (just in another folder), so
-														// without a replica row, a mailbox config also watching the
-														// target folder would see it as unprocessed and could create a
-														// duplicate ticket for it.
-														$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'ok', $oRawEmail);
-														Events::FireEvent(eEvent::MESSAGE_MOVED, ['target_folder' => $sTargetFolder]);
-													}
-													else {
-														// The move didn't actually happen: don't mark the replica 'ok',
-														// that would claim success for a message that's still sitting
-														// unmoved in its original folder.
-														$this->Trace("Move failed; marking the message (and replica) as in error instead of 'ok'.");
-														$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
-														Events::FireEvent(eEvent::MESSAGE_MARKED_ERROR, ['reason' => 'The message could not be moved.']);
-													}
-													$aReplicas[$sUIDL] = $oEmailReplica;
-													break;
-											
-												// @todo Seems to be unused in this fork. Clean up?
-												case eNextAction::PROCESS_ERROR:
-											
-													$sSubject = $oProcessor->GetLastErrorSubject();
-													$sMessage = $oProcessor->GetLastErrorMessage();
-													EmailBackgroundProcess::ReportError($sSubject, $sMessage, $oRawEmail);
-													$this->Trace("Deleting message (but not replica) due to process error: {$sUIDL}");
-													if($oMsgHandler->DeleteMessage()) {
-														$iTotalDeleted++;
-													}
-													else {
-														$this->Trace("Failed to delete the message: {$sUIDL}");
-													}
-													if(!$oEmailReplica->IsNew()) {								
-														$aReplicas[$sUIDL] = $oEmailReplica;
-													}
-													break;
-			
-											
-												
-												case eNextAction::SKIP_FOR_NOW:
-											
-													// Keep an already-persisted replica's existing row untouched: deleting it
-													// here would make the still-present message look brand new on the next
-													// poll (and could result in a duplicate ticket) instead of genuinely skipped.
-													$this->Trace('Skip for now.');
-													if(!$oEmailReplica->IsNew()) {
-														$aReplicas[$sUIDL] = $oEmailReplica;
-													}
-													break 2;
-												
-												case eNextAction::ABORT_ALL_FURTHER_PROCESSING:
-
-													// Keep an already-persisted replica's existing row untouched: deleting it
-													// here would make the still-present message look brand new on the next
-													// poll (and could result in a duplicate ticket) instead of genuinely skipped.
-													$this->Trace('Abort all further processing.');
-													if(!$oEmailReplica->IsNew()) {
-														$aReplicas[$sUIDL] = $oEmailReplica;
-													}
-													$bAbortAllProcessing = true;
-													break 3;
-												
-												default:
-												case eNextAction::NO_ACTION:
-											
-													$this->Trace("No more action for EmailReplica ID: ".$oEmailReplica->GetKey());
-													$this->UpdateEmailReplica($oEmailReplica, $oProcessor, 'ok', $oRawEmail);
-													$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
-													break;
-												
-											}
-
-										}
-									
-
-										break;
-					
-									case eNextAction::NO_ACTION:
-									default:
-										$this->Trace("No action for message (and replica): {$sUIDL}");
-										$aReplicas[$sUIDL] = $oEmailReplica; // Remember this new replica, don't delete it later as "unused"
-										break;
-									
-								}
-
-								if(time() > $iTimeLimit) {
-								
-									$this->Trace(self::CRON_TIME_LIMIT_REACHED_MESSAGE);
-									break; // We'll do the rest later
+									if($bMessageEvents) {
+										Events::FireEvent(eEvent::MESSAGE_FINISHED);
+									}
+									ProcessingHelper::ClearMessageState();
 
 								}
-
-								if($iMaxMessages > 0 && $iMailboxProcessed >= $iMaxMessages) {
-
-									$this->Trace("Maximum number of messages per run ({$iMaxMessages}) reached for this mailbox: the rest is processed later.");
-									$bMaxMessagesReached = true;
-									break; // We'll do the rest later
-
-								}
-
-							
-							
-							}
-							catch(Throwable $e) {
-
-								Events::FireEvent(eEvent::ERROR_PROCESSING, ['error_code' => get_class($e), 'error_message' => $e->getMessage()]);
-
-								if(!empty($oEmailReplica)) {
-									$this->Trace($e->getMessage());
-									$this->UpdateEmailReplica($oEmailReplica, $oProcessor);
-								}
-
-								$this->LogProcessException($e, $oSource);
-
-								// Don't let one message's failure abort the entire cron run: move on to the next
-								// message. The mailbox's IMAP connection is still valid and reused by the rest of
-								// this foreach, so it's not disconnected here (unlike the IMAP-error path above).
-								continue;
-							}
-							finally {
-
-								if($bMessageEvents) {
-									Events::FireEvent(eEvent::MESSAGE_FINISHED);
-								}
-								ProcessingHelper::ClearMessageState();
-
-							}
 						
 							}
 
