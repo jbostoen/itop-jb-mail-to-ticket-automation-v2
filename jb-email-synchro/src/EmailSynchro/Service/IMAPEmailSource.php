@@ -251,15 +251,27 @@ class IMAPEmailSource extends EmailSource {
 		ProcessingHelper::TraceChannel(static::LOG_CHANNEL, __METHOD__." for $this->sServer");
 		try {
 
+			// - The headers were already fetched with the listing; only the body is fetched now.
+			//   Headers are fetched again only if they are not available.
+			$sHead = $oMsgHandler->GetMessageObject()?->head() ?? '';
+
+			$oQuery = $this->GetFolder()->messages()->withBody();
+			if($sHead === '') {
+				$oQuery->withHeaders();
+			}
+			else {
+				$oQuery->withoutHeaders();
+			}
+
 			/** @var Message $oMessage */
-			$oMessage = $this->GetFolder()
-				->messages()
-				->withHeaders()
-				->withBody()
-				->findOrFail($oMsgHandler->GetUid(), ImapFetchIdentifier::Uid);
+			$oMessage = $oQuery->findOrFail($oMsgHandler->GetUid(), ImapFetchIdentifier::Uid);
 
 			if(!$oMessage) {
 				return null;
+			}
+
+			if($sHead === '') {
+				$sHead = $oMessage->head();
 			}
 
 		} catch(Throwable $e) {
@@ -271,7 +283,7 @@ class IMAPEmailSource extends EmailSource {
 
 			return null;
 		}
-		$oNewMail = new MessageFromMailbox($oMsgHandler->GetInternalIdentifier(), $oMessage->head(), $oMessage->body());
+		$oNewMail = new MessageFromMailbox($oMsgHandler->GetInternalIdentifier(), $sHead, $oMessage->body());
 
 		return $oNewMail;
 	}
