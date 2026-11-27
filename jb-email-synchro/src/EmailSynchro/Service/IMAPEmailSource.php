@@ -13,6 +13,7 @@ use DirectoryTree\ImapEngine\MailboxInterface;
 use DirectoryTree\ImapEngine\Message;
 use EmailSource;
 use Exception;
+use Generator;
 use Throwable;
 use JeffreyBostoenExtensions\MailToTicket\MessageHandler;
 use MailInboxBase;
@@ -396,6 +397,48 @@ class IMAPEmailSource extends EmailSource {
 		}
 
 		return $this->GetFolder()->messages()->uids()->all();
+
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function IterateListing(int $iBatchSize) : Generator {
+
+		$iBatchSize = max(1, $iBatchSize);
+		$oQuery = $this->GetFolder()->messages()->withHeaders();
+
+		// - Oldest first. Without server-side sorting, the messages come in the order of their UID (arrival order).
+		if($this->HasCapability('SORT')) {
+			$oQuery->sortBy(ImapSortKey::Date);
+		}
+
+		$aBatch = [];
+		$iIndex = 0;
+
+		// - The messages are fetched in batches, only when they are needed.
+		/** @var Message $oMessage */
+		foreach($oQuery->lazy($iBatchSize) as $oMessage) {
+
+			try {
+				$aBatch[$iIndex] = MessageHandler::FromMessage($oMessage, $this, $iIndex);
+			}
+			catch(Throwable $e) {
+				ProcessingHelper::TraceChannel(static::LOG_CHANNEL, static::LOG_DEBUG_CLASS." Unable to read message with UID {$oMessage->uid()} for $this->sServer: ".$e->getMessage());
+			}
+
+			$iIndex++;
+
+			if(count($aBatch) >= $iBatchSize) {
+				yield $aBatch;
+				$aBatch = [];
+			}
+
+		}
+
+		if($aBatch !== []) {
+			yield $aBatch;
+		}
 
 	}
 

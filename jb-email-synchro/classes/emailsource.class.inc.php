@@ -113,6 +113,29 @@ abstract class EmailSource {
 	abstract public function GetListing() : array;
 
 	/**
+	 * Iterates over the listing in batches, from oldest to newest.
+	 * The default implementation reads the complete listing first; sources should override this when they can read the messages in batches.
+	 * The keys of a batch are the original indexes of the messages in the listing.
+	 *
+	 * @param int $iBatchSize Maximum number of messages in a batch.
+	 *
+	 * @return \Generator<int, MessageHandler[]>
+	 */
+	public function IterateListing(int $iBatchSize) : \Generator {
+
+		$aMessages = $this->GetListing();
+
+		uasort($aMessages, function(MessageHandler $oHandlerA, MessageHandler $oHandlerB) {
+			return $oHandlerA->GetTimestamp() <=> $oHandlerB->GetTimestamp();
+		});
+
+		foreach(array_chunk($aMessages, max(1, $iBatchSize), true) as $aBatch) {
+			yield $aBatch;
+		}
+
+	}
+
+	/**
 	 * Gets one page of the listing, ordered from oldest to newest.
 	 * The default implementation reads the complete listing; sources should override this when they can page on the server.
 	 *

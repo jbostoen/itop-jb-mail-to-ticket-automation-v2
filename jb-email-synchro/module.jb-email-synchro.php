@@ -56,6 +56,7 @@ SetupWebPage::AddModule(
 			'debug' => false, // Set to true to turn on debugging
 			'periodicity' => 30, // interval at which to check for incoming emails (in s)
 			'retention_period' => 24, // number of hours the email replica is kept when it is no longer seen in the mailbox
+			'listing_batch_size' => 100, // number of messages that is read from the mail server at once (the replicas are looked up and the messages are processed per batch)
 			'body_parts_order' => 'text/html,text/plain', // Order in which to read the parts of the incoming emails
 			'big_files_dir' => '',
 
