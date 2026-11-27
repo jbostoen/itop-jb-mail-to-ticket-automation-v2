@@ -109,10 +109,31 @@ class IMAPEmailSource extends EmailSource {
 		$this->oMailbox = new Mailbox($aOptions);
 		$this->oMailbox->connect();
 
+		$this->TraceCapabilities();
+
 		$this->CheckUidValidity();
 
 		// Calls parent with original arguments
 		parent::__construct();
+	}
+
+	/**
+	 * Writes the capabilities advertised by the IMAP server (after authenticating) to the trace.
+	 * Features such as SORT, MOVE and UIDPLUS are optional, so this shows what a specific server supports.
+	 *
+	 * @return void
+	 */
+	private function TraceCapabilities() : void {
+
+		try {
+			$aCapabilities = $this->oMailbox->capabilities();
+			ProcessingHelper::TraceChannel(static::LOG_CHANNEL, 'IMAPEmailSource - Capabilities of %1$s: %2$s', $this->sServer, implode(' ', $aCapabilities));
+		}
+		catch(Throwable $e) {
+			// - Informational only; a server that does not answer the request must not block the processing.
+			ProcessingHelper::TraceChannel(static::LOG_CHANNEL, 'IMAPEmailSource - Unable to retrieve the capabilities of %1$s: %2$s', $this->sServer, $e->getMessage());
+		}
+
 	}
 
 	/**
