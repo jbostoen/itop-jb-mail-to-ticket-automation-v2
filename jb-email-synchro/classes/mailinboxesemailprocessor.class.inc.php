@@ -164,7 +164,7 @@ class MailInboxesEmailProcessor extends EmailProcessor {
 						$aErrors[] = $oInbox->sLastError;
 					}
 				}
-				elseif(in_array(ProcessingHelper::GetNextAction(), [eNextAction::PROCESS_MESSAGE, eNextAction::NO_ACTION], true)) {
+				elseif(!ProcessingHelper::IsSimulation() && in_array(ProcessingHelper::GetNextAction(), [eNextAction::PROCESS_MESSAGE, eNextAction::NO_ACTION], true)) {
 					// - No Ticket, and no Step claimed responsibility for this outcome either
 					//   (PROCESS_MESSAGE/NO_ACTION mean the pipeline ran to completion without any
 					//   policy deciding to skip/undesire/delete/move/abort): an actual, unexpected error.

@@ -41,6 +41,8 @@ Dict::Add('ES CR', 'Spanish', 'Español, Castellano', array(
 	'Class:MailInboxBase/Attribute:active+' => 'Solo si está en "Sí", el buzón será consultado. En caso contrario, no lo será.',
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Sí',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'No',
+	'Class:MailInboxBase/Attribute:simulation_mode' => 'Modo de simulación',
+	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Solo si está en "Sí", los correos se procesan y se registran, pero no se modifica nada: no se crean ni actualizan tickets, contactos ni adjuntos, los correos no se eliminan, mueven ni marcan, y no se envían notificaciones ni disparadores de eventos. Los mensajes se procesan de nuevo en cada ejecución.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Cifrado',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Cómo se protege la conexión con el servidor de correo.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

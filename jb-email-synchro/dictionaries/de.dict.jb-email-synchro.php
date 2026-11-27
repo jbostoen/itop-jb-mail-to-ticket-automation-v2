@@ -41,6 +41,8 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'Class:MailInboxBase/Attribute:active+' => 'Nur wenn auf "Ja" gesetzt, wird das Postfach abgefragt. Andernfalls wird es nicht abgefragt.',
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Ja',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Nein',
+	'Class:MailInboxBase/Attribute:simulation_mode' => 'Simulationsmodus',
+	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Nur wenn auf "Ja" gesetzt, werden E-Mails verarbeitet und protokolliert, aber nichts wird geändert: Es werden keine Tickets, Kontakte oder Anhänge erstellt oder aktualisiert, E-Mails werden nicht gelöscht, verschoben oder markiert, und es werden keine Benachrichtigungen oder Ereignis-Trigger gesendet. Nachrichten werden bei jedem Lauf erneut verarbeitet.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Verschlüsselung',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Wie die Verbindung zum Mailserver gesichert wird.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

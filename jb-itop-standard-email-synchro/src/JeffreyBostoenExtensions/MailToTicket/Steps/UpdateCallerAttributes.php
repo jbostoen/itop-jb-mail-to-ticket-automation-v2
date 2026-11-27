@@ -58,6 +58,11 @@ abstract class UpdateCallerAttributes extends Base {
 			return;
 		}
 
+		if(ProcessingHelper::IsSimulation()) {
+			static::Trace('.. Simulation: Person::'.$oCaller->GetKey().' is not updated.');
+			return;
+		}
+
 		static::Trace('.. Updating Person::'.$oCaller->GetKey().' with: '.http_build_query($aValues));
 		ProcessingHelper::InitObjectFromDefaultValues($oCaller, $aValues);
 

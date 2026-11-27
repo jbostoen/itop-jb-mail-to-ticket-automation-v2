@@ -63,6 +63,11 @@ abstract class SaveReferences extends Base {
 		
 		$oTicket = ProcessingHelper::GetTicket();
 		$oMailBox = ProcessingHelper::GetMailBox();
+
+		if(ProcessingHelper::IsSimulation()) {
+			static::Trace('.. Simulation: the references are not saved.');
+			return;
+		}
 		
 		if($oTicket !== null) {
 			

@@ -112,6 +112,22 @@ abstract class CreateOrUpdateTicket extends Base {
 		$oTicket = ProcessingHelper::GetTicket();
 		
 		$sBehavior = $oMailBox->Get('behavior');
+
+		// - In simulation mode, no ticket is created or updated.
+		if(ProcessingHelper::IsSimulation()) {
+
+			$sOutcome = match(true) {
+				$sBehavior === 'create_only' => 'created',
+				is_object($oTicket) => 'updated',
+				$sBehavior === 'update_only' => 'rejected (there is nothing to update)',
+				default => 'created',
+			};
+
+			static::Trace('.. Simulation: the ticket would be %1$s.', $sOutcome);
+			ProcessingHelper::AddOutcomeNote(sprintf('Simulation: the ticket would be %1$s.', $sOutcome));
+			return;
+
+		}
 		
 		try {
 				

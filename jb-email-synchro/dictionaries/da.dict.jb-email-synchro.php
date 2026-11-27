@@ -41,6 +41,8 @@ Dict::Add('DA DA', 'Danish', 'Dansk', array(
 	'Class:MailInboxBase/Attribute:active+' => 'Kun hvis sat til "Ja" bliver indbakken tjekket. Ellers bliver den ikke tjekket.',
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Ja',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Nej',
+	'Class:MailInboxBase/Attribute:simulation_mode' => 'Simuleringstilstand',
+	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Kun hvis sat til "Ja" behandles og logges e-mails, men intet ændres: der oprettes eller opdateres ingen sager, kontakter eller vedhæftede filer, e-mails slettes, flyttes eller markeres ikke, og der sendes ingen notifikationer eller hændelsestriggere. Beskeder behandles igen ved hver kørsel.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Kryptering',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Hvordan forbindelsen til mailserveren sikres.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

@@ -193,6 +193,17 @@ abstract class ProcessingHelper {
 	}
 
 	/**
+	 * Whether the mailbox that's being processed is in simulation mode: nothing is changed, the outcome is only traced.
+	 *
+	 * @return bool
+	 */
+	public static function IsSimulation() : bool {
+
+		return static::$oMailBox !== null && static::$oMailBox->Get('simulation_mode') === 'yes';
+
+	}
+
+	/**
 	 * Gets the e-mail that's being processed, if any.
 	 *
 	 * @return EmailMessage|null
@@ -896,6 +907,7 @@ abstract class ProcessingHelper {
 
 		$oInbox = static::GetMailBox();
 		$oEmail = static::GetMail();
+		$bSimulation = static::IsSimulation();
 
 		/** @var MessageFromMailbox $oRawEmail This raw e-mail will be the specific subclass that supports sending the e-mail as attachment. */
 		$oRawEmail = static::GetRawMail();
@@ -990,7 +1002,7 @@ abstract class ProcessingHelper {
 				$oRawEmail = null; // No original message in attachment
 				$oInbox->Trace($sSubject."\n\n".$sBody);
 				// Send the email now...
-				if(($sTo != '') && ($sFrom != '')) {
+				if(($sTo != '') && ($sFrom != '') && !$bSimulation) {
 					$oEmailToSend = new Email();
 					$oEmailToSend->SetRecipientTO($sTo);
 					$oEmailToSend->SetSubject($sSubject);
@@ -1008,7 +1020,7 @@ abstract class ProcessingHelper {
 				$sBody .= $sLastAction;
 
 				// Send the email now...
-				if(($sTo != '') && ($sFrom != '')) {
+				if(($sTo != '') && ($sFrom != '') && !$bSimulation) {
 					$oEmailToSend = new Email();
 					$oEmailToSend->SetRecipientTO($sTo);
 					$oEmailToSend->SetSubject($sSubject);
@@ -1039,7 +1051,10 @@ abstract class ProcessingHelper {
 		}
 		$sBody .= "<p>&nbsp;</p><p>Mail Inbox Configuration: ".$oInbox->GetHyperlink()."</p>\n";
 		
-		if(($sTo == '') || ($sFrom == '')) {
+		if($bSimulation) {
+			$oInbox->Trace('HandleError: Simulation. No notification is sent.');
+		}
+		elseif(($sTo == '') || ($sFrom == '')) {
 			$oInbox->Trace("HandleError: No forward configured for forwarding the email (To: '$sTo', From: '$sFrom'), skipping.");
 		}
 		elseif($oRawEmail) {

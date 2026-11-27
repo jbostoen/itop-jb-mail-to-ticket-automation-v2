@@ -82,6 +82,11 @@
 					<default_value>yes</default_value>
 					<is_null_allowed>false</is_null_allowed>
 				</field>
+				<field id="simulation_mode" xsi:type="AttributeYesNo">
+					<sql>simulation_mode</sql>
+					<default_value>no</default_value>
+					<is_null_allowed>false</is_null_allowed>
+				</field>
 				<field id="encryption" xsi:type="AttributeEnum">
 					<values>
 						<value id="ssl">

@@ -116,8 +116,13 @@ abstract class FindCaller extends Base {
 										ProcessingHelper::InitObjectFromDefaultValues($oCaller, $aDefaultValues);
 										
 										static::Trace("Create user with default values");
-										$oCaller->DBInsert();
-										Events::FireEvent(eEvent::CALLER_CREATED, ['caller->object()' => $oCaller]);
+										if(ProcessingHelper::IsSimulation()) {
+											static::Trace('Simulation: the Person is not created.');
+										}
+										else {
+											$oCaller->DBInsert();
+											Events::FireEvent(eEvent::CALLER_CREATED, ['caller->object()' => $oCaller]);
+										}
 									}
 									catch(Exception $e) {
 										// This is an actual error.

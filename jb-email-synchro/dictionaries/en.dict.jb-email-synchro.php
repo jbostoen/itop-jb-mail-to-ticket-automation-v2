@@ -41,6 +41,8 @@ Dict::Add('EN US', 'English', 'English', array(
 	'Class:MailInboxBase/Attribute:active+' => 'Only if set to "Yes", the inbox will be polled. Otherwise, it will not be polled.',
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Yes',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'No',
+	'Class:MailInboxBase/Attribute:simulation_mode' => 'Simulation mode',
+	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Only if set to "Yes", e-mails are processed and traced, but nothing is changed: no tickets, contacts or attachments are created or updated, no e-mails are deleted, moved or marked, and no notifications or event triggers are sent. Messages are processed again in every run.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Encryption',
 	'Class:MailInboxBase/Attribute:encryption+' => 'How the connection to the mail server is secured.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

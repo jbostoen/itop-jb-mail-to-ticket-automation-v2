@@ -41,6 +41,8 @@ Dict::Add('FR FR', 'French', 'Français', array(
 	'Class:MailInboxBase/Attribute:active+' => 'Si renseigné à "Oui", la boite mail est interrogée, sinon elle ne l\'est pas',
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Oui',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Non',
+	'Class:MailInboxBase/Attribute:simulation_mode' => 'Mode simulation',
+	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Uniquement si "Oui", les e-mails sont traités et tracés, mais rien n\'est modifié : aucun ticket, contact ou pièce jointe n\'est créé ou mis à jour, aucun e-mail n\'est supprimé, déplacé ou marqué, et aucune notification ni aucun déclencheur d\'événement n\'est envoyé. Les messages sont traités à nouveau à chaque exécution.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Chiffrement',
 	'Class:MailInboxBase/Attribute:encryption+' => 'La manière dont la connexion au serveur de messagerie est sécurisée.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

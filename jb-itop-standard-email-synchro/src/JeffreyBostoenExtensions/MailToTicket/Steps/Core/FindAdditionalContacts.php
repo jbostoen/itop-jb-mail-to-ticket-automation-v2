@@ -152,6 +152,10 @@ abstract class FindAdditionalContacts extends Base {
 							ProcessingHelper::InitObjectFromDefaultValues($oContact, $aDefaultValues);
 							try {
 								static::Trace("Try to create user with default values");
+								if(ProcessingHelper::IsSimulation()) {
+									static::Trace('Simulation: the Person is not created.');
+									continue;
+								}
 								$oContact->DBInsert();
 
 								// Add Person to list of additional Contacts (handled in PolicyCreateOrUpdateTicket)

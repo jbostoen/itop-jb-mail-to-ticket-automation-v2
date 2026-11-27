@@ -41,6 +41,8 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'Class:MailInboxBase/Attribute:active+' => 'Pouze pokud je nastaveno na "Ano", bude schránka kontrolována. V opačném případě kontrolována nebude.',
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Ano',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Ne',
+	'Class:MailInboxBase/Attribute:simulation_mode' => 'Simulační režim',
+	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Pouze pokud je nastaveno na "Ano", jsou e-maily zpracovány a zaznamenány, ale nic se nemění: nevytvářejí se ani neaktualizují tikety, kontakty ani přílohy, e-maily se nemažou, nepřesouvají ani neoznačují a neodesílají se žádná oznámení ani spouštěče událostí. Zprávy se zpracovávají znovu při každém spuštění.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Šifrování',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Způsob zabezpečení připojení k poštovnímu serveru.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

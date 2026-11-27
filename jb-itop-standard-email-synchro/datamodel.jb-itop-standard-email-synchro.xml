@@ -872,6 +872,9 @@ EOF
 								<item id="active">
 									<rank>80</rank>
 								</item>
+								<item id="simulation_mode">
+									<rank>85</rank>
+								</item>
 								<item id="trace">
 									<rank>90</rank>
 								</item>

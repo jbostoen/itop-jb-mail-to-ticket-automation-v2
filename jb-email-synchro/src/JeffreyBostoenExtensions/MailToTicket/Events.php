@@ -287,6 +287,12 @@ class Events implements iEventServiceSetup {
 			return;
 		}
 
+		// - A simulation never activates triggers (and so never sends notifications).
+		if(ProcessingHelper::IsSimulation()) {
+			ProcessingHelper::TraceCron('Simulation: event "%1$s" is not fired.', $mEvent instanceof eEvent ? $mEvent->value : $mEvent);
+			return;
+		}
+
 		$oEventData = new EventData(static::MAIL_PROCESSING_EVENT, null, [
 			'event' => $mEvent instanceof eEvent ? $mEvent->value : $mEvent,
 			'context_arguments' => $aContextArguments,

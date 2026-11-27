@@ -90,6 +90,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 
 		try {
 
+			// - In simulation mode, the replica is not written.
+			if(ProcessingHelper::IsSimulation()) {
+				$this->Trace('Simulation: the e-mail replica is not updated.');
+				return;
+			}
+
 			if(is_null($oRawEmail)) {
 				$oCurrentSource = $this->oCurrentSource;
 				if(isset($oCurrentSource)) {
@@ -242,6 +248,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					$oInbox = $oProcessor->GetInboxFromSource($oSource);
 
 					ProcessingHelper::SetMailBox($oInbox);
+
+					// - In simulation mode, everything is processed and traced, but nothing is changed.
+					$bSimulation = ProcessingHelper::IsSimulation();
+					if($bSimulation) {
+						$this->Trace('Simulation mode: nothing will be changed for this mailbox.');
+					}
 					
 					// - Sort; but keep original index number.
 					uasort($aMessages, function(MessageHandler $a, MessageHandler $b) {
@@ -327,7 +339,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 								$oEmailReplica->Set('last_seen', date('Y-m-d H:i:s'));
 								
 								// Initialize e-mail for which there is currently no replica (yet, or anymore).
-								if(!$oMsgHandler->InitMessage()) {
+								if(!$bSimulation && !$oMsgHandler->InitMessage()) {
 									$this->Trace("Failed to initialize message: uidl=$sUIDL index=$iMessage. The 'marked for removal' IMAP flag (if any) may not have been cleared.");
 								}
 								
@@ -345,6 +357,11 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 									continue;
 								}
 								elseif($oEmailReplica->Get('status') === 'undesired') {
+									if($bSimulation) {
+										$this->Trace("Simulation: undesired message: uidl=$sUIDL index=$iMessage. It is not purged.");
+										$iTotalSkippedUndesired++;
+										continue;
+									}
 									$this->Trace("\nUndesired message: uidl=$sUIDL index=$iMessage");
 									$iDelay = MetaModel::GetModuleSetting('jb-email-synchro', 'undesired_purge_delay', 7) * 86400;
 									if($iDelay > 0) {
@@ -386,6 +403,12 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 							}
 							
 							$eAction = ProcessingHelper::DispatchEmail($oEmailReplica);
+
+							// - Only a message that would be processed is simulated.
+							if($bSimulation && $eAction !== eNextAction::PROCESS_MESSAGE) {
+								$this->Trace("Simulation: uidl={$sUIDL} index={$iMessage}: the action would be {$eAction->name}.");
+								continue;
+							}
 
 							// - Only messages that are actually handled are reported; not the old ones that are skipped each run.
 							$bMessageEvents = !in_array($eAction, [eNextAction::NO_ACTION], true);
@@ -467,6 +490,11 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 										Events::FireEvent(eEvent::MESSAGE_DECODE_FAILED, ['invalid_reasons' => implode(', ', $oEmail->GetInvalidReasons())]);
 										$this->FireOutcomeEvent($eNextAction);
 
+										if($bSimulation) {
+											$this->Trace("Simulation: uidl={$sUIDL} index={$iMessage}: the action would be {$eNextAction->name}.");
+											$eNextAction = eNextAction::SKIP_FOR_NOW;
+										}
+
 										switch($eNextAction) {
 											case eNextAction::MARK_MESSAGE_AS_ERROR:
 												$iTotalMarkedAsError++;
@@ -495,6 +523,11 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 										$this->FireOutcomeEvent($eNextAction);
 										$this->Trace("EmailReplica ID after ProcessMessage(): ".$oEmailReplica->GetKey());
 						
+										if($bSimulation) {
+											$this->Trace("Simulation: uidl={$sUIDL} index={$iMessage}: the action would be {$eNextAction->name}.");
+											$eNextAction = eNextAction::SKIP_FOR_NOW;
+										}
+
 										switch($eNextAction) {
 											
 											case eNextAction::MARK_MESSAGE_AS_ERROR:
@@ -672,7 +705,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					
 					$aIDs = [ -1 ]; // Make sure that the array is never empty...
 					foreach($aReplicas as $oUsedReplica) {
-						if(is_object($oUsedReplica) && ($oUsedReplica->GetKey() != null)) {
+						if(!$bSimulation && is_object($oUsedReplica) && ($oUsedReplica->GetKey() != null)) {
 							// Remember last seen in order to not delete message because the IMAP connection failed only briefly. Occurs often with Microsoft Exchange Online.
 							$oUsedReplica->Set('last_seen', date('Y-m-d H:i:s'));
 							$oUsedReplica->DBUpdate();
@@ -690,7 +723,7 @@ class EmailBackgroundProcess implements iBackgroundProcess {
 					$this->Trace("Searching for unused EmailReplicas: {$sOQL}");
 					$oUnusedReplicaSet = new DBObjectSet(DBObjectSearch::FromOQL($sOQL));
 					$oUnusedReplicaSet->OptimizeColumnLoad(['EmailReplica' => ['uidl']]);
-					while($oReplica = $oUnusedReplicaSet->Fetch()) {
+					while(!$bSimulation && ($oReplica = $oUnusedReplicaSet->Fetch())) {
 						// Replica not used for at least N days
 						$this->Trace("Deleting unused EmailReplica since ".$iRetentionPeriod." hours (#".$oReplica->GetKey()."), UIDL: ".$oReplica->Get('uidl'));
 						$oReplica->DBDelete();

@@ -41,6 +41,8 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'Class:MailInboxBase/Attribute:active+' => 'Alleen als dit op "Ja" staat, wordt de mailbox uitgelezen. Anders niet.',
 	'Class:MailInboxBase/Attribute:active/Value:yes' => 'Ja',
 	'Class:MailInboxBase/Attribute:active/Value:no' => 'Nee',
+	'Class:MailInboxBase/Attribute:simulation_mode' => 'Simulatiemodus',
+	'Class:MailInboxBase/Attribute:simulation_mode+' => 'Alleen als dit op "Ja" staat, worden e-mails verwerkt en gelogd, maar wordt er niets gewijzigd: er worden geen tickets, contacten of bijlagen aangemaakt of bijgewerkt, e-mails worden niet verwijderd, verplaatst of gemarkeerd en er worden geen notificaties of gebeurtenistriggers verzonden. Berichten worden bij elke uitvoering opnieuw verwerkt.',
 	'Class:MailInboxBase/Attribute:encryption' => 'Versleuteling',
 	'Class:MailInboxBase/Attribute:encryption+' => 'Hoe de verbinding met de mailserver wordt beveiligd.',
 	'Class:MailInboxBase/Attribute:encryption/Value:ssl' => 'SSL/TLS',

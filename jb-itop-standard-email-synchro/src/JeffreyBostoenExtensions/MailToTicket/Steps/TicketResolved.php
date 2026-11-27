@@ -60,7 +60,13 @@ abstract class TicketResolved extends Base {
 
 						$bRet = false;
 						try {
-							$bRet = $oTicket->ApplyStimulus('ev_reopen');
+							if(ProcessingHelper::IsSimulation()) {
+								static::Trace('Simulation: the ticket is not reopened.');
+								$bRet = true;
+							}
+							else {
+								$bRet = $oTicket->ApplyStimulus('ev_reopen');
+							}
 						}
 						catch(Exception $e) {
 							static::Trace('Unable to apply stimulus "ev_reopen": '.$e->getMessage());
