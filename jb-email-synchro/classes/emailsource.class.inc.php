@@ -111,6 +111,56 @@ abstract class EmailSource {
 	 * @return MessageHandler[]
 	 */
 	abstract public function GetListing() : array;
+
+	/**
+	 * Gets one page of the listing, ordered from oldest to newest.
+	 * The default implementation reads the complete listing; sources should override this when they can page on the server.
+	 *
+	 * @param int $iStart Index (in the ordered listing) of the first message of the page.
+	 * @param int $iCount Maximum number of messages on the page.
+	 *
+	 * @return array{total: int, messages: MessageHandler[], unreadable: int} The total number of messages in the listing, the message handlers of the page and the number of messages of the page which could not be read.
+	 */
+	public function GetListingPage(int $iStart, int $iCount) : array {
+
+		$aMessages = $this->GetListing();
+
+		uasort($aMessages, function(MessageHandler $oHandlerA, MessageHandler $oHandlerB) {
+			return $oHandlerA->GetTimestamp() <=> $oHandlerB->GetTimestamp();
+		});
+
+		return [
+			'total' => count($aMessages),
+			'messages' => array_slice($aMessages, $iStart, $iCount),
+			'unreadable' => 0,
+		];
+
+	}
+
+	/**
+	 * Gets the date, sender and subject of a message (for display purposes).
+	 *
+	 * @param MessageHandler $oMsgHandler The message handler.
+	 *
+	 * @return array{date: string, from: string, subject: string}|null Null if the message can not be read.
+	 */
+	public function GetMessageSummary(MessageHandler $oMsgHandler) : ?array {
+
+		$oRawEmail = $this->GetMessage($oMsgHandler);
+
+		if(is_null($oRawEmail)) {
+			return null;
+		}
+
+		$oEmail = $oRawEmail->Decode($this->GetPartsOrder());
+
+		return [
+			'date' => $oEmail->sDate,
+			'from' => $oEmail->sCallerEmail,
+			'subject' => $oEmail->sSubject,
+		];
+
+	}
 	
 	/**
 	 * Disconnect from the server

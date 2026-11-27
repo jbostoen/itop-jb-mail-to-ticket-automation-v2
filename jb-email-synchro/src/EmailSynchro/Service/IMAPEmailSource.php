@@ -6,6 +6,7 @@ use JeffreyBostoenExtensions\MailToTicket\Helper;
 use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
 
 use DirectoryTree\ImapEngine\Enums\ImapFetchIdentifier;
+use DirectoryTree\ImapEngine\Enums\ImapSortKey;
 use DirectoryTree\ImapEngine\FolderInterface;
 use DirectoryTree\ImapEngine\Mailbox;
 use DirectoryTree\ImapEngine\MailboxInterface;
@@ -62,6 +63,9 @@ class IMAPEmailSource extends EmailSource {
 
 	/** @var bool $bMessagesDeleted Whether messages were deleted. */
 	private $bMessagesDeleted = false;
+
+	/** @var string[]|null $aCapabilities Capabilities advertised by the server (upper case); null until requested. */
+	private ?array $aCapabilities = null;
 
 	/** @var MailInboxBase The mailbox DBObject, kept for UIDVALIDITY tracking (see CheckUidValidity()). */
 	private MailInboxBase $oMailboxObject;
@@ -133,6 +137,29 @@ class IMAPEmailSource extends EmailSource {
 			// - Informational only; a server that does not answer the request must not block the processing.
 			ProcessingHelper::TraceChannel(static::LOG_CHANNEL, 'IMAPEmailSource - Unable to retrieve the capabilities of %1$s: %2$s', $this->sServer, $e->getMessage());
 		}
+
+	}
+
+	/**
+	 * Returns whether the IMAP server advertises the given capability (e.g. SORT, MOVE, UIDPLUS).
+	 *
+	 * @param string $sCapability Name of the capability (case-insensitive).
+	 *
+	 * @return bool
+	 */
+	public function HasCapability(string $sCapability) : bool {
+
+		if($this->aCapabilities === null) {
+			try {
+				$this->aCapabilities = array_map('strtoupper', $this->oMailbox->capabilities());
+			}
+			catch(Throwable $e) {
+				// - Without a known list of capabilities, optional features are considered unavailable.
+				return false;
+			}
+		}
+
+		return in_array(strtoupper($sCapability), $this->aCapabilities, true);
 
 	}
 
@@ -348,6 +375,88 @@ class IMAPEmailSource extends EmailSource {
 
 		}
 		return $aReturn;
+	}
+
+	/**
+	 * Returns the UIDs of all messages in the folder, from oldest to newest.
+	 * The server sorts by date if it supports SORT; otherwise the order is by UID (arrival order).
+	 * No message data is fetched.
+	 *
+	 * @return int[]
+	 */
+	private function GetSortedUids() : array {
+
+		if($this->HasCapability('SORT')) {
+			try {
+				return $this->GetFolder()->messages()->sortBy(ImapSortKey::Date)->uids()->all();
+			}
+			catch(Throwable $e) {
+				ProcessingHelper::TraceChannel(static::LOG_CHANNEL, static::LOG_DEBUG_CLASS." Server-side sorting failed for $this->sServer, falling back to UID order: ".$e->getMessage());
+			}
+		}
+
+		return $this->GetFolder()->messages()->uids()->all();
+
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function GetListingPage(int $iStart, int $iCount) : array {
+
+		$aUids = $this->GetSortedUids();
+		$aPageUids = array_slice($aUids, $iStart, $iCount);
+		$aMessages = [];
+
+		if($aPageUids !== []) {
+
+			// - Only the headers of the messages on this page are fetched.
+			//   The result is in UID order; the order of the (sorted) page is restored below.
+			$aLoaded = [];
+			/** @var Message $oMessage */
+			foreach($this->GetFolder()->messages()->withHeaders()->uid($aPageUids)->get() as $oMessage) {
+				$aLoaded[$oMessage->uid()] = $oMessage;
+			}
+
+			foreach($aPageUids as $iPosition => $iUid) {
+
+				if(!isset($aLoaded[$iUid])) {
+					continue;
+				}
+
+				try {
+					$aMessages[] = MessageHandler::FromMessage($aLoaded[$iUid], $this, $iStart + $iPosition);
+				}
+				catch(Throwable $e) {
+					ProcessingHelper::TraceChannel(static::LOG_CHANNEL, static::LOG_DEBUG_CLASS." Unable to read message with UID $iUid for $this->sServer: ".$e->getMessage());
+				}
+
+			}
+
+		}
+
+		return [
+			'total' => count($aUids),
+			'messages' => $aMessages,
+			'unreadable' => count($aPageUids) - count($aMessages),
+		];
+
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function GetMessageSummary(MessageHandler $oMsgHandler) : ?array {
+
+		$oMessage = $oMsgHandler->GetMessageObject();
+
+		if(!$oMessage) {
+			return null;
+		}
+
+		// - The headers were fetched with the listing; no body is needed.
+		return (new MessageFromMailbox($oMsgHandler->GetInternalIdentifier(), $oMessage->head(), ''))->GetSummary();
+
 	}
 
 	/**

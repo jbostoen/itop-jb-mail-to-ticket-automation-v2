@@ -59,7 +59,7 @@ Dict::Add('IT IT', 'Italian', 'Italiano', array(
 	'MailInbox:MailboxContent' => 'Contenuto della casella di posta',
 	'MailInbox:MailboxContent:ConfirmMessage' => 'Sei sicuro?',
 	'MailInbox:NoValidEmailsFound' => 'Nessuna e-mail valida trovata in questa casella di posta.',
-	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail visualizzate. Ci sono %2$d e-mail nella casella di posta (%3$d non elaborate e %4$d illeggibili/corrotte).',
+	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail visualizzate. Ci sono %2$d e-mail nella casella di posta. Tra le e-mail visualizzate, %3$d non sono elaborate e %4$d sono illeggibili/corrotte.',
 	'MailInbox:UnprocessableMessages' => 'Ci sono %1$s e-mail che non possono essere elencate a causa di un problema tecnico.',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'Il parametro MySQL max_allowed_packet in "my.ini" è troppo piccolo: %1$s. Il valore consigliato è almeno: %2$s',
 	'MailInbox:Status' => 'Stato',

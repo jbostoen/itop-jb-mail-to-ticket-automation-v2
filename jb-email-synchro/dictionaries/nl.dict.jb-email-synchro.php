@@ -59,7 +59,7 @@ Dict::Add('NL NL', 'Dutch', 'Nederlands', array(
 	'MailInbox:MailboxContent' => 'Inhoud van de mailbox',
 	'MailInbox:MailboxContent:ConfirmMessage' => 'Weet u het zeker?',
 	'MailInbox:NoValidEmailsFound' => 'Geen geldige e-mails gevonden in deze mailbox.',
-	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail(s) weergegeven. Er zijn %2$d e-mail(s) in de mailbox (%3$d onverwerkt en %4$d onleesbaar/beschadigd).',
+	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail(s) weergegeven. Er zijn %2$d e-mail(s) in de mailbox. Van de weergegeven e-mail(s) zijn er %3$d onverwerkt en %4$d onleesbaar/beschadigd.',
 	'MailInbox:UnprocessableMessages' => 'Er zijn %1$s e-mail(s) die door een technisch probleem niet kunnen worden weergegeven.',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'De MySQL-parameter max_allowed_packet in "my.ini" is te klein: %1$s. De aanbevolen waarde is minstens: %2$s',
 	'MailInbox:Status' => 'Status',

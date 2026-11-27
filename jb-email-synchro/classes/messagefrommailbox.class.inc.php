@@ -87,12 +87,7 @@ class MessageFromMailbox extends RawEmailMessage {
 		$aAttachments = $this->GetAttachments();
 		$sDecodeStatus = '';
 		$oRelatedObject = $this->GetRelatedObject();
-		$iTime = strtotime($this->GetHeader('date'), 0); // Parse the RFC822 date format
-		if($iTime === false) {
-			ProcessingHelper::TraceChannel('jb-email-synchro', "Missing or unparsable Date header for message '{$this->sUIDL}', falling back to the current time.");
-			$iTime = time();
-		}
- 		$sDate = date('Y-m-d H:i:s', $iTime);
+		$sDate = $this->GetDateString();
 		
  		$aTos = $this->GetTo();
  		$aCCs = $this->GetCc();
@@ -117,6 +112,42 @@ class MessageFromMailbox extends RawEmailMessage {
 		);
 		$oMessage->oRawEmail = $this; // Keep the source raw email for reference and further processing if needed
 		return $oMessage;
+	}
+
+	/**
+	 * Returns the date of the message (Date header), formatted as 'Y-m-d H:i:s'.
+	 * Falls back to the current time if the header is missing or can not be parsed.
+	 *
+	 * @return string
+	 */
+	protected function GetDateString() : string {
+
+		$iTime = strtotime($this->GetHeader('date'), 0); // Parse the RFC822 date format
+		if($iTime === false) {
+			ProcessingHelper::TraceChannel('jb-email-synchro', "Missing or unparsable Date header for message '{$this->sUIDL}', falling back to the current time.");
+			$iTime = time();
+		}
+
+		return date('Y-m-d H:i:s', $iTime);
+
+	}
+
+	/**
+	 * Returns the date, sender and subject of the message.
+	 * Only the headers are used: the body and the attachments are not decoded.
+	 *
+	 * @return array{date: string, from: string, subject: string}
+	 */
+	public function GetSummary() : array {
+
+		$aCallers = $this->GetSender();
+
+		return [
+			'date' => $this->GetDateString(),
+			'from' => count($aCallers) > 0 ? $aCallers[0]->GetEmailAddress() : '',
+			'subject' => $this->GetSubject(),
+		];
+
 	}
 
 	protected function GetCallerName() {

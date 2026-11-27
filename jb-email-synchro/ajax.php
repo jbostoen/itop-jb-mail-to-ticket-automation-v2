@@ -58,16 +58,6 @@ function GetMailboxContent($oPage, $oInbox) {
 			/** @var int $iTotalMsgCount The number of available messages. */
 			$iTotalMsgCount = $oSource->GetMessagesCount();
 
-			 // Note: This may differ from $oSource->GetMessagesCount(); as messages with errors could be skipped 
-			 // (At least with the Laminas PHP library used in previous versions of this extension).
-			
-			/** @var MessageHandler[] $aMessages */
-			$aMessages = $oSource->GetListing();
-
-			// - In a previous iteration with a different IMAP engine, corruption could occur.
-			//   Extra filtering was applied at this step.
-			$iTotalMsgOkCount = count($aMessages);
-			
 			if($iStartIndex < 0 || $iMaxCount <= 0) {
 				// Don't process, invalid indexes
 				$oPage->add('Invalid start or max.');
@@ -75,15 +65,15 @@ function GetMailboxContent($oPage, $oInbox) {
 				return;
 			}
 
-			// Avoid user specifying a higher number (start) than the total message number count
-			$iStart = $iStartIndex;
-		
-			// Avoid user specifying a higher number (start + count) than the total mesage number count
-			// The largest index is (message count - 1), since messages are retrieved by index (starting at 0)
-			// Bound against $iTotalMsgOkCount (the number of entries actually present in $aMessages/$aMessageIndexes),
-			// not $iTotalMsgCount (a separate IMAP STATUS count that can differ), to avoid indexing past the array.
-			$iEnd = min($iStart + $iMaxCount - 1, $iTotalMsgOkCount - 1);
-			
+			// - Only the requested page is read from the mailbox: the server sorts (when supported)
+			//   and the headers are fetched for the displayed messages only, not for the entire folder.
+			//   The number of messages in the listing can differ from the message count of the folder (e.g. messages flagged as deleted).
+			/** @var array{total: int, messages: MessageHandler[], unreadable: int} $aListingPage */
+			$aListingPage = $oSource->GetListingPage($iStartIndex, $iMaxCount);
+
+			/** @var MessageHandler[] $aMessages Message handlers of the displayed page. */
+			$aMessages = $aListingPage['messages'];
+
 		}
 		catch(Throwable $e) {
 			$oInbox->Trace('Failed to initialize the mailbox: '.$oInbox->GetName().'. Reason: '.$e->getMessage());
@@ -99,24 +89,22 @@ function GetMailboxContent($oPage, $oInbox) {
 		
 		if($iTotalMsgCount > 0) {
 			
-			// Sort the items, but keep the original index.
-			uasort($aMessages, function(MessageHandler $oHandlerA, MessageHandler $oHandlerB) {
-				return $oHandlerA->GetTimestamp() <=> $oHandlerB->GetTimestamp();
-			});
-			
-			// Get the corresponding EmailReplica object for each message
+			// Get the corresponding EmailReplica object for each displayed message
 			$aInternalIdentifiers = array_map(function(MessageHandler $oMsgHandler) {
 				return $oMsgHandler->GetInternalIdentifier();
 			}, $aMessages);
 			
 			
-			/** @var int $iMsgOkCount The number of readable emails between start and end index. */
+			/** @var int $iMsgOkCount The number of readable emails on the displayed page. */
 			$iMsgOkCount = 0;
 
-			/** @var int $iProcessedCount The number of processed (non-corrupted) emails / Existing e-mail replicas. */
+			/** @var int $iProcessedCount The number of processed emails (existing e-mail replicas) among the readable emails on the displayed page. */
 			$iProcessedCount = 0;
 
-			if($iTotalMsgOkCount > 0) {
+			/** @var int $iUnreadableCount The number of emails on the displayed page which could not be read. */
+			$iUnreadableCount = $aListingPage['unreadable'];
+
+			if(count($aMessages) > 0) {
 				
 				$sOQL = '
 					SELECT EmailReplica 
@@ -133,7 +121,6 @@ function GetMailboxContent($oPage, $oInbox) {
 					'status',
 					'error_message'
 				]]);
-				$iProcessedCount = $oReplicaSet->Count();
 
 				/** @var array $aProcessed Array containing items with the following properties:
 				 * - status
@@ -168,30 +155,23 @@ function GetMailboxContent($oPage, $oInbox) {
 				];
 
 				$aData = [];
-				$aMessageIndexes = array_keys($aMessages);
 				
-				$iCurrentIndex = $iStart;
-				while($iCurrentIndex <= $iEnd) {
-					
-					// Obtain the actual index for the message (take Nth index)
-					$iMessage = $aMessageIndexes[$iCurrentIndex];
+				/** @var MessageHandler $oMsgHandler */
+				foreach($aMessages as $oMsgHandler) {
 
-					/** @var MessageHandler $oMsgHandler */
-					$oMsgHandler = $aMessages[$iMessage];
+					// - Date, sender and subject are read from the headers which were fetched for this page; the body is not needed.
+					$aSummary = $oSource->GetMessageSummary($oMsgHandler);
 
-					$oRawEmail = $oSource->GetMessage($oMsgHandler);
-
-					
-					if(is_null($oRawEmail)) {
+					if(is_null($aSummary)) {
 						
 						// Just ignore.
 						// Adding a dummy record in the table could lead to actions being performed which should not be available for this corrupted message.
+						$iUnreadableCount += 1;
 						
 					}
 					else {
 						
 						$iMsgOkCount += 1;
-						$oEmail = $oRawEmail->Decode($oSource->GetPartsOrder());
 
 						$sUIDL = $oMsgHandler->GetInternalIdentifier();
 						$sStatus = Dict::S('MailInbox:Status/New');
@@ -201,6 +181,8 @@ function GetMailboxContent($oPage, $oInbox) {
 						$sReplicaLink = '';
 						if(array_key_exists($sUIDL, $aProcessed)) {
 							
+							$iProcessedCount += 1;
+
 							switch($aProcessed[$sUIDL]['status']) {
 								case 'ok':
 									$sStatus = Dict::S('MailInbox:Status/Processed');
@@ -237,9 +219,9 @@ function GetMailboxContent($oPage, $oInbox) {
 							'status' => $sStatus,
 							// Decoded straight from the untrusted e-mail: the table renders cell values as
 							// raw HTML, so these must be escaped to prevent stored XSS via a crafted header.
-							'date' => htmlentities($oEmail->sDate, ENT_QUOTES, 'UTF-8'),
-							'from' => htmlentities($oEmail->sCallerEmail, ENT_QUOTES, 'UTF-8'),
-							'subject' => htmlentities($oEmail->sSubject, ENT_QUOTES, 'UTF-8'),
+							'date' => htmlentities($aSummary['date'], ENT_QUOTES, 'UTF-8'),
+							'from' => htmlentities($aSummary['from'], ENT_QUOTES, 'UTF-8'),
+							'subject' => htmlentities($aSummary['subject'], ENT_QUOTES, 'UTF-8'),
 							'ticket' => $sLink,
 							'error' => htmlentities($sErrorMsg, ENT_QUOTES, 'UTF-8'),
 							'details' => $sDetailsLink,
@@ -251,8 +233,6 @@ function GetMailboxContent($oPage, $oInbox) {
 						
 					}
 					
-					$iCurrentIndex += 1;
-					
 				}
 			
 			}
@@ -261,11 +241,12 @@ function GetMailboxContent($oPage, $oInbox) {
 				
 				// If we have messages in the mailbox, even if none can be read (meaning they can't be displayed), we are displaying the mailbox stats
 				// This will greatly help the user understanding what's going on !
+				// Note: the numbers of unprocessed and unreadable messages only apply to the displayed page, as only that part of the listing is read.
 				$oPage->p(Dict::Format('MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox',
 					$iMsgOkCount,
 					$iTotalMsgCount,
-					($iTotalMsgCount - $iProcessedCount),
-					($iTotalMsgCount - $iTotalMsgOkCount))
+					($iMsgOkCount - $iProcessedCount),
+					$iUnreadableCount)
 				);
 				
 			}

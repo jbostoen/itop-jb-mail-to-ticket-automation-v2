@@ -59,7 +59,7 @@ Dict::Add('SV SV', 'Swedish', 'Svenska', array(
 	'MailInbox:MailboxContent' => 'Brevlådans innehåll',
 	'MailInbox:MailboxContent:ConfirmMessage' => 'Är du säker?',
 	'MailInbox:NoValidEmailsFound' => 'Inga giltiga e-postmeddelanden hittades i denna brevlåda.',
-	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-postmeddelande(n) visade. Det finns %2$d e-postmeddelande(n) i brevlådan (%3$d obehandlade och %4$d oläsbara/skadade).',
+	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-postmeddelande(n) visade. Det finns %2$d e-postmeddelande(n) i brevlådan. Av de visade e-postmeddelandena är %3$d obehandlade och %4$d oläsbara/skadade.',
 	'MailInbox:UnprocessableMessages' => 'Det finns %1$s e-postmeddelande(n) som inte kan listas på grund av ett tekniskt problem.',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'MySQL-parametern max_allowed_packet i "my.ini" är för liten: %1$s. Rekommenderat värde är minst: %2$s',
 	'MailInbox:Status' => 'Status',

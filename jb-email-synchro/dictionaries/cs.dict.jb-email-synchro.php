@@ -59,7 +59,7 @@ Dict::Add('CS CZ', 'Czech', 'Čeština', array(
 	'MailInbox:MailboxContent' => 'Obsah schránky',
 	'MailInbox:MailboxContent:ConfirmMessage' => 'Jste si jisti?',
 	'MailInbox:NoValidEmailsFound' => 'V této schránce nebyly nalezeny žádné platné e-maily.',
-	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => 'Zobrazeno %1$d e-mail(ů). Ve schránce je %2$d e-mail(ů) (%3$d nezpracovaných a %4$d nečitelných/poškozených).',
+	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail(ů) zobrazeno. Ve schránce je %2$d e-mail(ů). Ze zobrazených e-mailů je %3$d nezpracovaných a %4$d nečitelných/poškozených.',
 	'MailInbox:UnprocessableMessages' => 'Existuje %1$s e-mail(ů), které nelze zobrazit kvůli technickému problému.',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'Parametr MySQL max_allowed_packet v "my.ini" je příliš malý: %1$s. Doporučená hodnota je alespoň: %2$s',
 	'MailInbox:Status' => 'Stav',

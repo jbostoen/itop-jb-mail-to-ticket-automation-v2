@@ -59,7 +59,7 @@ Dict::Add('DA DA', 'Danish', 'Dansk', array(
 	'MailInbox:MailboxContent' => 'Mailboksens indhold',
 	'MailInbox:MailboxContent:ConfirmMessage' => 'Er du sikker?',
 	'MailInbox:NoValidEmailsFound' => 'Ingen gyldige e-mails fundet i denne mailboks.',
-	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail(s) vist. Der er %2$d e-mail(s) i mailboksen (%3$d ubehandlede og %4$d ulæselige/beskadigede).',
+	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail(s) vist. Der er %2$d e-mail(s) i mailboksen. Blandt de viste e-mail(s) er %3$d ubehandlede og %4$d ulæselige/beskadigede.',
 	'MailInbox:UnprocessableMessages' => 'Der er %1$s e-mail(s), som ikke kan vises på grund af et teknisk problem.',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'MySQL-parameteren max_allowed_packet i "my.ini" er for lille: %1$s. Den anbefalede værdi er mindst: %2$s',
 	'MailInbox:Status' => 'Status',

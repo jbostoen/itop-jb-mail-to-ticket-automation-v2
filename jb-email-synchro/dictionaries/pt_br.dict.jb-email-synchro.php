@@ -59,7 +59,7 @@ Dict::Add('PT BR', 'Brazilian', 'Brazilian', array(
 	'MailInbox:MailboxContent' => 'Conteúdo da caixa de correio',
 	'MailInbox:MailboxContent:ConfirmMessage' => 'Tem a certeza?',
 	'MailInbox:NoValidEmailsFound' => 'Não foram encontrados e-mails válidos nesta caixa de correio.',
-	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail(s) apresentado(s). Existem %2$d e-mail(s) na caixa de correio (%3$d por processar e %4$d ilegíveis/corrompidos).',
+	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d e-mail(s) apresentado(s). Existem %2$d e-mail(s) na caixa de correio. Dos e-mails apresentados, %3$d estão por processar e %4$d são ilegíveis/corrompidos.',
 	'MailInbox:UnprocessableMessages' => 'Existem %1$s e-mail(s) que não podem ser listados devido a um problema técnico.',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'O parâmetro MySQL max_allowed_packet em "my.ini" é demasiado pequeno: %1$s. O valor recomendado é, pelo menos: %2$s',
 	'MailInbox:Status' => 'Estado',

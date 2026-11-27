@@ -59,7 +59,7 @@ Dict::Add('DE DE', 'German', 'Deutsch', array(
 	'MailInbox:MailboxContent' => 'Postfachinhalt',
 	'MailInbox:MailboxContent:ConfirmMessage' => 'Sind Sie sicher?',
 	'MailInbox:NoValidEmailsFound' => 'In diesem Postfach wurden keine gültigen E-Mails gefunden.',
-	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d E-Mail(s) angezeigt. Es gibt %2$d E-Mail(s) im Postfach (%3$d unverarbeitet und %4$d unlesbar/beschädigt).',
+	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d E-Mail(s) angezeigt. Es gibt %2$d E-Mail(s) im Postfach. Von den angezeigten E-Mail(s) sind %3$d unverarbeitet und %4$d unlesbar/beschädigt.',
 	'MailInbox:UnprocessableMessages' => 'Es gibt %1$s E-Mail(s), die aufgrund eines technischen Problems nicht aufgelistet werden können.',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'Der MySQL-Parameter max_allowed_packet in "my.ini" ist zu klein: %1$s. Der empfohlene Wert beträgt mindestens: %2$s',
 	'MailInbox:Status' => 'Status',

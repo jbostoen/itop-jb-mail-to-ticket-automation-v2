@@ -59,7 +59,7 @@ Dict::Add('ES CR', 'Spanish', 'Español, Castellano', array(
 	'MailInbox:MailboxContent' => 'Contenido del buzón',
 	'MailInbox:MailboxContent:ConfirmMessage' => '¿Está seguro?',
 	'MailInbox:NoValidEmailsFound' => 'No se encontraron correos válidos en este buzón.',
-	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d correo(s) mostrado(s). Hay %2$d correo(s) en el buzón (%3$d sin procesar y %4$d ilegibles/corruptos).',
+	'MailInbox:Z_DisplayedThereAre_X_Msg_Y_NewInTheMailbox' => '%1$d correo(s) mostrado(s). Hay %2$d correo(s) en el buzón. De los correos mostrados, %3$d están sin procesar y %4$d son ilegibles/corruptos.',
 	'MailInbox:UnprocessableMessages' => 'Hay %1$s correo(s) que no se pueden listar debido a un problema técnico.',
 	'MailInbox:MaxAllowedPacketTooSmall' => 'El parámetro MySQL max_allowed_packet en "my.ini" es demasiado pequeño: %1$s. El valor recomendado es al menos: %2$s',
 	'MailInbox:Status' => 'Estado',
