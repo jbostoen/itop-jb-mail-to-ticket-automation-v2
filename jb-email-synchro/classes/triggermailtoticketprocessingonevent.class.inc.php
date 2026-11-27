@@ -2,7 +2,7 @@
 /**
  * @copyright   Copyright (c) 2019-2026 Jeffrey Bostoen
  * @license     https://www.gnu.org/licenses/gpl-3.0.en.html
- * @version     3.2.261023
+ * @version     3.2.261127
  */
 
 use JeffreyBostoenExtensions\MailToTicket\ProcessingHelper;
