@@ -401,43 +401,67 @@ class IMAPEmailSource extends EmailSource {
 	}
 
 	/**
+	 * Creates the message handlers for the given UIDs; the headers are fetched in one request.
+	 * UIDs of messages which can not be read (e.g. removed in the meantime) are left out.
+	 *
+	 * @param int[] $aUids UIDs, in the desired order.
+	 * @param int $iFirstIndex Original index (in the sorted listing) of the first UID.
+	 *
+	 * @return MessageHandler[] Message handlers with their original index as key.
+	 */
+	private function GetHandlersByUids(array $aUids, int $iFirstIndex) : array {
+
+		if($aUids === []) {
+			return [];
+		}
+
+		// - The result is in UID order; the requested order is restored below.
+		$aLoaded = [];
+		/** @var Message $oMessage */
+		foreach($this->GetFolder()->messages()->withHeaders()->uid($aUids)->get() as $oMessage) {
+			$aLoaded[$oMessage->uid()] = $oMessage;
+		}
+
+		$aHandlers = [];
+		foreach(array_values($aUids) as $iPosition => $iUid) {
+
+			if(!isset($aLoaded[$iUid])) {
+				continue;
+			}
+
+			try {
+				$aHandlers[$iFirstIndex + $iPosition] = MessageHandler::FromMessage($aLoaded[$iUid], $this, $iFirstIndex + $iPosition);
+			}
+			catch(Throwable $e) {
+				ProcessingHelper::TraceChannel(static::LOG_CHANNEL, static::LOG_DEBUG_CLASS." Unable to read message with UID $iUid for $this->sServer: ".$e->getMessage());
+			}
+
+		}
+
+		return $aHandlers;
+
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	public function IterateListing(int $iBatchSize) : Generator {
 
 		$iBatchSize = max(1, $iBatchSize);
-		$oQuery = $this->GetFolder()->messages()->withHeaders();
 
-		// - Oldest first. Without server-side sorting, the messages come in the order of their UID (arrival order).
-		if($this->HasCapability('SORT')) {
-			$oQuery->sortBy(ImapSortKey::Date);
-		}
+		// - First only the UIDs, oldest first: no message data is fetched yet.
+		$aUids = $this->GetSortedUids();
+		ProcessingHelper::TraceChannel(static::LOG_CHANNEL, static::LOG_DEBUG_CLASS." ".count($aUids)." message(s) listed for $this->sServer");
 
-		$aBatch = [];
-		$iIndex = 0;
+		// - Then the headers, one batch at a time and only when the batch is needed.
+		foreach(array_chunk($aUids, $iBatchSize) as $iBatch => $aBatchUids) {
 
-		// - The messages are fetched in batches, only when they are needed.
-		/** @var Message $oMessage */
-		foreach($oQuery->lazy($iBatchSize) as $oMessage) {
+			$aBatch = $this->GetHandlersByUids($aBatchUids, $iBatch * $iBatchSize);
 
-			try {
-				$aBatch[$iIndex] = MessageHandler::FromMessage($oMessage, $this, $iIndex);
-			}
-			catch(Throwable $e) {
-				ProcessingHelper::TraceChannel(static::LOG_CHANNEL, static::LOG_DEBUG_CLASS." Unable to read message with UID {$oMessage->uid()} for $this->sServer: ".$e->getMessage());
-			}
-
-			$iIndex++;
-
-			if(count($aBatch) >= $iBatchSize) {
+			if($aBatch !== []) {
 				yield $aBatch;
-				$aBatch = [];
 			}
 
-		}
-
-		if($aBatch !== []) {
-			yield $aBatch;
 		}
 
 	}
@@ -449,34 +473,7 @@ class IMAPEmailSource extends EmailSource {
 
 		$aUids = $this->GetSortedUids();
 		$aPageUids = array_slice($aUids, $iStart, $iCount);
-		$aMessages = [];
-
-		if($aPageUids !== []) {
-
-			// - Only the headers of the messages on this page are fetched.
-			//   The result is in UID order; the order of the (sorted) page is restored below.
-			$aLoaded = [];
-			/** @var Message $oMessage */
-			foreach($this->GetFolder()->messages()->withHeaders()->uid($aPageUids)->get() as $oMessage) {
-				$aLoaded[$oMessage->uid()] = $oMessage;
-			}
-
-			foreach($aPageUids as $iPosition => $iUid) {
-
-				if(!isset($aLoaded[$iUid])) {
-					continue;
-				}
-
-				try {
-					$aMessages[] = MessageHandler::FromMessage($aLoaded[$iUid], $this, $iStart + $iPosition);
-				}
-				catch(Throwable $e) {
-					ProcessingHelper::TraceChannel(static::LOG_CHANNEL, static::LOG_DEBUG_CLASS." Unable to read message with UID $iUid for $this->sServer: ".$e->getMessage());
-				}
-
-			}
-
-		}
+		$aMessages = array_values($this->GetHandlersByUids($aPageUids, $iStart));
 
 		return [
 			'total' => count($aUids),
