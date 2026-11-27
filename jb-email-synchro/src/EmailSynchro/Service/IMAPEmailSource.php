@@ -545,10 +545,21 @@ class IMAPEmailSource extends EmailSource {
 				return false;
 			}
 
-			// Use copy+delete instead of move as GMail won't expunge automatically and break our way of iterating over messages indexes
-			$oMessage->copy($sTargetFolder);
-			$oMessage->delete();
-			$this->bMessagesDeleted = true;
+			if($this->HasCapability('MOVE')) {
+
+				// - A single, atomic command: the message is gone from this folder right away (no deleted flag, no expunge needed).
+				$oMessage->move($sTargetFolder);
+
+			}
+			else {
+
+				// - Without MOVE: copy, flag as deleted and expunge when disconnecting.
+				//   Messages are identified by their UID, so the expunge that follows later does not affect the ones that are still to be processed.
+				$oMessage->copy($sTargetFolder);
+				$oMessage->delete();
+				$this->bMessagesDeleted = true;
+
+			}
 
 		} catch(Throwable $e) {
 			ProcessingHelper::ErrorChannel(static::LOG_CHANNEL, __METHOD__." for $this->sServer throws an exception", [
